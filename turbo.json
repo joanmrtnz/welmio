@@ -1,6 +1,22 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+
+  "packageConfigurations": {
+    "packages/ui": {
+      "build": {
+        "outputs": ["dist/**"],
+        "dependsOn": ["^build"]
+      }
+    },
+    "packages/core": {
+      "build": {
+        "outputs": ["dist/**"],
+        "dependsOn": ["^build"]
+      }
+    }
+  },
+
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

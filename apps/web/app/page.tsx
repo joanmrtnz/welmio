@@ -1,6 +1,8 @@
 import Image, { type ImageProps } from "next/image";
 import { Button } from "@repo/ui/button";
 import styles from "./page.module.css";
+import { helloCore } from "@repo/core";
+
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
@@ -33,7 +35,7 @@ export default function Home() {
         />
         <ol>
           <li>
-            Get started by editing <code>apps/web/app/page.tsx</code>
+           { helloCore() }
           </li>
           <li>Save and see your changes instantly.</li>
         </ol>
