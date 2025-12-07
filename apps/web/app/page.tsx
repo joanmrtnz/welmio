@@ -26,10 +26,10 @@ const ThemeImage = (props: Props) => {
 
   export default function Home() {
     return (
-      <div className={styles.page}>
+      <div>
         <main className={styles.main}>
         <Navbar
-          logo={<img src="./welmio-logo.svg" alt="Welmio Logo" height={40}/>}
+          logo={<img src="./welmio-logo.svg" alt="Welmio Logo" height={40} width={42}/>}
           links={[
             { label: "Features", href: "/Features" },
             { label: "Pricing", href: "/Pricing" },

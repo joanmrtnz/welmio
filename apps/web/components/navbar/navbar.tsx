@@ -27,7 +27,7 @@ export const Navbar = ({
 
   return (
     <nav className={classes} {...props}>
-      <Container className={styles.inner}>
+      <div className={styles.inner}>
         <div className={styles.logo}>{logo}</div>
 
         <ul className={styles.links}>
@@ -43,7 +43,7 @@ export const Navbar = ({
         </ul>
 
         <div className={styles.right}>{rightSlot}</div>
-      </Container>
+      </div>
     </nav>
   );
 };
