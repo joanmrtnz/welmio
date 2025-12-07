@@ -2,7 +2,7 @@
 
 import { HTMLAttributes, ReactNode } from "react";
 import styles from "./navbar.module.css";
-import { Container } from "@repo/ui/components/container/contianer";
+import { Container } from "@repo/ui/components/container/container";
 import { Typography } from "@repo/ui/components/typography/typography";
 
 interface NavLink {

@@ -3,8 +3,9 @@ import { Button } from "@repo/ui/components/button/button";
 import styles from "./page.module.css";
 import { helloCore } from "@repo/core";
 import { Typography } from "@repo/ui/components/typography/typography";
-import { Container } from "@repo/ui/components/container/contianer";
+import { Container } from "@repo/ui/components/container/container";
 import { Navbar } from "../components/navbar/navbar";
+import { HeroSection } from "../components/navbar/hero/heroSection";
 
 
 type Props = Omit<ImageProps, "src"> & {
@@ -42,22 +43,13 @@ const ThemeImage = (props: Props) => {
           }
         />
 
-        <section style={{ marginTop: "4rem" }}>
-          <Container>
-            <Typography variant="h1">
-              The easiest way to manage projects
-            </Typography>
+        <HeroSection
+        title="The easiest way to manage projects"
+        subtitle="From the small stuff to the big picture, organize the work so teams know what to do, why it matters, and how to get it done."
+        image="/welmio-mockup.png"
+        imageAlt="Hero section image"
+        />
 
-            <Typography variant="lead" style={{ marginTop: "1rem" }}>
-              From the small stuff to the big picture...
-            </Typography>
-
-            <div style={{ marginTop: "2rem", display: "flex", gap: "1rem" }}>
-              <Button size="lg">Get Started</Button>
-              <Button variant="secondary">Watch Video</Button>
-            </div>
-          </Container>
-        </section>
       </main>
       <footer className={styles.footer}>
         <a
