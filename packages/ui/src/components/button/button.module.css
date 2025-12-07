@@ -1,5 +1,5 @@
 .button {
- appearance: none;
+  appearance: none;
   border-radius: 128px;
   height: 48px;
   padding: 0 20px;
@@ -17,18 +17,23 @@
   min-width: 180px;
 }
 
+.button--primary:hover {
+  background-color: #01ab83;
+}
+
+
 .button:focus-visible {
   box-shadow: 0 0 0 2px var(--primary, #16a34a);
 }
 
 .button--primary {
-  background-color: var(--primary, #16a34a);
+  background-color: var(--primary, #00D09E);
   color: #ffffff;
   
 }
 
 .button--primary:hover {
-  background-color: rgba(22, 163, 74, 0.9);
+  background-color: #01ab83;
 }
 
 .button--secondary {
@@ -37,7 +42,7 @@
 }
 
 .button--secondary:hover {
-  background-color: rgba(15, 23, 42, 0.9);
+  background-color: rgba(31, 47, 86, 0.9);
 }
 
 .button--outline {

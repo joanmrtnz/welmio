@@ -1,7 +1,8 @@
 import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
+import { Button } from "@repo/ui/components/button/button";
 import styles from "./page.module.css";
 import { helloCore } from "@repo/core";
+import { Typography } from "@repo/ui/components/typography/typography";
 
 
 type Props = Omit<ImageProps, "src"> & {
@@ -45,7 +46,7 @@ export default function Home() {
           Get started
           </Button>
 
-          <Button variant="ghost" size="md">
+          <Button variant="secondary" size="md">
             Learn more
           </Button>
 
@@ -53,6 +54,23 @@ export default function Home() {
             Secondary action
           </Button>
         </div>
+
+        <section style={{ maxWidth: 600 }}>
+          <Typography variant="h1">
+            The easiest way to manage projects
+          </Typography>
+
+          <Typography variant="lead" style={{ marginTop: "1rem" }}>
+            From the small stuff to the big picture, organizes the work
+            so teams know what to do, why it matters, and how to get it done.
+          </Typography>
+
+          <div style={{ marginTop: "2rem" }}>
+            <Button variant="secondary" size="md">
+              Watch Video
+            </Button>
+          </div>
+        </section>
         
       </main>
       <footer className={styles.footer}>
