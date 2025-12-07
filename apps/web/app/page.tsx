@@ -3,6 +3,7 @@ import { Button } from "@repo/ui/components/button/button";
 import styles from "./page.module.css";
 import { helloCore } from "@repo/core";
 import { Typography } from "@repo/ui/components/typography/typography";
+import { Container } from "@repo/ui/components/container/contianer";
 
 
 type Props = Omit<ImageProps, "src"> & {
@@ -56,20 +57,22 @@ export default function Home() {
         </div>
 
         <section style={{ maxWidth: 600 }}>
-          <Typography variant="h1">
-            The easiest way to manage projects
-          </Typography>
+           <Container>
+            <Typography variant="h1">
+              The easiest way to manage projects
+            </Typography>
 
-          <Typography variant="lead" style={{ marginTop: "1rem" }}>
-            From the small stuff to the big picture, organizes the work
-            so teams know what to do, why it matters, and how to get it done.
-          </Typography>
+            <Typography variant="lead" style={{ marginTop: "1rem" }}>
+              From the small stuff to the big picture, organizes the work
+              so teams know what to do, why it matters, and how to get it done.
+            </Typography>
 
-          <div style={{ marginTop: "2rem" }}>
-            <Button variant="secondary" size="md">
-              Watch Video
-            </Button>
-          </div>
+            <div style={{ marginTop: "2rem" }}>
+              <Button variant="secondary" size="md">
+                Watch Video
+              </Button>
+            </div>
+          </Container>
         </section>
         
       </main>
