@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import { helloCore } from "@repo/core";
 import { Typography } from "@repo/ui/components/typography/typography";
 import { Container } from "@repo/ui/components/container/contianer";
+import { Navbar } from "../components/navbar/navbar";
 
 
 type Props = Omit<ImageProps, "src"> & {
@@ -22,59 +23,41 @@ const ThemeImage = (props: Props) => {
   );
 };
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <ThemeImage
-          className={styles.logo}
-          srcLight="turborepo-dark.svg"
-          srcDark="turborepo-light.svg"
-          alt="Turborepo logo"
-          width={180}
-          height={38}
-          priority
+  export default function Home() {
+    return (
+      <div className={styles.page}>
+        <main className={styles.main}>
+        <Navbar
+          logo={<img src="./welmio-logo.svg" alt="Welmio Logo" height={40}/>}
+          links={[
+            { label: "Features", href: "/Features" },
+            { label: "Pricing", href: "/Pricing" },
+            { label: "Careers", href: "/Careers" },
+            { label: "Help", href: "/Help" },
+          ]}
+          rightSlot={
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <img src="./google-play.svg" alt="Google Play" height={40} />
+            </div>
+          }
         />
-        <ol>
-          <li>
-           { helloCore() }
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className={styles.ctas}>
-          <Button variant="primary" size="lg">
-          Get started
-          </Button>
-
-          <Button variant="secondary" size="md">
-            Learn more
-          </Button>
-
-          <Button variant="outline" size="sm">
-            Secondary action
-          </Button>
-        </div>
-
-        <section style={{ maxWidth: 600 }}>
-           <Container>
+        <section style={{ marginTop: "4rem" }}>
+          <Container>
             <Typography variant="h1">
               The easiest way to manage projects
             </Typography>
 
             <Typography variant="lead" style={{ marginTop: "1rem" }}>
-              From the small stuff to the big picture, organizes the work
-              so teams know what to do, why it matters, and how to get it done.
+              From the small stuff to the big picture...
             </Typography>
 
-            <div style={{ marginTop: "2rem" }}>
-              <Button variant="secondary" size="md">
-                Watch Video
-              </Button>
+            <div style={{ marginTop: "2rem", display: "flex", gap: "1rem" }}>
+              <Button size="lg">Get Started</Button>
+              <Button variant="secondary">Watch Video</Button>
             </div>
           </Container>
         </section>
-        
       </main>
       <footer className={styles.footer}>
         <a
