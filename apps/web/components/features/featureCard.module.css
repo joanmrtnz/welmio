@@ -1,0 +1,25 @@
+.card {
+  text-align: center;
+  padding: 2rem 1.5rem;
+}
+
+.icon {
+  height: 48px;
+  width: 48px;
+  margin: 0 auto 1.25rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  opacity: 0.8;
+  line-height: 1.6;
+  max-width: 300px;
+  margin: 0 auto;
+}

@@ -5,7 +5,9 @@ import { helloCore } from "@repo/core";
 import { Typography } from "@repo/ui/components/typography/typography";
 import { Container } from "@repo/ui/components/container/container";
 import { Navbar } from "../components/navbar/navbar";
-import { HeroSection } from "../components/navbar/hero/heroSection";
+import { HeroSection } from "../components/hero/heroSection";
+import { FeatureCard } from "../components/features/featureCard";
+import { FeaturesSection } from "../components/features/featureSection";
 
 
 type Props = Omit<ImageProps, "src"> & {
@@ -50,6 +52,49 @@ const ThemeImage = (props: Props) => {
         imageAlt="Hero section image"
         />
 
+        <FeaturesSection
+          title="Tailor-made features"
+          subtitle="Lorem ipsum is common placeholder text used to demonstrate the graphic elements..."
+          features={[
+            {
+              icon: <img src="/file-text.svg" />,
+              title: "Robust workflow",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+            {
+              icon: <img src="/globe.svg" />,
+              title: "Flexibility",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+            {
+              icon: <img src="/window.svg" />,
+              title: "User friendly",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+            {
+              icon: <img src="/file-text.svg" />,
+              title: "Multiple layouts",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+            {
+              icon: <img src="/globe.svg" />,
+              title: "Better components",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+            {
+              icon: <img src="/window.svg" />,
+              title: "Well organised",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+          ]}
+        />
+  
       </main>
       <footer className={styles.footer}>
         <a
