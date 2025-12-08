@@ -9,8 +9,8 @@ import styles from "./button.module.css";
 
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost";
-  size?: "sm" | "md" | "lg";
+  variant?: "primary" | "secondary" | "outline" ;
+  size?: "xxxs" | "xxs" | "xs" | "sm" | "md" | "lg";
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
