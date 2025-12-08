@@ -7,7 +7,8 @@ export type TypographyVariant =
   | "h1"
   | "h2"
   | "lead"
-  | "text";
+  | "text"
+  | "small";
 
 export interface TypographyProps
   extends HTMLAttributes<HTMLElement> {
@@ -27,6 +28,7 @@ export const Typography = ({
     h2: "h2",
     lead: "p",
     text: "p",
+    small: "p",
   }[variant];
 
   const classes = [
