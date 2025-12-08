@@ -52,4 +52,8 @@
   .imageWrapper {
     margin-top: 2rem;
   }
+
+  .actions{
+    justify-content: center;
+  }
 }

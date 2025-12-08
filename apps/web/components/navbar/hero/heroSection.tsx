@@ -29,8 +29,8 @@ export const HeroSection = ({
           </Typography>
 
           <div className={styles.actions}>
-            <Button size="xxs">Login</Button>
-            <Button variant="secondary" size="xxs">Sign Up</Button>
+            <Button size="xs">Login</Button>
+            <Button variant="secondary" size="xs">Sign Up</Button>
           </div>
         </div>
 
