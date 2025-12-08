@@ -1,9 +1,10 @@
 "use client";
 
-import { HTMLAttributes, ReactNode } from "react";
+import { HTMLAttributes, ReactNode, useState } from "react";
 import styles from "./navbar.module.css";
 import { Container } from "@repo/ui/components/container/container";
 import { Typography } from "@repo/ui/components/typography/typography";
+import { Button } from "@repo/ui/components/button/button";
 
 interface NavLink {
   label: string;
@@ -23,6 +24,8 @@ export const Navbar = ({
   className,
   ...props
 }: NavbarProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const classes = [styles.navbar, className].filter(Boolean).join(" ");
 
   return (
@@ -30,19 +33,48 @@ export const Navbar = ({
       <div className={styles.inner}>
         <div className={styles.logo}>{logo}</div>
 
-        <ul className={styles.links}>
+        <ul className={styles.linksDesktop}>
           {links.map((link) => (
             <li key={link.href}>
               <a href={link.href} className={styles.link}>
-                 <Typography variant="text">
-                    {link.label}
-                </Typography>
+                <Typography variant="text">{link.label}</Typography>
               </a>
             </li>
           ))}
         </ul>
 
-        <div className={styles.right}>{rightSlot}</div>
+        <div className={styles.rightDesktop}>{rightSlot}</div>
+
+        <button
+          className={styles.hamburger}
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle menu"
+        >
+          <span className={styles.bar}></span>
+          <span className={styles.bar}></span>
+          <span className={styles.bar}></span>
+        </button>
+      </div>
+
+      <div
+        className={`${styles.mobileMenu} ${
+          isOpen ? styles.mobileMenuOpen : ""
+        }`}
+      >
+        <ul>
+          {links.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                className={styles.mobileLink}
+                onClick={() => setIsOpen(false)}
+              >
+                <Typography variant="small">{link.label}</Typography>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div className={styles.mobileRight}>{rightSlot}</div>
       </div>
     </nav>
   );

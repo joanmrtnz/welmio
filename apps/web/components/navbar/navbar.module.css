@@ -34,14 +34,93 @@
   padding: 0;
 }
 
-
 .link:hover {
   opacity: 1;
   color: #00D09E;
 }
 
-.right {
+.linksDesktop {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.link {
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.rightDesktop {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.bar {
+  width: 22px;
+  height: 3px;
+  background: var(--foreground, #111);
+  border-radius: 2px;
+}
+
+.mobileMenu {
+  display: none;
+  background: var(--background, white);
+  border-top: 1px solid #e5e5e5;
+  padding: 1rem;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.mobileMenuOpen {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mobileMenu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mobileLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.mobileRight {
+  display: flex;
+  gap: 1rem;
+}
+
+
+@media (max-width: 850px) {
+  .linksDesktop,
+  .rightDesktop {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
+
