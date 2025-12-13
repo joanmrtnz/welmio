@@ -1,5 +1,5 @@
 .section {
-  padding: 5rem 0;
+  padding: 7rem 0;
 }
 
 .header {
@@ -19,8 +19,13 @@
 }
 
 @media (min-width: 1024px) {
+  .section {
+    margin: 0 4rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
   .grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -31,6 +36,9 @@
 }
 
 @media (max-width: 599px) {
+  .section {
+     padding: 5rem 0;
+  }
   .grid {
     grid-template-columns: 1fr;
   }
