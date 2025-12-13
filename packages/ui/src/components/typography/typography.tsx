@@ -6,6 +6,7 @@ import styles from "./typography.module.css";
 export type TypographyVariant =
   | "h1"
   | "h2"
+  | "h3"
   | "lead"
   | "text"
   | "small";
@@ -26,6 +27,7 @@ export const Typography = ({
   const Component = as || {
     h1: "h1",
     h2: "h2",
+    h3: "h3",
     lead: "p",
     text: "p",
     small: "p",
