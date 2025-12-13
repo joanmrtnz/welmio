@@ -1,0 +1,27 @@
+.card {
+  display: flex;
+  text-align: left;
+  padding: 2rem 1.5rem;
+  align-items: center;
+}
+
+.icon {
+  margin-right: 2rem;
+}
+.icon img,
+.icon svg{
+  height: 40px;
+  width: 40px;
+}
+
+.title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  opacity: 0.8;
+  line-height: 1.6;
+  max-width: 300px;
+  margin: 0 auto;
+}

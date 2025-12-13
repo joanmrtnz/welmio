@@ -4,6 +4,7 @@ import { Navbar } from "../components/navbar/navbar";
 import { HeroSection } from "../components/hero/heroSection";
 import { FeaturesSection } from "../components/features/featuresSection";
 import { TestimonialsSection } from "../components/testimonials/testimonialsSection";
+import { MetricsSection } from "../components/metrics/metricsSection";
 
 
 
@@ -119,6 +120,38 @@ const ThemeImage = (props: Props) => {
             },
           ]}
         />
+
+         <MetricsSection
+          title="Our 18 years of achievements"
+          subtitle="With our super powers we have reached this"
+          metrics={[
+            {
+              icon: <img src="/file-text.svg" />,
+              title: "10,000+",
+              description:
+                "Downloads per day",
+            },
+            {
+              icon: <img src="/globe.svg" />,
+              title: "2,000,000+",
+              description:
+                "Users",
+            },
+            {
+              icon: <img src="/window.svg" />,
+              title: "500+",
+              description:
+                "Clients",
+            },
+            {
+              icon: <img src="/file-text.svg" />,
+              title: "140",
+              description:
+                "Countries",
+            },
+          ]}
+        />
+
   
       </main>
       <footer className={styles.footer}>

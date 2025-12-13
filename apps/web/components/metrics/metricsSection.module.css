@@ -1,0 +1,37 @@
+.section {
+  padding: 5rem 0;
+}
+
+.header {
+  text-align: left;
+  max-width: 700px;
+  margin: 0 1.5rem 3.5rem;
+}
+
+.subtitle {
+  margin-top: 1rem;
+  opacity: 0.85;
+}
+
+.grid {
+  display: grid;
+  justify-items: left;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 600px) and (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 599px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
