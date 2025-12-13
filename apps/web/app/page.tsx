@@ -1,13 +1,10 @@
 import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/components/button/button";
 import styles from "./page.module.css";
-import { helloCore } from "@repo/core";
-import { Typography } from "@repo/ui/components/typography/typography";
-import { Container } from "@repo/ui/components/container/container";
 import { Navbar } from "../components/navbar/navbar";
 import { HeroSection } from "../components/hero/heroSection";
-import { FeatureCard } from "../components/features/featureCard";
-import { FeaturesSection } from "../components/features/featureSection";
+import { FeaturesSection } from "../components/features/featuresSection";
+import { TestimonialsSection } from "../components/testimonials/testimonialsSection";
+
 
 
 type Props = Omit<ImageProps, "src"> & {
@@ -89,6 +86,34 @@ const ThemeImage = (props: Props) => {
             {
               icon: <img src="/window.svg" />,
               title: "Well organised",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+          ]}
+        />
+
+         <TestimonialsSection
+          title="Real Stories from Real Customers"
+          subtitle="Get inspired by these stories."
+          testimonials={[
+            {
+              image: <img src="/profile-photo-1.png" />,
+              name: "Sarah Connor",
+              date: "01/01/2000",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+            {
+              image: <img src="/profile-photo-2.png" />,
+              name: "Maria Who",
+              date: "01/01/2000",
+              description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
+            },
+            {
+              image: <img src="/profile-photo-3.png" />,
+              name: "John Doe",
+              date: "01/01/2000",
               description:
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed erat nibh tristique ipsum.",
             },
