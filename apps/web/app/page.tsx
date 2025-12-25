@@ -5,6 +5,8 @@ import { HeroSection } from "../components/hero/heroSection";
 import { FeaturesSection } from "../components/features/featuresSection";
 import { TestimonialsSection } from "../components/testimonials/testimonialsSection";
 import { MetricsSection } from "../components/metrics/metricsSection";
+import { CtaSection } from "../components/cta/ctaSection";
+
 
 
 
@@ -37,7 +39,7 @@ const ThemeImage = (props: Props) => {
             { label: "Help", href: "/Help" },
           ]}
           rightSlot={
-            <div style={{ display: "flex", gap: "1rem" }}>
+            <div>
               <img src="./google-play.svg" alt="Google Play" height={40} />
             </div>
           }
@@ -150,6 +152,12 @@ const ThemeImage = (props: Props) => {
                 "Countries",
             },
           ]}
+        />
+
+        <CtaSection
+          title="Manage all projects from your mobile"
+          subtitle="Download the app to manage your projects, keep track of the progress and complete tasks without procastinating. Stay on track and complete on time!."
+          ctaText="Get the App"
         />
 
   
