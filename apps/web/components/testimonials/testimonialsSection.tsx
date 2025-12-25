@@ -25,31 +25,33 @@ export const TestimonialsSection = ({
 }: TestimonialsSectionProps) => {
   return (
     <section className={styles.section}>
-      <div className={styles.header}>
+      <div className={styles.content}>
+        <div className={styles.header}>
 
-        <div className={styles.titleWrapper}>
-          <span className={styles.backgroundIcon}>
-            <QuotesIcon/>
-          </span>
+          <div className={styles.titleWrapper}>
+            <span className={styles.backgroundIcon}>
+              <QuotesIcon/>
+            </span>
 
-          <Typography className={styles.title} variant="h3">{title}</Typography>
+            <Typography className={styles.title} variant="h3">{title}</Typography>
+          </div>
+
+          <Typography variant="lead" className={styles.subtitle}>
+            {subtitle}
+          </Typography>
         </div>
 
-        <Typography variant="lead" className={styles.subtitle}>
-          {subtitle}
-        </Typography>
-      </div>
-
-      <div className={styles.grid}>
-        {testimonials.map((testimonial) => (
-          <TestimonialCard
-            key={testimonial.name}
-            image={testimonial.image}
-            name={testimonial.name}
-            date={testimonial.date}
-            description={testimonial.description}
-          />
-        ))}
+        <div className={styles.grid}>
+          {testimonials.map((testimonial) => (
+            <TestimonialCard
+              key={testimonial.name}
+              image={testimonial.image}
+              name={testimonial.name}
+              date={testimonial.date}
+              description={testimonial.description}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
