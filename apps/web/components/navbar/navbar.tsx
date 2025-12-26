@@ -3,6 +3,8 @@
 import { HTMLAttributes, ReactNode, useState } from "react";
 import styles from "./navbar.module.css";
 import { Typography } from "@repo/ui/components/typography/typography";
+import { Logo } from "../shared/logo";
+import { AppBadges } from "../shared/appBadges";
 
 interface NavLink {
   label: string;
@@ -29,7 +31,7 @@ export const Navbar = ({
   return (
     <nav className={classes} {...props}>
       <div className={styles.inner}>
-        <div className={styles.logo}>{logo}</div>
+          <div className={styles.logo}><Logo /></div>
 
         <ul className={styles.linksDesktop}>
           {links.map((link) => (
@@ -41,7 +43,7 @@ export const Navbar = ({
           ))}
         </ul>
 
-        <div className={styles.rightDesktop}>{rightSlot}</div>
+        <div className={styles.rightDesktop}><AppBadges /></div>
 
         <button
           className={styles.hamburger}
@@ -72,7 +74,7 @@ export const Navbar = ({
             </li>
           ))}
         </ul>
-        <div className={styles.mobileRight}>{rightSlot}</div>
+        <div className={styles.mobileRight}><AppBadges /></div>
       </div>
     </nav>
   );

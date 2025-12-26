@@ -3,6 +3,7 @@
 import styles from "./ctaSection.module.css";
 import { Typography } from "@repo/ui/components/typography/typography";
 import clsx from "clsx";
+import { AppBadges } from "../shared/appBadges";
 
 interface ctaSectionProps {
   title: string;
@@ -29,9 +30,7 @@ export const CtaSection = ({
             {ctaText}
           </Typography>
 
-          <div>
-            <img src="./google-play.svg" alt="Google Play" height={40} />
-          </div>
+         <AppBadges />
         </div>
       </div>
 
