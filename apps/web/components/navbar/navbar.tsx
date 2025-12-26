@@ -2,9 +2,7 @@
 
 import { HTMLAttributes, ReactNode, useState } from "react";
 import styles from "./navbar.module.css";
-import { Container } from "@repo/ui/components/container/container";
 import { Typography } from "@repo/ui/components/typography/typography";
-import { Button } from "@repo/ui/components/button/button";
 
 interface NavLink {
   label: string;

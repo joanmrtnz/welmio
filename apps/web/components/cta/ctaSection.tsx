@@ -44,10 +44,8 @@ export const CtaSection = ({
             <img src="/welmio-mockup-cta-2.png" alt="CTA mobile image 2" className={styles.image} />
         </div>
      
-     
       </div>
     </div>
-      {/* TODO: add cta buttons here */}
     </section>
   );
 };
