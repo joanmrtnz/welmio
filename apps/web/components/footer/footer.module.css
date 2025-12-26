@@ -1,0 +1,80 @@
+.footer {
+  background-color: black;
+  width: 100%;
+  padding: 1.5rem 0;
+  position: relative;
+  z-index: 10;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  color: lightgray;
+}
+
+.contactBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: space-between;
+  padding: .5rem 2rem;
+ 
+}
+
+.ctaBlock {
+  display: flex;
+  font-size: medium;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: left;
+  padding: .5rem 2rem;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  background-color: #00D09E;
+  border-radius: .5rem;
+  width: 2.5rem;
+  img {
+    padding: 5px;
+  }
+}
+
+.linksGrid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: .5rem;
+  margin: 2rem 0;
+}
+
+.link:hover {
+  opacity: 1;
+  color: #00D09E;
+}
+
+.link {
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.rightDesktop {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.legalText{
+  opacity: .7;
+  font-size: small;
+}
+
+
+@media (min-width: 1024px) {
+  .footer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

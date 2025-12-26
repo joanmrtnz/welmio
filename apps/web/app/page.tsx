@@ -6,6 +6,9 @@ import { FeaturesSection } from "../components/features/featuresSection";
 import { TestimonialsSection } from "../components/testimonials/testimonialsSection";
 import { MetricsSection } from "../components/metrics/metricsSection";
 import { CtaSection } from "../components/cta/ctaSection";
+import { NAV_LINKS } from "../components/navbar/navLinks";
+import { Footer } from "../components/footer/footer";
+import { FOOTER_LINKS } from "../components/footer/footerLinks";
 
 
 
@@ -30,20 +33,7 @@ const ThemeImage = (props: Props) => {
     return (
       <div>
         <main className={styles.main}>
-        <Navbar
-          logo={<img src="./welmio-logo.svg" alt="Welmio Logo" height={40} width={42}/>}
-          links={[
-            { label: "Features", href: "/Features" },
-            { label: "Pricing", href: "/Pricing" },
-            { label: "Careers", href: "/Careers" },
-            { label: "Help", href: "/Help" },
-          ]}
-          rightSlot={
-            <div>
-              <img src="./google-play.svg" alt="Google Play" height={40} />
-            </div>
-          }
-        />
+        <Navbar links={NAV_LINKS} />
 
         <HeroSection
         title="The easiest way to manage projects"
@@ -162,36 +152,8 @@ const ThemeImage = (props: Props) => {
 
   
       </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com/templates?search=turborepo&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://turborepo.com?utm_source=create-turbo"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to turborepo.com →
-        </a>
-      </footer>
+
+      <Footer links={FOOTER_LINKS} />
     </div>
   );
 }
