@@ -3,6 +3,7 @@ name: Build, Push & Deploy Welmio
 on:
   push:
     branches:
+      - pre
       - prod
 
 jobs:
