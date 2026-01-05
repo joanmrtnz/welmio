@@ -24,7 +24,7 @@ jobs:
           docker build \
             -t ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }} \
             -t ${{ secrets.DOCKERHUB_REPO }}:latest \
-            ./apps/web
+            .
 
       - name: Push Docker image
         run: |
