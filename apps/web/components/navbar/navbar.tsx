@@ -5,6 +5,7 @@ import styles from "./navbar.module.css";
 import { Typography } from "@repo/ui/components/typography/typography";
 import { Logo } from "../shared/logo";
 import { AppBadges } from "../shared/appBadges";
+import Link from "next/link";
 
 interface NavLink {
   label: string;
@@ -64,13 +65,13 @@ export const Navbar = ({
         <ul>
           {links.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 className={styles.mobileLink}
                 onClick={() => setIsOpen(false)}
               >
                 <Typography variant="small">{link.label}</Typography>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

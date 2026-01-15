@@ -4,6 +4,7 @@ import styles from "./heroSection.module.css";
 import { Typography } from "@repo/ui/components/typography/typography";
 import { Container } from "@repo/ui/components/container/container";
 import { Button } from "@repo/ui/components/button/button";
+import Link from "next/link";
 
 interface HeroSectionProps {
   title: string;
@@ -29,8 +30,13 @@ export const HeroSection = ({
           </Typography>
 
           <div className={styles.actions}>
-            <Button size="xs">Login</Button>
-            <Button variant="secondary" size="xs">Sign Up</Button>
+            <Link href="/login">
+               <Button size="xs">Login</Button>
+            </Link>
+           
+            <Link href="/signup">
+              <Button variant="secondary" size="xs">Sign Up</Button>
+            </Link>
           </div>
         </div>
 

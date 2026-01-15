@@ -3,6 +3,7 @@ import { Typography } from "@repo/ui/components/typography/typography";
 import styles from "./footer.module.css";
 import { Logo } from "../shared/logo";
 import { AppBadges } from "../shared/appBadges";
+import Link from "next/link";
 
 interface NavLink {
   label: string;
@@ -24,9 +25,9 @@ export const Footer =  ({
         <ul className={styles.linksGrid}>
           {links.map((link) => (
             <li key={link.href}>
-              <a href={link.href} className={styles.link}>
+              <Link href={link.href} className={styles.link}>
                 <Typography variant="text">{link.label}</Typography>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
