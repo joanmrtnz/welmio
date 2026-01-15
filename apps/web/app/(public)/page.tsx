@@ -1,14 +1,14 @@
 import Image, { type ImageProps } from "next/image";
 import styles from "./page.module.css";
-import { Navbar } from "../components/navbar/navbar";
-import { HeroSection } from "../components/hero/heroSection";
-import { FeaturesSection } from "../components/features/featuresSection";
-import { TestimonialsSection } from "../components/testimonials/testimonialsSection";
-import { MetricsSection } from "../components/metrics/metricsSection";
-import { CtaSection } from "../components/cta/ctaSection";
-import { NAV_LINKS } from "../components/navbar/navLinks";
-import { Footer } from "../components/footer/footer";
-import { FOOTER_LINKS } from "../components/footer/footerLinks";
+import { Navbar } from "../../components/navbar/navbar";
+import { HeroSection } from "../../components/hero/heroSection";
+import { FeaturesSection } from "../../components/features/featuresSection";
+import { TestimonialsSection } from "../../components/testimonials/testimonialsSection";
+import { MetricsSection } from "../../components/metrics/metricsSection";
+import { CtaSection } from "../../components/cta/ctaSection";
+import { NAV_LINKS } from "../../components/navbar/navLinks";
+import { Footer } from "../../components/footer/footer";
+import { FOOTER_LINKS } from "../../components/footer/footerLinks";
 
 
 
