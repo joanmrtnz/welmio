@@ -1,0 +1,13 @@
+.link {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  font-size: x-small;
+  color: #093030;
+  text-decoration: none;
+  font-family: 'Avenir', 'Montserrat', 'Corbel', 'URW Gothic', sans-serif;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

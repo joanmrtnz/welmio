@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./login.module.css";
+import { AuthInput } from "@repo/ui/components/auth/auth-input";
+import { AuthButton } from "@repo/ui/components/auth/auth-button";
+import { TextLink } from "@repo/ui/components/auth/text-link";
+
+import styles from "./login-form.module.css";
+
 
 export function LoginForm() {
   const router = useRouter();
@@ -13,37 +18,39 @@ export function LoginForm() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      return;
-    }
+    if (!email || !password) return;
 
-    // TODO: add real auth
+    // mock navigation
     router.push("/dashboard");
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
-      <h1 className={styles.title}>Login</h1>
+    <form onSubmit={handleSubmit} className={styles.form}>
+     
+        <AuthInput
+          label="Username or Email"
+          type="email"
+          placeholder="example@email.com"
+        />
 
-      <input
-        type="email"
-        placeholder="Email"
-        className={styles.input}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <AuthInput
+          label="Password"
+          type="password"
+          placeholder="••••••••"
+        />
+     
+        <AuthButton variant="dark">
+          Log In
+        </AuthButton>
 
-      <input
-        type="password"
-        placeholder="Password"
-        className={styles.input}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <TextLink href="/forgot-password">
+          Forgot Password?
+        </TextLink>
 
-      <button className={styles.button} type="submit">
-        Sign in
-      </button>
+      <AuthButton variant="light">
+          Sign In
+        </AuthButton>
+
     </form>
   );
 }
