@@ -4,7 +4,7 @@ export function Section({
   children,
   spacing = "md",
   width = "full",
-  align = "left",
+  align = "center",
 }: {
   children: React.ReactNode;
   spacing?: "xs" | "sm" | "md" | "lg" | "xl" | "x2l" | "x3l";

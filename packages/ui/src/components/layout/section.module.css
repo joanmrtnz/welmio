@@ -48,12 +48,16 @@
 
 .align-left {
   text-align: left;
+  align-items: left;
+  align-items: start;
 }
 
 .align-rigth {
    text-align: right;
+   align-items: end;
 }
 
 .align-center {
    text-align: center;
+   align-items: center;
 }
