@@ -1,0 +1,11 @@
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.link svg {
+  display: block;
+}
