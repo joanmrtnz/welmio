@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthInput } from "@repo/ui/components/auth/auth-input";
 import { AuthButton } from "@repo/ui/components/auth/auth-button";
-import { TextLink } from "@repo/ui/components/auth/text-link";
 import { Section } from "@repo/ui/components/layout/section";
 
 import styles from "./login-form.module.css";
 import { InlineLink } from "@repo/ui/components/links/inline-link";
+import { IconLink } from "@repo/ui/components/links/icon-link";
 import { Typography } from "@repo/ui/components/typography/typography";
+import { GoogleIcon } from "@repo/ui/icons/GoogleIcon";
 
 
 export function LoginForm() {
@@ -48,8 +49,8 @@ export function LoginForm() {
           </AuthButton>
         
          <Section spacing="md">
-            <Typography variant="xsmall">
-              <InlineLink href="/forgot-password">
+            <Typography variant="xxsmall">
+              <InlineLink weight="bold" href="/forgot-password">
                 Forgot Password?
               </InlineLink>
             </Typography>
@@ -61,6 +62,32 @@ export function LoginForm() {
             Sign Up
           </AuthButton>
         </Section>
+
+        <Typography variant="xsmall" weight="medium">
+          Use{" "}
+          <InlineLink weight="bold" href="/forgot-password">
+            Fingerprint
+          </InlineLink>
+          {" "}To Access
+        </Typography>
+
+      <Section spacing="lg">
+        <Typography variant="xxsmall">
+          or sign up with{" "}
+        </Typography>
+        <Section spacing="md">
+          <IconLink href="/sign-up-google" ariaLabel="Sign up with Google">
+            <GoogleIcon size={25} />
+          </IconLink>
+        </Section>
+    
+       <Typography variant="xxsmall">
+          Don't have an account?{" "}
+          <InlineLink href="/sign-up">
+            Sign Up
+          </InlineLink>
+        </Typography>
+      </Section>
     </form>
   );
 }
