@@ -6,75 +6,63 @@ import { AuthInput } from "@repo/ui/components/auth/auth-input";
 import { AuthButton } from "@repo/ui/components/auth/auth-button";
 import { Section } from "@repo/ui/components/layout/section";
 
-import styles from "./login-form.module.css";
+import styles from "./verify-form.module.css";
 import { InlineLink } from "@repo/ui/components/links/inline-link";
 import { IconLink } from "@repo/ui/components/links/icon-link";
 import { Typography } from "@repo/ui/components/typography/typography";
 import { GoogleIcon } from "@repo/ui/icons/GoogleIcon";
 
 
-export function LoginForm() {
+export function VerifyForm() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!email || !password) return;
-    router.push("/dashboard");
+    if (!code) return;
+    router.push("/forgot-password/new-password");
+  };
+
+  const sendCode = () => {
+    console.log("Sending recovery code again...");
   };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-      <Section spacing="x2l">
-      
-          <AuthInput
-            label="Username or Email"
-            type="email"
-            placeholder="example@email.com"
-          />
 
+      <Section spacing="x3l" align="left">
           <AuthInput
-            label="Password"
-            type="password"
-            placeholder="••••••••"
+            label="Enter Recovery Code"
+            type="code" 
+            placeholder=""
+            value={code}
+            onChange={(e) => setCode(e.currentTarget.value)}
           />
-        </Section>
+      </Section>
 
-        <Section spacing="lg">
-          <AuthButton type="submit" variant="dark">
-            Log In
-          </AuthButton>
-        
+      <Section spacing="xs">
+        <AuthButton 
+        type="submit" 
+        variant="dark" 
+        >
+          Accept
+        </AuthButton>
          <Section spacing="md">
-            <Typography variant="xxsmall">
-              <InlineLink weight="bold" href="/forgot-password">
-                Forgot Password?
-              </InlineLink>
-            </Typography>
-          </Section>
-
-        <AuthButton
-          onClick={() => router.push("/signup")}
-          variant="light">
-            Sign Up
-          </AuthButton>
+          <AuthButton
+            onClick={() => sendCode()}
+            variant="light">
+              Send Again
+            </AuthButton>
         </Section>
+      </Section>
 
-        <Typography variant="xsmall" weight="medium">
-          Use{" "}
-          <InlineLink weight="bold" href="/forgot-password">
-            Fingerprint
-          </InlineLink>
-          {" "}To Access
-        </Typography>
-
-      <Section spacing="lg">
+      <Section spacing="x3l">
         <Typography variant="xxsmall">
           or sign up with{" "}
         </Typography>
+
         <Section spacing="md">
           <IconLink href="/signup-google" ariaLabel="Sign up with Google">
             <GoogleIcon size={25} />

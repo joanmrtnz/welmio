@@ -1,0 +1,63 @@
+.section {
+  width: 100%;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.xs {
+  margin-block: 4px;
+}
+
+.sm {
+  margin-block: 8px;
+}
+
+.md {
+  margin-block: 16px;
+}
+
+.lg {
+  margin-block: 24px;
+}
+
+.xl {
+  margin-block: 32px;
+}
+
+.x2l {
+  margin-block: 40px;
+}
+
+.x3l {
+  margin-block: 48px;
+}
+
+.width-full {
+  width: 100%;
+}
+
+.width-70 {
+  width: 70%;
+}
+
+.width-50 {
+  width: 50%;
+}
+
+.align-left {
+  text-align: left;
+  align-items: left;
+  align-items: start;
+}
+
+.align-rigth {
+   text-align: right;
+   align-items: end;
+}
+
+.align-center {
+   text-align: center;
+   align-items: center;
+}

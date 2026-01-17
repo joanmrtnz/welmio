@@ -2,7 +2,6 @@
   margin: 0;
   padding: 0;
   color: inherit;
-  font-family: var(--font-sans, "Inter", sans-serif);
 }
 
 .typography--h1 {
@@ -42,5 +41,25 @@
 
 .typography--small {
   font-size: 0.875rem;
+}
+
+.typography--xsmall {
+  font-size: 0.7rem;
+}
+
+.typography--xxsmall {
+  font-size: 0.6rem;
+}
+
+.typography--normal {
+  font-weight: 400;
+}
+
+.typography--medium {
+  font-weight: 500;
+}
+
+.typography--bold {
+  font-weight: 700;
 }
 

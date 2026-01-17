@@ -1,0 +1,7 @@
+.container {
+  min-height: 100vh;
+  background-color: #00c896;
+
+  display: grid;
+  grid-template-rows: auto 1fr;
+}

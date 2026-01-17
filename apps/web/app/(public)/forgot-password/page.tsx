@@ -1,12 +1,12 @@
 import { AuthCard } from "@repo/ui/components/auth/auth-card";
-import { SignUpForm } from "./signup-form";
+import { ForgotPasswordForm } from "./forgot-password-form";
 import { AuthPageLayout } from "@repo/ui/components/layout/auth-page-layout";
 
-export default function SignUpPage() {
+export default function ForgotPasswordPage() {
   return (
-    <AuthPageLayout title="Create Account">
+    <AuthPageLayout title="Forgot Password">
       <AuthCard>
-        <SignUpForm />
+        <ForgotPasswordForm />
       </AuthCard>
     </AuthPageLayout>
   );
