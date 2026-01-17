@@ -2,7 +2,6 @@
   margin: 0;
   padding: 0;
   color: inherit;
-  font-family: var(--font-sans, "Inter", sans-serif);
 }
 
 .typography--h1 {
