@@ -47,3 +47,19 @@
   font-size: 0.7rem;
 }
 
+.typography--xxsmall {
+  font-size: 0.6rem;
+}
+
+.typography--normal {
+  font-weight: 400;
+}
+
+.typography--medium {
+  font-weight: 500;
+}
+
+.typography--bold {
+  font-weight: 700;
+}
+
