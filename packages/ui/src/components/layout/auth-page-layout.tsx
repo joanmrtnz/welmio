@@ -12,7 +12,7 @@ export function AuthPageLayout({
   return (
     <main className={styles.container}>
       <Section spacing="x3l">
-        <Typography variant="h2">
+        <Typography variant="h2" weight="bold">
           {title}
         </Typography>
       </Section>
