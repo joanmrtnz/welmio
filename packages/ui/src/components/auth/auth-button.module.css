@@ -1,15 +1,12 @@
 .button {
   width: 50%;
-  margin-top: 12px;
   padding: 12px;
   border-radius: 9999px;
   border: none;
   background-color: #00c896;
-  color: white;
   font-size: 0.95rem;
   font-weight: 600;
-  cursor: pointer;
-  color: #093030; 
+  cursor: pointer; 
 }
 
 .dark {
@@ -17,7 +14,7 @@
 }
 
 .light {
-    background-color: #e6f9f1;;
+    background-color: #DFF7E2;
 }
 
 .dark:hover {
