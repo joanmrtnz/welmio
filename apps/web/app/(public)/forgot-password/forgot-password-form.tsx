@@ -22,7 +22,7 @@ export function ForgotPasswordForm() {
     e.preventDefault();
 
     if (!email) return;
-    router.push("/dashboard");
+    router.push("/forgot-password/verify");
   };
 
   return (
@@ -44,11 +44,16 @@ export function ForgotPasswordForm() {
             label="Enter Email Address"
             type="email"
             placeholder="example@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.currentTarget.value)}
           />
       </Section>
 
         <Section spacing="xs">
-          <AuthButton type="submit" variant="dark">
+          <AuthButton 
+          type="submit" 
+          variant="dark"
+         >
             Next Step
           </AuthButton>
       </Section>
@@ -67,14 +72,14 @@ export function ForgotPasswordForm() {
         </Typography>
 
         <Section spacing="md">
-          <IconLink href="/sign-up-google" ariaLabel="Sign up with Google">
+          <IconLink href="/signup-google" ariaLabel="Sign up with Google">
             <GoogleIcon size={25} />
           </IconLink>
         </Section>
     
        <Typography variant="xxsmall">
           Don't have an account?{" "}
-          <InlineLink href="/sign-up">
+          <InlineLink href="/signup">
             Sign Up
           </InlineLink>
         </Typography>
