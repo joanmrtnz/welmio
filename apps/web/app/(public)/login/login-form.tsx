@@ -8,6 +8,8 @@ import { TextLink } from "@repo/ui/components/auth/text-link";
 import { Section } from "@repo/ui/components/layout/section";
 
 import styles from "./login-form.module.css";
+import { InlineLink } from "@repo/ui/components/links/inline-link";
+import { Typography } from "@repo/ui/components/typography/typography";
 
 
 export function LoginForm() {
@@ -20,8 +22,6 @@ export function LoginForm() {
     e.preventDefault();
 
     if (!email || !password) return;
-
-    // mock navigation
     router.push("/dashboard");
   };
 
@@ -46,15 +46,19 @@ export function LoginForm() {
           <AuthButton type="submit" variant="dark">
             Log In
           </AuthButton>
-
-          <TextLink href="/forgot-password">
-            Forgot Password?
-          </TextLink>
+        
+         <Section spacing="md">
+            <Typography variant="xsmall">
+              <InlineLink href="/forgot-password">
+                Forgot Password?
+              </InlineLink>
+            </Typography>
+          </Section>
 
         <AuthButton
           onClick={() => router.push("/signup")}
           variant="light">
-            Sign In
+            Sign Up
           </AuthButton>
         </Section>
     </form>
