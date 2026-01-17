@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AuthInput } from "@repo/ui/components/auth/auth-input";
 import { AuthButton } from "@repo/ui/components/auth/auth-button";
 import { TextLink } from "@repo/ui/components/auth/text-link";
+import { Section } from "@repo/ui/components/layout/section";
 
 import styles from "./login-form.module.css";
 
@@ -26,31 +27,34 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
-     
-        <AuthInput
-          label="Username or Email"
-          type="email"
-          placeholder="example@email.com"
-        />
+      <Section spacing="x2l">
+      
+          <AuthInput
+            label="Username or Email"
+            type="email"
+            placeholder="example@email.com"
+          />
 
-        <AuthInput
-          label="Password"
-          type="password"
-          placeholder="••••••••"
-        />
-     
-        <AuthButton variant="dark">
-          Log In
-        </AuthButton>
+          <AuthInput
+            label="Password"
+            type="password"
+            placeholder="••••••••"
+          />
+        </Section>
 
-        <TextLink href="/forgot-password">
-          Forgot Password?
-        </TextLink>
+        <Section spacing="lg">
+          <AuthButton variant="dark">
+            Log In
+          </AuthButton>
 
-      <AuthButton variant="light">
-          Sign In
-        </AuthButton>
+          <TextLink href="/forgot-password">
+            Forgot Password?
+          </TextLink>
 
+        <AuthButton variant="light">
+            Sign In
+          </AuthButton>
+        </Section>
     </form>
   );
 }
