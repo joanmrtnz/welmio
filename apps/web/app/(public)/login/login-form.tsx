@@ -43,7 +43,7 @@ export function LoginForm() {
         </Section>
 
         <Section spacing="lg">
-          <AuthButton variant="dark">
+          <AuthButton type="submit" variant="dark">
             Log In
           </AuthButton>
 
@@ -51,7 +51,9 @@ export function LoginForm() {
             Forgot Password?
           </TextLink>
 
-        <AuthButton variant="light">
+        <AuthButton
+          onClick={() => router.push("/signup")}
+          variant="light">
             Sign In
           </AuthButton>
         </Section>
