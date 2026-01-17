@@ -2,12 +2,16 @@ import styles from "./auth-input.module.css";
 
 export function AuthInput({
   label,
-  type,
+  type = "text",
   placeholder,
+  value,
+  onChange,
 }: {
   label: string;
-  type: string;
+  type?: string;
   placeholder?: string;
+  value?: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
 }) {
   return (
     <div className={styles.wrapper}>
@@ -16,6 +20,8 @@ export function AuthInput({
         type={type}
         placeholder={placeholder}
         className={styles.input}
+        value={value}
+        onChange={onChange}
       />
     </div>
   );
