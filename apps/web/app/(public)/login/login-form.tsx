@@ -83,7 +83,7 @@ export function LoginForm() {
     
        <Typography variant="xxsmall">
           Don't have an account?{" "}
-          <InlineLink href="/sign-up">
+          <InlineLink href="/signup">
             Sign Up
           </InlineLink>
         </Typography>
