@@ -18,7 +18,7 @@ export function NewPasswordForm() {
     e.preventDefault();
 
     if ( !newPassword || !confirmNewPassword || confirmNewPassword !== newPassword) return;
-    router.push("/login");
+    router.push("/forgot-password/success");
   };
 
 
