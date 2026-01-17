@@ -33,3 +33,27 @@
 .x3l {
   margin-block: 48px;
 }
+
+.width-full {
+  width: 100%;
+}
+
+.width-70 {
+  width: 70%;
+}
+
+.width-50 {
+  width: 50%;
+}
+
+.align-left {
+  text-align: left;
+}
+
+.align-rigth {
+   text-align: right;
+}
+
+.align-center {
+   text-align: center;
+}
