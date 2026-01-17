@@ -22,7 +22,7 @@ export function VerifyForm() {
     e.preventDefault();
 
     if (!code) return;
-    router.push("/new-password");
+    router.push("/forgot-password/new-password");
   };
 
   const sendCode = () => {
