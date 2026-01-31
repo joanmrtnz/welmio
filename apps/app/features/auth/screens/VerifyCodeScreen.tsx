@@ -2,58 +2,46 @@ import { View, Text, StyleSheet } from "react-native";
 import { Link, router } from "expo-router";
 import { AuthInput } from "../components/AuthInput";
 import { AuthButton } from "../components/AuthButton";
-import { AuthHeader } from "../components/AuthHeader";
 import { fonts } from "@/theme/fonts";
 
 const GREEN = "#00c896";
 const DARK_GREEN = "#059669";
 const LIGHT_GREEN = "#f1fff3";
 
-export default function ForgotPasswordScreen() {
+export default function VerifyCodeScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Text style={styles.welcome}>Forgot Password</Text>
+        <Text style={styles.welcome}>Recovery Code</Text>
       </View>
 
       <View style={styles.card}>
-        <View style={styles.header}>
-           <AuthHeader
-            title="Reset password?"
-            subtitle="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-          />
-        </View>
-      
         <View style={styles.form}>
-
           <AuthInput
-            label="Enter Email Address"
-            placeholder="example@email.com"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            autoCorrect={false}
-            textContentType="emailAddress"
+            label="Enter Recovery Code"
+            keyboardType="number-pad"
+            textContentType="oneTimeCode"
           />
 
           <View style={styles.buttons}>
             <AuthButton
-              title="Next step"
+              title="Accept"
               onPress={() => {
-                router.push("/(public)/forgot-password/verify-code")
+                router.push("/(public)/forgot-password/new-password");
               }}
             />
 
-             <AuthButton
-              title="Sign Up"
+            <AuthButton
+              title="Send Again"
               variant="secondary"
               onPress={() => {
-                router.push("/(public)/signup");
+                // later: resend code
               }}
             />
           </View>
 
           <Text style={styles.divider}>or sign up with</Text>
-          
+
           <View style={styles.socialCircle}>
             <Text style={styles.socialText}>G</Text>
           </View>
@@ -96,36 +84,23 @@ const styles = StyleSheet.create({
     padding: 24,
   },
 
-   header: {
-    marginTop: 55,
-  },
-
   form: {
-    marginTop: 80,
-    gap: 16,
+    marginTop: 90,
+    gap: 24,
   },
 
- buttons:{
-    marginTop: 64,
+  buttons: {
     alignItems: "center",
-    justifyContent: "center",
-    gap: 55,
-    fontFamily: fonts.medium,
-  },
-
-  footer: {
-    fontSize: 11,
-    textAlign: "center",
-    color: "#052e2b",
-    fontFamily: fonts.regular,
+    gap: 24,
+    marginTop: 24,
   },
 
   divider: {
     textAlign: "center",
     color: "#052e2b",
-    marginTop: 15,
     fontSize: 11,
     fontFamily: fonts.regular,
+    marginTop: 40,
   },
 
   socialCircle: {
@@ -141,6 +116,14 @@ const styles = StyleSheet.create({
 
   socialText: {
     fontSize: 20,
+    fontFamily: fonts.bold,
+  },
+
+  footer: {
+    fontSize: 11,
+    textAlign: "center",
+    color: "#052e2b",
+    fontFamily: fonts.regular,
   },
 
   link: {
