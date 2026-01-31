@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
 import { Link } from "expo-router";
-import { AuthHeader } from "../components/AuthHeader";
 import { AuthInput } from "../components/AuthInput";
 import { AuthButton } from "../components/AuthButton";
 import { fonts } from "@/theme/fonts";

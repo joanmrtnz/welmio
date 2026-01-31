@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { AuthInput } from "../components/AuthInput";
 import { AuthButton } from "../components/AuthButton";
 import { fonts } from "@/theme/fonts";
@@ -29,16 +29,23 @@ export default function LoginScreen() {
 
          
           <View style={styles.buttons}>
-            <AuthButton title="Log In" />
+            <AuthButton
+              title="Log In"
+              onPress={() => {
+                router.replace("/(app)/(tabs)/home");
+              }}
+            />
 
-            <Link href="/(public)/reset-password" style={styles.link}>
+            <Link href="/(public)/forgot-password" style={styles.link}>
                 <Text>Forgot Password?</Text>
             </Link>
 
             <AuthButton
-                title="Sign Up"
-                variant="secondary"
-                onPress={() => {}}
+              title="Sign Up"
+              variant="secondary"
+              onPress={() => {
+                router.push("/(public)/signup");
+              }}
             />
           </View>
 
