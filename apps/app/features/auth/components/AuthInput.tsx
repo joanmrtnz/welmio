@@ -13,7 +13,7 @@ export function AuthInput({
       {label && <Text style={styles.label}>{label}</Text>}
       <TextInput
         {...props}
-        placeholderTextColor="#9ca3af"
+        placeholderTextColor="#768e7e"
         style={styles.input}
       />
     </View>
