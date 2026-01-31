@@ -104,12 +104,13 @@ const styles = StyleSheet.create({
   },
 
   headerArea: {
-    height: 130,
+    height: 150,
     justifyContent: "center",
     alignItems: "center",
   },
 
   welcome: {
+    marginTop: 30,
     fontSize: 31,
     color: "#052e2b",
     fontFamily: fonts.bold,

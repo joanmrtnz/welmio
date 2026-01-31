@@ -49,9 +49,11 @@ export default function LoginScreen() {
             />
           </View>
 
-          <Text style={styles.fingerprint}>
-            Use <Text style={styles.bold}>Fingerprint</Text> To Access
-          </Text>
+          <Link href="/(public)/finger-print" style={styles.fingerprint}>
+            <Text >
+              Use <Text style={styles.bold}>Fingerprint</Text> To Access
+            </Text>
+          </Link>
 
           <Text style={styles.divider}>or sign up with</Text>
 
@@ -82,12 +84,13 @@ const styles = StyleSheet.create({
   },
 
   headerArea: {
-    height: 130,
+    height: 150,
     justifyContent: "center",
     alignItems: "center",
   },
 
   welcome: {
+    marginTop: 30,
     fontSize: 31,
     color: "#052e2b",
     fontFamily: fonts.bold,
