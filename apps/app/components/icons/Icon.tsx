@@ -3,6 +3,10 @@ import Groceries from "../../assets/icons/groceries.svg";
 import Rent from "../../assets/icons/rent.svg";
 import Car from "../../assets/icons/car.svg";
 import Food from "../../assets/icons/food.svg";
+import Search from "../../assets/icons/search.svg";
+import Calendar from "../../assets/icons/calendar.svg";
+import Back from "../../assets/icons/back.svg";
+import Bell from "../../assets/icons/bell.svg";
 
 
 
@@ -14,6 +18,10 @@ const icons = {
   rent: Rent,
   car: Car,
   food: Food,
+  search: Search,
+  calendar: Calendar,
+  back: Back,
+  bell: Bell,
 };
 
 type IconName = keyof typeof icons;
