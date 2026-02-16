@@ -7,10 +7,11 @@ import Search from "../../assets/icons/search.svg";
 import Calendar from "../../assets/icons/calendar.svg";
 import Back from "../../assets/icons/back.svg";
 import Bell from "../../assets/icons/bell.svg";
-
-
-
-
+import Medicine from "../../assets/icons/medicine.svg";
+import Savings from "../../assets/icons/savings.svg";
+import Plus from "../../assets/icons/plus.svg";
+import Gift from "../../assets/icons/gift.svg";
+import Ticket from "../../assets/icons/ticket.svg";
 
 const icons = {
   money: Money,
@@ -22,6 +23,11 @@ const icons = {
   calendar: Calendar,
   back: Back,
   bell: Bell,
+  medicine: Medicine,
+  savings: Savings, 
+  plus: Plus, 
+  gift: Gift,
+  ticket: Ticket,
 };
 
 type IconName = keyof typeof icons;
