@@ -12,6 +12,12 @@ import Savings from "../../assets/icons/savings.svg";
 import Plus from "../../assets/icons/plus.svg";
 import Gift from "../../assets/icons/gift.svg";
 import Ticket from "../../assets/icons/ticket.svg";
+import User from "../../assets/icons/user.svg";
+import Shield from "../../assets/icons/shield.svg";
+import Settings from "../../assets/icons/settings.svg";
+import Help from "../../assets/icons/help.svg";
+import Logout from "../../assets/icons/logout.svg";
+
 
 const icons = {
   money: Money,
@@ -28,6 +34,11 @@ const icons = {
   plus: Plus, 
   gift: Gift,
   ticket: Ticket,
+  user: User,
+  shield: Shield,
+  settings: Settings,
+  help: Help,
+  logout: Logout,
 };
 
 type IconName = keyof typeof icons;
