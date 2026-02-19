@@ -1,1 +1,1 @@
-export { default } from "@/features/app/screens/CategoriesScreen";
+export { default } from "@/features/categories/screens/CategoriesScreen";
