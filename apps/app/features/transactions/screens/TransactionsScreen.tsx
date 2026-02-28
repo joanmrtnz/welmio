@@ -15,7 +15,7 @@ const BUTTON_GREEN = "#1A9E6A";
 
 export default function TransactionScreen() {
   return (
-    <ScrollView style={styles.screen}>
+    <View style={styles.screen}>
         <View style={styles.headerArea}>
             <Icon name="back" size={18} color={WHITE} />
             <Text style={styles.title}>Transactions</Text>
@@ -53,7 +53,11 @@ export default function TransactionScreen() {
           </Text>
         </View>
 
-      <View style={styles.card}>               
+      <View style={styles.cardWrapper}> 
+        <ScrollView
+      contentContainerStyle={styles.cardContent}
+      showsVerticalScrollIndicator={false}
+    >              
        <Text style={styles.monthLabel}>April</Text>
        <View style={styles.transactionRow}>
             <View style={styles.iconCircle}>
@@ -182,8 +186,9 @@ export default function TransactionScreen() {
             
         </View>
 
+      </ScrollView>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -216,12 +221,19 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
 
-  card: {
+  cardWrapper: {
+    flex: 1,
     backgroundColor: LIGHT_GREEN,
     borderTopLeftRadius: 70,
     borderTopRightRadius: 70,
-    padding: 38,
-    height:"100%",
+    paddingTop: 40,
+    overflow: "hidden",
+  },
+
+  cardContent: {
+   paddingHorizontal: 32,
+    paddingTop: 30,
+    paddingBottom: 120
   },
 
   balanceRow: {

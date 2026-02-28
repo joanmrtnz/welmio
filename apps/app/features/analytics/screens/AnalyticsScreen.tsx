@@ -15,7 +15,7 @@ const BLACK = "#052e2b";
 export default function AnalyticsScreen() {
 
   return (
-    <ScrollView style={styles.screen}>
+    <View style={styles.screen}>
       <View style={styles.headerArea}>
         <Icon name="back" size={18} color={WHITE} />
         <Text style={styles.title}>Quickly Analysis</Text>
@@ -61,27 +61,31 @@ export default function AnalyticsScreen() {
       </View>
 
 
-      <View style={styles.card}>               
+      <View style={styles.cardWrapper}> 
+        <ScrollView
+           contentContainerStyle={styles.cardContent}
+           showsVerticalScrollIndicator={false}
+         >                    
 
-      <View style={styles.graphicCard}>
-        <View style={styles.graphHeader}>
-          <Text style={styles.graphTitle}>April Expenses</Text>
+        <View style={styles.graphicCard}>
+          <View style={styles.graphHeader}>
+            <Text style={styles.graphTitle}>April Expenses</Text>
 
-          <View style={styles.graphActions}>
-            <Pressable style={styles.graphIcon}>
-              <Icon name="search" />
-            </Pressable>
+            <View style={styles.graphActions}>
+              <Pressable style={styles.graphIcon}>
+                <Icon name="search" />
+              </Pressable>
 
-            <Pressable style={styles.graphIcon}>
-              <Icon name="calendar" />
-            </Pressable>
+              <Pressable style={styles.graphIcon}>
+                <Icon name="calendar" />
+              </Pressable>
+            </View>
+          </View>
+
+          <View>
+          {/*  TODO: create real graphic*/}
           </View>
         </View>
-
-        <View>
-        {/*  TODO: create real graphic*/}
-        </View>
-      </View>
 
        <View style={styles.transactionRow}>
             <View style={styles.iconCircle}>
@@ -156,9 +160,10 @@ export default function AnalyticsScreen() {
             <View style={styles.amountColumn}>
                 <Text style={styles.amountPositive}>-$674.40</Text>
             </View>
-        </View>
+          </View>
+        </ScrollView>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -192,12 +197,19 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
 
-  card: {
+  cardWrapper: {
+    flex: 1,
     backgroundColor: LIGHT_GREEN,
     borderTopLeftRadius: 70,
     borderTopRightRadius: 70,
-    padding: 38,
-    height:"100%",
+    paddingTop: 40,
+    overflow: "hidden",
+  },
+
+  cardContent: {
+    paddingHorizontal: 32,
+    paddingTop: 30,
+    paddingBottom: 120,
   },
 
  graphicCard: {

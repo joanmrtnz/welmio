@@ -19,7 +19,7 @@ export default function HomeScreen() {
   const [selected, setSelected] = useState<"daily" | "weekly" | "monthly">("monthly");
 
   return (
-    <ScrollView style={styles.screen}>
+    <View style={styles.screen}>
       <View style={styles.headerArea}>
         <Text style={styles.welcome}>Hi, Welcome Back</Text>
         <Text style={styles.subtitle}>Good Morning</Text>
@@ -48,7 +48,11 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-      <View style={styles.card}>               
+       <View style={styles.cardWrapper}> 
+        <ScrollView
+          contentContainerStyle={styles.cardContent}
+          showsVerticalScrollIndicator={false}
+        >                  
 
         <View style={styles.statsCard}>
           <View style={styles.statLeft}>
@@ -187,8 +191,9 @@ export default function HomeScreen() {
                 <Text style={styles.amountPositive}>-$674.40</Text>
             </View>
         </View>
+       </ScrollView>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -219,13 +224,21 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
 
-  card: {
+  cardWrapper: {
+    flex: 1,
     backgroundColor: LIGHT_GREEN,
     borderTopLeftRadius: 70,
     borderTopRightRadius: 70,
-    padding: 38,
-    height:"100%",
+    paddingTop: 40,
+    overflow: "hidden",
   },
+
+  cardContent: {
+    paddingHorizontal: 32,
+    paddingTop: 30,
+    paddingBottom: 120
+  },
+
 
   balanceRow: {
     flexDirection: "row",

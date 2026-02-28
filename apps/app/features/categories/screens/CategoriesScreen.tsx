@@ -15,7 +15,7 @@ const BUTTON_GREEN = "#1A9E6A";
 
 export default function CategoriesScreen() {
   return (
-    <ScrollView style={styles.screen}>
+    <View style={styles.screen}>
         <View style={styles.headerArea}>
             <Icon name="back" size={18} color={WHITE} />
             <Text style={styles.title}>Categories</Text>
@@ -47,7 +47,8 @@ export default function CategoriesScreen() {
           </Text>
         </View>
 
-      <View style={styles.card}>  
+     <View style={styles.cardWrapper}> 
+       <View style={styles.cardContent}>  
         <View style={styles.grid}>
           {[
             { label: "Food", icon: "food", size: 45},
@@ -69,8 +70,9 @@ export default function CategoriesScreen() {
           ))}
         </View>
              
+       </View>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -103,12 +105,19 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
 
-  card: {
+  cardWrapper: {
+    flex: 1,
     backgroundColor: LIGHT_GREEN,
     borderTopLeftRadius: 70,
     borderTopRightRadius: 70,
-    padding: 38,
-    height:"100%",
+    paddingTop: 40,
+    overflow: "hidden",
+  },
+
+  cardContent: {
+   paddingHorizontal: 32,
+    paddingTop: 30,
+    paddingBottom: 120
   },
 
   balanceRow: {
