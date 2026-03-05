@@ -23,4 +23,26 @@ export class AuthController {
   getMe(@Req() req) {
     return req.user;
   }
+
+  @Post('send-reset-password-code')
+  sendResetPasswordCode(@Body('email') email: string) {
+    return this.authService.sendResetPasswordCode(email);
+  }
+
+  @Post('validate-reset-password-code')
+  validateResetPasswordCode(
+    @Body('email') email: string,
+    @Body('code') code: string,
+  ) {
+    return this.authService.validateResetPasswordCode(email, code);
+  }
+
+  @Post('reset-password')
+  resetPassword(
+    @Body('email') email: string,
+    @Body('code') code: string,
+    @Body('password') password: string,
+  ) {
+    return this.authService.resetPassword(email, code, password);
+  }
 }

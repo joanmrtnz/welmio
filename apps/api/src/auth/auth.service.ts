@@ -18,6 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+
   async register(dto: { email: string; password: string }) {
     if (!dto.email || !dto.password) {
       throw new BadRequestException('Email and password are required');
@@ -97,4 +98,110 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
+
+  async sendResetPasswordCode(email: string) {
+
+  if (!email) {
+    throw new BadRequestException('Email is required');
+  }
+
+  const user = await this.prisma.user.findUnique({
+    where: { email },
+  });
+
+  // don't reveal if the email exist
+  if (!user) {
+    return { message: 'If the email exists, a code has been sent' };
+  }
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedCode = await bcrypt.hash(code, 10);
+  const expiry = new Date(Date.now() + 5 * 60 * 1000); // 10 min
+
+  await this.prisma.user.update({
+    where: { email },
+    data: {
+      resetPasswordCode: hashedCode,
+      resetPasswordCodeExpiry: expiry,
+    },
+  });
+
+  // TODO: send real email or SMS
+  console.log('RESET CODE:', code);
+
+  return {
+    message: 'If the email exists, a code has been sent',
+  };
+}
+
+async validateResetPasswordCode(email: string, code: string) {
+
+  const user = await this.prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user || !user.resetPasswordCode) {
+    throw new UnauthorizedException('Invalid code');
+  }
+
+  if (!user.resetPasswordCodeExpiry) {
+    throw new UnauthorizedException('Invalid or expired code');
+  }
+
+  if (user.resetPasswordCodeExpiry < new Date()) {
+    throw new UnauthorizedException('Code expired');
+  }
+
+  const valid = await bcrypt.compare(
+    code,
+    user.resetPasswordCode,
+  );
+
+  if (!valid) {
+    throw new UnauthorizedException('Invalid code');
+  }
+
+  return {
+    valid,
+  };
+}
+
+async resetPassword(
+  email: string,
+  code: string,
+  newPassword: string,
+) {
+
+  if (!newPassword || newPassword.length < 6) {
+    throw new BadRequestException('Password must be at least 6 characters');
+  }
+
+  const user = await this.prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user || user.resetPasswordCode !== code) {
+    throw new UnauthorizedException('Invalid code');
+  }
+
+  if (user.resetPasswordCodeExpiry && user.resetPasswordCodeExpiry  < new Date()) {
+    throw new UnauthorizedException('Code expired');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await this.prisma.user.update({
+    where: { email },
+    data: {
+      password: hashedPassword,
+      resetPasswordCode: null,
+      resetPasswordCodeExpiry: null,
+    },
+  });
+
+  return {
+    message: 'Password updated successfully',
+  };
+}
+
 }
