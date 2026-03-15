@@ -4,14 +4,17 @@ export function AuthButton({
   title,
   variant = "primary",
   onPress,
+  disabled = false
 }: {
   title: string;
   variant?: "primary" | "secondary";
   onPress?: () => void;
+  disabled?: boolean;
 }) {
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       style={[
         styles.base,
         variant === "primary" ? styles.primary : styles.secondary,
