@@ -3,8 +3,30 @@ import { Link, router } from "expo-router";
 import { AuthInput } from "../components/AuthInput";
 import { AuthButton } from "../components/AuthButton";
 import { fonts } from "@/theme/fonts";
+import { useLogin } from "@/features/auth/hooks/useLogin";
+import { useState } from "react";
 
 export default function LoginScreen() {
+
+  const { execute, loading } = useLogin();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  async function handleLogin() {
+
+    try {
+      const res = await execute(
+      {
+        email,
+        password,
+      });
+
+      if (res) router.replace("/(app)/(tabs)/home");
+    } catch (error){
+      console.warn(error);
+    }
+  }
+
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
@@ -19,21 +41,23 @@ export default function LoginScreen() {
             label="Username or Email"
             placeholder="example@email.com"
             autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
           />
 
           <AuthInput
             label="Password"
             placeholder="••••••••"
             secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
 
-         
           <View style={styles.buttons}>
             <AuthButton
               title="Log In"
-              onPress={() => {
-                router.replace("/(app)/(tabs)/home");
-              }}
+              onPress={handleLogin} 
+              disabled={loading}
             />
 
             <Link href="/(public)/forgot-password" style={styles.link}>

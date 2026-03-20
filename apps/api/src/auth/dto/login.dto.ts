@@ -1,6 +1,7 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { LoginInput } from "@repo/shared-types";
+import { IsEmail, IsString, MinLength } from "class-validator";
 
-export class LoginDto {
+export class LoginDto implements LoginInput {
   @IsEmail()
   email: string;
 
