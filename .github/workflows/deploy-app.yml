@@ -1,10 +1,17 @@
-name: Build, Push & Deploy Welmio
+name: Build, Push & Deploy APP
 
 on:
   push:
     branches:
       - pre
       - prod
+    paths:
+      - 'apps/app/**'
+      - 'packages/shared-types/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - 'turbo.json'
 
 jobs:
   build-and-push:
@@ -21,19 +28,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build API image
-        run: |
-          docker build \
-            -f apps/api/Dockerfile \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:${{ github.sha }} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:prod \
-            .
-
-      - name: Push API image
-        run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:prod
-
       - name: Build APP image
         run: |
           docker build \
@@ -48,19 +42,6 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod
 
-      - name: Build WEB image
-        run: |
-          docker build \
-            -f apps/web/Dockerfile \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio:${{ github.sha }} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio:prod \
-            .
-
-      - name: Push WEB image
-        run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio:${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio:prod
-
   deploy:
     if: github.ref_name == 'prod'
     needs: build-and-push
@@ -70,5 +51,5 @@ jobs:
       - name: Deploy on server
         run: |
           cd /opt/welmio
-          docker compose pull
-          docker compose up -d
+          docker compose pull app-web
+          docker compose up -d app-web
