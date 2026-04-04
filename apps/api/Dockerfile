@@ -16,4 +16,4 @@ WORKDIR /app/apps/api
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "pnpm exec prisma generate && pnpm exec prisma migrate dev --name init && pnpm run dev"]
+CMD ["sh", "-c", "pnpm exec prisma generate && pnpm exec prisma migrate deploy && pnpm run start:prod"]
