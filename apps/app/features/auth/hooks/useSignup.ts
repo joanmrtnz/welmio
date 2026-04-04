@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { login } from "@/app/lib/api/auth";
-import { LoginInput } from "@repo/shared-types";
+import { signup } from "@/app/lib/api/auth";
+import type { RegisterInput } from "@repo/shared-types";
 
-export function useLogin() {
+export function useSignup() {
   const [loading, setLoading] = useState(false);
 
-  async function execute(data: LoginInput) {
+  async function execute(data: RegisterInput) {
     setLoading(true);
 
     try {
-      const res = await login(data);
+      const res = await signup(data);
       return res;
     } finally {
       setLoading(false);
