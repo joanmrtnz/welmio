@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-and-push:
+    if: github.ref_name == 'prod'
     runs-on: ubuntu-latest
 
     steps:
@@ -20,19 +21,48 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker image (welmio)
+      - name: Build API image
         run: |
           docker build \
-            -t ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }} \
-            -t ${{ secrets.DOCKERHUB_REPO }}:latest \
+            -f apps/api/Dockerfile \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:prod \
             .
 
-      - name: Push Docker image
+      - name: Push API image
         run: |
-          docker push ${{ secrets.DOCKERHUB_REPO }}:${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_REPO }}:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:prod
+
+      - name: Build APP image
+        run: |
+          docker build \
+            -f apps/app/Dockerfile \
+            --build-arg EXPO_PUBLIC_API_URL=${{ secrets.EXPO_PUBLIC_API_URL }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod \
+            .
+
+      - name: Push APP image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod
+
+      - name: Build WEB image
+        run: |
+          docker build \
+            -f apps/web/Dockerfile \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio:prod \
+            .
+
+      - name: Push WEB image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio:prod
 
   deploy:
+    if: github.ref_name == 'prod'
     needs: build-and-push
     runs-on: [self-hosted, welmio, prod]
 
