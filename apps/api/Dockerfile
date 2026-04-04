@@ -14,6 +14,9 @@ COPY apps/api ./apps/api
 
 WORKDIR /app/apps/api
 
+RUN pnpm exec prisma generate
+RUN pnpm run build
+
 EXPOSE 3000
 
-CMD ["sh", "-c", "pnpm exec prisma generate && pnpm exec prisma migrate deploy && pnpm run start:prod"]
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && pnpm run start:prod"]
