@@ -10,6 +10,7 @@ import { Prisma } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,23 +20,29 @@ export class AuthService {
   ) {}
 
 
-  async register(dto: { email: string; password: string }) {
-    if (!dto.email || !dto.password) {
-      throw new BadRequestException('Email and password are required');
+  async register(dto: RegisterDto) {
+    const { fullName, email, mobileNumber, dateOfBirth, password } = dto;
+
+    if (!fullName || !email || !mobileNumber || !dateOfBirth || !password) {
+      throw new BadRequestException('All fields are required');
     }
 
-    if (dto.password.length < 6) {
+    if (password.length < 6) {
       throw new BadRequestException(
         'Password must be at least 6 characters long',
       );
     }
+
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     try {
       const user = await this.prisma.user.create({
         data: {
-          email: dto.email,
+          fullName,
+          email,
+          mobileNumber,
+          dateOfBirth: new Date(dateOfBirth),
           password: hashedPassword,
         },
       });

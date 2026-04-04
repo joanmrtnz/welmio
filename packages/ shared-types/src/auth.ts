@@ -4,7 +4,10 @@ export interface LoginInput {
 }
 
 export interface RegisterInput {
+  fullName: string;
   email: string;
+  mobileNumber: string;
+  dateOfBirth: string;
   password: string;
 }
 

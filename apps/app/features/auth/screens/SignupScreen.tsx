@@ -1,93 +1,145 @@
 import { View, Text, StyleSheet } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { AuthInput } from "../components/AuthInput";
 import { AuthButton } from "../components/AuthButton";
 import { fonts } from "@/theme/fonts";
+import { useState } from "react";
+import { useSignup } from "@/features/auth/hooks/useSignup";
+import { toIsoDate } from "@/app/lib/date";
 
 
 export default function SignupScreen() {
+  const { execute, loading } = useSignup();
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  async function handleSignup() {
+    try {
+      if (password !== confirmPassword) {
+        console.warn("Las contraseñas no coinciden");
+        return;
+      }
+
+      const formattedDateOfBirth = toIsoDate(dateOfBirth);
+
+      if (!formattedDateOfBirth) {
+        console.warn("Invalid date format");
+        return;
+      }
+
+      const res = await execute({
+        fullName,
+        email,
+        mobileNumber,
+        dateOfBirth: formattedDateOfBirth,
+        password,
+      });
+
+      if (res) {
+        router.replace("/(app)/(tabs)/home");
+      }
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
   return (
     <View style={styles.screen}>
-    <View style={styles.headerArea}>
+      <View style={styles.headerArea}>
         <Text style={styles.welcome}>Create Account</Text>
-    </View>
+      </View>
 
-    <View style={styles.card}>
-
+      <View style={styles.card}>
         <View style={styles.form}>
-        <AuthInput
+          <AuthInput
             label="Full Name"
             placeholder="John Doe"
             autoCapitalize="words"
             textContentType="name"
-        />
+            value={fullName}
+            onChangeText={setFullName}
+          />
 
-        <AuthInput
+          <AuthInput
             label="Email"
             placeholder="example@email.com"
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
             autoCorrect={false}
-        />
+            value={email}
+            onChangeText={setEmail}
+          />
 
-        <AuthInput
+          <AuthInput
             label="Mobile Number"
             placeholder="+123 456 789"
             keyboardType="phone-pad"
             textContentType="telephoneNumber"
-        />
+            value={mobileNumber}
+            onChangeText={setMobileNumber}
+          />
 
-        <AuthInput
+          <AuthInput
             label="Date of Birth"
             placeholder="DD / MM / YYYY"
             keyboardType="numbers-and-punctuation"
-        />
+            value={dateOfBirth}
+            onChangeText={setDateOfBirth}
+          />
 
-        <AuthInput
+          <AuthInput
             label="Password"
             placeholder="••••••••"
             secureTextEntry
             textContentType="newPassword"
-        />
+            value={password}
+            onChangeText={setPassword}
+          />
 
-        <AuthInput
+          <AuthInput
             label="Confirm Password"
             placeholder="••••••••"
             secureTextEntry
             textContentType="newPassword"
-        />
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
 
-
-        <View style={styles.legalContainer}>
+          <View style={styles.legalContainer}>
             <Text style={styles.legal}>
-                By continuing, you agree to the{" "}
-                <Link href="/(public)/terms-of-use" asChild>
-                    <Text style={styles.legalLink}>Terms of Use</Text>
-                </Link>{" "}
-                and{" "}
-                <Link href="/(public)/privacy-policy" asChild>
-                    <Text style={styles.legalLink}>Privacy Policy</Text>
-                </Link>
+              By continuing, you agree to the{" "}
+              <Link href="/(public)/terms-of-use" asChild>
+                <Text style={styles.legalLink}>Terms of Use</Text>
+              </Link>{" "}
+              and{" "}
+              <Link href="/(public)/privacy-policy" asChild>
+                <Text style={styles.legalLink}>Privacy Policy</Text>
+              </Link>
             </Text>
-        </View>
+          </View>
 
+          <View style={styles.buttons}>
+            <AuthButton
+              title="Sign up"
+              onPress={handleSignup}
+              disabled={loading}
+            />
+          </View>
 
-
-        <View style={styles.buttons}>
-            <AuthButton title="Sign up" />
-        </View>
-
-        <Link 
-        href="/(public)/login" 
-        style={styles.footer}>
-            <Text >
-            Already have an account?{" "}
-            <Text style={styles.link}>Log in</Text>
+          <Link href="/(public)/login" style={styles.footer}>
+            <Text>
+              Already have an account?{" "}
+              <Text style={styles.link}>Log in</Text>
             </Text>
-        </Link>
+          </Link>
         </View>
-    </View>
+      </View>
     </View>
   );
 }
