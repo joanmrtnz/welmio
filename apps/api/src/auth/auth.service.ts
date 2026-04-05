@@ -187,17 +187,18 @@ async resetPassword(
     where: { email },
   });
 
+ 
   if (!user || !user.resetPasswordCode) {
-    throw new UnauthorizedException('Invalid credentials');
+    throw new UnauthorizedException('Invalid code');
   }
 
-  if (user.resetPasswordCodeExpiry && user.resetPasswordCodeExpiry  < new Date()) {
+  if (user.resetPasswordCodeExpiry && user.resetPasswordCodeExpiry < new Date()) {
     throw new UnauthorizedException('Code expired');
   }
 
-  const valid = await bcrypt.compare(code, user.resetPasswordCode);
+  const validCode = await bcrypt.compare(code, user.resetPasswordCode);
 
-  if (!valid) {
+  if (!validCode) {
     throw new UnauthorizedException('Invalid code');
   }
 

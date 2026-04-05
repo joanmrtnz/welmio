@@ -41,7 +41,7 @@ export class AuthController {
   resetPassword(
     @Body('email') email: string,
     @Body('code') code: string,
-    @Body('password') password: string,
+    @Body('newPassword') password: string,
   ) {
     return this.authService.resetPassword(email, code, password);
   }
