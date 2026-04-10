@@ -11,12 +11,14 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
 
@@ -133,8 +135,9 @@ export class AuthService {
     },
   });
 
-  // TODO: send real email or SMS
-  console.log('RESET CODE:', code);
+
+  await this.mailService.sendResetPasswordCodeEmail(email, code);
+
 
   return {
     message: 'If the email exists, a code has been sent',
