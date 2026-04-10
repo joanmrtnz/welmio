@@ -18,3 +18,28 @@ export function signup(payload: RegisterInput) {
     body: JSON.stringify(payload),
   });
 }
+
+export function sendResetPasswordCode(email: string) {
+  return apiFetch<{ message: string }>("/auth/send-reset-password-code", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function validateResetPasswordCode(email: string, code: string) {
+  return apiFetch<{ valid: boolean }>("/auth/validate-reset-password-code", {
+    method: "POST",
+    body: JSON.stringify({ email, code }),
+  });
+}
+
+export function resetPassword(
+  email: string,
+  code: string,
+  newPassword: string,
+) {
+  return apiFetch<{ message: string }>("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ email, code, newPassword }),
+  });
+}
