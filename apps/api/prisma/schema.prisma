@@ -12,22 +12,116 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+enum FrequencyType {
+  one_time
+  weekly
+  monthly
+  yearly
+}
+
+enum TransactionNature {
+  fixed
+  variable
+  rent
+  subscription
+  salary
+  refund
+  other
+}
+
+enum AccountType {
+  bank
+  cash
+  credit_card
+  debit_card
+  savings
+  wallet
+  investment
+}
 
 model User {
   id                      String    @id @default(uuid())
   fullName                String
   email                   String    @unique
-  mobileNumber            String
-  dateOfBirth             DateTime
+  mobileNumber            String?
+  dateOfBirth             DateTime?
   password                String
   role                    UserRole  @default(USER)
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
   resetPasswordCode       String?
   resetPasswordCodeExpiry DateTime?
+  transactions            Transaction[]
+  accounts                Account[]
+  categories   Category[]
 }
 
-enum UserRole {
-  USER
-  ADMIN
+model Transaction {
+  id                String              @id @default(cuid())
+  userId            String
+  amount            Decimal             @db.Decimal(12, 2)
+  currency          String              @db.VarChar(3)
+  type              TransactionType
+  description       String
+  notes             String?
+  date              DateTime
+  categoryId        String
+  accountId         String
+  frequencyType     FrequencyType       @default(one_time)
+  transactionNature TransactionNature   @default(other)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category          Category            @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  account           Account             @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([userId, date(sort: Desc)])
+  @@index([userId, type, date(sort: Desc)])
+  @@index([userId, categoryId, date(sort: Desc)])
+  @@index([userId, accountId, date(sort: Desc)])
+  @@index([userId, currency, date(sort: Desc)])
+  @@index([userId, frequencyType])
+  @@index([userId, transactionNature])
+}
+
+model Account {
+  id            String         @id @default(cuid())
+  userId        String
+  name          String
+  type          AccountType
+  currencies    String[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+
+  @@unique([userId, name])
+}
+
+model Category {
+  id            String         @id @default(cuid())
+  userId        String
+  name          String
+  color String?
+  icon          String?
+  type          TransactionType
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+
+  @@unique([userId, name, type])
 }

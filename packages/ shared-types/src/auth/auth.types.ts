@@ -11,7 +11,7 @@ export interface RegisterInput {
   password: string;
 }
 
-export interface AuthUser {
+export interface AuthResponseUser {
   id: string;
   email: string;
   role: "USER" | "ADMIN";
@@ -19,5 +19,5 @@ export interface AuthUser {
 
 export interface AuthResponse {
   accessToken: string;
-  user: AuthUser;
+  user: AuthResponseUser;
 }
