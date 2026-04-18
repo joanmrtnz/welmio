@@ -2,11 +2,8 @@ import { Controller, Get, UseGuards } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { JwtUser } from 'src/auth/types/jwt.types';
 
-interface JwtUser {
-  sub: string;
-  email: string;
-}
 
 @UseGuards(JwtAuthGuard)
 @Controller('transactions')

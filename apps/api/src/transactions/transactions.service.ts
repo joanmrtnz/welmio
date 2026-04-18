@@ -5,10 +5,14 @@ import {
   TransactionsOverviewResponseDto,
 } from './dto/transactions-overview-response.dto';
 import { PrismaService } from 'prisma/prisma.service';
+import { FinanceSummaryService } from 'src/finance/finance-summary.service';
 
 @Injectable()
 export class TransactionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly financeSummaryService: FinanceSummaryService,
+  ) {}
 
 
   async getUserTransactions(userId: string) {
@@ -60,53 +64,34 @@ export class TransactionsService {
       throw new NotFoundException('User not found');
     }
 
-    const transactions = await this.prisma.transaction.findMany({
-      where: { userId },
-      include: {
-        category: {
-          select: {
-            id: true,
-            name: true,
-            icon: true,
-            color: true,
-            type: true,
+    const [summary, transactions] = await Promise.all([
+      this.financeSummaryService.getUserFinanceSummary(userId),
+      this.prisma.transaction.findMany({
+        where: { userId },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              icon: true,
+              color: true,
+              type: true,
+            },
+          },
+          account: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+              currencies: true,
+            },
           },
         },
-        account: {
-          select: {
-            id: true,
-            name: true,
-            type: true,
-            currencies: true,
-          },
+        orderBy: {
+          date: 'desc',
         },
-      },
-      orderBy: {
-        date: 'desc',
-      },
-    });
-
-    let totalIncome = 0;
-    let totalExpense = 0;
-
-    for (const transaction of transactions) {
-      const amount = Number(transaction.amount);
-
-      if (transaction.type === 'income') {
-        totalIncome += amount;
-      } else {
-        totalExpense += amount;
-      }
-    }
-
-    const totalBalance = totalIncome - totalExpense;
-    const expenseRatio =
-      totalIncome > 0 ? Math.round((totalExpense / totalIncome) * 100) : 0;
-
-    const progressMessage =
-      totalIncome > 0
-        ? `${expenseRatio}% of your income has been spent.`
-        : 'No income registered yet.';
+      }),
+    ]);
 
     const groupedByMonth = new Map<string, TransactionOverviewItemDto[]>();
 
@@ -156,13 +141,7 @@ export class TransactionsService {
     }));
 
     return {
-      summary: {
-        totalBalance: totalBalance.toFixed(2),
-        totalIncome: totalIncome.toFixed(2),
-        totalExpense: totalExpense.toFixed(2),
-        expenseRatio,
-        progressMessage,
-      },
+      summary,
       groups,
     };
   }
