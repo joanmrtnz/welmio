@@ -27,3 +27,48 @@ export interface Transaction {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface TransactionOverviewCategory {
+  id: string;
+  name: string;
+  icon?: string | null;
+  color?: string | null;
+  type: TransactionType;
+}
+
+export interface TransactionOverviewAccount {
+  id: string;
+  name: string;
+  type: string;
+  currencies: string[];
+}
+
+export interface TransactionOverviewItem {
+  id: string;
+  description: string;
+  notes?: string | null;
+  amount: string;
+  currency: string;
+  type: TransactionType;
+  date: string;
+  frequencyType: FrequencyType;
+  transactionNature: TransactionNature;
+  category: TransactionOverviewCategory;
+  account: TransactionOverviewAccount;
+}
+
+export interface TransactionOverviewGroup {
+  month: string;
+  items: TransactionOverviewItem[];
+}
+
+export interface TransactionsOverviewResponse {
+  summary: {
+    totalBalance: string;
+    totalIncome: string;
+    totalExpense: string;
+    expenseRatio: number;
+    progressMessage: string;
+  };
+  groups: TransactionOverviewGroup[];
+}
