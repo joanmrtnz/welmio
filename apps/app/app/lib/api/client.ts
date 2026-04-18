@@ -1,3 +1,5 @@
+import { getAccessToken } from "@/app/lib/auth-storage";
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 if (!API_URL) {
@@ -14,11 +16,13 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const { token, headers, ...rest } = options;
 
+  const resolvedToken = token ?? (await getAccessToken());
+
   const response = await fetch(`${API_URL}${path}`, {
     ...rest,
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(resolvedToken ? { Authorization: `Bearer ${resolvedToken}` } : {}),
       ...(headers ?? {}),
     },
   });
