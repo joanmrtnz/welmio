@@ -126,7 +126,7 @@ export class AuthService {
 
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   const hashedCode = await bcrypt.hash(code, 10);
-  const expiry = new Date(Date.now() + 5 * 60 * 1000); // 10 min
+  const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   await this.prisma.user.update({
     where: { email },
