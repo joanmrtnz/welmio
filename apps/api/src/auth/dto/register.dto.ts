@@ -1,5 +1,11 @@
-import { RegisterInput } from "@repo/shared-types";
-import { IsEmail, IsString, MinLength, IsDateString } from "class-validator";
+import { RegisterInput } from '@repo/shared-types';
+import {
+  IsDateString,
+  IsEmail,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class RegisterDto implements RegisterInput {
   @IsString()
@@ -9,12 +15,14 @@ export class RegisterDto implements RegisterInput {
   @IsEmail()
   email: string;
 
+  @IsOptional()
   @IsString()
   @MinLength(6)
-  mobileNumber: string;
+  mobileNumber?: string;
 
+  @IsOptional()
   @IsDateString()
-  dateOfBirth: string;
+  dateOfBirth?: string;
 
   @IsString()
   @MinLength(6)
