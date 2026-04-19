@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { useAnalytics } from "../hooks/useAnalytics";
+import { getChartMaxValue, getChartYAxisLabels, normalizeChartBars } from "../utils/chart";
 
 const GREEN = "#00c896";
 const DIVIDER_GREEN = "#00d09e";
@@ -14,7 +15,16 @@ const TAB_GREEN = "#14cfa1";
 
 
 export default function AnalyticsScreen() {
-  const { selected, setSelected, data, loading } = useAnalytics();  
+  const { selected, setSelected, data, loading } = useAnalytics(); 
+  const chartBars = data
+    ? normalizeChartBars(data.chart.labels, data.chart.income, data.chart.expense, 90)
+    : [];
+
+  const maxValue = data
+    ? getChartMaxValue(data.chart.income, data.chart.expense)
+    : 1;
+
+  const yAxisLabels = getChartYAxisLabels(maxValue); 
 
   function formatCurrency(amount: string, currency = "USD") {
     return new Intl.NumberFormat("en-US", {
@@ -160,10 +170,11 @@ export default function AnalyticsScreen() {
 
             <View style={styles.chartArea}>
               <View style={styles.chartLabels}>
-                <Text style={styles.chartYAxis}>15k</Text>
-                <Text style={styles.chartYAxis}>10k</Text>
-                <Text style={styles.chartYAxis}>5k</Text>
-                <Text style={styles.chartYAxis}>1k</Text>
+                {yAxisLabels.map((label) => (
+                  <Text key={label} style={styles.chartYAxis}>
+                    {label}
+                  </Text>
+                ))}
               </View>
 
               <View style={styles.chartContent}>
@@ -175,25 +186,13 @@ export default function AnalyticsScreen() {
                 </View>
 
                 <View style={styles.chartBarsRow}>
-                  {[
-                    { day: "Mon", income: 60, expense: 80 },
-                    { day: "Tue", income: 35, expense: 0 },
-                    { day: "Wed", income: 80, expense: 40 },
-                    { day: "Thu", income: 55, expense: 0 },
-                    { day: "Fri", income: 90, expense: 85 },
-                    { day: "Sat", income: 20, expense: 0 },
-                    { day: "Sun", income: 50, expense: 22 },
-                  ].map((item) => (
-                    <View key={item.day} style={styles.barGroup}>
+                  {chartBars.map((item) => (
+                    <View key={item.label} style={styles.barGroup}>
                       <View style={styles.barPair}>
-                        <View
-                          style={[styles.barIncome, { height: item.income }]}
-                        />
-                        <View
-                          style={[styles.barExpense, { height: item.expense }]}
-                        />
+                        <View style={[styles.barIncome, { height: item.income }]} />
+                        <View style={[styles.barExpense, { height: item.expense }]} />
                       </View>
-                      <Text style={styles.barLabel}>{item.day}</Text>
+                      <Text style={styles.barLabel}>{item.label}</Text>
                     </View>
                   ))}
                 </View>
@@ -205,13 +204,17 @@ export default function AnalyticsScreen() {
             <View style={styles.totalItem}>
               <Icon name="money" size={22} color={TAB_GREEN} />
               <Text style={styles.totalLabel}>Income</Text>
-              <Text style={styles.totalIncome}>$4,120.00</Text>
+              <Text style={styles.totalIncome}>
+                {data ? formatCurrency(data.summary.totalIncome) : "$0.00"}
+              </Text>
             </View>
 
             <View style={styles.totalItem}>
               <Icon name="money" size={22} color={DARK_GREEN} />
               <Text style={styles.totalLabel}>Expense</Text>
-              <Text style={styles.totalExpense}>$1,187.40</Text>
+              <Text style={styles.totalExpense}>
+                {data ? formatCurrency(data.summary.totalExpense) : "$0.00"}
+              </Text>
             </View>
           </View>
 
