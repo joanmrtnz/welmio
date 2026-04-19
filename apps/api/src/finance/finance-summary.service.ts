@@ -5,9 +5,23 @@ import { PrismaService } from 'prisma/prisma.service';
 export class FinanceSummaryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUserFinanceSummary(userId: string) {
+  async getUserFinanceSummary(
+    userId: string,
+    startDate?: Date,
+    endDate?: Date,
+  ) {
     const transactions = await this.prisma.transaction.findMany({
-      where: { userId },
+      where: {
+        userId,
+        ...(startDate && endDate
+          ? {
+              date: {
+                gte: startDate,
+                lte: endDate,
+              },
+            }
+          : {}),
+      },
       select: {
         amount: true,
         type: true,

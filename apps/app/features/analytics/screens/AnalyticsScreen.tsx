@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-import { useState } from "react";
+import { useAnalytics } from "../hooks/useAnalytics";
 
 const GREEN = "#00c896";
 const DIVIDER_GREEN = "#00d09e";
@@ -14,16 +14,7 @@ const TAB_GREEN = "#14cfa1";
 
 
 export default function AnalyticsScreen() {
-
-  const [selected, setSelected] = useState<"daily" | "weekly" | "monthly">("monthly");
-  const data = {
-    summary: {
-      totalBalance: "7783.00",
-      totalExpense: "1187.40",
-      expenseRatio: 30,
-      progressMessage: "30% Of Your Expenses, Looks Good.",
-    },
-  };
+  const { selected, setSelected, data, loading } = useAnalytics();  
 
   function formatCurrency(amount: string, currency = "USD") {
     return new Intl.NumberFormat("en-US", {
@@ -131,6 +122,23 @@ export default function AnalyticsScreen() {
               ]}
             >
               Monthly
+            </Text>
+          </Pressable>
+
+           <Pressable
+            onPress={() => setSelected("yearly")}
+            style={[
+              styles.segmentItem,
+              selected === "yearly" && styles.segmentItemActive,
+            ]}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                selected === "yearly" && styles.segmentTextActive,
+              ]}
+            >
+              Yearly
             </Text>
           </Pressable>
         </View>

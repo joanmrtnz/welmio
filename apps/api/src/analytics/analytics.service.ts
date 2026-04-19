@@ -1,97 +1,71 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
+import { FinanceSummaryService } from '../finance/finance-summary.service';
+import { AnalyticsPeriod } from "@repo/shared-types";
+import { AnalyticsResponse } from "@repo/shared-types";
 
-export type AnalyticsPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
-type AnalyticsSummaryResponse = {
-  period: AnalyticsPeriod;
-  totals: {
-    balance: number;
-    income: number;
-    expense: number;
-  };
-  budget: {
-    spentPercentage: number;
-    spentAmount: number;
-    limitAmount: number | null;
-    message: string;
-  };
-  chart: {
-    labels: string[];
-    income: number[];
-    expense: number[];
-  };
-  targets: Array<{
-    id: string;
-    name: string;
-    progress: number;
-    currentAmount: number;
-    targetAmount: number;
-  }>;
-};
 
 @Injectable()
 export class AnalyticsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly financeSummaryService: FinanceSummaryService,
+  ) {}
 
   async getSummary(
     userId: string,
     period: AnalyticsPeriod = 'weekly',
-  ): Promise<AnalyticsSummaryResponse> {
-    const { startDate, endDate, labels } = this.getRangeByPeriod(period);
-
-    const transactions = await this.prisma.transaction.findMany({
-      where: {
-        userId,
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      orderBy: {
-        date: 'asc',
-      },
+  ): Promise<AnalyticsResponse> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
     });
 
-    const incomeTransactions = transactions.filter(
-      (transaction) => transaction.type === 'income',
-    );
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-    const expenseTransactions = transactions.filter(
-      (transaction) => transaction.type === 'expense',
-    );
+    const { startDate, endDate, labels } = this.getRangeByPeriod(period);
 
-    const income = incomeTransactions.reduce(
-      (sum, transaction) => sum + this.toNumber(transaction.amount),
-      0,
-    );
-
-    const expense = expenseTransactions.reduce(
-      (sum, transaction) => sum + this.toNumber(transaction.amount),
-      0,
-    );
-
-    const balance = income - expense;
+    const [summary, transactions] = await Promise.all([
+      this.financeSummaryService.getUserFinanceSummary(
+        userId,
+        startDate,
+        endDate,
+      ),
+      this.prisma.transaction.findMany({
+        where: {
+          userId,
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+        orderBy: {
+          date: 'asc',
+        },
+      }),
+    ]);
 
     const chart = this.buildChart(period, labels, transactions);
 
-    // todo: make this value programmatic
+     // todo: make this value programmatic
     const budgetLimit = 20000;
     const spentPercentage =
       budgetLimit > 0
-        ? Math.min(Math.round((expense / budgetLimit) * 100), 100)
+        ? Math.min(
+            Math.round((Number(summary.totalExpense) / budgetLimit) * 100),
+            100,
+          )
         : 0;
 
     return {
       period,
-      totals: {
-        balance: this.roundTo2(balance),
-        income: this.roundTo2(income),
-        expense: this.roundTo2(expense),
-      },
+      summary,
       budget: {
         spentPercentage,
-        spentAmount: this.roundTo2(expense),
+        spentAmount: Number(summary.totalExpense),
         limitAmount: budgetLimit,
         message: `${spentPercentage}% Of Your Expenses, Looks Good.`,
       },
@@ -132,14 +106,7 @@ export class AnalyticsService {
     const endDate = new Date(now);
     endDate.setHours(23, 59, 59, 999);
 
-    const labels = [
-      '00',
-      '04',
-      '08',
-      '12',
-      '16',
-      '20',
-    ];
+    const labels = ['00', '04', '08', '12', '16', '20'];
 
     return { startDate, endDate, labels };
   }
@@ -150,7 +117,7 @@ export class AnalyticsService {
     labels: string[];
   } {
     const current = new Date(now);
-    const day = current.getDay(); // 0 sunday, 1 monday...
+    const day = current.getDay();
     const mondayOffset = day === 0 ? -6 : 1 - day;
 
     const startDate = new Date(current);
@@ -193,7 +160,10 @@ export class AnalyticsService {
     const endDate = new Date(now.getFullYear(), 11, 31);
     endDate.setHours(23, 59, 59, 999);
 
-    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const labels = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
 
     return { startDate, endDate, labels };
   }
