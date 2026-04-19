@@ -1,164 +1,227 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-
+import { useState } from "react";
 
 const GREEN = "#00c896";
 const DIVIDER_GREEN = "#00d09e";
 const DARK_GREEN = "#059669";
 const LIGHT_GREEN = "#f1fff3";
-const MEDIUM_GREEN = "#dff7e2"
+const MEDIUM_GREEN = "#dff7e2";
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
+const TAB_GREEN = "#14cfa1";
 
 
 export default function AnalyticsScreen() {
+
+  const [selected, setSelected] = useState<"daily" | "weekly" | "monthly">("monthly");
+  const data = {
+    summary: {
+      totalBalance: "7783.00",
+      totalExpense: "1187.40",
+      expenseRatio: 30,
+      progressMessage: "30% Of Your Expenses, Looks Good.",
+    },
+  };
+
+  function formatCurrency(amount: string, currency = "USD") {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+    }).format(Number(amount));
+  }
 
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
         <Icon name="back" size={18} color={WHITE} />
-        <Text style={styles.title}>Quickly Analysis</Text>
+        <Text style={styles.title}>Analytics</Text>
         <View style={styles.notifications}>
-          <Icon name="bell"/>
+          <Icon name="bell" />
         </View>
       </View>
 
-      <View style={styles.statsCard}>
-          <View style={styles.statLeft}>
-            <View style={styles.circle}>
-              <Icon name="car" size={40}/>
-            </View>
-            <Text style={styles.statTitle}>Savings{"\n"}On Goals</Text>
-          </View>
+      <View style={styles.balanceRow}>
+        <View>
+          <Text style={styles.label}>Total Balance</Text>
+          <Text style={styles.balance}>
+            {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
+          </Text>
+        </View>
 
-          <View style={styles.separatorVertical} />
+        <View style={styles.separator} />
 
-          <View style={styles.statRight}>
-             <View style={styles.statItem}>
-              <View style={styles.statIcon}>
-                <Icon name="money" size={33}  />
-              </View>
-
-              <View style={styles.statText}>
-                <Text style={styles.statLabel}>Revenue Last Week</Text>
-                <Text style={styles.statPositive}>$4,000.00</Text>
-              </View>
-            </View>
-
-            <View style={styles.separatorHorizontal} />
-
-            <View style={styles.statItem}>
-              <View style={styles.statIcon}>
-                <Icon name="food" size={33} />
-              </View>
-              <View style={styles.statText}>
-                <Text style={styles.statLabel}>Food Last Week</Text>
-                <Text style={styles.statNegative}>-$100.00</Text>
-              </View>
-            </View>
-          </View>
+        <View>
+          <Text style={styles.label}>Total Expense</Text>
+          <Text style={styles.expense}>
+            {data ? `-${formatCurrency(data.summary.totalExpense)}` : "-$0.00"}
+          </Text>
+        </View>
       </View>
 
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBar}>
+          <View
+            style={[
+              styles.progressFill,
+              {
+                width: `${Math.min(data?.summary.expenseRatio ?? 0, 100)}%`,
+              },
+            ]}
+          />
+        </View>
+        <Text style={styles.progressText}>
+          {data?.summary.progressMessage ?? "Loading analytics..."}
+        </Text>
+      </View>
 
-      <View style={styles.cardWrapper}> 
+      <View style={styles.cardWrapper}>
         <ScrollView
-           contentContainerStyle={styles.cardContent}
-           showsVerticalScrollIndicator={false}
-         >                    
+          contentContainerStyle={styles.cardContent}
+          showsVerticalScrollIndicator={false}
+        >
 
-        <View style={styles.graphicCard}>
-          <View style={styles.graphHeader}>
-            <Text style={styles.graphTitle}>April Expenses</Text>
+        <View style={styles.segmentedControl}>
+          <Pressable
+            onPress={() => setSelected("daily")}
+            style={[
+              styles.segmentItem,
+              selected === "daily" && styles.segmentItemActive,
+            ]}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                selected === "daily" && styles.segmentTextActive,
+              ]}
+            >
+              Daily
+            </Text>
+          </Pressable>
 
-            <View style={styles.graphActions}>
-              <Pressable style={styles.graphIcon}>
-                <Icon name="search" />
-              </Pressable>
+          <Pressable
+            onPress={() => setSelected("weekly")}
+            style={[
+              styles.segmentItem,
+              selected === "weekly" && styles.segmentItemActive,
+            ]}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                selected === "weekly" && styles.segmentTextActive,
+              ]}
+            >
+              Weekly
+            </Text>
+          </Pressable>
 
-              <Pressable style={styles.graphIcon}>
-                <Icon name="calendar" />
-              </Pressable>
+          <Pressable
+            onPress={() => setSelected("monthly")}
+            style={[
+              styles.segmentItem,
+              selected === "monthly" && styles.segmentItemActive,
+            ]}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                selected === "monthly" && styles.segmentTextActive,
+              ]}
+            >
+              Monthly
+            </Text>
+          </Pressable>
+        </View>
+
+          <View style={styles.graphicCard}>
+            <View style={styles.graphHeader}>
+              <Text style={styles.graphTitle}>Income & Expenses</Text>
+
+              <View style={styles.graphActions}>
+                <Pressable style={styles.graphIcon}>
+                  <Icon name="search" />
+                </Pressable>
+
+                <Pressable style={styles.graphIcon}>
+                  <Icon name="calendar" />
+                </Pressable>
+              </View>
+            </View>
+
+            <View style={styles.chartArea}>
+              <View style={styles.chartLabels}>
+                <Text style={styles.chartYAxis}>15k</Text>
+                <Text style={styles.chartYAxis}>10k</Text>
+                <Text style={styles.chartYAxis}>5k</Text>
+                <Text style={styles.chartYAxis}>1k</Text>
+              </View>
+
+              <View style={styles.chartContent}>
+                <View style={styles.chartGrid}>
+                  <View style={styles.gridLine} />
+                  <View style={styles.gridLine} />
+                  <View style={styles.gridLine} />
+                  <View style={styles.gridLine} />
+                </View>
+
+                <View style={styles.chartBarsRow}>
+                  {[
+                    { day: "Mon", income: 60, expense: 80 },
+                    { day: "Tue", income: 35, expense: 0 },
+                    { day: "Wed", income: 80, expense: 40 },
+                    { day: "Thu", income: 55, expense: 0 },
+                    { day: "Fri", income: 90, expense: 85 },
+                    { day: "Sat", income: 20, expense: 0 },
+                    { day: "Sun", income: 50, expense: 22 },
+                  ].map((item) => (
+                    <View key={item.day} style={styles.barGroup}>
+                      <View style={styles.barPair}>
+                        <View
+                          style={[styles.barIncome, { height: item.income }]}
+                        />
+                        <View
+                          style={[styles.barExpense, { height: item.expense }]}
+                        />
+                      </View>
+                      <Text style={styles.barLabel}>{item.day}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
             </View>
           </View>
 
-          <View>
-          {/*  TODO: create real graphic*/}
+          <View style={styles.totalsRow}>
+            <View style={styles.totalItem}>
+              <Icon name="money" size={22} color={TAB_GREEN} />
+              <Text style={styles.totalLabel}>Income</Text>
+              <Text style={styles.totalIncome}>$4,120.00</Text>
+            </View>
+
+            <View style={styles.totalItem}>
+              <Icon name="money" size={22} color={DARK_GREEN} />
+              <Text style={styles.totalLabel}>Expense</Text>
+              <Text style={styles.totalExpense}>$1,187.40</Text>
+            </View>
           </View>
-        </View>
 
-       <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="money" size={25} /></Text>
-            </View>
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Salary Payment From Main Company
-                </Text>
-                <Text style={styles.transactionMeta}>18:27 · April 30</Text>
+          <Text style={styles.targetsTitle}>My Targets</Text>
+
+          <View style={styles.targetsRow}>
+            <View style={styles.targetCard}>
+              <View style={styles.progressCircle}>
+                <Text style={styles.progressValue}>30%</Text>
+              </View>
+              <Text style={styles.targetLabel}>Travel</Text>
             </View>
 
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Monthly</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>$4,000.00</Text>
-            </View>
-        </View>
-
-        <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="groceries" size={45}/></Text>
-            </View>
-
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Groceries
-                </Text>
-                <Text style={styles.transactionMeta}>17:00 · April 24</Text>
-            </View>
-
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Pantry</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>-$100.00</Text>
-            </View>
-            
-        </View>
-
-          <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="rent" size={45} /></Text>
-            </View>
-
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Rent
-                </Text>
-                <Text style={styles.transactionMeta}>8:30 · April 15</Text>
-            </View>
-
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Rent</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>-$674.40</Text>
+            <View style={styles.targetCard}>
+              <View style={styles.progressCircle}>
+                <Text style={styles.progressValue}>50%</Text>
+              </View>
+              <Text style={styles.targetLabel}>Car</Text>
             </View>
           </View>
         </ScrollView>
@@ -181,11 +244,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginTop: 50,
     marginBottom: 20,
-
   },
 
   title: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 18,
     fontFamily: fonts.bold,
     color: BLACK,
@@ -207,22 +269,79 @@ const styles = StyleSheet.create({
   },
 
   cardContent: {
-    paddingHorizontal: 32,
-    paddingTop: 30,
+    paddingHorizontal: 24,
+    paddingTop: 22,
     paddingBottom: 120,
   },
 
- graphicCard: {
-  backgroundColor: MEDIUM_GREEN,
-  borderRadius: 24,
-  padding: 20,
+  balanceRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 24,
+    gap: 30,
+  },
+
+  label: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: BLACK,
+  },
+
+  balance: {
+    fontSize: 22,
+    fontFamily: fonts.bold,
+    color: WHITE,
+  },
+
+  expense: {
+    fontSize: 22,
+    fontFamily: fonts.bold,
+    color: BLACK,
+  },
+
+  separator: {
+    width: 1,
+    backgroundColor: "#d1fae5",
+  },
+
+  progressContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+
+  progressBar: {
+    height: 20,
+    borderRadius: 10,
+    width: "70%",
+    backgroundColor: "#d1fae5",
+    overflow: "hidden",
+  },
+
+  progressFill: {
+    width: "30%",
+    height: "100%",
+    backgroundColor: BLACK,
+  },
+
+  progressText: {
+    marginTop: 8,
+    fontSize: 12,
+    fontFamily: fonts.medium,
+    color: BLACK,
+  },
+
+  graphicCard: {
+    backgroundColor: MEDIUM_GREEN,
+    borderRadius: 24,
+    padding: 16,
+    marginBottom: 18,
   },
 
   graphHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 14,
   },
 
   graphTitle: {
@@ -233,176 +352,198 @@ const styles = StyleSheet.create({
 
   graphActions: {
     flexDirection: "row",
-    gap: 12,
+    gap: 8,
   },
 
   graphIcon: {
-    backgroundColor: GREEN,
-    padding: 3,
-    borderRadius: 7,
+    backgroundColor: TAB_GREEN,
+    padding: 4,
+    borderRadius: 10,
   },
 
-  statsCard: {
-    backgroundColor: GREEN,
-    borderRadius: 28,
-    padding: 16,
-    marginHorizontal: 30,
+  chartArea: {
     flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 30,
+    alignItems: "flex-end",
   },
 
-  statLeft: {
-    flex: 0.5,
-    alignItems: "center",
+  chartLabels: {
+    width: 28,
+    height: 150,
+    justifyContent: "space-between",
+    paddingBottom: 18,
   },
 
-  circle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    borderColor: WHITE,
-    borderWidth: 2,
-    marginBottom: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  statTitle: {
-    fontSize: 12,
-    fontFamily: fonts.medium,
-    color: BLACK,
-    textAlign: "center",
-  },
-
-  separatorVertical: {
-    width: 1,
-    backgroundColor: "#d1fae5",
-    marginHorizontal: 12,
-  },
-
-  separatorHorizontal: {
-    height: 1,
-    backgroundColor: "#d1fae5",
-    marginVertical: 12,
-  },
-
-  statRight: {
-    flex: 1,
-  },
-  statItem: {
-    flexDirection: "row",
-    gap: 7,
-  },
-
-  statIcon: {
-    flex: 0.3,
-  },
-
-  statText: {
-    flex: 1,
-  },
-  
-  statLabel: {
-    fontSize: 11,
+  chartYAxis: {
+    fontSize: 10,
     fontFamily: fonts.regular,
-    color: BLACK,
+    color: "#6b8f87",
   },
 
-  statPositive: {
-    fontSize: 14,
-    fontFamily: fonts.bold,
-    color: BLACK,
+  chartContent: {
+    flex: 1,
+    height: 150,
+    position: "relative",
   },
 
-  statNegative: {
-    fontSize: 14,
-    fontFamily: fonts.bold,
-    color: BLACK,
+  chartGrid: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 18,
+    justifyContent: "space-between",
   },
 
-  transaction: {
+  gridLine: {
+    borderTopWidth: 1,
+    borderTopColor: "#b5ddd5",
+    borderStyle: "dashed",
+  },
+
+  chartBarsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 12,
+    alignItems: "flex-end",
+    height: 150,
+    paddingLeft: 4,
+    paddingRight: 2,
   },
 
-  amountPositive: {
-    fontSize: 12,
-    fontFamily: fonts.bold,
-    color: BLACK,
-  },
-
-  amountNegative: {
-    fontSize: 12,
-    fontFamily: fonts.bold,
-    color: BLACK,
-  },
-
-  iconCircle: {
-    width: 53,
-    height: 53,
-    borderRadius: 17,
-    borderWidth: 2,
-    borderColor: DIVIDER_GREEN,
+  barGroup: {
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-end",
   },
 
-  icon: {
-    fontSize: 18,
-  },
-
-  transactionRow: {
+  barPair: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
+    alignItems: "flex-end",
+    gap: 3,
+    height: 112,
+    marginBottom: 8,
   },
 
-  transactionInfo: {
-    flex: 1,
-    marginLeft: 12,
-    marginRight: 10,
+  barIncome: {
+    width: 6,
+    borderRadius: 4,
+    backgroundColor: TAB_GREEN,
   },
 
-  transactionTitle: {
-    fontSize: 12,
+  barExpense: {
+    width: 6,
+    borderRadius: 4,
+    backgroundColor: DARK_GREEN,
+  },
+
+  barLabel: {
+    fontSize: 10,
     fontFamily: fonts.medium,
     color: BLACK,
   },
 
-  transactionMeta: {
-    fontSize: 11,
+  totalsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 18,
+  },
+
+  totalItem: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  totalLabel: {
+    marginTop: 6,
+    fontSize: 12,
     fontFamily: fonts.regular,
     color: BLACK,
-    marginTop: 5,
   },
 
-  categoryColumn: {
-    height: 32,
-    width: 80,
-    alignItems: "center",
+  totalIncome: {
+    marginTop: 2,
+    fontSize: 16,
+    fontFamily: fonts.bold,
+    color: BLACK,
+  },
+
+  totalExpense: {
+    marginTop: 2,
+    fontSize: 16,
+    fontFamily: fonts.bold,
+    color: BLACK,
+  },
+
+  targetsTitle: {
+    fontSize: 14,
+    fontFamily: fonts.bold,
+    color: BLACK,
+    marginBottom: 14,
+  },
+
+  targetsRow: {
     flexDirection: "row",
-    justifyContent: "center",
-    borderLeftColor: DIVIDER_GREEN,
-    borderLeftWidth: 1,
-    borderRightColor: DIVIDER_GREEN,
-    borderRightWidth: 1,
+    justifyContent: "space-between",
   },
 
-  amountColumn: {
-    width: 90,
+  targetCard: {
+    width: "47%",
+    backgroundColor: DIVIDER_GREEN,
+    borderRadius: 24,
+    paddingVertical: 18,
     alignItems: "center",
-    flexDirection: "row",
     justifyContent: "center",
   },
 
-  transactionCategory: {
-    fontSize: 11,
+  progressCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    borderWidth: 3,
+    borderColor: WHITE,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+
+  progressValue: {
+    fontSize: 20,
+    fontFamily: fonts.bold,
+    color: WHITE,
+  },
+
+  targetLabel: {
+    fontSize: 13,
+    fontFamily: fonts.medium,
+    color: WHITE,
+  },
+
+  segmentedControl: {
+    backgroundColor: "#d7ead9",
+    borderRadius: 18,
+    padding: 6,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+
+  segmentItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    borderRadius: 14,
+  },
+
+  segmentItemActive: {
+    backgroundColor: "#14cfa1",
+  },
+
+  segmentText: {
+    fontSize: 12,
     fontFamily: fonts.medium,
     color: BLACK,
-    textAlign: "center",
   },
 
+  segmentTextActive: {
+    fontFamily: fonts.bold,
+  },
 });
-
