@@ -170,8 +170,8 @@ export default function AnalyticsScreen() {
 
             <View style={styles.chartArea}>
               <View style={styles.chartLabels}>
-                {yAxisLabels.map((label) => (
-                  <Text key={label} style={styles.chartYAxis}>
+                {yAxisLabels.map((label, index) => (
+                  <Text key={`${label}-${index}`} style={styles.chartYAxis}>
                     {label}
                   </Text>
                 ))}
