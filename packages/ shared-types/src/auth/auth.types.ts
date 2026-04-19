@@ -6,12 +6,12 @@ export interface LoginInput {
 export interface RegisterInput {
   fullName: string;
   email: string;
-  mobileNumber: string;
-  dateOfBirth: string;
+  mobileNumber?: string;
+  dateOfBirth?: string;
   password: string;
 }
 
-export interface AuthUser {
+export interface AuthResponseUser {
   id: string;
   email: string;
   role: "USER" | "ADMIN";
@@ -19,5 +19,5 @@ export interface AuthUser {
 
 export interface AuthResponse {
   accessToken: string;
-  user: AuthUser;
+  user: AuthResponseUser;
 }

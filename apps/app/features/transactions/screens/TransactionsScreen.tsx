@@ -1,6 +1,10 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import { TransactionsOverviewResponse } from "@repo/shared-types";
+import { useEffect, useState } from "react";
+import { apiFetch } from "@/app/lib/api/client";
+import { formatCategoryLabel, formatCurrency, formatSignedAmount, formatTransactionMeta } from "../utils/formatters";
 
 
 const GREEN = "#00c896";
@@ -14,179 +18,134 @@ const BUTTON_GREEN = "#1A9E6A";
 
 
 export default function TransactionScreen() {
+  const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
+
+  useEffect(() => {
+    async function loadTransactions() {
+      try {
+        const response = await apiFetch<TransactionsOverviewResponse>(
+          "/transactions/overview",
+        );
+        setData(response);
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+
+    loadTransactions();
+  }, []);
+
   return (
     <View style={styles.screen}>
-        <View style={styles.headerArea}>
-            <Icon name="back" size={18} color={WHITE} />
-            <Text style={styles.title}>Transactions</Text>
-            <View style={styles.notifications}>
-                <Icon name="bell"/>
-            </View>
+      <View style={styles.headerArea}>
+        <Icon name="back" size={18} color={WHITE} />
+        <Text style={styles.title}>Transactions</Text>
+        <View style={styles.notifications}>
+          <Icon name="bell" />
         </View>
+      </View>
 
-        <View style={styles.balanceCard}>
-            <Text style={styles.balanceCardLabel}>Total Balance</Text>
-            <Text style={styles.balanceCardTitle}>$7,783.00</Text>
-        </View>
+      <View style={styles.balanceCard}>
+        <Text style={styles.balanceCardLabel}>Total Balance</Text>
+        <Text style={styles.balanceCardTitle}>
+          {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
+        </Text>
+      </View>
 
-    
       <View style={styles.balanceRow}>
-          <View>
-            <Text style={styles.label}>Total Balance</Text>
-            <Text style={styles.balance}>$7,783.00</Text>
-          </View>
-
-          <View style={styles.separator} />
-
-          <View>
-            <Text style={styles.label}>Total Expense</Text>
-            <Text style={styles.expense}>-$1,187.40</Text>
-          </View>
-        </View>
-
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
-          </View>
-          <Text style={styles.progressText}>
-            30% Of Your Expenses, Looks Good.
+        <View>
+          <Text style={styles.label}>Total Balance</Text>
+          <Text style={styles.balance}>
+            {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
           </Text>
         </View>
 
-      <View style={styles.cardWrapper}> 
+        <View style={styles.separator} />
+
+        <View>
+          <Text style={styles.label}>Total Expense</Text>
+          <Text style={styles.expense}>
+            {data ? `-${formatCurrency(data.summary.totalExpense)}` : "-$0.00"}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBar}>
+          <View
+            style={[
+              styles.progressFill,
+              {
+                width: `${Math.min(data?.summary.expenseRatio ?? 0, 100)}%`,
+              },
+            ]}
+          />
+        </View>
+        <Text style={styles.progressText}>
+          {data?.summary.progressMessage ?? "Loading transactions..."}
+        </Text>
+      </View>
+
+      <View style={styles.cardWrapper}>
         <ScrollView
-      contentContainerStyle={styles.cardContent}
-      showsVerticalScrollIndicator={false}
-    >              
-       <Text style={styles.monthLabel}>April</Text>
-       <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="money" size={25} color={BUTTON_GREEN} /></Text>
-            </View>
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Salary Payment From Main Company
-                </Text>
-                <Text style={styles.transactionMeta}>18:27 · April 30</Text>
-            </View>
+          contentContainerStyle={styles.cardContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {data?.groups.map((group) => (
+            <View key={group.month}>
+              <Text style={styles.monthLabel}>{group.month}</Text>
 
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Monthly</Text>
-            </View>
+              {group.items.map((item) => (
+                <View key={item.id} style={styles.transactionRow}>
+                  <View style={styles.iconCircle}>
+                    <Text style={styles.icon}>
+                      <Icon
+                        name={(item.category.icon ?? "money") as never}
+                        size={25}
+                        color={BUTTON_GREEN}
+                      />
+                    </Text>
+                  </View>
 
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>$4,000.00</Text>
-            </View>
-        </View>
+                  <View style={styles.transactionInfo}>
+                    <Text
+                      style={styles.transactionTitle}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.description}
+                    </Text>
+                    <Text style={styles.transactionMeta}>
+                      {formatTransactionMeta(item.date)}
+                    </Text>
+                  </View>
 
-        <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="groceries" size={45}  color={BUTTON_GREEN} /></Text>
-            </View>
+                  <View style={styles.categoryColumn}>
+                    <Text style={styles.transactionCategory}>
+                      {formatCategoryLabel(
+                        item.category.name,
+                        item.frequencyType,
+                        item.transactionNature,
+                      )}
+                    </Text>
+                  </View>
 
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Groceries
-                </Text>
-                <Text style={styles.transactionMeta}>17:00 · April 24</Text>
+                  <View style={styles.amountColumn}>
+                    <Text
+                      style={
+                        item.type === "expense"
+                          ? styles.amountNegative
+                          : styles.amountPositive
+                      }
+                    >
+                      {formatSignedAmount(item.amount, item.type, item.currency)}
+                    </Text>
+                  </View>
+                </View>
+              ))}
             </View>
-
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Pantry</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>-$100.00</Text>
-            </View>
-            
-        </View>
-
-        <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="rent" size={45}  color={BUTTON_GREEN}  /></Text>
-            </View>
-
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Rent
-                </Text>
-                <Text style={styles.transactionMeta}>8:30 · April 15</Text>
-            </View>
-
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Rent</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>-$674.40</Text>
-            </View>
-        </View>
-
-        <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="money" size={25}  color={BUTTON_GREEN} /></Text>
-            </View>
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Salary Payment From Main Company
-                </Text>
-                <Text style={styles.transactionMeta}>18:27 · April 30</Text>
-            </View>
-
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Monthly</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>$4,000.00</Text>
-            </View>
-        </View>
-
-        <Text style={styles.monthLabel}>March</Text>
-
-        <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="groceries" size={45}  color={BUTTON_GREEN} /></Text>
-            </View>
-
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Groceries
-                </Text>
-                <Text style={styles.transactionMeta}>17:00 · April 24</Text>
-            </View>
-
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Pantry</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>-$100.00</Text>
-            </View>
-            
-        </View>
-
-      </ScrollView>
+          ))}
+        </ScrollView>
       </View>
     </View>
   );

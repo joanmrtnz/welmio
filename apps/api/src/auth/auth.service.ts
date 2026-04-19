@@ -25,8 +25,10 @@ export class AuthService {
   async register(dto: RegisterDto) {
     const { fullName, email, mobileNumber, dateOfBirth, password } = dto;
 
-    if (!fullName || !email || !mobileNumber || !dateOfBirth || !password) {
-      throw new BadRequestException('All fields are required');
+    if (!fullName || !email || !password) {
+      throw new BadRequestException(
+        'fullName, email and password are required',
+      );
     }
 
     if (password.length < 6) {
@@ -35,16 +37,15 @@ export class AuthService {
       );
     }
 
-
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
       const user = await this.prisma.user.create({
         data: {
           fullName,
           email,
-          mobileNumber,
-          dateOfBirth: new Date(dateOfBirth),
+          mobileNumber: mobileNumber ?? null,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
           password: hashedPassword,
         },
       });
@@ -104,7 +105,7 @@ export class AuthService {
     const payload = { sub: userId, email };
 
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      accessToken: await this.jwtService.signAsync(payload),
     };
   }
 
@@ -125,7 +126,7 @@ export class AuthService {
 
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   const hashedCode = await bcrypt.hash(code, 10);
-  const expiry = new Date(Date.now() + 5 * 60 * 1000); // 10 min
+  const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   await this.prisma.user.update({
     where: { email },
