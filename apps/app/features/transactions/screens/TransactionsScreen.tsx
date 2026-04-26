@@ -75,7 +75,7 @@ export default function TransactionScreen() {
             styles.incomeIcon,
             totalsFilter === "income" && styles.totalIconActive]
             }>
-             <Icon name="income" size={22} color={totalsFilter === "income" ? WHITE : BLACK}/>
+             <Icon name="income" size={18} color={totalsFilter === "income" ? WHITE : BLACK}/>
           </View>
           <Text style={[
             styles.label, 
@@ -101,7 +101,7 @@ export default function TransactionScreen() {
             styles.incomeIcon,
             totalsFilter === "expense" && styles.totalIconActive]
             }>
-             <Icon name="expense" size={22} color={totalsFilter === "expense" ? WHITE : BLACK}/>
+             <Icon name="expense" size={18} color={totalsFilter === "expense" ? WHITE : BLACK}/>
           </View>
            <Text style={[
             styles.label, 
@@ -387,12 +387,21 @@ transactionCategory: {
   textAlign: "center",
 },
 
+totalsRow: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  gap: 20,
+  marginHorizontal: 30,
+  marginBottom: 24,
+},
+
 totalCard: {
-  width: "40%",
-  backgroundColor: "#ffffff",
+  flex: 1,
+  height: 110,
   borderRadius: 20,
+  backgroundColor: WHITE,
   paddingVertical: 16,
-  paddingHorizontal: 82,
+  paddingHorizontal: 18,
   alignItems: "center",
   justifyContent: "center",
   gap: 5,
@@ -416,16 +425,9 @@ totalLabelActive: {
   color: WHITE,
 },
 
-totalsRow: {
-  marginHorizontal: 20,
-  flexDirection: "row",
-  justifyContent: "space-around",
-  marginBottom: 18,
-},
-
 calendarFloatingButton: {
   position: "absolute",
-  top: 405,
+  top: 415,
   right: 28,
   width: 35,
   height: 35,
@@ -434,7 +436,10 @@ calendarFloatingButton: {
   alignItems: "center",
   justifyContent: "center",
   zIndex: 10,
-  elevation: 6,
+  shadowColor: "transparent",
+  shadowOpacity: 0,
+  shadowRadius: 0,
+  shadowOffset: { width: 0, height: 0 },
 },
 
 });
