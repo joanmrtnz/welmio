@@ -17,9 +17,14 @@ import Shield from "../../assets/icons/shield.svg";
 import Settings from "../../assets/icons/settings.svg";
 import Help from "../../assets/icons/help.svg";
 import Logout from "../../assets/icons/logout.svg";
+import Income from "../../assets/icons/income.svg";
+import Expense from "../../assets/icons/expense.svg";
+
 
 
 const icons = {
+  arrowUp: Money,
+  arrowDown: Money,
   money: Money,
   groceries: Groceries,
   rent: Rent,
@@ -39,6 +44,8 @@ const icons = {
   settings: Settings,
   help: Help,
   logout: Logout,
+  income: Income,
+  expense: Expense,
 };
 
 type IconName = keyof typeof icons;

@@ -2,9 +2,10 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { TransactionsOverviewResponse } from "@repo/shared-types";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/app/lib/api/client";
 import { formatCategoryLabel, formatCurrency, formatSignedAmount, formatTransactionMeta } from "../utils/formatters";
+import { getFilteredTransactionGroups } from "../utils/transactions";
 
 
 const GREEN = "#00c896";
@@ -15,11 +16,19 @@ const MEDIUM_GREEN = "#23C988"
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
 const BUTTON_GREEN = "#1A9E6A";
+const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+const TAB_GREEN = "#14cfa1";
+
 
 
 export default function TransactionScreen() {
   const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
+  const [totalsFilter, setTotalsFilter] = useState<"all" | "income" | "expense">("all");
 
+  const filteredGroups = useMemo(() => {
+    return getFilteredTransactionGroups(data, totalsFilter);
+  }, [data, totalsFilter]);
+ 
   useEffect(() => {
     async function loadTransactions() {
       try {
@@ -52,46 +61,72 @@ export default function TransactionScreen() {
         </Text>
       </View>
 
-      <View style={styles.balanceRow}>
-        <View>
-          <Text style={styles.label}>Total Balance</Text>
-          <Text style={styles.balance}>
-            {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
+      <View style={styles.totalsRow}>
+        <Pressable
+          onPress={() =>
+            setTotalsFilter((prev) => (prev === "income" ? "all" : "income"))
+          }
+          style={[
+            styles.totalCard,
+            totalsFilter === "income" && styles.totalCardActive,
+          ]}
+        >
+          <View style={[
+            styles.incomeIcon,
+            totalsFilter === "income" && styles.totalIconActive]
+            }>
+             <Icon name="income" size={22} color={totalsFilter === "income" ? WHITE : BLACK}/>
+          </View>
+          <Text style={[
+            styles.label, 
+             totalsFilter === "income" && styles.labelActive,
+          ]}>Income</Text>
+           <Text style={[
+            styles.expense,
+            totalsFilter === "income" && styles.totalLabelActive]}>
+            {data ? formatCurrency(data.summary.totalIncome) : "$0.00"}
           </Text>
-        </View>
+        </Pressable>
 
-        <View style={styles.separator} />
-
-        <View>
-          <Text style={styles.label}>Total Expense</Text>
-          <Text style={styles.expense}>
-            {data ? `-${formatCurrency(data.summary.totalExpense)}` : "-$0.00"}
+        <Pressable
+          onPress={() =>
+            setTotalsFilter((prev) => (prev === "expense" ? "all" : "expense"))
+          }
+          style={[
+            styles.totalCard,
+            totalsFilter === "expense" && styles.totalCardActive,
+          ]}
+        >
+          <View style={[
+            styles.incomeIcon,
+            totalsFilter === "expense" && styles.totalIconActive]
+            }>
+             <Icon name="expense" size={22} color={totalsFilter === "expense" ? WHITE : BLACK}/>
+          </View>
+           <Text style={[
+            styles.label, 
+             totalsFilter === "expense" && styles.labelActive,
+          ]}>Expense</Text>
+          <Text style={[
+            styles.expense,
+            totalsFilter === "expense" && styles.totalLabelActive]}>
+            {data ? formatCurrency(data.summary.totalExpense) : "$0.00"}
           </Text>
-        </View>
+        </Pressable>
       </View>
 
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progressFill,
-              {
-                width: `${Math.min(data?.summary.expenseRatio ?? 0, 100)}%`,
-              },
-            ]}
-          />
-        </View>
-        <Text style={styles.progressText}>
-          {data?.summary.progressMessage ?? "Loading transactions..."}
-        </Text>
-      </View>
+      <Pressable style={styles.calendarFloatingButton}>
+          <Icon 
+          name="calendar"
+          size={26} />
+      </Pressable>
 
       <View style={styles.cardWrapper}>
         <ScrollView
           contentContainerStyle={styles.cardContent}
           showsVerticalScrollIndicator={false}
         >
-          {data?.groups.map((group) => (
+          {filteredGroups.map((group) => (
             <View key={group.month}>
               <Text style={styles.monthLabel}>{group.month}</Text>
 
@@ -185,7 +220,7 @@ const styles = StyleSheet.create({
     backgroundColor: LIGHT_GREEN,
     borderTopLeftRadius: 70,
     borderTopRightRadius: 70,
-    paddingTop: 40,
+    paddingTop: 20,
     overflow: "hidden",
   },
 
@@ -215,7 +250,7 @@ const styles = StyleSheet.create({
   },
 
   expense: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: fonts.bold,
     color: BLACK,
   },
@@ -225,31 +260,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#d1fae5",
   },
 
-  progressContainer: {
-    alignItems: "center",
-    marginBottom: 24,
-  },
-
-  progressBar: {
-    height: 20,
-    borderRadius: 10,
-    width: "70%",
-    backgroundColor: "#d1fae5",
-    overflow: "hidden",
-  },
-
-  progressFill: {
-    width: "30%",
-    height: "100%",
-    backgroundColor: BLACK,
-  },
-
-  progressText: {
-    marginTop: 8,
-    fontSize: 12,
-    fontFamily: fonts.medium,
-    color: BLACK,
-  },
 
   balanceCard: {
     backgroundColor: LIGHT_GREEN,
@@ -308,6 +318,17 @@ icon: {
   fontSize: 18,
 },
 
+incomeIcon: {
+  borderColor: BLACK,
+  borderWidth: 2,
+  borderRadius: 5,
+},
+
+totalIconActive: {
+  borderColor: WHITE,
+  borderWidth: 1,
+},
+
 monthLabel: {
     fontSize: 16,
     fontFamily: fonts.bold,
@@ -364,6 +385,56 @@ transactionCategory: {
   fontFamily: fonts.medium,
   color: BLACK,
   textAlign: "center",
+},
+
+totalCard: {
+  width: "40%",
+  backgroundColor: "#ffffff",
+  borderRadius: 20,
+  paddingVertical: 16,
+  paddingHorizontal: 82,
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 5,
+  borderColor: WHITE,
+  borderWidth: 1,
+},
+
+totalCardActive: {
+  backgroundColor: DARK_GREEN,
+  borderColor: LIGTH_GRAY,
+  borderWidth: 1,
+},
+
+labelActive: {
+  color: WHITE,
+  fontFamily: fonts.semibold,
+
+},
+
+totalLabelActive: {
+  color: WHITE,
+},
+
+totalsRow: {
+  marginHorizontal: 20,
+  flexDirection: "row",
+  justifyContent: "space-around",
+  marginBottom: 18,
+},
+
+calendarFloatingButton: {
+  position: "absolute",
+  top: 405,
+  right: 28,
+  width: 35,
+  height: 35,
+  borderRadius: 12,
+  backgroundColor: TAB_GREEN,
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 10,
+  elevation: 6,
 },
 
 });

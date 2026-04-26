@@ -159,11 +159,15 @@ export default function AnalyticsScreen() {
 
               <View style={styles.graphActions}>
                 <Pressable style={styles.graphIcon}>
-                  <Icon name="search" />
+                  <Icon 
+                  name="search"
+                  size={26} />
                 </Pressable>
 
                 <Pressable style={styles.graphIcon}>
-                  <Icon name="calendar" />
+                  <Icon 
+                  name="calendar"
+                  size={26} />
                 </Pressable>
               </View>
             </View>
