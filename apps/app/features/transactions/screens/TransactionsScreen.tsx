@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { TransactionsOverviewResponse } from "@repo/shared-types";
@@ -7,6 +7,8 @@ import { apiFetch } from "@/app/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
 import { formatCurrency } from "../utils/formatters";
 import { TransactionsGroupedList } from "../components/TransactionsGroupedList";
+import { CategoryFilterModal } from "../components/CategoryFilterModal";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 
 const GREEN = "#00c896";
@@ -22,10 +24,12 @@ const TAB_GREEN = "#14cfa1";
 export default function TransactionScreen() {
   const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
   const [totalsFilter, setTotalsFilter] = useState<"all" | "income" | "expense">("all");
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
 
   const filteredGroups = useMemo(() => {
-    return getFilteredTransactionGroups(data, totalsFilter);
-  }, [data, totalsFilter]);
+    return getFilteredTransactionGroups(data, totalsFilter, selectedCategoryIds);
+  }, [data, totalsFilter, selectedCategoryIds]);
  
   useEffect(() => {
     async function loadTransactions() {
@@ -113,17 +117,37 @@ export default function TransactionScreen() {
         </Pressable>
       </View>
 
-      <Pressable style={styles.calendarFloatingButton}>
-          <Icon 
-          name="calendar"
-          size={26} />
-      </Pressable>
+     <View style={styles.floatingButtons}>
+        <Pressable
+          onPress={() => setIsCategoryModalVisible(true)}
+          style={[
+            styles.floatingButton,
+            selectedCategoryIds.length > 0 && styles.floatingButtonActive,
+          ]}
+        >
+           <FontAwesome size={16} name="tags" color={BLACK} />
+        </Pressable>
+
+        <Pressable style={styles.floatingButton}>
+          <Icon name="calendar" size={26} />
+        </Pressable>
+      </View>
 
       <View style={styles.cardWrapper}>
         <View style={styles.cardContent}>
           <TransactionsGroupedList groups={filteredGroups} />
         </View>
       </View>
+
+      <CategoryFilterModal
+        visible={isCategoryModalVisible}
+        selectedCategoryIds={selectedCategoryIds}
+        onClose={() => setIsCategoryModalVisible(false)}
+        onApply={setSelectedCategoryIds}
+          onAddMoreCategories={() => {
+            setIsCategoryModalVisible(false);
+          }}
+      />
     </View>
   );
 }
@@ -269,22 +293,31 @@ const styles = StyleSheet.create({
     color: WHITE,
   },
 
-  calendarFloatingButton: {
-    position: "absolute",
-    top: 415,
-    right: 28,
-    width: 35,
-    height: 35,
-    borderRadius: 12,
-    backgroundColor: TAB_GREEN,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-    shadowColor: "transparent",
-    shadowOpacity: 0,
-    shadowRadius: 0,
-    shadowOffset: { width: 0, height: 0 },
-  },
+  floatingButtons: {
+  position: "absolute",
+  top: 415,
+  right: 28,
+  flexDirection: "row",
+  gap: 10,
+  zIndex: 10,
+},
+
+floatingButton: {
+  width: 35,
+  height: 35,
+  borderRadius: 12,
+  backgroundColor: TAB_GREEN,
+  alignItems: "center",
+  justifyContent: "center",
+  shadowColor: "transparent",
+  shadowOpacity: 0,
+  shadowRadius: 0,
+  shadowOffset: { width: 0, height: 0 },
+},
+
+floatingButtonActive: {
+  backgroundColor: DARK_GREEN,
+},
 
   cardContent: {
    paddingHorizontal: 32,

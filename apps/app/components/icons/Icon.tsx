@@ -19,8 +19,8 @@ import Help from "../../assets/icons/help.svg";
 import Logout from "../../assets/icons/logout.svg";
 import Income from "../../assets/icons/income.svg";
 import Expense from "../../assets/icons/expense.svg";
-
-
+import Close from "../../assets/icons/close.svg";
+import Plane from "../../assets/icons/plane.svg";
 
 const icons = {
   arrowUp: Money,
@@ -46,6 +46,8 @@ const icons = {
   logout: Logout,
   income: Income,
   expense: Expense,
+  close: Close,
+  plane: Plane,
 };
 
 type IconName = keyof typeof icons;
