@@ -144,9 +144,6 @@ export default function TransactionScreen() {
         selectedCategoryIds={selectedCategoryIds}
         onClose={() => setIsCategoryModalVisible(false)}
         onApply={setSelectedCategoryIds}
-          onAddMoreCategories={() => {
-            setIsCategoryModalVisible(false);
-          }}
       />
     </View>
   );
