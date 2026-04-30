@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { TransactionsOverviewResponse } from "@repo/shared-types";
@@ -9,6 +9,7 @@ import { formatCurrency } from "../utils/formatters";
 import { TransactionsGroupedList } from "../components/TransactionsGroupedList";
 import { CategoryFilterModal } from "../components/CategoryFilterModal";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { CreateTransactionModal } from "../components/CreateTransactionModal";
 
 
 const GREEN = "#00c896";
@@ -26,23 +27,26 @@ export default function TransactionScreen() {
   const [totalsFilter, setTotalsFilter] = useState<"all" | "income" | "expense">("all");
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [isCreateTransactionModalVisible, setIsCreateTransactionModalVisible] =
+  useState(false);
 
   const filteredGroups = useMemo(() => {
     return getFilteredTransactionGroups(data, totalsFilter, selectedCategoryIds);
   }, [data, totalsFilter, selectedCategoryIds]);
+
+  async function loadTransactions() {
+    try {
+      const response = await apiFetch<TransactionsOverviewResponse>(
+        "/transactions/overview",
+      );
+
+      setData(response);
+    } catch (error) {
+      console.warn(error);
+    }
+  }
  
   useEffect(() => {
-    async function loadTransactions() {
-      try {
-        const response = await apiFetch<TransactionsOverviewResponse>(
-          "/transactions/overview",
-        );
-        setData(response);
-      } catch (error) {
-        console.warn(error);
-      }
-    }
-
     loadTransactions();
   }, []);
 
@@ -133,10 +137,20 @@ export default function TransactionScreen() {
         </Pressable>
       </View>
 
+       <View style={styles.floatingAddMoreButton}>
+        <Pressable 
+        style={styles.floatingAddButton} 
+        onPress={() => setIsCreateTransactionModalVisible(true)}>
+           <Icon size={22} name="plus" color={BLACK} />
+        </Pressable>
+      </View>
+
       <View style={styles.cardWrapper}>
-        <View style={styles.cardContent}>
+        <ScrollView 
+        contentContainerStyle={styles.cardContent} 
+        showsVerticalScrollIndicator={false}>
           <TransactionsGroupedList groups={filteredGroups} />
-        </View>
+        </ScrollView>
       </View>
 
       <CategoryFilterModal
@@ -144,6 +158,12 @@ export default function TransactionScreen() {
         selectedCategoryIds={selectedCategoryIds}
         onClose={() => setIsCategoryModalVisible(false)}
         onApply={setSelectedCategoryIds}
+      />
+
+      <CreateTransactionModal
+        visible={isCreateTransactionModalVisible}
+        onClose={() => setIsCreateTransactionModalVisible(false)}
+        onCreated={loadTransactions}
       />
     </View>
   );
@@ -299,6 +319,26 @@ const styles = StyleSheet.create({
   zIndex: 10,
 },
 
+  floatingAddMoreButton: {
+  position: "absolute",
+  top: 760,
+  right: 28,
+  zIndex: 10,
+},
+
+floatingAddButton: {
+  width: 55,
+  height: 55,
+  borderRadius: 100,
+  backgroundColor: TAB_GREEN,
+  alignItems: "center",
+  justifyContent: "center",
+  shadowColor: "transparent",
+  shadowOpacity: 0,
+  shadowRadius: 0,
+  shadowOffset: { width: 0, height: 0 },
+},
+
 floatingButton: {
   width: 35,
   height: 35,
@@ -317,7 +357,7 @@ floatingButtonActive: {
 },
 
   cardContent: {
-   paddingHorizontal: 32,
+    paddingHorizontal: 32,
     paddingTop: 30,
     paddingBottom: 120
   },
