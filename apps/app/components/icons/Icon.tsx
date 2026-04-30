@@ -22,6 +22,8 @@ import Expense from "../../assets/icons/expense.svg";
 import Close from "../../assets/icons/close.svg";
 import Plane from "../../assets/icons/plane.svg";
 import Book from "../../assets/icons/book.svg";
+import Check from "../../assets/icons/check.svg";
+
 
 
 const icons = {
@@ -51,6 +53,7 @@ const icons = {
   close: Close,
   plane: Plane,
   book: Book,
+  check: Check,
 };
 
 type IconName = keyof typeof icons;
