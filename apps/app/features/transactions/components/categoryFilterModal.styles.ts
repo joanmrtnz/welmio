@@ -36,13 +36,22 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 22,
     paddingBottom: 20,
+    overflow: "hidden",
+  },
+
+  scrollView: {
+    width: "100%",
+  },
+
+  scrollContent: {
+    paddingBottom: 8,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 24,
+    marginBottom: 16,
   },
 
   title: {
@@ -69,13 +78,13 @@ export const styles = StyleSheet.create({
   gridItem: {
     width: "30%",
     alignItems: "center",
-    marginBottom: 28,
+    marginBottom: 22,
   },
 
   gridIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
+    width: 64,
+    height: 64,
+    borderRadius: 18,
     backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",

@@ -1,6 +1,7 @@
 import {
   Modal,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -88,49 +89,55 @@ export function CategoryFilterModal({
                 </Pressable>
               </View>
 
-              <View style={styles.grid}>
-                {categories.map((item) => {
-                  const isSelected = draftSelectedIds.includes(item.id);
+              <ScrollView
+                  style={styles.scrollView}
+                  contentContainerStyle={styles.scrollContent}
+                  showsVerticalScrollIndicator={false}
+                >
+                <View style={styles.grid}>
+                  {categories.map((item) => {
+                    const isSelected = draftSelectedIds.includes(item.id);
 
-                  return (
-                    <Pressable
-                      key={item.id}
-                      style={styles.gridItem}
-                      onPress={() => handleToggleCategory(item.id)}
-                    >
-                      <View
-                        style={[
-                          styles.gridIcon,
-                          isSelected && styles.gridIconSelected,
-                        ]}
+                    return (
+                      <Pressable
+                        key={item.id}
+                        style={styles.gridItem}
+                        onPress={() => handleToggleCategory(item.id)}
                       >
-                        <Icon
-                          name={(item.icon ?? "plus") as any}
-                          size={52}
-                          color={WHITE}
-                        />
-                      </View>
+                        <View
+                          style={[
+                            styles.gridIcon,
+                            isSelected && styles.gridIconSelected,
+                          ]}
+                        >
+                          <Icon
+                            name={(item.icon ?? "plus") as any}
+                            size={52}
+                            color={WHITE}
+                          />
+                        </View>
 
-                      <Text
-                        style={[
-                          styles.gridLabel,
-                          isSelected && styles.gridLabelSelected,
-                        ]}
-                      >
-                        {item.name}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
+                        <Text
+                          style={[
+                            styles.gridLabel,
+                            isSelected && styles.gridLabelSelected,
+                          ]}
+                        >
+                          {item.name}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
 
-              <Pressable
-                style={styles.addMoreButton}
-                onPress={() => setMode("create")}
-              >
-                <Icon name="plus" size={23} color={BLACK} />
-                <Text style={styles.addMoreText}>Add more categories</Text>
-              </Pressable>
+                <Pressable
+                  style={styles.addMoreButton}
+                  onPress={() => setMode("create")}
+                >
+                  <Icon name="plus" size={23} color={BLACK} />
+                  <Text style={styles.addMoreText}>Add more categories</Text>
+                </Pressable>
+              </ScrollView>
 
               <View style={styles.actions}>
                 <Pressable style={styles.clearButton} onPress={clearFilters}>
@@ -155,113 +162,115 @@ export function CategoryFilterModal({
                 </Pressable>
               </View>
 
-              <TextInput
-                value={categoryName}
-                onChangeText={setCategoryName}
-                placeholder="Category name"
-                placeholderTextColor="rgba(5, 46, 43, 0.45)"
-                style={styles.input}
-              />
+              <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
+                <TextInput
+                  value={categoryName}
+                  onChangeText={setCategoryName}
+                  placeholder="Category name"
+                  placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                  style={styles.input}
+                />
 
-              <Text style={styles.sectionLabel}>Type</Text>
+                <Text style={styles.sectionLabel}>Type</Text>
 
-              <View style={styles.typeRow}>
-                <Pressable
-                  style={[
-                    styles.typeButton,
-                    selectedType === "income" && styles.typeButtonSelected,
-                  ]}
-                  onPress={() => setSelectedType("income")}
-                >
-                  <Text
-                    style={[
-                      styles.typeButtonText,
-                      selectedType === "income" &&
-                        styles.typeButtonTextSelected,
-                    ]}
-                  >
-                    Income
-                  </Text>
-                </Pressable>
+  <View style={styles.typeRow}>
+    <Pressable
+      style={[
+        styles.typeButton,
+        selectedType === "income" && styles.typeButtonSelected,
+      ]}
+      onPress={() => setSelectedType("income")}
+    >
+      <Text
+        style={[
+          styles.typeButtonText,
+          selectedType === "income" && styles.typeButtonTextSelected,
+        ]}
+      >
+        Income
+      </Text>
+    </Pressable>
 
-                <Pressable
-                  style={[
-                    styles.typeButton,
-                    selectedType === "expense" && styles.typeButtonSelected,
-                  ]}
-                  onPress={() => setSelectedType("expense")}
-                >
-                  <Text
-                    style={[
-                      styles.typeButtonText,
-                      selectedType === "expense" &&
-                        styles.typeButtonTextSelected,
-                    ]}
-                  >
-                    Expense
-                  </Text>
-                </Pressable>
-              </View>
+    <Pressable
+      style={[
+        styles.typeButton,
+        selectedType === "expense" && styles.typeButtonSelected,
+      ]}
+      onPress={() => setSelectedType("expense")}
+    >
+      <Text
+        style={[
+          styles.typeButtonText,
+          selectedType === "expense" && styles.typeButtonTextSelected,
+        ]}
+      >
+        Expense
+      </Text>
+    </Pressable>
+  </View>
 
-              <Text style={styles.sectionLabel}>Icon</Text>
+  <Text style={styles.sectionLabel}>Icon</Text>
 
-              <View style={styles.iconSelectorGrid}>
-                {CATEGORY_ICONS.map((item) => {
-                  const isSelected = selectedIcon === item.name;
+  <View style={styles.iconSelectorGrid}>
+    {CATEGORY_ICONS.map((item) => {
+      const isSelected = selectedIcon === item.name;
 
-                  return (
-                    <Pressable
-                      key={item.name}
-                      style={[
-                        styles.iconOption,
-                        isSelected && styles.iconOptionSelected,
-                      ]}
-                      onPress={() => setSelectedIcon(item.name)}
-                    >
-                      <Icon
-                        name={item.name as any}
-                        size={24}
-                        color={isSelected ? WHITE : BLACK}
-                      />
-
-                      <Text
-                        style={[
-                          styles.iconOptionLabel,
-                          isSelected && styles.iconOptionLabelSelected,
-                        ]}
+      return (
+        <Pressable
+          key={item.name}
+          style={[
+            styles.iconOption,
+            isSelected && styles.iconOptionSelected,
+          ]}
+                        onPress={() => setSelectedIcon(item.name)}
                       >
-                        {item.label}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
+                        <Icon
+                          name={item.name as any}
+                          size={24}
+                          color={isSelected ? WHITE : BLACK}
+                        />
 
-              <Text style={styles.sectionLabel}>Color</Text>
+                        <Text
+                          style={[
+                            styles.iconOptionLabel,
+                            isSelected && styles.iconOptionLabelSelected,
+                          ]}
+                        >
+                          {item.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
 
-              <View style={styles.colorSelectorRow}>
-                {CATEGORY_COLORS.map((color) => {
-                  const isSelected = selectedColor === color;
+                <Text style={styles.sectionLabel}>Color</Text>
 
-                  return (
-                    <Pressable
-                      key={color}
-                      style={[
-                        styles.colorOption,
-                        { backgroundColor: color },
-                        isSelected && styles.colorOptionSelected,
-                      ]}
-                      onPress={() => setSelectedColor(color)}
-                    />
-                  );
-                })}
-              </View>
+                <View style={styles.colorSelectorRow}>
+                  {CATEGORY_COLORS.map((color) => {
+                    const isSelected = selectedColor === color;
+
+                    return (
+                      <Pressable
+                        key={color}
+                        style={[
+                          styles.colorOption,
+                          { backgroundColor: color },
+                          isSelected && styles.colorOptionSelected,
+                        ]}
+                        onPress={() => setSelectedColor(color)}
+                      />
+                    );
+                  })}
+                </View>
+              </ScrollView>
 
               <View style={styles.actions}>
-                <Pressable
-                  style={styles.clearButton}
-                  onPress={handleBackToFilter}
-                >
+                <Pressable style={styles.clearButton} onPress={handleBackToFilter}>
                   <Text style={styles.clearButtonText}>Cancel</Text>
                 </Pressable>
 
