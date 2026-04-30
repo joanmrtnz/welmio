@@ -10,3 +10,7 @@ export interface Category {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type CategoriesOverviewResponse = {
+  categories: Category[];
+};
