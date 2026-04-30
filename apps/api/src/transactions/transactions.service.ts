@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   TransactionOverviewGroupDto,
   TransactionOverviewItemDto,
@@ -6,6 +6,8 @@ import {
 } from './dto/transactions-overview-response.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { FinanceSummaryService } from 'src/finance/finance-summary.service';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class TransactionsService {
@@ -145,4 +147,67 @@ export class TransactionsService {
       groups,
     };
   }
+
+    async createTransaction(
+    userId: string,
+    createTransactionDto: CreateTransactionDto,
+  ) {
+    const amount = new Prisma.Decimal(createTransactionDto.amount);
+
+    const category = await this.prisma.category.findFirst({
+      where: {
+        id: createTransactionDto.categoryId,
+        userId,
+      },
+      select: {
+        id: true,
+        type: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found.');
+    }
+
+    if (category.type !== createTransactionDto.type) {
+      throw new BadRequestException(
+        'Transaction type must match category type.',
+      );
+    }
+
+    const account = await this.prisma.account.findFirst({
+      where: {
+        id: createTransactionDto.accountId,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!account) {
+      throw new NotFoundException('Account not found.');
+    }
+
+    return this.prisma.transaction.create({
+      data: {
+        userId,
+        accountId: account.id,
+        categoryId: category.id,
+        amount,
+        currency: createTransactionDto.currency.trim().toUpperCase(),
+        type: createTransactionDto.type,
+        description: createTransactionDto.description.trim(),
+        notes: createTransactionDto.notes?.trim() || null,
+        date: new Date(createTransactionDto.date),
+        frequencyType: createTransactionDto.frequencyType ?? 'one_time',
+        transactionNature: createTransactionDto.transactionNature ?? 'other',
+      },
+      include: {
+        category: true,
+        account: true,
+      },
+    });
+  }
+
 }
