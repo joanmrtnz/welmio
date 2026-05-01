@@ -54,8 +54,9 @@ export function TransactionsGroupedList({
       console.warn("[TransactionsGroupedList] delete transaction error:", error);
     }
   }
-
+  
   function handleEditTransaction(transaction: TransactionOverviewItem) {
+    closeTransactionDetails();
     onEditTransaction?.(transaction);
   }
 

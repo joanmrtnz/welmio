@@ -28,20 +28,18 @@ const TAB_GREEN = "#14cfa1";
 
 export default function TransactionScreen() {
 
+  function handleEditTransaction(transaction: TransactionOverviewItem) {
+    setTransactionToEdit(transaction);
+    setIsCreateTransactionModalVisible(true);
+  }
+
+  const [transactionToEdit, setTransactionToEdit] =
+    useState<TransactionOverviewItem | null>(null);
+
   async function handleDeleteTransaction(transactionId: string) {
     await deleteTransaction(transactionId);
   }
 
-  async function handleEditTransaction(transaction: TransactionOverviewItem) {
-    console.log("[TransactionsScreen] edit transaction:", transaction);
-
-    // todo: add real edit transation ui flow 
-    await updateTransaction(transaction.id, {
-      description: `${transaction.description} updated`,
-    });
-
-    await loadTransactions();
-  }
   const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
   const [totalsFilter, setTotalsFilter] = useState<"all" | "income" | "expense">("all");
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
@@ -159,7 +157,10 @@ export default function TransactionScreen() {
        <View style={styles.floatingAddMoreButton}>
         <Pressable 
         style={styles.floatingAddButton} 
-        onPress={() => setIsCreateTransactionModalVisible(true)}>
+        onPress={() => {
+          setTransactionToEdit(null)
+          setIsCreateTransactionModalVisible(true)
+        }}>
            <Icon size={35} strokeWidth={1} name="plus" color={BLACK} />
         </Pressable>
       </View>
@@ -186,7 +187,11 @@ export default function TransactionScreen() {
 
       <CreateTransactionModal
         visible={isCreateTransactionModalVisible}
-        onClose={() => setIsCreateTransactionModalVisible(false)}
+        transactionToEdit={transactionToEdit}
+        onClose={() => {
+          setIsCreateTransactionModalVisible(false);
+          setTransactionToEdit(null);
+        }}
         onCreated={loadTransactions}
       />
     </View>

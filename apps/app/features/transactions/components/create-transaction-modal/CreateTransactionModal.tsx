@@ -19,15 +19,18 @@ import {
   createTransactionModalColors,
   styles,
 } from "@/features/transactions/components/create-transaction-modal/createTransactionModal.styles";
+import { TransactionOverviewItem } from "@repo/shared-types";
 
 type CreateTransactionModalProps = {
   visible: boolean;
+  transactionToEdit?: TransactionOverviewItem | null;
   onClose: () => void;
   onCreated?: () => void | Promise<void>;
 };
 
 export function CreateTransactionModal({
   visible,
+  transactionToEdit,
   onClose,
   onCreated,
 }: CreateTransactionModalProps) {
@@ -69,9 +72,10 @@ export function CreateTransactionModal({
 
     handleClose,
     handleSelectAccount,
-    handleCreateTransaction,
+    handleSubmitTransaction,
   } = useCreateTransactionForm({
     visible,
+    transactionToEdit,
     onClose,
     onCreated,
   });
@@ -88,7 +92,9 @@ export function CreateTransactionModal({
       <Pressable style={styles.backdrop} onPress={handleClose}>
         <Pressable style={styles.modalCard}>
           <View style={styles.header}>
-            <Text style={styles.title}>New Transaction</Text>
+            <Text style={styles.title}>
+              {transactionToEdit ? "Edit Transaction" : "New Transaction"}
+            </Text>
 
             <Pressable onPress={handleClose} style={styles.closeButton}>
               <Icon name="close" size={15} color={BLACK} />
@@ -332,10 +338,16 @@ export function CreateTransactionModal({
                   styles.applyButton,
                   !canSave && styles.applyButtonDisabled,
                 ]}
-                onPress={handleCreateTransaction}
+                onPress={handleSubmitTransaction}
               >
                 <Text style={styles.applyButtonText}>
-                  {isSaving ? "Saving..." : "Save"}
+                  {isSaving
+                    ? transactionToEdit
+                      ? "Updating..."
+                      : "Saving..."
+                    : transactionToEdit
+                      ? "Update"
+                      : "Save"}
                 </Text>
               </Pressable>
             </View>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getAccounts } from "../services/accounts.service";
 import { getCategoriesOverview } from "../services/categories.service";
-import { createTransaction } from "../services/transactions.service";
+import { createTransaction, updateTransaction } from "../services/transactions.service";
 
 import {
   formatDateInput,
@@ -17,17 +17,20 @@ import {
   TransactionNature,
   TransactionType,
   Category,
-  Account
+  Account,
+  TransactionOverviewItem
 } from "@repo/shared-types";
 
 type UseCreateTransactionFormParams = {
   visible: boolean;
+  transactionToEdit?: TransactionOverviewItem | null;
   onClose: () => void;
   onCreated?: () => void | Promise<void>;
 };
 
 export function useCreateTransactionForm({
   visible,
+  transactionToEdit,
   onClose,
   onCreated,
 }: UseCreateTransactionFormParams) {
@@ -66,6 +69,19 @@ export function useCreateTransactionForm({
     selectedAccountId &&
     date.trim() &&
     !isSaving;
+  
+    function fillFormFromTransaction(transaction: TransactionOverviewItem) {
+        setType(transaction.type);
+        setAmount(String(transaction.amount));
+        setCurrency(transaction.currency);
+        setDate(formatDateInput(new Date(transaction.date)));
+        setDescription(transaction.description);
+        setNotes(transaction.notes ?? "");
+        setSelectedCategoryId(transaction.category.id);
+        setSelectedAccountId(transaction.account.id);
+        setFrequencyType(transaction.frequencyType);
+        setTransactionNature(transaction.transactionNature);
+    }
 
   useEffect(() => {
     if (!visible) return;
@@ -82,6 +98,11 @@ export function useCreateTransactionForm({
 
         setCategories(nextCategories);
         setAccounts(nextAccounts);
+
+        if (transactionToEdit) {
+          fillFormFromTransaction(transactionToEdit);
+          return;
+        }
 
         const firstCategory = nextCategories.find(
           (category) => category.type === type,
@@ -101,9 +122,11 @@ export function useCreateTransactionForm({
     }
 
     loadFormData();
-  }, [visible, type]);
+  }, [visible, transactionToEdit]);
 
   useEffect(() => {
+    if (transactionToEdit) return;
+
     const categoryExistsInCurrentType = filteredCategories.some(
       (category) => category.id === selectedCategoryId,
     );
@@ -113,7 +136,7 @@ export function useCreateTransactionForm({
     }
 
     setTransactionNature(getDefaultTransactionNature(type));
-  }, [type, filteredCategories, selectedCategoryId]);
+  }, [type, filteredCategories, selectedCategoryId, transactionToEdit]);
 
   function resetForm() {
     setType("expense");
@@ -143,7 +166,7 @@ export function useCreateTransactionForm({
     }
   }
 
-  async function handleCreateTransaction() {
+  async function handleSubmitTransaction() {
     if (!canSave) return;
 
     const parsedDate = parseTransactionDate(date);
@@ -152,27 +175,33 @@ export function useCreateTransactionForm({
       return;
     }
 
+    const payload = {
+      amount: parsedAmount,
+      currency: normalizeCurrency(currency),
+      type,
+      description: description.trim(),
+      notes: notes.trim() || undefined,
+      date: parsedDate.toISOString(),
+      categoryId: selectedCategoryId,
+      accountId: selectedAccountId,
+      frequencyType,
+      transactionNature,
+    };
+
     try {
       setIsSaving(true);
 
-      await createTransaction({
-        amount: parsedAmount,
-        currency: normalizeCurrency(currency),
-        type,
-        description: description.trim(),
-        notes: notes.trim() || undefined,
-        date: parsedDate.toISOString(),
-        categoryId: selectedCategoryId,
-        accountId: selectedAccountId,
-        frequencyType,
-        transactionNature,
-      });
+      if (transactionToEdit) {
+        await updateTransaction(transactionToEdit.id, payload);
+      } else {
+        await createTransaction(payload);
+      }
 
       resetForm();
       await onCreated?.();
       onClose();
     } catch (error) {
-      console.warn("[CreateTransactionModal] create transaction error:", error);
+      console.warn("[CreateTransactionModal] submit transaction error:", error);
     } finally {
       setIsSaving(false);
     }
@@ -217,6 +246,6 @@ export function useCreateTransactionForm({
 
     handleClose,
     handleSelectAccount,
-    handleCreateTransaction,
+    handleSubmitTransaction,
   };
 }
