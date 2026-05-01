@@ -8,6 +8,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { FinanceSummaryService } from 'src/finance/finance-summary.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { Prisma } from '@prisma/client';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -148,7 +149,7 @@ export class TransactionsService {
     };
   }
 
-    async createTransaction(
+  async createTransaction(
     userId: string,
     createTransactionDto: CreateTransactionDto,
   ) {
@@ -208,6 +209,139 @@ export class TransactionsService {
         account: true,
       },
     });
+  }
+
+  async updateTransaction(
+    userId: string,
+    transactionId: string,
+    updateTransactionDto: UpdateTransactionDto,
+  ) {
+    const existingTransaction = await this.prisma.transaction.findFirst({
+      where: {
+        id: transactionId,
+        userId,
+      },
+      select: {
+        id: true,
+        type: true,
+        categoryId: true,
+        accountId: true,
+      },
+    });
+
+    if (!existingTransaction) {
+      throw new NotFoundException('Transaction not found.');
+    }
+
+    const nextType = updateTransactionDto.type ?? existingTransaction.type;
+    const nextCategoryId =
+      updateTransactionDto.categoryId ?? existingTransaction.categoryId;
+    const nextAccountId =
+      updateTransactionDto.accountId ?? existingTransaction.accountId;
+
+    const category = await this.prisma.category.findFirst({
+      where: {
+        id: nextCategoryId,
+        userId,
+      },
+      select: {
+        id: true,
+        type: true,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found.');
+    }
+
+    if (category.type !== nextType) {
+      throw new BadRequestException(
+        'Transaction type must match category type.',
+      );
+    }
+
+    const account = await this.prisma.account.findFirst({
+      where: {
+        id: nextAccountId,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!account) {
+      throw new NotFoundException('Account not found.');
+    }
+
+    return this.prisma.transaction.update({
+      where: {
+        id: existingTransaction.id,
+      },
+      data: {
+        ...(updateTransactionDto.amount !== undefined && {
+          amount: new Prisma.Decimal(updateTransactionDto.amount),
+        }),
+        ...(updateTransactionDto.currency !== undefined && {
+          currency: updateTransactionDto.currency.trim().toUpperCase(),
+        }),
+        ...(updateTransactionDto.type !== undefined && {
+          type: updateTransactionDto.type,
+        }),
+        ...(updateTransactionDto.description !== undefined && {
+          description: updateTransactionDto.description.trim(),
+        }),
+        ...(updateTransactionDto.notes !== undefined && {
+          notes: updateTransactionDto.notes?.trim() || null,
+        }),
+        ...(updateTransactionDto.date !== undefined && {
+          date: new Date(updateTransactionDto.date),
+        }),
+        ...(updateTransactionDto.categoryId !== undefined && {
+          categoryId: category.id,
+        }),
+        ...(updateTransactionDto.accountId !== undefined && {
+          accountId: account.id,
+        }),
+        ...(updateTransactionDto.frequencyType !== undefined && {
+          frequencyType: updateTransactionDto.frequencyType,
+        }),
+        ...(updateTransactionDto.transactionNature !== undefined && {
+          transactionNature: updateTransactionDto.transactionNature,
+        }),
+      },
+      include: {
+        category: true,
+        account: true,
+      },
+    });
+  }
+
+  async deleteTransaction(userId: string, transactionId: string) {
+    const existingTransaction = await this.prisma.transaction.findFirst({
+      where: {
+        id: transactionId,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!existingTransaction) {
+      throw new NotFoundException('Transaction not found.');
+    }
+
+    await this.prisma.transaction.delete({
+      where: {
+        id: existingTransaction.id,
+      },
+    });
+
+    return {
+      id: existingTransaction.id,
+      deleted: true,
+    };
   }
 
 }

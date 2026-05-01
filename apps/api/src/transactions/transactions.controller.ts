@@ -1,10 +1,19 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtUser } from 'src/auth/types/jwt.types';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('transactions')
@@ -20,6 +29,27 @@ export class TransactionsController {
       user.sub,
       createTransactionDto,
     );
+  }
+
+  @Put(':id')
+  updateTransaction(
+    @CurrentUser() user: JwtUser,
+    @Param('id') transactionId: string,
+    @Body() updateTransactionDto: UpdateTransactionDto,
+  ) {
+    return this.transactionsService.updateTransaction(
+      user.sub,
+      transactionId,
+      updateTransactionDto,
+    );
+  }
+
+  @Delete(':id')
+  deleteTransaction(
+    @CurrentUser() user: JwtUser,
+    @Param('id') transactionId: string,
+  ) {
+    return this.transactionsService.deleteTransaction(user.sub, transactionId);
   }
 
   @Get()
