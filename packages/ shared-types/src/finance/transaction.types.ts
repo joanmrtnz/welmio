@@ -72,3 +72,16 @@ export interface TransactionsOverviewResponse {
   };
   groups: TransactionOverviewGroup[];
 }
+
+export type CreateTransactionPayload = {
+  amount: number;
+  currency: string;
+  type: TransactionType;
+  description: string;
+  notes?: string;
+  date: string;
+  categoryId: string;
+  accountId: string;
+  frequencyType: FrequencyType;
+  transactionNature: TransactionNature;
+};

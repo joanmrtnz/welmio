@@ -16,3 +16,9 @@ export interface Account {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type AccountsResponse =
+  | {
+      accounts: Account[];
+    }
+  | Account[];

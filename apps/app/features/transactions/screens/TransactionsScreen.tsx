@@ -1,47 +1,79 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-import { TransactionsOverviewResponse } from "@repo/shared-types";
-import { useEffect, useState } from "react";
-import { apiFetch } from "@/app/lib/api/client";
-import { formatCategoryLabel, formatCurrency, formatSignedAmount, formatTransactionMeta } from "../utils/formatters";
+import {
+  deleteTransaction,
+  updateTransaction,
+} from "@/features/transactions/services/transactions.service";
 
+import { TransactionsOverviewResponse, TransactionOverviewItem} from "@repo/shared-types";
+import { useEffect, useMemo, useState } from "react";
+import { apiFetch } from "@/app/lib/api/client";
+import { getFilteredTransactionGroups } from "../utils/transactions";
+import { formatCurrency } from "../utils/formatters";
+import { TransactionsGroupedList } from "../components/transactions-grouped-list/TransactionsGroupedList";
+import { CategoryFilterModal } from "../components/category-filter-modal/CategoryFilterModal";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { CreateTransactionModal } from "../components/create-transaction-modal/CreateTransactionModal";
 
 const GREEN = "#00c896";
-const DIVIDER_GREEN = "#00d09e";
 const DARK_GREEN = "#059669";
 const LIGHT_GREEN = "#f1fff3";
-const MEDIUM_GREEN = "#23C988"
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
-const BUTTON_GREEN = "#1A9E6A";
+const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+const TAB_GREEN = "#14cfa1";
+
 
 
 export default function TransactionScreen() {
+
+  function handleEditTransaction(transaction: TransactionOverviewItem) {
+    setTransactionToEdit(transaction);
+    setIsCreateTransactionModalVisible(true);
+  }
+
+  const [transactionToEdit, setTransactionToEdit] =
+    useState<TransactionOverviewItem | null>(null);
+
+  async function handleDeleteTransaction(transactionId: string) {
+    await deleteTransaction(transactionId);
+  }
+
   const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
+  const [totalsFilter, setTotalsFilter] = useState<"all" | "income" | "expense">("all");
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [isCreateTransactionModalVisible, setIsCreateTransactionModalVisible] =
+  useState(false);
 
-  useEffect(() => {
-    async function loadTransactions() {
-      try {
-        const response = await apiFetch<TransactionsOverviewResponse>(
-          "/transactions/overview",
-        );
-        setData(response);
-      } catch (error) {
-        console.warn(error);
-      }
+  const filteredGroups = useMemo(() => {
+    return getFilteredTransactionGroups(data, totalsFilter, selectedCategoryIds);
+  }, [data, totalsFilter, selectedCategoryIds]);
+
+  async function loadTransactions() {
+    try {
+      const response = await apiFetch<TransactionsOverviewResponse>(
+        "/transactions/overview",
+      );
+
+      setData(response);
+    } catch (error) {
+      console.warn(error);
     }
-
+  }
+ 
+  useEffect(() => {
     loadTransactions();
   }, []);
 
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="back" size={18} color={WHITE} />
+        <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Transactions</Text>
         <View style={styles.notifications}>
-          <Icon name="bell" />
+           <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
         </View>
       </View>
 
@@ -52,101 +84,116 @@ export default function TransactionScreen() {
         </Text>
       </View>
 
-      <View style={styles.balanceRow}>
-        <View>
-          <Text style={styles.label}>Total Balance</Text>
-          <Text style={styles.balance}>
-            {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
+      <View style={styles.totalsRow}>
+        <Pressable
+          onPress={() =>
+            setTotalsFilter((prev) => (prev === "income" ? "all" : "income"))
+          }
+          style={[
+            styles.totalCard,
+            totalsFilter === "income" && styles.totalCardActive,
+          ]}
+        >
+          <View style={[
+            styles.incomeIcon,
+            totalsFilter === "income" && styles.totalIconActive]
+            }>
+             <Icon name="income" size={18} color={totalsFilter === "income" ? WHITE : BLACK}/>
+          </View>
+          <Text style={[
+            styles.label, 
+             totalsFilter === "income" && styles.labelActive,
+          ]}>Income</Text>
+           <Text style={[
+            styles.expense,
+            totalsFilter === "income" && styles.totalLabelActive]}>
+            {data ? formatCurrency(data.summary.totalIncome) : "$0.00"}
           </Text>
-        </View>
+        </Pressable>
 
-        <View style={styles.separator} />
-
-        <View>
-          <Text style={styles.label}>Total Expense</Text>
-          <Text style={styles.expense}>
-            {data ? `-${formatCurrency(data.summary.totalExpense)}` : "-$0.00"}
+        <Pressable
+          onPress={() =>
+            setTotalsFilter((prev) => (prev === "expense" ? "all" : "expense"))
+          }
+          style={[
+            styles.totalCard,
+            totalsFilter === "expense" && styles.totalCardActive,
+          ]}
+        >
+          <View style={[
+            styles.incomeIcon,
+            totalsFilter === "expense" && styles.totalIconActive]
+            }>
+             <Icon name="expense" size={18} color={totalsFilter === "expense" ? WHITE : BLACK}/>
+          </View>
+           <Text style={[
+            styles.label, 
+             totalsFilter === "expense" && styles.labelActive,
+          ]}>Expense</Text>
+          <Text style={[
+            styles.expense,
+            totalsFilter === "expense" && styles.totalLabelActive]}>
+            {data ? formatCurrency(data.summary.totalExpense) : "$0.00"}
           </Text>
-        </View>
+        </Pressable>
       </View>
 
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progressFill,
-              {
-                width: `${Math.min(data?.summary.expenseRatio ?? 0, 100)}%`,
-              },
-            ]}
-          />
-        </View>
-        <Text style={styles.progressText}>
-          {data?.summary.progressMessage ?? "Loading transactions..."}
-        </Text>
+     <View style={styles.floatingButtons}>
+        <Pressable
+          onPress={() => setIsCategoryModalVisible(true)}
+          style={[
+            styles.floatingButton,
+            selectedCategoryIds.length > 0 && styles.floatingButtonActive,
+          ]}
+        >
+           <FontAwesome size={16} name="tags" color={BLACK} />
+        </Pressable>
+
+        <Pressable style={styles.floatingButton}>
+          <Icon name="calendar" size={26} />
+        </Pressable>
+      </View>
+
+       <View style={styles.floatingAddMoreButton}>
+        <Pressable 
+        style={styles.floatingAddButton} 
+        onPress={() => {
+          setTransactionToEdit(null)
+          setIsCreateTransactionModalVisible(true)
+        }}>
+           <Icon size={35} strokeWidth={1} name="plus" color={BLACK} />
+        </Pressable>
       </View>
 
       <View style={styles.cardWrapper}>
-        <ScrollView
-          contentContainerStyle={styles.cardContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {data?.groups.map((group) => (
-            <View key={group.month}>
-              <Text style={styles.monthLabel}>{group.month}</Text>
-
-              {group.items.map((item) => (
-                <View key={item.id} style={styles.transactionRow}>
-                  <View style={styles.iconCircle}>
-                    <Text style={styles.icon}>
-                      <Icon
-                        name={(item.category.icon ?? "money") as never}
-                        size={25}
-                        color={BUTTON_GREEN}
-                      />
-                    </Text>
-                  </View>
-
-                  <View style={styles.transactionInfo}>
-                    <Text
-                      style={styles.transactionTitle}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {item.description}
-                    </Text>
-                    <Text style={styles.transactionMeta}>
-                      {formatTransactionMeta(item.date)}
-                    </Text>
-                  </View>
-
-                  <View style={styles.categoryColumn}>
-                    <Text style={styles.transactionCategory}>
-                      {formatCategoryLabel(
-                        item.category.name,
-                        item.frequencyType,
-                        item.transactionNature,
-                      )}
-                    </Text>
-                  </View>
-
-                  <View style={styles.amountColumn}>
-                    <Text
-                      style={
-                        item.type === "expense"
-                          ? styles.amountNegative
-                          : styles.amountPositive
-                      }
-                    >
-                      {formatSignedAmount(item.amount, item.type, item.currency)}
-                    </Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          ))}
+        <ScrollView 
+        contentContainerStyle={styles.cardContent} 
+        showsVerticalScrollIndicator={false}>
+        <TransactionsGroupedList
+          groups={filteredGroups}
+          onChanged={loadTransactions}
+          onDeleteTransaction={handleDeleteTransaction}
+          onEditTransaction={handleEditTransaction}
+        />
         </ScrollView>
       </View>
+
+      <CategoryFilterModal
+        visible={isCategoryModalVisible}
+        selectedCategoryIds={selectedCategoryIds}
+        onClose={() => setIsCategoryModalVisible(false)}
+        onApply={setSelectedCategoryIds}
+      />
+
+      <CreateTransactionModal
+        visible={isCreateTransactionModalVisible}
+        transactionToEdit={transactionToEdit}
+        onClose={() => {
+          setIsCreateTransactionModalVisible(false);
+          setTransactionToEdit(null);
+        }}
+        onCreated={loadTransactions}
+      />
     </View>
   );
 }
@@ -157,18 +204,18 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
   },
 
- headerArea: {
+  headerArea: {
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: 38,
+    paddingHorizontal: 30,
     paddingVertical: 10,
     marginTop: 50,
     marginBottom: 20,
   },
 
   title: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 18,
     fontFamily: fonts.bold,
     color: BLACK,
@@ -185,14 +232,8 @@ const styles = StyleSheet.create({
     backgroundColor: LIGHT_GREEN,
     borderTopLeftRadius: 70,
     borderTopRightRadius: 70,
-    paddingTop: 40,
+    paddingTop: 20,
     overflow: "hidden",
-  },
-
-  cardContent: {
-   paddingHorizontal: 32,
-    paddingTop: 30,
-    paddingBottom: 120
   },
 
   balanceRow: {
@@ -215,7 +256,7 @@ const styles = StyleSheet.create({
   },
 
   expense: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: fonts.bold,
     color: BLACK,
   },
@@ -223,32 +264,6 @@ const styles = StyleSheet.create({
   separator: {
     width: 1,
     backgroundColor: "#d1fae5",
-  },
-
-  progressContainer: {
-    alignItems: "center",
-    marginBottom: 24,
-  },
-
-  progressBar: {
-    height: 20,
-    borderRadius: 10,
-    width: "70%",
-    backgroundColor: "#d1fae5",
-    overflow: "hidden",
-  },
-
-  progressFill: {
-    width: "30%",
-    height: "100%",
-    backgroundColor: BLACK,
-  },
-
-  progressText: {
-    marginTop: 8,
-    fontSize: 12,
-    fontFamily: fonts.medium,
-    color: BLACK,
   },
 
   balanceCard: {
@@ -276,95 +291,105 @@ const styles = StyleSheet.create({
     color: BLACK,
   },
 
-  transaction: {
+  incomeIcon: {
+    borderColor: BLACK,
+    borderWidth: 2,
+    borderRadius: 5,
+  },
+
+  totalIconActive: {
+    borderColor: WHITE,
+    borderWidth: 1,
+  },
+
+  totalsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 12,
+    gap: 20,
+    marginHorizontal: 30,
+    marginBottom: 24,
   },
 
-  amountPositive: {
-    fontSize: 12,
-    fontFamily: fonts.bold,
-    color: BLACK,
+  totalCard: {
+    flex: 1,
+    height: 110,
+    borderRadius: 20,
+    backgroundColor: WHITE,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+    borderColor: WHITE,
+    borderWidth: 1,
   },
 
-  amountNegative: {
-    fontSize: 12,
-    fontFamily: fonts.bold,
-    color: BLACK,
+  totalCardActive: {
+    backgroundColor: DARK_GREEN,
+    borderColor: LIGTH_GRAY,
+    borderWidth: 1,
   },
 
-iconCircle: {
-  width: 53,
-  height: 53,
-  borderRadius: 17,
-  borderWidth: 2,
-  borderColor: MEDIUM_GREEN,
+  labelActive: {
+    color: WHITE,
+    fontFamily: fonts.semibold,
+  },
+
+  totalLabelActive: {
+    color: WHITE,
+  },
+
+  floatingButtons: {
+  position: "absolute",
+  top: 415,
+  right: 28,
+  flexDirection: "row",
+  gap: 10,
+  zIndex: 10,
+},
+
+  floatingAddMoreButton: {
+  position: "absolute",
+  top: 760,
+  right: 28,
+  zIndex: 10,
+},
+
+floatingAddButton: {
+  width: 55,
+  height: 55,
+  borderRadius: 100,
+  backgroundColor: TAB_GREEN,
   alignItems: "center",
   justifyContent: "center",
+  shadowColor: "transparent",
+  shadowOpacity: 0,
+  shadowRadius: 0,
+  shadowOffset: { width: 0, height: 0 },
 },
 
-icon: {
-  fontSize: 18,
-},
-
-monthLabel: {
-    fontSize: 16,
-    fontFamily: fonts.bold,
-    color: BLACK,
-},
-
-
-transactionRow: {
-  flexDirection: "row",
+floatingButton: {
+  width: 35,
+  height: 35,
+  borderRadius: 12,
+  backgroundColor: TAB_GREEN,
   alignItems: "center",
-  paddingVertical: 14,
-},
-
-transactionInfo: {
-  flex: 1,
-  marginLeft: 12,
-  marginRight: 10,
-},
-
-transactionTitle: {
-  fontSize: 12,
-  fontFamily: fonts.medium,
-  color: BLACK,
-},
-
-transactionMeta: {
-  fontSize: 11,
-  fontFamily: fonts.regular,
-  color: BLACK,
-  marginTop: 5,
-},
-
-categoryColumn: {
-  height: 32,
-  width: 80,
-  alignItems: "center",
-  flexDirection: "row",
   justifyContent: "center",
-  borderLeftColor: DIVIDER_GREEN,
-  borderLeftWidth: 1,
-  borderRightColor: DIVIDER_GREEN,
-  borderRightWidth: 1,
+  shadowColor: "transparent",
+  shadowOpacity: 0,
+  shadowRadius: 0,
+  shadowOffset: { width: 0, height: 0 },
 },
 
-amountColumn: {
-  width: 90,
-  alignItems: "center",
-  flexDirection: "row",
-  justifyContent: "center",
+floatingButtonActive: {
+  backgroundColor: DARK_GREEN,
 },
 
-transactionCategory: {
-  fontSize: 11,
-  fontFamily: fonts.medium,
-  color: BLACK,
-  textAlign: "center",
-},
+  cardContent: {
+    paddingHorizontal: 32,
+    paddingTop: 30,
+    paddingBottom: 120
+  },
 
 });
 

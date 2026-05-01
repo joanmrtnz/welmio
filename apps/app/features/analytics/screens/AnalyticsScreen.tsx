@@ -9,6 +9,7 @@ const DIVIDER_GREEN = "#00d09e";
 const DARK_GREEN = "#059669";
 const LIGHT_GREEN = "#f1fff3";
 const MEDIUM_GREEN = "#dff7e2";
+const LIGTH_GRAY = "rgba(0,0,0,0.1)";
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
 const TAB_GREEN = "#14cfa1";
@@ -36,10 +37,10 @@ export default function AnalyticsScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="back" size={18} color={WHITE} />
+        <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Analytics</Text>
         <View style={styles.notifications}>
-          <Icon name="bell" />
+          <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
         </View>
       </View>
 
@@ -159,11 +160,15 @@ export default function AnalyticsScreen() {
 
               <View style={styles.graphActions}>
                 <Pressable style={styles.graphIcon}>
-                  <Icon name="search" />
+                  <Icon 
+                  name="search"
+                  size={26} />
                 </Pressable>
 
                 <Pressable style={styles.graphIcon}>
-                  <Icon name="calendar" />
+                  <Icon 
+                  name="calendar"
+                  size={26} />
                 </Pressable>
               </View>
             </View>
@@ -202,7 +207,9 @@ export default function AnalyticsScreen() {
 
           <View style={styles.totalsRow}>
             <View style={styles.totalItem}>
-              <Icon name="money" size={22} color={TAB_GREEN} />
+              <View style={styles.totalIncomeIcon}>
+                <Icon name="income" size={26} strokeWidth={1} color={TAB_GREEN} />
+              </View>
               <Text style={styles.totalLabel}>Income</Text>
               <Text style={styles.totalIncome}>
                 {data ? formatCurrency(data.summary.totalIncome) : "$0.00"}
@@ -210,7 +217,9 @@ export default function AnalyticsScreen() {
             </View>
 
             <View style={styles.totalItem}>
-              <Icon name="money" size={22} color={DARK_GREEN} />
+              <View style={styles.totalExpenseIcon}>
+                <Icon name="expense" size={26} strokeWidth={1} color={DARK_GREEN} />
+              </View>
               <Text style={styles.totalLabel}>Expense</Text>
               <Text style={styles.totalExpense}>
                 {data ? formatCurrency(data.summary.totalExpense) : "$0.00"}
@@ -251,7 +260,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: 38,
+    paddingHorizontal: 30,
     paddingVertical: 10,
     marginTop: 50,
     marginBottom: 20,
@@ -460,6 +469,19 @@ const styles = StyleSheet.create({
   totalItem: {
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  totalIncomeIcon: {
+    borderColor: TAB_GREEN,
+    borderWidth: 1,
+    borderRadius: 8
+  },
+
+
+  totalExpenseIcon: {
+    borderColor: DARK_GREEN,
+    borderWidth: 1,
+    borderRadius: 8
   },
 
   totalLabel: {
