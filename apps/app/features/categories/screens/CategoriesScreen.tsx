@@ -60,10 +60,10 @@ export default function CategoriesScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="back" size={18} color={WHITE} />
+        <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Categories</Text>
         <View style={styles.notifications}>
-          <Icon name="bell" />
+          <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
         </View>
       </View>
 
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: 38,
+    paddingHorizontal: 30,
     paddingVertical: 10,
     marginTop: 50,
     marginBottom: 20,

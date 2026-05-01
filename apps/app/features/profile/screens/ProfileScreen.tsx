@@ -19,11 +19,11 @@ export default function ProfileScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-          <Icon name="back" size={18} color={WHITE} />
+          <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Profile</Text>
 
         <View style={styles.notifications}>
-          <Icon name="bell" color={BLACK} />
+          <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
         </View>
       </View>
 
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 38,
+    paddingHorizontal: 30,
     paddingVertical: 10,
     marginTop: 50,
   },
