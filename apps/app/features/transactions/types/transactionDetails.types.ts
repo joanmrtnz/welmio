@@ -4,8 +4,8 @@ export type TransactionDetailsItem = TransactionOverviewItem;
 
 export type TransactionDetailsModalProps = {
   visible: boolean;
-  transaction: TransactionDetailsItem | null;
+  transaction: TransactionOverviewItem | null;
   onClose: () => void;
-  onEdit: (transaction: TransactionDetailsItem) => void;
-  onDelete: (transaction: TransactionDetailsItem) => void;
+  onEdit: (transaction: TransactionOverviewItem) => void;
+  onDelete: (transaction: TransactionOverviewItem) => void | Promise<void>;
 };

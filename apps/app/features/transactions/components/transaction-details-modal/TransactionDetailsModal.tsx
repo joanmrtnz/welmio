@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Modal,
   Pressable,
@@ -26,9 +27,30 @@ export function TransactionDetailsModal({
   onEdit,
   onDelete,
 }: TransactionDetailsModalProps) {
-  if (!transaction) return null;
 
+  if (!transaction) return null;
   const isExpense = transaction.type === "expense";
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  async function handleDeleteTransaction() {
+    if (!transaction || isDeleting) return;
+
+    try {
+      setIsDeleting(true);
+      await onDelete(transaction);
+    } catch (error) {
+      console.warn("[TransactionDetailsModal] delete transaction error:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
+  function handleEditTransaction() {
+    if (!transaction) return;
+
+    onEdit(transaction);
+  }
+
   return (
     <Modal
       visible={visible}
@@ -43,22 +65,35 @@ export function TransactionDetailsModal({
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>Transaction details</Text>
-              <Text style={styles.subtitle}>{formatDate(transaction.date)}</Text>
+              <Text style={styles.subtitle}>
+                {formatDate(transaction.date)}
+              </Text>
             </View>
 
             <View style={styles.headerActions}>
               <Pressable
                 style={styles.iconButton}
-                onPress={() => onEdit(transaction)}
+                onPress={handleEditTransaction}
               >
-                <Icon name="edit" size={16} strokeWidth={1.5} color={BLACK} />
+                <Icon
+                  name="edit"
+                  size={16}
+                  strokeWidth={1.5}
+                  color={BLACK}
+                />
               </Pressable>
 
               <Pressable
                 style={[styles.iconButton, styles.deleteIconButton]}
-                onPress={() => onDelete(transaction)}
+                onPress={handleDeleteTransaction}
+                disabled={isDeleting}
               >
-                <Icon name="bin" size={23} strokeWidth={1.5} color={RED} />
+                <Icon
+                  name="bin"
+                  size={23}
+                  strokeWidth={1.5}
+                  color={RED}
+                />
               </Pressable>
 
               <Pressable style={styles.iconButton} onPress={onClose}>
@@ -66,6 +101,7 @@ export function TransactionDetailsModal({
               </Pressable>
             </View>
           </View>
+
           <ScrollView
             style={styles.scrollView}
             contentContainerStyle={styles.content}
@@ -83,7 +119,9 @@ export function TransactionDetailsModal({
                 />
               </View>
 
-              <Text style={styles.description}>{transaction.description}</Text>
+              <Text style={styles.description}>
+                {transaction.description}
+              </Text>
 
               <Text
                 style={[
@@ -118,7 +156,9 @@ export function TransactionDetailsModal({
 
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Currency</Text>
-                <Text style={styles.detailValue}>{transaction.currency}</Text>
+                <Text style={styles.detailValue}>
+                  {transaction.currency}
+                </Text>
               </View>
 
               <View style={styles.detailRow}>
@@ -153,18 +193,31 @@ export function TransactionDetailsModal({
             <View style={styles.actions}>
               <Pressable
                 style={styles.editButton}
-                onPress={() => onEdit(transaction)}
+                onPress={handleEditTransaction}
               >
-                <Icon name="edit" size={16} strokeWidth={1.8} color={WHITE} />
+                <Icon
+                  name="edit"
+                  size={16}
+                  strokeWidth={1.8}
+                  color={WHITE}
+                />
                 <Text style={styles.editButtonText}>Edit</Text>
               </Pressable>
 
               <Pressable
                 style={styles.deleteButton}
-                onPress={() => onDelete(transaction)}
+                onPress={handleDeleteTransaction}
+                disabled={isDeleting}
               >
-                <Icon name="bin" size={23} strokeWidth={2} color={RED} />
-                <Text style={styles.deleteButtonText}>Delete</Text>
+                <Icon
+                  name="bin"
+                  size={23}
+                  strokeWidth={2}
+                  color={RED}
+                />
+                <Text style={styles.deleteButtonText}>
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </Text>
               </Pressable>
             </View>
           </ScrollView>

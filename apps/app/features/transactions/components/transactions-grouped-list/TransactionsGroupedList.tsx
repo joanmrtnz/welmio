@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
-import { TransactionOverviewGroup } from "@repo/shared-types";
+import type { TransactionOverviewGroup, TransactionOverviewItem } from "@repo/shared-types";
 import {
   formatCategoryLabel,
   formatSignedAmount,
@@ -15,15 +15,19 @@ const DIVIDER_GREEN = "#00d09e";
 const BUTTON_GREEN = "#1A9E6A";
 const BLACK = "#052e2b";
 
+
 type TransactionsGroupedListProps = {
   groups: TransactionOverviewGroup[];
-  emptyMessage?: string;
+  onChanged?: () => void | Promise<void>;
+  onEditTransaction?: (transaction: TransactionOverviewItem) => void;
+  onDeleteTransaction?: (transactionId: string) => Promise<void>;
 };
-
 
 export function TransactionsGroupedList({
   groups,
-  emptyMessage = "No transactions found.",
+  onChanged,
+  onEditTransaction,
+  onDeleteTransaction,
 }: TransactionsGroupedListProps) {
 
   const [selectedTransaction, setSelectedTransaction] =
@@ -41,25 +45,22 @@ export function TransactionsGroupedList({
     setSelectedTransaction(null);
   }
 
-  function handleEditTransaction(transaction: TransactionDetailsItem) {
-    console.log("[TransactionsGroupedList] edit transaction:", transaction);
-
-    // Fase 2:
-    // 1. cerrar este modal
-    // 2. abrir CreateTransactionModal en modo edit
-    // 3. pasarle la transaction seleccionada
+  async function handleDeleteTransaction(transaction: TransactionOverviewItem) {
+    try {
+      await onDeleteTransaction?.(transaction.id);
+      await onChanged?.();
+      closeTransactionDetails();
+    } catch (error) {
+      console.warn("[TransactionsGroupedList] delete transaction error:", error);
+    }
   }
 
-  function handleDeleteTransaction(transaction: TransactionDetailsItem) {
-    console.log("[TransactionsGroupedList] delete transaction:", transaction);
-
-    // Fase 2:
-    // await apiFetch(`/transactions/${transaction.id}`, { method: "DELETE" });
-    // onDeleted?.();
+  function handleEditTransaction(transaction: TransactionOverviewItem) {
+    onEditTransaction?.(transaction);
   }
 
   if (groups.length === 0) {
-    return <Text style={styles.emptyMessage}>{emptyMessage}</Text>;
+    return <Text style={styles.emptyMessage}>No transactions found.</Text>;
   }
 
   return (

@@ -1,7 +1,12 @@
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-import { TransactionsOverviewResponse } from "@repo/shared-types";
+import {
+  deleteTransaction,
+  updateTransaction,
+} from "@/features/transactions/services/transactions.service";
+
+import { TransactionsOverviewResponse, TransactionOverviewItem} from "@repo/shared-types";
 import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/app/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
@@ -22,6 +27,21 @@ const TAB_GREEN = "#14cfa1";
 
 
 export default function TransactionScreen() {
+
+  async function handleDeleteTransaction(transactionId: string) {
+    await deleteTransaction(transactionId);
+  }
+
+  async function handleEditTransaction(transaction: TransactionOverviewItem) {
+    console.log("[TransactionsScreen] edit transaction:", transaction);
+
+    // todo: add real edit transation ui flow 
+    await updateTransaction(transaction.id, {
+      description: `${transaction.description} updated`,
+    });
+
+    await loadTransactions();
+  }
   const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
   const [totalsFilter, setTotalsFilter] = useState<"all" | "income" | "expense">("all");
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
@@ -148,7 +168,12 @@ export default function TransactionScreen() {
         <ScrollView 
         contentContainerStyle={styles.cardContent} 
         showsVerticalScrollIndicator={false}>
-          <TransactionsGroupedList groups={filteredGroups} />
+        <TransactionsGroupedList
+          groups={filteredGroups}
+          onChanged={loadTransactions}
+          onDeleteTransaction={handleDeleteTransaction}
+          onEditTransaction={handleEditTransaction}
+        />
         </ScrollView>
       </View>
 
