@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
 import { TransactionOverviewGroup } from "@repo/shared-types";
@@ -6,7 +6,10 @@ import {
   formatCategoryLabel,
   formatSignedAmount,
   formatTransactionMeta,
-} from "../utils/formatters";
+} from "../../utils/formatters";
+import { TransactionDetailsModal } from "../transaction-details-modal/TransactionDetailsModal";
+import { useState } from "react";
+import { TransactionDetailsItem } from "../../types/transactionDetails.types";
 
 const DIVIDER_GREEN = "#00d09e";
 const BUTTON_GREEN = "#1A9E6A";
@@ -17,10 +20,44 @@ type TransactionsGroupedListProps = {
   emptyMessage?: string;
 };
 
+
 export function TransactionsGroupedList({
   groups,
   emptyMessage = "No transactions found.",
 }: TransactionsGroupedListProps) {
+
+  const [selectedTransaction, setSelectedTransaction] =
+  useState<TransactionDetailsItem | null>(null);
+
+  const [isDetailsModalVisible, setIsDetailsModalVisible] = useState(false);
+
+  function openTransactionDetails(transaction: TransactionDetailsItem) {
+    setSelectedTransaction(transaction);
+    setIsDetailsModalVisible(true);
+  }
+
+  function closeTransactionDetails() {
+    setIsDetailsModalVisible(false);
+    setSelectedTransaction(null);
+  }
+
+  function handleEditTransaction(transaction: TransactionDetailsItem) {
+    console.log("[TransactionsGroupedList] edit transaction:", transaction);
+
+    // Fase 2:
+    // 1. cerrar este modal
+    // 2. abrir CreateTransactionModal en modo edit
+    // 3. pasarle la transaction seleccionada
+  }
+
+  function handleDeleteTransaction(transaction: TransactionDetailsItem) {
+    console.log("[TransactionsGroupedList] delete transaction:", transaction);
+
+    // Fase 2:
+    // await apiFetch(`/transactions/${transaction.id}`, { method: "DELETE" });
+    // onDeleted?.();
+  }
+
   if (groups.length === 0) {
     return <Text style={styles.emptyMessage}>{emptyMessage}</Text>;
   }
@@ -32,15 +69,16 @@ export function TransactionsGroupedList({
           <Text style={styles.monthLabel}>{group.month}</Text>
 
           {group.items.map((item) => (
-            <View key={item.id} style={styles.transactionRow}>
+            <Pressable key={item.id} 
+            style={styles.transactionRow}
+            onPress={() => openTransactionDetails(item as TransactionDetailsItem)}>
               <View style={styles.iconCircle}>
-                <Text style={styles.icon}>
                   <Icon
                     name={(item.category.icon ?? "money") as never}
-                    size={25}
+                    size={46}
+                    strokeWidth={0.8}
                     color={BUTTON_GREEN}
                   />
-                </Text>
               </View>
 
               <View style={styles.transactionInfo}>
@@ -77,10 +115,17 @@ export function TransactionsGroupedList({
                   {formatSignedAmount(item.amount, item.type, item.currency)}
                 </Text>
               </View>
-            </View>
+            </Pressable>
           ))}
         </View>
       ))}
+      <TransactionDetailsModal
+        visible={isDetailsModalVisible}
+        transaction={selectedTransaction}
+        onClose={closeTransactionDetails}
+        onEdit={handleEditTransaction}
+        onDelete={handleDeleteTransaction}
+      />
     </>
   );
 }
@@ -116,9 +161,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  icon: {
-    fontSize: 18,
-  },
 
   transactionInfo: {
     flex: 1,

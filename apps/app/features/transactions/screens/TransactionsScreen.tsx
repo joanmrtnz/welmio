@@ -6,11 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/app/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
 import { formatCurrency } from "../utils/formatters";
-import { TransactionsGroupedList } from "../components/TransactionsGroupedList";
-import { CategoryFilterModal } from "../components/CategoryFilterModal";
+import { TransactionsGroupedList } from "../components/transactions-grouped-list/TransactionsGroupedList";
+import { CategoryFilterModal } from "../components/category-filter-modal/CategoryFilterModal";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { CreateTransactionModal } from "../components/CreateTransactionModal";
-
+import { CreateTransactionModal } from "../components/create-transaction-modal/CreateTransactionModal";
 
 const GREEN = "#00c896";
 const DARK_GREEN = "#059669";
@@ -53,10 +52,10 @@ export default function TransactionScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="back" size={18} color={WHITE} />
+        <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Transactions</Text>
         <View style={styles.notifications}>
-          <Icon name="bell" />
+           <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
         </View>
       </View>
 
@@ -141,7 +140,7 @@ export default function TransactionScreen() {
         <Pressable 
         style={styles.floatingAddButton} 
         onPress={() => setIsCreateTransactionModalVisible(true)}>
-           <Icon size={22} name="plus" color={BLACK} />
+           <Icon size={35} strokeWidth={1} name="plus" color={BLACK} />
         </Pressable>
       </View>
 
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: 38,
+    paddingHorizontal: 30,
     paddingVertical: 10,
     marginTop: 50,
     marginBottom: 20,

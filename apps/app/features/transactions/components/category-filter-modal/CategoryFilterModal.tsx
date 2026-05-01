@@ -9,11 +9,11 @@ import {
 
 import { Icon } from "@/components/icons/Icon";
 
-import { useCategoryFilterModal } from "../hooks/useCategoryFilterModal";
+import { useCategoryFilterModal } from "../../hooks/useCategoryFilterModal";
 import {
   CATEGORY_COLORS,
   CATEGORY_ICONS,
-} from "../constants/categoryOptions";
+} from "../../constants/categoryOptions";
 
 import {
   categoryFilterModalColors,
@@ -113,6 +113,7 @@ export function CategoryFilterModal({
                           <Icon
                             name={(item.icon ?? "plus") as any}
                             size={52}
+                            strokeWidth={1}
                             color={WHITE}
                           />
                         </View>
@@ -177,72 +178,63 @@ export function CategoryFilterModal({
                 />
 
                 <Text style={styles.sectionLabel}>Type</Text>
+                <View style={styles.typeRow}>
+                  <Pressable
+                    style={[
+                      styles.typeButton,
+                      selectedType === "income" && styles.typeButtonSelected,
+                    ]}
+                    onPress={() => setSelectedType("income")}
+                  >
+                    <Text
+                      style={[
+                        styles.typeButtonText,
+                        selectedType === "income" && styles.typeButtonTextSelected,
+                      ]}
+                    >
+                      Income
+                    </Text>
+                  </Pressable>
 
-  <View style={styles.typeRow}>
-    <Pressable
-      style={[
-        styles.typeButton,
-        selectedType === "income" && styles.typeButtonSelected,
-      ]}
-      onPress={() => setSelectedType("income")}
-    >
-      <Text
-        style={[
-          styles.typeButtonText,
-          selectedType === "income" && styles.typeButtonTextSelected,
-        ]}
-      >
-        Income
-      </Text>
-    </Pressable>
+                  <Pressable
+                    style={[
+                      styles.typeButton,
+                      selectedType === "expense" && styles.typeButtonSelected,
+                    ]}
+                    onPress={() => setSelectedType("expense")}
+                  >
+                    <Text
+                      style={[
+                        styles.typeButtonText,
+                        selectedType === "expense" && styles.typeButtonTextSelected,
+                      ]}
+                    >
+                      Expense
+                    </Text>
+                  </Pressable>
+                </View>
 
-    <Pressable
-      style={[
-        styles.typeButton,
-        selectedType === "expense" && styles.typeButtonSelected,
-      ]}
-      onPress={() => setSelectedType("expense")}
-    >
-      <Text
-        style={[
-          styles.typeButtonText,
-          selectedType === "expense" && styles.typeButtonTextSelected,
-        ]}
-      >
-        Expense
-      </Text>
-    </Pressable>
-  </View>
+                <Text style={styles.sectionLabel}>Icon</Text>
 
-  <Text style={styles.sectionLabel}>Icon</Text>
+                <View style={styles.iconSelectorGrid}>
+                  {CATEGORY_ICONS.map((item) => {
+                    const isSelected = selectedIcon === item.name;
 
-  <View style={styles.iconSelectorGrid}>
-    {CATEGORY_ICONS.map((item) => {
-      const isSelected = selectedIcon === item.name;
-
-      return (
-        <Pressable
-          key={item.name}
-          style={[
-            styles.iconOption,
-            isSelected && styles.iconOptionSelected,
-          ]}
+                    return (
+                      <Pressable
+                        key={item.name}
+                        style={[
+                          styles.iconOption,
+                          isSelected && styles.iconOptionSelected,
+                        ]}
                         onPress={() => setSelectedIcon(item.name)}
                       >
                         <Icon
                           name={item.name as any}
-                          size={24}
+                          size={50}
+                          strokeWidth={1}
                           color={isSelected ? WHITE : BLACK}
                         />
-
-                        <Text
-                          style={[
-                            styles.iconOptionLabel,
-                            isSelected && styles.iconOptionLabelSelected,
-                          ]}
-                        >
-                          {item.label}
-                        </Text>
                       </Pressable>
                     );
                   })}

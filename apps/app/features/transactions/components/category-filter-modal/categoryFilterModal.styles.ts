@@ -181,14 +181,14 @@ export const styles = StyleSheet.create({
   iconSelectorGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     gap: 10,
     marginBottom: 16,
   },
 
   iconOption: {
-    width: "30%",
-    height: 68,
+    width: "25%",
+    height: 60,
     borderRadius: 18,
     backgroundColor: WHITE,
     alignItems: "center",

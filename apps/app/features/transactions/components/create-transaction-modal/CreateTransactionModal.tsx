@@ -18,7 +18,7 @@ import {
 import {
   createTransactionModalColors,
   styles,
-} from "@/features/transactions/components/createTransactionModal.styles";
+} from "@/features/transactions/components/create-transaction-modal/createTransactionModal.styles";
 
 type CreateTransactionModalProps = {
   visible: boolean;

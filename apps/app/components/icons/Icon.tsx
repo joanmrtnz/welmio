@@ -23,8 +23,8 @@ import Close from "../../assets/icons/close.svg";
 import Plane from "../../assets/icons/plane.svg";
 import Book from "../../assets/icons/book.svg";
 import Check from "../../assets/icons/check.svg";
-
-
+import Bin from "../../assets/icons/bin.svg";
+import Edit from "../../assets/icons/edit.svg";
 
 const icons = {
   arrowUp: Money,
@@ -54,20 +54,23 @@ const icons = {
   plane: Plane,
   book: Book,
   check: Check,
+  bin: Bin, 
+  edit: Edit,
 };
 
 type IconName = keyof typeof icons;
-
 type IconProps = {
   name: IconName;
   size?: number;
   color?: string;
+  strokeWidth?: number;
 };
 
 export function Icon({
   name,
   size = 24,
   color = "#093030",
+  strokeWidth = 1.5,
 }: IconProps) {
   const SvgIcon = icons[name];
 
@@ -76,5 +79,13 @@ export function Icon({
     return null;
   }
 
-  return <SvgIcon width={size} height={size} stroke={color} />;
+  return (
+    <SvgIcon
+      width={size}
+      height={size}
+      stroke={color}
+      strokeWidth={strokeWidth}
+      fill="none"
+    />
+  );
 }
