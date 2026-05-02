@@ -15,6 +15,7 @@ import { TransactionsGroupedList } from "../components/transactions-grouped-list
 import { CategoryFilterModal } from "../components/category-filter-modal/CategoryFilterModal";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { CreateTransactionModal } from "../components/create-transaction-modal/CreateTransactionModal";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
 const GREEN = "#00c896";
 const DARK_GREEN = "#059669";
@@ -37,7 +38,13 @@ export default function TransactionScreen() {
     useState<TransactionOverviewItem | null>(null);
 
   async function handleDeleteTransaction(transactionId: string) {
-    await deleteTransaction(transactionId);
+    try {
+      await deleteTransaction(transactionId);
+      feedback.success("Transaction deleted successfully");
+    } catch (error) {
+      console.warn(error);
+      feedback.error("Error deleting transaction");
+    }
   }
 
   const [data, setData] = useState<TransactionsOverviewResponse | null>(null);

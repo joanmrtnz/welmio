@@ -11,6 +11,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { View } from 'react-native';
+import { FeedbackProvider } from '@/components/ui/feedback/feedbackProvider';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -27,12 +28,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack  
-      screenOptions={{
-          headerShown: false,
-      }}>
-      </Stack>
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <FeedbackProvider>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        />
+      </FeedbackProvider>
     </ThemeProvider>
   );
 }

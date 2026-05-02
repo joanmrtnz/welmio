@@ -16,6 +16,7 @@ import {
   normalizeCategoryName,
   toggleCategoryId,
 } from "../utils/categoryFilter";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
 type CategoryType = "income" | "expense";
 type ModalMode = "filter" | "create";
@@ -112,6 +113,8 @@ export function useCategoryFilterModal({
         color: selectedColor,
       });
 
+      feedback.success("Category created successfully");
+
       setCategories((prev) => [...prev, newCategory]);
       setDraftSelectedIds((prev) => [...prev, newCategory.id]);
 
@@ -119,6 +122,7 @@ export function useCategoryFilterModal({
       setMode("filter");
     } catch (error) {
       console.warn("[CategoryFilterModal] create category error:", error);
+      feedback.error("Error submitting the category");
     } finally {
       setIsSaving(false);
     }
