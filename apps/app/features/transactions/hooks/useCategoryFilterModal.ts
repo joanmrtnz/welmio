@@ -3,7 +3,9 @@ import type { Category } from "@repo/shared-types";
 
 import {
   createCategory,
+  deleteCategory,
   getCategoriesOverview,
+  updateCategory,
 } from "../services/categories.service";
 
 import {
@@ -113,10 +115,8 @@ export function useCategoryFilterModal({
 
     try {
       await Promise.all(
-        draftSelectedIds.map((categoryId) => console.log(categoryId)),
+        draftSelectedIds.map((categoryId) => deleteCategory(categoryId)),
       );
-
-      // deleteCategory(categoryId)
 
       feedback.success(
         draftSelectedIds.length === 1
@@ -129,6 +129,23 @@ export function useCategoryFilterModal({
       await loadCategories();
     } catch (error) {
       console.warn("[CategoryFilterModal] delete categories error:", error);
+
+      const statusCode =
+        error instanceof Error && "statusCode" in error
+          ? error.statusCode
+          : error instanceof Error && "status" in error
+            ? error.status
+            : null;
+
+      if (statusCode === 409) {
+        // TODO: add logic and a confirmation dialog to delete
+        // all transactions associated with this category, and the category itself.
+        feedback.error(
+          "This category is linked to existing transactions and can't be deleted.",
+        );
+        return;
+      }
+
       feedback.error("Error deleting categories");
     }
   }
@@ -148,7 +165,7 @@ export function useCategoryFilterModal({
 
       if (editingCategoryId) {
         console.log("modifing: ", editingCategoryId,",  with payload: ", payload);
-        //  await updateCategory(editingCategoryId, payload);
+        await updateCategory(editingCategoryId, payload);
         feedback.success("Category updated successfully");
       } else {
         await createCategory(payload);
@@ -157,7 +174,6 @@ export function useCategoryFilterModal({
 
       resetCategoryForm();
       setMode("filter");
-      // es este metodo?
       await loadCategories();
     } catch (error) {
       console.warn("[CategoryFilterModal] save category error:", error);
