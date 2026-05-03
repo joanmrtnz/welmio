@@ -80,7 +80,7 @@ export default function EditProfileScreen() {
     >
 
       <View style={styles.headerArea}>
-        <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={WHITE} />
+        <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
         <Text style={styles.title}>Edit My Profile</Text>
 
         <View style={styles.notifications}>
