@@ -14,3 +14,15 @@ export interface Category {
 export type CategoriesOverviewResponse = {
   categories: Category[];
 };
+
+export type DateRange = {
+  startDate: Date | null;
+  endDate: Date | null;
+};
+
+export type CalendarFilterModalProps = {
+  visible: boolean;
+  selectedRange: DateRange;
+  onClose: () => void;
+  onApply: (range: DateRange) => void;
+};

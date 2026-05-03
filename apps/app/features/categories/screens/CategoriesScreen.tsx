@@ -60,7 +60,7 @@ export default function CategoriesScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
+        <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Categories</Text>
         <View style={styles.notifications}>
           <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />

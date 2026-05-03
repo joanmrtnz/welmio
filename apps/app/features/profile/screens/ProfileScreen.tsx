@@ -7,6 +7,7 @@ import {
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { ProfileOption } from "../components/ProfileOption";
+import { router } from "expo-router";
 
 const GREEN = "#00c896";
 const LIGHT_GREEN = "#f1fff3";
@@ -19,7 +20,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-          <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
+          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Profile</Text>
 
         <View style={styles.notifications}>
@@ -44,7 +45,11 @@ export default function ProfileScreen() {
        
         {/* Options */}
         <View style={styles.optionsContainer}>
-          <ProfileOption icon="user" label="Edit Profile" />
+         <ProfileOption
+            icon="user"
+            label="Edit Profile"
+            onPress={() => router.push("/profile/edit")}
+          />
           <ProfileOption icon="shield" label="Security" />
           <ProfileOption icon="settings" label="Setting" />
           <ProfileOption icon="help" label="Help" />

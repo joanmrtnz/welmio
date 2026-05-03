@@ -1,0 +1,243 @@
+import { useMemo, useState } from "react";
+import { Modal, Pressable, Text, View } from "react-native";
+
+import { Icon } from "@/components/icons/Icon";
+
+import {
+  calendarFilterModalColors,
+  styles,
+} from "./calendarFilterModal.styles";
+import { CalendarFilterModalProps, DateRange } from "@repo/shared-types";
+
+
+const WEEK_DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
+export function CalendarFilterModal({
+  visible,
+  selectedRange,
+  onClose,
+  onApply,
+}: CalendarFilterModalProps) {
+  const [currentMonth, setCurrentMonth] = useState(() => new Date());
+  const [draftRange, setDraftRange] = useState<DateRange>(selectedRange);
+
+  const { BLACK } = calendarFilterModalColors;
+
+  const monthDays = useMemo(() => {
+    return getCalendarMonthDays(currentMonth);
+  }, [currentMonth]);
+
+  const monthTitle = useMemo(() => {
+    return currentMonth.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
+  }, [currentMonth]);
+
+  function handleClose() {
+    setDraftRange(selectedRange);
+    onClose();
+  }
+
+  function handlePreviousMonth() {
+    setCurrentMonth((prev) => {
+      const next = new Date(prev);
+      next.setMonth(prev.getMonth() - 1);
+      return next;
+    });
+  }
+
+  function handleNextMonth() {
+    setCurrentMonth((prev) => {
+      const next = new Date(prev);
+      next.setMonth(prev.getMonth() + 1);
+      return next;
+    });
+  }
+
+  function handleSelectDay(date: Date) {
+    setDraftRange((prev) => {
+      if (!prev.startDate || prev.endDate) {
+        return {
+          startDate: date,
+          endDate: null,
+        };
+      }
+
+      if (isSameDay(prev.startDate, date)) {
+        return {
+          startDate: null,
+          endDate: null,
+        };
+      }
+
+      if (date < prev.startDate) {
+        return {
+          startDate: date,
+          endDate: prev.startDate,
+        };
+      }
+
+      return {
+        startDate: prev.startDate,
+        endDate: date,
+      };
+    });
+  }
+
+  function handleClear() {
+    setDraftRange({
+      startDate: null,
+      endDate: null,
+    });
+  }
+
+  function handleApply() {
+    onApply(draftRange);
+    onClose();
+  }
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
+      <Pressable style={styles.backdrop} onPress={handleClose}>
+        <Pressable style={styles.modalCard}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Filter by date</Text>
+
+            <Pressable onPress={handleClose} style={styles.closeButton}>
+              <Icon name="close"  size={15} color={BLACK} />
+            </Pressable>
+          </View>
+
+          <View style={styles.monthHeader}>
+            <Pressable
+              onPress={handlePreviousMonth}
+              style={styles.monthArrowButton}
+            >
+              <Icon name="arrowLeft" size={16} strokeWidth={1.5} color={BLACK} />
+            </Pressable>
+
+            <Text style={styles.monthTitle}>{monthTitle}</Text>
+
+            <Pressable
+              onPress={handleNextMonth}
+              style={styles.monthArrowButton}
+            >
+              <Icon name="arrowRight" size={16} strokeWidth={1.5} color={BLACK} />
+            </Pressable>
+          </View>
+
+          <View style={styles.weekDaysRow}>
+            {WEEK_DAYS.map((day) => (
+              <Text key={day} style={styles.weekDayText}>
+                {day}
+              </Text>
+            ))}
+          </View>
+
+          <View style={styles.daysGrid}>
+            {monthDays.map((day) => {
+              if (!day) {
+                return <View key={Math.random()} style={styles.dayCell} />;
+              }
+
+              const isStart =
+                draftRange.startDate && isSameDay(day, draftRange.startDate);
+
+              const isEnd =
+                draftRange.endDate && isSameDay(day, draftRange.endDate);
+
+              const isBetween =
+                draftRange.startDate &&
+                draftRange.endDate &&
+                day > draftRange.startDate &&
+                day < draftRange.endDate;
+
+              const isSelected = isStart || isEnd;
+
+              return (
+                <Pressable
+                  key={day.toISOString()}
+                  style={[
+                    styles.dayCell,
+                    isBetween && styles.dayCellBetween,
+                    isSelected && styles.dayCellSelected,
+                    isStart && draftRange.endDate && styles.dayCellStart,
+                    isEnd && styles.dayCellEnd,
+                  ]}
+                  onPress={() => handleSelectDay(day)}
+                >
+                  <Text
+                    style={[
+                      styles.dayText,
+                      isBetween && styles.dayTextBetween,
+                      isSelected && styles.dayTextSelected,
+                    ]}
+                  >
+                    {day.getDate()}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View style={styles.actions}>
+            <Pressable style={styles.clearButton} onPress={handleClear}>
+              <Text style={styles.clearButtonText}>Clear</Text>
+            </Pressable>
+
+            <Pressable style={styles.applyButton} onPress={handleApply}>
+              <Text style={styles.applyButtonText}>Apply filter</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+function getCalendarMonthDays(date: Date) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  const firstDayOfMonth = new Date(year, month, 1);
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+
+  const firstWeekDay = getMondayBasedWeekDay(firstDayOfMonth);
+  const totalDays = lastDayOfMonth.getDate();
+
+  const days: Array<Date | null> = [];
+
+  for (let i = 0; i < firstWeekDay; i += 1) {
+    days.push(null);
+  }
+
+  for (let day = 1; day <= totalDays; day += 1) {
+    days.push(new Date(year, month, day));
+  }
+
+  return days;
+}
+
+function getMondayBasedWeekDay(date: Date) {
+  const day = date.getDay();
+
+  if (day === 0) {
+    return 6;
+  }
+
+  return day - 1;
+}
+
+function isSameDay(firstDate: Date, secondDate: Date) {
+  return (
+    firstDate.getFullYear() === secondDate.getFullYear() &&
+    firstDate.getMonth() === secondDate.getMonth() &&
+    firstDate.getDate() === secondDate.getDate()
+  );
+}
