@@ -46,8 +46,18 @@ export function useCategoryFilterModal({
   const [selectedColor, setSelectedColor] = useState(DEFAULT_CATEGORY_COLOR);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
 
   const canSaveCategory = Boolean(categoryName.trim()) && !isSaving;
+
+  async function loadCategories() {
+    try {
+      const response = await getCategoriesOverview();
+      setCategories(response.categories);
+    } catch (error) {
+      console.warn("[CategoryFilterModal] load categories error:", error);
+    }
+  }
 
   useEffect(() => {
     if (!visible) return;
@@ -55,33 +65,121 @@ export function useCategoryFilterModal({
     setMode("filter");
     setDraftSelectedIds(selectedCategoryIds);
 
-    async function loadCategories() {
-      try {
-        const response = await getCategoriesOverview();
-        setCategories(response.categories);
-      } catch (error) {
-        console.warn("[CategoryFilterModal] load categories error:", error);
-      }
-    }
+    
 
     loadCategories();
   }, [visible, selectedCategoryIds]);
 
-  function resetCreateForm() {
+
+
+  function resetCategoryForm() {
     setCategoryName("");
     setSelectedType(DEFAULT_CATEGORY_TYPE);
     setSelectedIcon(DEFAULT_CATEGORY_ICON);
     setSelectedColor(DEFAULT_CATEGORY_COLOR);
+    setEditingCategoryId(null);
   }
+
+  function handleOpenCreateCategory() {
+    resetCategoryForm();
+    setMode("create");
+  }
+
+  function handleEditSelectedCategory() {
+    if (draftSelectedIds.length !== 1) {
+      feedback.error("Select only one category to edit");
+      return;
+    }
+
+    const selectedCategory = categories.find(
+      (category) => category.id === draftSelectedIds[0],
+    );
+
+    if (!selectedCategory) {
+      feedback.error("Category not found");
+      return;
+    }
+
+    setEditingCategoryId(selectedCategory.id);
+    setCategoryName(selectedCategory.name);
+    setSelectedType(selectedCategory.type ?? DEFAULT_CATEGORY_TYPE);
+    setSelectedIcon(selectedCategory.icon ?? DEFAULT_CATEGORY_ICON);
+    setSelectedColor(selectedCategory.color ?? DEFAULT_CATEGORY_COLOR);
+    setMode("create");
+  }
+
+  async function handleDeleteSelectedCategories() {
+    if (!draftSelectedIds.length) return;
+
+    try {
+      await Promise.all(
+        draftSelectedIds.map((categoryId) => console.log(categoryId)),
+      );
+
+      // deleteCategory(categoryId)
+
+      feedback.success(
+        draftSelectedIds.length === 1
+          ? "Category deleted successfully"
+          : "Categories deleted successfully",
+      );
+
+      setDraftSelectedIds([]);
+
+      await loadCategories();
+    } catch (error) {
+      console.warn("[CategoryFilterModal] delete categories error:", error);
+      feedback.error("Error deleting categories");
+    }
+  }
+
+  async function handleSubmitCategory() {
+    if (!canSaveCategory || isSaving) return;
+
+    try {
+      setIsSaving(true);
+
+      const payload = {
+        name: categoryName.trim(),
+        type: selectedType,
+        icon: selectedIcon,
+        color: selectedColor,
+      };
+
+      if (editingCategoryId) {
+        console.log("modifing: ", editingCategoryId,",  with payload: ", payload);
+        //  await updateCategory(editingCategoryId, payload);
+        feedback.success("Category updated successfully");
+      } else {
+        await createCategory(payload);
+        feedback.success("Category created successfully");
+      }
+
+      resetCategoryForm();
+      setMode("filter");
+      // es este metodo?
+      await loadCategories();
+    } catch (error) {
+      console.warn("[CategoryFilterModal] save category error:", error);
+      feedback.error(
+        editingCategoryId
+          ? "Error updating category"
+          : "Error creating category",
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
 
   function handleClose() {
     setMode("filter");
-    resetCreateForm();
+    resetCategoryForm();
     onClose();
   }
 
   function handleBackToFilter() {
-    resetCreateForm();
+    resetCategoryForm();
     setMode("filter");
   }
 
@@ -118,7 +216,7 @@ export function useCategoryFilterModal({
       setCategories((prev) => [...prev, newCategory]);
       setDraftSelectedIds((prev) => [...prev, newCategory.id]);
 
-      resetCreateForm();
+      resetCategoryForm();
       setMode("filter");
     } catch (error) {
       console.warn("[CategoryFilterModal] create category error:", error);
@@ -150,11 +248,17 @@ export function useCategoryFilterModal({
     isSaving,
     canSaveCategory,
 
+    editingCategoryId,
+
     handleClose,
     handleBackToFilter,
     handleToggleCategory,
     clearFilters,
     applyFilters,
     handleCreateCategory,
+    handleOpenCreateCategory,
+    handleEditSelectedCategory,
+    handleDeleteSelectedCategories,
+    handleSubmitCategory,
   };
 }

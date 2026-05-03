@@ -8,6 +8,7 @@ const BUTTON_GREEN = "#1A9E6A";
 const DARK_GREEN = "#059669";
 const TAB_GREEN = "#14cfa1";
 const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+const RED = "#ef4444";
 
 export const categoryFilterModalColors = {
   WHITE,
@@ -17,6 +18,7 @@ export const categoryFilterModalColors = {
   DARK_GREEN,
   TAB_GREEN,
   LIGTH_GRAY,
+  RED,
 };
 
 export const styles = StyleSheet.create({
@@ -270,5 +272,27 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fonts.bold,
     color: WHITE,
+  },
+
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  headerIconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: WHITE,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: LIGTH_GRAY,
+  },
+
+  deleteIconButton: {
+    backgroundColor: "rgba(239, 68, 68, 0.12)",
+    borderColor: "rgba(239, 68, 68, 0.25)",
   },
 });

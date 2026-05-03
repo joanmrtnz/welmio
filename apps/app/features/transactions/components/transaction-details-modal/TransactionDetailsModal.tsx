@@ -28,9 +28,9 @@ export function TransactionDetailsModal({
   onDelete,
 }: TransactionDetailsModalProps) {
 
+  const [isDeleting, setIsDeleting] = useState(false);
   if (!transaction) return null;
   const isExpense = transaction.type === "expense";
-  const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDeleteTransaction() {
     if (!transaction || isDeleting) return;
