@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,23 +14,64 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { AuthInput } from "@/features/auth/components/AuthInput";
 import { AuthButton } from "@/features/auth/components/AuthButton";
+import { getUserProfile, updateUserProfile } from "../services/profile-service";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
 export default function EditProfileScreen() {
-  const [username, setUsername] = useState("John Smith");
-  const [phone, setPhone] = useState("+44 555 5555");
-  const [email, setEmail] = useState("example@example.com");
+  const [usernameLabel, setUsernameLabel] = useState("");
+  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [darkTheme, setDarkTheme] = useState(false);
 
-  function handleUpdateProfile() {
-    console.log({
-      username,
-      phone,
-      email,
-      pushNotifications,
-      darkTheme,
-    });
+  async function handleUpdateProfile() {
+    try {
+      setIsLoading(true);
+
+      const updatedUser = await updateUserProfile({
+        fullName: username.trim(),
+        mobileNumber: phone.trim() || null,
+      });
+
+      setUsername(updatedUser.fullName ?? "");
+      setUsernameLabel(updatedUser.fullName ?? "");
+      setPhone(updatedUser.mobileNumber ?? "");
+      setEmail(updatedUser.email ?? "");
+      setUserId(updatedUser.id);
+
+      feedback.success("Profile updated successfully");
+    } catch (error) {
+      console.warn(error);
+      feedback.error("Error updating profile");
+    } finally {
+      setIsLoading(false);
+    }
   }
+
+  useEffect(() => {
+    async function loadUserProfile() {
+      try {
+        setIsLoading(true);
+
+        const user = await getUserProfile();
+
+        setUsername(user.fullName ?? "");
+        setUsernameLabel(user.fullName ?? "");
+        setPhone(user.mobileNumber ?? "");
+        setEmail(user.email ?? "");
+        setUserId(user.id);
+      } catch (error) {
+        console.error("Error loading user profile", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadUserProfile();
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -73,8 +114,10 @@ export default function EditProfileScreen() {
           contentContainerStyle={styles.cardContent}
         >
           <View style={styles.nameContainer}>
-            <Text style={styles.name}>John Smith</Text>
-            <Text style={styles.userId}>ID: 25000024</Text>
+          <Text style={styles.name}>{usernameLabel || "User"}</Text>
+          <Text style={styles.userId}>
+            {email ? email : "-"}
+          </Text>
           </View>
 
           <Text style={styles.sectionTitle}>Account Settings</Text>
@@ -107,6 +150,7 @@ export default function EditProfileScreen() {
               autoCorrect={false}
               value={email}
               onChangeText={setEmail}
+              editable={false}
             />
 
             <View style={styles.settingRow}>
@@ -138,8 +182,8 @@ export default function EditProfileScreen() {
             </View>
 
             <View style={styles.buttons}>
-              <AuthButton
-                title="Update Profile"
+             <AuthButton
+                title={isLoading ? "Loading..." : "Update Profile"}
                 onPress={handleUpdateProfile}
               />
             </View>
