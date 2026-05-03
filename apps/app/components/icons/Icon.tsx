@@ -26,6 +26,8 @@ import Book from "../../assets/icons/book.svg";
 import Check from "../../assets/icons/check.svg";
 import Bin from "../../assets/icons/bin.svg";
 import Edit from "../../assets/icons/edit.svg";
+import Key from "../../assets/icons/key.svg";
+
 
 const icons = {
   arrowUp: Money,
@@ -58,6 +60,7 @@ const icons = {
   check: Check,
   bin: Bin, 
   edit: Edit,
+  key: Key,
 };
 
 type IconName = keyof typeof icons;

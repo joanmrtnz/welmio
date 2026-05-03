@@ -20,7 +20,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={WHITE} />
+          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
         <Text style={styles.title}>Profile</Text>
 
         <View style={styles.notifications}>
@@ -55,7 +55,11 @@ export default function ProfileScreen() {
             label="Security"
             onPress={() => router.push("/profile/security")}
           />
-          <ProfileOption icon="settings" label="Setting" />
+          <ProfileOption
+            icon="settings"
+            label="Settings"
+            onPress={() => router.push("/profile/settings")}
+          />
           <ProfileOption icon="help" label="Help" />
           <ProfileOption icon="logout" label="Logout"/>
         </View>
