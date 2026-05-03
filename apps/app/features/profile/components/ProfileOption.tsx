@@ -10,27 +10,20 @@ import { fonts } from "@/theme/fonts";
 type OptionProps = {
   icon: any;
   label: string;
+  onPress?: () => void;
 };
 
-export function ProfileOption({ icon, label}: OptionProps) {
+export function ProfileOption({ icon, label, onPress }: OptionProps) {
   return (
-    <Pressable style={styles.optionRow}>
+    <Pressable style={styles.optionRow} onPress={onPress}>
       <View style={styles.optionIcon}>
         <Icon name={icon} size={26} color={WHITE} />
       </View>
 
-      <Text
-        style={[
-          styles.optionLabel
-        ]}
-      >
-        {label}
-      </Text>
+      <Text style={styles.optionLabel}>{label}</Text>
     </Pressable>
   );
 }
-
-
 
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
