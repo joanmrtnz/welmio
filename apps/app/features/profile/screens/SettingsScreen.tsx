@@ -30,7 +30,11 @@ export default function SettingsScreen() {
           contentContainerStyle={styles.cardContent}
         >
           <View style={styles.optionsContainer}>
-            <SettingsOption icon="key" label="Password Settings" />
+            <SettingsOption
+              icon="key"
+              label="Change Password"
+              onPress={() => router.push("/profile/change-password")}
+            />
             <SettingsOption icon="user" label="Delete Account" />
           </View>
         </ScrollView>
@@ -42,11 +46,12 @@ export default function SettingsScreen() {
 type SettingsOptionProps = {
   icon: any;
   label: string;
+  onPress?: () => void;
 };
 
-function SettingsOption({ icon, label }: SettingsOptionProps) {
+function SettingsOption({ icon, label, onPress }: SettingsOptionProps) {
   return (
-    <Pressable style={styles.optionRow}>
+    <Pressable style={styles.optionRow} onPress={onPress}>
       <View style={styles.optionLeft}>
         <View style={styles.optionIcon}>
           <Icon name={icon} size={20} color={BLACK} />
