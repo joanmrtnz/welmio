@@ -3,3 +3,8 @@ export type UpdateUserProfilePayload = {
   mobileNumber?: string | null;
   dateOfBirth?: string | null;
 };
+
+export type ChangePasswordPayload = {
+  currentPassword: string;
+  newPassword: string;
+};

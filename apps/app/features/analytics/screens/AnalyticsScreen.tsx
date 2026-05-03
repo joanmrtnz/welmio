@@ -37,7 +37,7 @@ export default function AnalyticsScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={WHITE} />
+        <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
         <Text style={styles.title}>Analytics</Text>
         <View style={styles.notifications}>
           <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
