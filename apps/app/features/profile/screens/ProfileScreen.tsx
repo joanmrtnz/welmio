@@ -19,7 +19,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-          <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
+          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Profile</Text>
 
         <View style={styles.notifications}>

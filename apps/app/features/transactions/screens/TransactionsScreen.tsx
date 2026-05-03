@@ -16,6 +16,7 @@ import { CategoryFilterModal } from "../components/category-filter-modal/Categor
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { CreateTransactionModal } from "../components/create-transaction-modal/CreateTransactionModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
+import { CalendarFilterModal } from "../components/calendar-filter-modal/CalendarFilterModal";
 
 const GREEN = "#00c896";
 const DARK_GREEN = "#059669";
@@ -25,7 +26,10 @@ const BLACK = "#052e2b";
 const LIGTH_GRAY = "rgba(0,0,0,0.1)";
 const TAB_GREEN = "#14cfa1";
 
-
+type DateRange = {
+  startDate: Date | null;
+  endDate: Date | null;
+};
 
 export default function TransactionScreen() {
 
@@ -53,10 +57,26 @@ export default function TransactionScreen() {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [isCreateTransactionModalVisible, setIsCreateTransactionModalVisible] =
   useState(false);
+  const [isCalendarFilterModalVisible, setIsCalendarFilterModalVisible] =
+  useState(false);
+  const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({
+    startDate: null,
+    endDate: null,
+  });
 
-  const filteredGroups = useMemo(() => {
-    return getFilteredTransactionGroups(data, totalsFilter, selectedCategoryIds);
-  }, [data, totalsFilter, selectedCategoryIds]);
+  const hasSelectedDateRange =
+  Boolean(selectedDateRange.startDate) || Boolean(selectedDateRange.endDate);
+
+   const filteredGroups = useMemo(
+  () =>
+    getFilteredTransactionGroups(
+      data,
+      totalsFilter,
+      selectedCategoryIds,
+      selectedDateRange,
+    ),
+  [data, totalsFilter, selectedCategoryIds, selectedDateRange],
+);
 
   async function loadTransactions() {
     try {
@@ -77,7 +97,7 @@ export default function TransactionScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
+        <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={WHITE} />
         <Text style={styles.title}>Transactions</Text>
         <View style={styles.notifications}>
            <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
@@ -156,7 +176,13 @@ export default function TransactionScreen() {
            <FontAwesome size={16} name="tags" color={BLACK} />
         </Pressable>
 
-        <Pressable style={styles.floatingButton}>
+        <Pressable
+          onPress={() => setIsCalendarFilterModalVisible(true)}
+          style={[
+            styles.floatingButton,
+            hasSelectedDateRange && styles.floatingButtonActive,
+          ]}
+        >
           <Icon name="calendar" size={26} />
         </Pressable>
       </View>
@@ -190,6 +216,15 @@ export default function TransactionScreen() {
         selectedCategoryIds={selectedCategoryIds}
         onClose={() => setIsCategoryModalVisible(false)}
         onApply={setSelectedCategoryIds}
+      />
+
+      <CalendarFilterModal
+        visible={isCalendarFilterModalVisible}
+        selectedRange={selectedDateRange}
+        onClose={() => setIsCalendarFilterModalVisible(false)}
+        onApply={(range) => {
+          setSelectedDateRange(range);
+        }}
       />
 
       <CreateTransactionModal
