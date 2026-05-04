@@ -9,6 +9,10 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { ProfileOption } from "../components/ProfileOption";
 import { router } from "expo-router";
+import { useState } from "react";
+import { removeAccessToken } from "@/app/lib/auth-storage";
+import { feedback } from "@/components/ui/feedback/feedback.service";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 
 const GREEN = "#00c896";
 const LIGHT_GREEN = "#f1fff3";
@@ -18,6 +22,37 @@ const BUTTON_GREEN = "#1A9E6A";
 
 
 export default function ProfileScreen() {
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  function handleOpenLogoutDialog() {
+    setShowLogoutDialog(true);
+  }
+
+  function handleCloseLogoutDialog() {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setShowLogoutDialog(false);
+  }
+
+  async function handleConfirmLogout() {
+    // TODO: disable push notifications
+    try {
+      setIsLoggingOut(true);
+
+      await removeAccessToken();
+
+      setShowLogoutDialog(false);
+      router.replace("/login");
+    } catch (error) {
+      console.warn(error);
+      feedback.error("Error ending session");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
@@ -63,9 +98,25 @@ export default function ProfileScreen() {
             label="Settings"
             onPress={() => router.push("/profile/settings")}
           />
-          <ProfileOption icon="logout" label="Logout"/>
+          <ProfileOption
+            icon="logout"
+            label="Logout"
+            onPress={handleOpenLogoutDialog}
+          />
         </View>
       </View>
+
+      <ConfirmDialog
+        visible={showLogoutDialog}
+        title="End Session"
+        message="Are you sure you want to log out?"
+        confirmLabel="Yes, End Session"
+        cancelLabel="Cancel"
+        loadingLabel="Ending..."
+        isLoading={isLoggingOut}
+        onConfirm={handleConfirmLogout}
+        onCancel={handleCloseLogoutDialog}
+      />
     </View>
   );
 }
