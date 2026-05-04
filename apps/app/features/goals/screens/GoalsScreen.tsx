@@ -2,6 +2,9 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { GoalsOverviewResponse } from "@repo/shared-types";
+import { getGoalsOverview } from "../services/goals.service";
 
 const GREEN = "#00c896";
 const DIVIDER_GREEN = "#00d09e";
@@ -13,59 +16,62 @@ const BLACK = "#052e2b";
 const TAB_GREEN = "#14cfa1";
 const BUTTON_GREEN = "#1A9E6A";
 
-const goals = [
-  {
-    id: "1",
-    name: "House Deposit",
-    icon: "rent",
-    saved: 9000,
-    target: 30000,
-    targetDate: "Dec 2027",
-    monthlyNeeded: 875,
-    status: "A bit behind",
-    progress: 30,
-  },
-  {
-    id: "2",
-    name: "Emergency Fund",
-    icon: "money",
-    saved: 3250,
-    target: 5000,
-    targetDate: "Oct 2026",
-    monthlyNeeded: 290,
-    status: "On track",
-    progress: 65,
-  },
-  {
-    id: "3",
-    name: "New Laptop",
-    icon: "income",
-    saved: 720,
-    target: 1200,
-    targetDate: "Aug 2026",
-    monthlyNeeded: 160,
-    status: "On track",
-    progress: 60,
-  },
-];
 
-function formatCurrency(amount: number, currency = "USD") {
+function formatCurrency(amount: number | string, currency = "USD") {
+  const numericAmount =
+    typeof amount === "string" ? Number(amount) : amount;
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
-  }).format(amount);
+  }).format(Number.isFinite(numericAmount) ? numericAmount : 0);
 }
 
 export default function GoalsScreen() {
-  const totalSaved = goals.reduce((total, goal) => total + goal.saved, 0);
-  const totalTarget = goals.reduce((total, goal) => total + goal.target, 0);
-  const totalMonthlyNeeded = goals.reduce(
-    (total, goal) => total + goal.monthlyNeeded,
-    0,
-  );
 
-  const globalProgress = Math.round((totalSaved / totalTarget) * 100);
-  const mainGoal = goals[0];
+  const [data, setData] = useState<GoalsOverviewResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadGoalsOverview() {
+      try {
+        setIsLoading(true);
+        setErrorMessage(null);
+
+        const response = await getGoalsOverview();
+
+        if (isMounted) {
+          setData(response);
+        }
+      } catch (error) {
+        console.warn(error);
+
+        if (isMounted) {
+          setErrorMessage("Could not load goals.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadGoalsOverview();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const totalSaved = data?.summary.totalSaved ?? 0;
+  const totalTarget = data?.summary.totalTarget ?? 0;
+  const globalProgress = data?.summary.globalProgress ?? 0;
+  const totalMonthlyNeeded = data?.summary.monthlyNeeded ?? 0;
+  const mainGoal = data?.mainGoal ?? null;
+  const goals = data?.goals ?? [];
 
   return (
     <View style={styles.screen}>
@@ -100,7 +106,9 @@ export default function GoalsScreen() {
           <View style={[styles.progressFill, { width: `${globalProgress}%` }]} />
         </View>
         <Text style={styles.progressText}>
-          {globalProgress}% of your goals completed.
+          {isLoading
+            ? "Loading goals..."
+            : errorMessage ?? data?.summary.progressMessage ?? "No goals yet."}
         </Text>
       </View>
 
@@ -109,47 +117,63 @@ export default function GoalsScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.cardContent}
         >
-          <View style={styles.mainGoalCard}>
-            <View style={styles.mainGoalHeader}>
-              <View>
-                <Text style={styles.sectionEyebrow}>Main Goal</Text>
-                <Text style={styles.mainGoalTitle}>{mainGoal.name}</Text>
-              </View>
+         {mainGoal ? (
+            <View style={styles.mainGoalCard}>
+    <View style={styles.mainGoalHeader}>
+      <View>
+        <Text style={styles.sectionEyebrow}>Main Goal</Text>
+        <Text style={styles.mainGoalTitle}>{mainGoal.name}</Text>
+      </View>
 
-              <View style={styles.mainGoalIcon}>
-                <Icon name="car" size={55} color={WHITE} strokeWidth={0.8} />
-              </View>
+      <View style={styles.mainGoalIcon}>
+        <Icon
+          name={(mainGoal.icon ?? "target") as never}
+          size={38}
+          color={WHITE}
+          strokeWidth={1.3}
+        />
+      </View>
+    </View>
+
+    <View style={styles.bigProgressRow}>
+      <View style={styles.progressCircle}>
+        <Text style={styles.progressCircleValue}>
+          {mainGoal.progress}%
+        </Text>
+      </View>
+
+      <View style={styles.mainGoalInfo}>
+        <Text style={styles.goalAmount}>
+          {formatCurrency(mainGoal.saved, mainGoal.currency)}
+        </Text>
+
+        <Text style={styles.goalMeta}>
+          saved of {formatCurrency(mainGoal.target, mainGoal.currency)}
+        </Text>
+
+        <Text style={styles.goalMeta}>
+          Target date · {mainGoal.targetDate ?? "No date"}
+        </Text>
+      </View>
+    </View>
+
+    <View style={styles.mainProgressBar}>
+      <View
+        style={[
+          styles.mainProgressFill,
+          { width: `${Math.min(mainGoal.progress, 100)}%` },
+        ]}
+      />
+    </View>
             </View>
-
-            <View style={styles.bigProgressRow}>
-              <View style={styles.progressCircle}>
-                <Text style={styles.progressCircleValue}>
-                  {mainGoal.progress}%
-                </Text>
-              </View>
-
-              <View style={styles.mainGoalInfo}>
-                <Text style={styles.goalAmount}>
-                  {formatCurrency(mainGoal.saved)}
-                </Text>
-                <Text style={styles.goalMeta}>
-                  saved of {formatCurrency(mainGoal.target)}
-                </Text>
-                <Text style={styles.goalMeta}>
-                  Target date · {mainGoal.targetDate}
-                </Text>
-              </View>
+          ) : (
+            <View style={styles.emptyMainGoalCard}>
+              <Text style={styles.mainGoalTitle}>No goals yet</Text>
+              <Text style={styles.goalMeta}>
+                Create your first goal to start tracking your progress.
+              </Text>
             </View>
-
-            <View style={styles.mainProgressBar}>
-              <View
-                style={[
-                  styles.mainProgressFill,
-                  { width: `${mainGoal.progress}%` },
-                ]}
-              />
-            </View>
-          </View>
+          )}
 
           <View style={styles.paceCard}>
             <View style={styles.paceItem}>
@@ -187,7 +211,7 @@ export default function GoalsScreen() {
                 <View style={styles.goalLeft}>
                   <View style={styles.iconCircle}>
                     <Icon
-                      name={goal.icon as never}
+                      name={(goal.icon ?? "target") as never}
                       size={30}
                       color={BUTTON_GREEN}
                       strokeWidth={1.2}
@@ -195,15 +219,12 @@ export default function GoalsScreen() {
                   </View>
 
                   <View style={styles.goalTextContent}>
-                    <Text
-                      style={styles.goalTitle}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
+                    <Text style={styles.goalTitle} numberOfLines={1}>
                       {goal.name}
                     </Text>
+
                     <Text style={styles.goalSubtitle}>
-                      {goal.targetDate} · {goal.status}
+                      {goal.targetDate ?? "No date"} · {goal.statusLabel}
                     </Text>
                   </View>
                 </View>
@@ -217,17 +238,18 @@ export default function GoalsScreen() {
                 <View
                   style={[
                     styles.goalProgressFill,
-                    { width: `${goal.progress}%` },
+                    { width: `${Math.min(goal.progress, 100)}%` },
                   ]}
                 />
               </View>
 
               <View style={styles.goalBottomRow}>
                 <Text style={styles.goalSmallText}>
-                  {formatCurrency(goal.saved)} saved
+                  {formatCurrency(goal.saved, goal.currency)} saved
                 </Text>
+
                 <Text style={styles.goalSmallText}>
-                  {formatCurrency(goal.target)}
+                  {formatCurrency(goal.target, goal.currency)}
                 </Text>
               </View>
             </Pressable>
@@ -235,14 +257,18 @@ export default function GoalsScreen() {
 
           <View style={styles.tipCard}>
             <View style={styles.tipIcon}>
-              <Icon name="money" size={28} color={WHITE} strokeWidth={1.2} />
+              <Icon name="money" size={50} color={WHITE} strokeWidth={0.8} />
             </View>
 
             <View style={styles.tipContent}>
               <Text style={styles.tipTitle}>Smart tip</Text>
               <Text style={styles.tipText}>
-                You need around {formatCurrency(mainGoal.monthlyNeeded)} per
-                month to reach your house deposit goal on time.
+                {mainGoal
+                  ? `You need around ${formatCurrency(
+                      mainGoal.monthlyNeeded,
+                      mainGoal.currency,
+                    )} per month to reach your ${mainGoal.name.toLowerCase()} goal on time.`
+                  : "Create a goal to receive simple progress tips."}
               </Text>
             </View>
           </View>
@@ -651,6 +677,16 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
     backgroundColor: GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  emptyMainGoalCard: {
+    backgroundColor: GREEN,
+    borderRadius: 28,
+    padding: 22,
+    marginBottom: 24,
+    minHeight: 150,
     alignItems: "center",
     justifyContent: "center",
   },
