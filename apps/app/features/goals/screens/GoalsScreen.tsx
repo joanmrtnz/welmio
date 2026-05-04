@@ -3,10 +3,11 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { CreateGoalPayload, GoalOverviewItem, GoalsOverviewResponse } from "@repo/shared-types";
-import { createGoal, getGoalsOverview } from "../services/goals.service";
-import { CreateGoalModal } from "../create-goal-modal/CreateGoalModal";
+import { CreateGoalPayload, GoalOverviewItem, GoalsOverviewResponse, UpdateGoalPayload } from "@repo/shared-types";
+import { createGoal, getGoalsOverview, updateGoal } from "../services/goals.service";
+import { CreateGoalModal } from "../components/create-goal-modal/CreateGoalModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
+import { GoalDetailsModal } from "../components/create-goal-modal/GoalDetailsModal";
 
 const GREEN = "#00c896";
 const DIVIDER_GREEN = "#00d09e";
@@ -35,6 +36,21 @@ export default function GoalsScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isCreateGoalModalVisible, setIsCreateGoalModalVisible] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<GoalOverviewItem | null>(null);
+  const [isGoalDetailsModalVisible, setIsGoalDetailsModalVisible] =
+    useState(false);
+  const [createGoalModalMode, setCreateGoalModalMode] = useState<"create" | "edit">("create");
+  const [editingGoal, setEditingGoal] = useState<GoalOverviewItem | null>(null);
+
+  function openGoalDetails(goal: GoalOverviewItem) {
+    setSelectedGoal(goal);
+    setIsGoalDetailsModalVisible(true);
+  }
+
+  function closeGoalDetails() {
+    setIsGoalDetailsModalVisible(false);
+    setSelectedGoal(null);
+  }
 
   async function handleCreateGoal(payload: CreateGoalPayload) {
     try {
@@ -48,6 +64,29 @@ export default function GoalsScreen() {
 
       const message =
         error instanceof Error ? error.message : "Could not create goal.";
+
+      feedback.error(message);
+    }
+  }
+
+  async function handleUpdateGoal(
+    goalId: string,
+    payload: UpdateGoalPayload,
+  ) {
+    try {
+      await updateGoal(goalId, payload);
+      await loadGoalsOverview();
+
+      setIsCreateGoalModalVisible(false);
+      setEditingGoal(null);
+      setCreateGoalModalMode("create");
+
+      feedback.success("Goal updated successfully.");
+    } catch (error) {
+      console.warn(error);
+
+      const message =
+        error instanceof Error ? error.message : "Could not update goal.";
 
       feedback.error(message);
     }
@@ -73,16 +112,25 @@ export default function GoalsScreen() {
     loadGoalsOverview();
   }, [loadGoalsOverview]);
 
- function openCreateGoalModal() {
+  function openCreateGoalModal() {
+    setCreateGoalModalMode("create");
+    setEditingGoal(null);
     setIsCreateGoalModalVisible(true);
   }
 
   function closeCreateGoalModal() {
     setIsCreateGoalModalVisible(false);
+    setEditingGoal(null);
+    setCreateGoalModalMode("create");
   }
 
-  async function handleGoalCreated(_goal: GoalOverviewItem) {
-    await loadGoalsOverview();
+  function openEditGoalModal(goal: GoalOverviewItem) {
+    setSelectedGoal(null);
+    setIsGoalDetailsModalVisible(false);
+
+    setEditingGoal(goal);
+    setCreateGoalModalMode("edit");
+    setIsCreateGoalModalVisible(true);
   }
 
   const totalSaved = data?.summary.totalSaved ?? 0;
@@ -137,54 +185,57 @@ export default function GoalsScreen() {
           contentContainerStyle={styles.cardContent}
         >
          {mainGoal ? (
-            <View style={styles.mainGoalCard}>
-    <View style={styles.mainGoalHeader}>
-      <View>
-        <Text style={styles.sectionEyebrow}>Main Goal</Text>
-        <Text style={styles.mainGoalTitle}>{mainGoal.name}</Text>
-      </View>
+           <Pressable
+                style={styles.mainGoalCard}
+                onPress={() => openGoalDetails(mainGoal)}
+              >
+              <View style={styles.mainGoalHeader}>
+                <View>
+                  <Text style={styles.sectionEyebrow}>Main Goal</Text>
+                  <Text style={styles.mainGoalTitle}>{mainGoal.name}</Text>
+                </View>
 
-      <View style={styles.mainGoalIcon}>
-        <Icon
-          name={(mainGoal.icon ?? "target") as never}
-          size={38}
-          color={WHITE}
-          strokeWidth={1.3}
-        />
-      </View>
-    </View>
+                <View style={styles.mainGoalIcon}>
+                  <Icon
+                    name={(mainGoal.icon ?? "target") as never}
+                    size={38}
+                    color={WHITE}
+                    strokeWidth={1.3}
+                  />
+                </View>
+              </View>
 
-    <View style={styles.bigProgressRow}>
-      <View style={styles.progressCircle}>
-        <Text style={styles.progressCircleValue}>
-          {mainGoal.progress}%
-        </Text>
-      </View>
+              <View style={styles.bigProgressRow}>
+                <View style={styles.progressCircle}>
+                  <Text style={styles.progressCircleValue}>
+                    {mainGoal.progress}%
+                  </Text>
+                </View>
 
-      <View style={styles.mainGoalInfo}>
-        <Text style={styles.goalAmount}>
-          {formatCurrency(mainGoal.saved, mainGoal.currency)}
-        </Text>
+                <View style={styles.mainGoalInfo}>
+                  <Text style={styles.goalAmount}>
+                    {formatCurrency(mainGoal.saved, mainGoal.currency)}
+                  </Text>
 
-        <Text style={styles.goalMeta}>
-          saved of {formatCurrency(mainGoal.target, mainGoal.currency)}
-        </Text>
+                  <Text style={styles.goalMeta}>
+                    saved of {formatCurrency(mainGoal.target, mainGoal.currency)}
+                  </Text>
 
-        <Text style={styles.goalMeta}>
-          Target date · {mainGoal.targetDate ?? "No date"}
-        </Text>
-      </View>
-    </View>
+                  <Text style={styles.goalMeta}>
+                    Target date · {mainGoal.targetDate ?? "No date"}
+                  </Text>
+                </View>
+              </View>
 
-    <View style={styles.mainProgressBar}>
-      <View
-        style={[
-          styles.mainProgressFill,
-          { width: `${Math.min(mainGoal.progress, 100)}%` },
-        ]}
-      />
-    </View>
-            </View>
+              <View style={styles.mainProgressBar}>
+                <View
+                  style={[
+                    styles.mainProgressFill,
+                    { width: `${Math.min(mainGoal.progress, 100)}%` },
+                  ]}
+                />
+              </View>
+            </Pressable>
           ) : (
             <View style={styles.emptyMainGoalCard}>
               <Text style={styles.mainGoalTitle}>No goals yet</Text>
@@ -225,7 +276,10 @@ export default function GoalsScreen() {
           </View>
 
           {goals.map((goal) => (
-            <Pressable key={goal.id} style={styles.goalCard}>
+            <Pressable 
+            key={goal.id} 
+            style={styles.goalCard}
+            onPress={() => openGoalDetails(goal)} >
               <View style={styles.goalTopRow}>
                 <View style={styles.goalLeft}>
                   <View style={styles.iconCircle}>
@@ -299,8 +353,18 @@ export default function GoalsScreen() {
       </View>
       <CreateGoalModal
         visible={isCreateGoalModalVisible}
+        mode={createGoalModalMode}
+        goal={editingGoal}
         onClose={closeCreateGoalModal}
         onSubmit={handleCreateGoal}
+        onUpdate={handleUpdateGoal}
+      />
+
+      <GoalDetailsModal
+        visible={isGoalDetailsModalVisible}
+        goal={selectedGoal}
+        onClose={closeGoalDetails}
+        onEdit={openEditGoalModal}
       />
     </View>
   );
