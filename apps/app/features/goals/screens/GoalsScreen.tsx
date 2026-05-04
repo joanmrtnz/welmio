@@ -92,6 +92,30 @@ export default function GoalsScreen() {
     }
   }
 
+  async function handleDeleteGoal(goal: GoalOverviewItem) {
+    try {
+      console.log("Delete goal later", goal.id);
+
+      // TODO:
+      // await deleteGoal(goal.id);
+      // await loadGoalsOverview();
+
+      setIsGoalDetailsModalVisible(false);
+      setSelectedGoal(null);
+
+      feedback.success("Goal deleted successfully.");
+    } catch (error) {
+      console.warn(error);
+
+      const message =
+        error instanceof Error ? error.message : "Could not delete goal.";
+
+      feedback.error(message);
+
+      throw error;
+    }
+  }
+
   const loadGoalsOverview = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -365,6 +389,7 @@ export default function GoalsScreen() {
         goal={selectedGoal}
         onClose={closeGoalDetails}
         onEdit={openEditGoalModal}
+        onDelete={handleDeleteGoal}
       />
     </View>
   );
