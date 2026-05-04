@@ -7,10 +7,13 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { CategoriesModule } from './categories/categories.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { AccountsModule } from './accounts/accounts.module';
+import { UsersModule } from './users/users.module';
+import { GoalsService } from './goals/goals.service';
+import { GoalsModule } from './goals/goals.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, TransactionsModule, CategoriesModule, AnalyticsModule, AccountsModule],
+  imports: [AuthModule, PrismaModule, TransactionsModule, CategoriesModule, AnalyticsModule, AccountsModule, UsersModule, GoalsModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GoalsService],
 })
 export class AppModule {}

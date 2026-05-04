@@ -20,6 +20,7 @@ import {
   Account,
   TransactionOverviewItem
 } from "@repo/shared-types";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
 type UseCreateTransactionFormParams = {
   visible: boolean;
@@ -193,8 +194,10 @@ export function useCreateTransactionForm({
 
       if (transactionToEdit) {
         await updateTransaction(transactionToEdit.id, payload);
+        feedback.success("Transaction updated successfully");
       } else {
         await createTransaction(payload);
+        feedback.success("Transaction created successfully");
       }
 
       resetForm();
@@ -202,6 +205,7 @@ export function useCreateTransactionForm({
       onClose();
     } catch (error) {
       console.warn("[CreateTransactionModal] submit transaction error:", error);
+      feedback.error("Error submitting the transaction");
     } finally {
       setIsSaving(false);
     }

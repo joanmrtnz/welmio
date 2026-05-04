@@ -19,6 +19,8 @@ import {
   categoryFilterModalColors,
   styles,
 } from "./categoryFilterModal.styles";
+import { useState } from "react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 
 type CategoryFilterModalProps = {
   visible: boolean;
@@ -55,12 +57,18 @@ export function CategoryFilterModal({
     isSaving,
     canSaveCategory,
 
+    editingCategoryId,
+
     handleClose,
     handleBackToFilter,
     handleToggleCategory,
     clearFilters,
     applyFilters,
-    handleCreateCategory,
+
+    handleOpenCreateCategory,
+    handleEditSelectedCategory,
+    handleDeleteSelectedCategories,
+    handleSubmitCategory,
   } = useCategoryFilterModal({
     visible,
     selectedCategoryIds,
@@ -68,7 +76,38 @@ export function CategoryFilterModal({
     onApply,
   });
 
-  const { BLACK, WHITE } = categoryFilterModalColors;
+  const { BLACK, WHITE, RED } = categoryFilterModalColors;
+
+  const hasSelectedCategories = draftSelectedIds.length > 0;
+  const canEditSelectedCategory = draftSelectedIds.length === 1;
+  const isEditingCategory = Boolean(editingCategoryId);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeletingCategories, setIsDeletingCategories] = useState(false);
+
+
+  function handleOpenDeleteDialog() {
+    setShowDeleteDialog(true);
+  }
+
+  function handleCloseDeleteDialog() {
+    if (isDeletingCategories) return;
+
+    setShowDeleteDialog(false);
+  }
+
+  async function handleConfirmDeleteCategories() {
+    try {
+      setIsDeletingCategories(true);
+
+      await handleDeleteSelectedCategories();
+
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.warn("[CategoryFilterModal] delete categories error:", error);
+    } finally {
+      setIsDeletingCategories(false);
+    }
+  }
 
   return (
     <Modal
@@ -84,16 +123,52 @@ export function CategoryFilterModal({
               <View style={styles.header}>
                 <Text style={styles.title}>Filter by category</Text>
 
-                <Pressable onPress={handleClose} style={styles.closeButton}>
-                  <Icon name="close" size={15} color={BLACK} />
-                </Pressable>
+                <View style={styles.headerActions}>
+                  {hasSelectedCategories && (
+                    <>
+                      {canEditSelectedCategory && (
+                        <Pressable
+                          onPress={handleEditSelectedCategory}
+                          style={styles.headerIconButton}
+                        >
+                          <Icon
+                            name="edit"
+                            size={17}
+                            strokeWidth={1.6}
+                            color={BLACK}
+                          />
+                        </Pressable>
+                      )}
+
+                     <Pressable
+                        onPress={handleOpenDeleteDialog}
+                        style={[
+                          styles.headerIconButton,
+                          styles.deleteIconButton,
+                        ]}
+                        disabled={isDeletingCategories}
+                      >
+                        <Icon
+                          name="bin"
+                          size={21}
+                          strokeWidth={1.6}
+                          color={RED}
+                        />
+                      </Pressable>
+                    </>
+                  )}
+
+                  <Pressable onPress={handleClose} style={styles.closeButton}>
+                    <Icon name="close" size={15} color={BLACK} />
+                  </Pressable>
+                </View>
               </View>
 
               <ScrollView
-                  style={styles.scrollView}
-                  contentContainerStyle={styles.scrollContent}
-                  showsVerticalScrollIndicator={false}
-                >
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+              >
                 <View style={styles.grid}>
                   {categories.map((item) => {
                     const isSelected = draftSelectedIds.includes(item.id);
@@ -133,7 +208,7 @@ export function CategoryFilterModal({
 
                 <Pressable
                   style={styles.addMoreButton}
-                  onPress={() => setMode("create")}
+                  onPress={handleOpenCreateCategory}
                 >
                   <Icon name="plus" size={23} color={BLACK} />
                   <Text style={styles.addMoreText}>Add more categories</Text>
@@ -153,7 +228,9 @@ export function CategoryFilterModal({
           ) : (
             <>
               <View style={styles.header}>
-                <Text style={styles.title}>New Category</Text>
+                <Text style={styles.title}>
+                  {isEditingCategory ? "Edit Category" : "New Category"}
+                </Text>
 
                 <Pressable
                   onPress={handleBackToFilter}
@@ -178,6 +255,7 @@ export function CategoryFilterModal({
                 />
 
                 <Text style={styles.sectionLabel}>Type</Text>
+
                 <View style={styles.typeRow}>
                   <Pressable
                     style={[
@@ -189,7 +267,8 @@ export function CategoryFilterModal({
                     <Text
                       style={[
                         styles.typeButtonText,
-                        selectedType === "income" && styles.typeButtonTextSelected,
+                        selectedType === "income" &&
+                          styles.typeButtonTextSelected,
                       ]}
                     >
                       Income
@@ -206,7 +285,8 @@ export function CategoryFilterModal({
                     <Text
                       style={[
                         styles.typeButtonText,
-                        selectedType === "expense" && styles.typeButtonTextSelected,
+                        selectedType === "expense" &&
+                          styles.typeButtonTextSelected,
                       ]}
                     >
                       Expense
@@ -262,7 +342,10 @@ export function CategoryFilterModal({
               </ScrollView>
 
               <View style={styles.actions}>
-                <Pressable style={styles.clearButton} onPress={handleBackToFilter}>
+                <Pressable
+                  style={styles.clearButton}
+                  onPress={handleBackToFilter}
+                >
                   <Text style={styles.clearButtonText}>Cancel</Text>
                 </Pressable>
 
@@ -271,16 +354,37 @@ export function CategoryFilterModal({
                     styles.applyButton,
                     !canSaveCategory && styles.applyButtonDisabled,
                   ]}
-                  onPress={handleCreateCategory}
+                  onPress={handleSubmitCategory}
                 >
                   <Text style={styles.applyButtonText}>
-                    {isSaving ? "Saving..." : "Save"}
+                    {isSaving
+                      ? "Saving..."
+                      : isEditingCategory
+                        ? "Save changes"
+                        : "Save"}
                   </Text>
                 </Pressable>
               </View>
             </>
           )}
         </Pressable>
+        <ConfirmDialog
+          visible={showDeleteDialog}
+          title="Delete Category"
+          message={`Are you sure you want to delete ${
+            draftSelectedIds.length === 1 ? "this category" : "these categories"
+          }?
+          This action cannot be undone.`}
+          confirmLabel={
+            draftSelectedIds.length === 1 ? "Yes, Delete" : "Yes, Delete All"
+          }
+          cancelLabel="Cancel"
+          loadingLabel="Deleting..."
+          destructive
+          isLoading={isDeletingCategories}
+          onConfirm={handleConfirmDeleteCategories}
+          onCancel={handleCloseDeleteDialog}
+        />
       </Pressable>
     </Modal>
   );

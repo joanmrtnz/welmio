@@ -5,7 +5,8 @@ import Car from "../../assets/icons/car.svg";
 import Food from "../../assets/icons/food.svg";
 import Search from "../../assets/icons/search.svg";
 import Calendar from "../../assets/icons/calendar.svg";
-import Back from "../../assets/icons/back.svg";
+import ArrowLeft from "../../assets/icons/arrow_left.svg";
+import ArrowRight from "../../assets/icons/arrow_rigth.svg";
 import Bell from "../../assets/icons/bell.svg";
 import Medicine from "../../assets/icons/medicine.svg";
 import Savings from "../../assets/icons/savings.svg";
@@ -25,6 +26,10 @@ import Book from "../../assets/icons/book.svg";
 import Check from "../../assets/icons/check.svg";
 import Bin from "../../assets/icons/bin.svg";
 import Edit from "../../assets/icons/edit.svg";
+import Key from "../../assets/icons/key.svg";
+import { IconName } from "@repo/shared-types";
+import { SvgProps } from "react-native-svg";
+import { ComponentType } from "react";
 
 const icons = {
   arrowUp: Money,
@@ -36,11 +41,12 @@ const icons = {
   food: Food,
   search: Search,
   calendar: Calendar,
-  back: Back,
+  arrowLeft: ArrowLeft,
+  arrowRight: ArrowRight,
   bell: Bell,
   medicine: Medicine,
-  savings: Savings, 
-  plus: Plus, 
+  savings: Savings,
+  plus: Plus,
   gift: Gift,
   ticket: Ticket,
   user: User,
@@ -54,11 +60,11 @@ const icons = {
   plane: Plane,
   book: Book,
   check: Check,
-  bin: Bin, 
+  bin: Bin,
   edit: Edit,
-};
+  key: Key,
+} satisfies Record<IconName, ComponentType<SvgProps>>;
 
-type IconName = keyof typeof icons;
 type IconProps = {
   name: IconName;
   size?: number;

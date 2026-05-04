@@ -3,6 +3,7 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { getChartMaxValue, getChartYAxisLabels, normalizeChartBars } from "../utils/chart";
+import { router } from "expo-router";
 
 const GREEN = "#00c896";
 const DIVIDER_GREEN = "#00d09e";
@@ -37,7 +38,9 @@ export default function AnalyticsScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="back" size={22} strokeWidth={2.5} color={WHITE} />
+        <Pressable onPress={() => router.back()}>
+          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        </Pressable>
         <Text style={styles.title}>Analytics</Text>
         <View style={styles.notifications}>
           <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
