@@ -35,7 +35,11 @@ export default function SettingsScreen() {
               label="Change Password"
               onPress={() => router.push("/profile/change-password")}
             />
-            <SettingsOption icon="user" label="Delete Account" />
+           <SettingsOption
+              icon="user"
+              label="Delete Account"
+              onPress={() => router.push("/profile/delete-account")}
+            />
           </View>
         </ScrollView>
       </View>
