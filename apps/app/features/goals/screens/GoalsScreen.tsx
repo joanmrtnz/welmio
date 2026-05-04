@@ -2,10 +2,11 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { GoalsOverviewResponse } from "@repo/shared-types";
-import { getGoalsOverview } from "../services/goals.service";
+import { useCallback, useEffect, useState } from "react";
+import { CreateGoalPayload, GoalOverviewItem, GoalsOverviewResponse } from "@repo/shared-types";
+import { createGoal, getGoalsOverview } from "../services/goals.service";
 import { CreateGoalModal } from "../create-goal-modal/CreateGoalModal";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
 const GREEN = "#00c896";
 const DIVIDER_GREEN = "#00d09e";
@@ -35,7 +36,44 @@ export default function GoalsScreen() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isCreateGoalModalVisible, setIsCreateGoalModalVisible] = useState(false);
 
-  function openCreateGoalModal() {
+  async function handleCreateGoal(payload: CreateGoalPayload) {
+    try {
+      await createGoal(payload);
+      await loadGoalsOverview();
+
+      setIsCreateGoalModalVisible(false);
+      feedback.success("Goal created successfully.");
+    } catch (error) {
+      console.warn(error);
+
+      const message =
+        error instanceof Error ? error.message : "Could not create goal.";
+
+      feedback.error(message);
+    }
+  }
+
+  const loadGoalsOverview = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      const response = await getGoalsOverview();
+
+      setData(response);
+    } catch (error) {
+      console.warn(error);
+      setErrorMessage("Could not load goals.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadGoalsOverview();
+  }, [loadGoalsOverview]);
+
+ function openCreateGoalModal() {
     setIsCreateGoalModalVisible(true);
   }
 
@@ -43,42 +81,9 @@ export default function GoalsScreen() {
     setIsCreateGoalModalVisible(false);
   }
 
-  async function handleGoalCreated() {
-    // TODO: add loadGoalsOverview() logic
+  async function handleGoalCreated(_goal: GoalOverviewItem) {
+    await loadGoalsOverview();
   }
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadGoalsOverview() {
-      try {
-        setIsLoading(true);
-        setErrorMessage(null);
-
-        const response = await getGoalsOverview();
-
-        if (isMounted) {
-          setData(response);
-        }
-      } catch (error) {
-        console.warn(error);
-
-        if (isMounted) {
-          setErrorMessage("Could not load goals.");
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadGoalsOverview();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const totalSaved = data?.summary.totalSaved ?? 0;
   const totalTarget = data?.summary.totalTarget ?? 0;
@@ -295,7 +300,7 @@ export default function GoalsScreen() {
       <CreateGoalModal
         visible={isCreateGoalModalVisible}
         onClose={closeCreateGoalModal}
-        onCreated={handleGoalCreated}
+        onSubmit={handleCreateGoal}
       />
     </View>
   );

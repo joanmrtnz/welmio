@@ -2,6 +2,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { useState } from "react";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
+import { CreateGoalPayload, GoalType } from "@repo/shared-types";
 
 const GREEN = "#00c896";
 const LIGHT_GREEN = "#f1fff3";
@@ -11,10 +12,11 @@ const BUTTON_GREEN = "#1A9E6A";
 const DIVIDER_GREEN = "#00d09e";
 const LIGTH_GRAY = "rgba(0,0,0,0.1)";
 
+
 type CreateGoalModalProps = {
   visible: boolean;
   onClose: () => void;
-  onCreated?: () => void | Promise<void>;
+  onSubmit: (payload: CreateGoalPayload) => Promise<void>;
 };
 
 const goalTypes = [
@@ -34,7 +36,7 @@ const goalIcons = [
 export function CreateGoalModal({
   visible,
   onClose,
-  onCreated,
+  onSubmit,
 }: CreateGoalModalProps) {
   const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
@@ -42,10 +44,60 @@ export function CreateGoalModal({
   const [targetDate, setTargetDate] = useState("");
   const [selectedType, setSelectedType] = useState("savings");
   const [selectedIcon, setSelectedIcon] = useState("home");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  type FeedbackState = {
+  type: "success" | "error";
+  message: string;
+  } | null;
+  const [feedback, setFeedback] = useState<FeedbackState>(null);
 
-  async function handleMockCreate() {
-    await onCreated?.();
-    onClose();
+  async function handleCreateGoal() {
+    try {
+      setIsSubmitting(true);
+
+      const parsedTargetAmount = Number(targetAmount);
+      const parsedCurrentAmount = currentAmount.trim()
+        ? Number(currentAmount)
+        : 0;
+
+      if (!name.trim()) {
+        throw new Error("Goal name is required.");
+      }
+
+      if (!Number.isFinite(parsedTargetAmount) || parsedTargetAmount <= 0) {
+        throw new Error("Target amount must be greater than 0.");
+      }
+
+      if (!Number.isFinite(parsedCurrentAmount) || parsedCurrentAmount < 0) {
+        throw new Error("Current amount must be 0 or greater.");
+      }
+
+      if (parsedCurrentAmount > parsedTargetAmount) {
+        throw new Error("Current amount cannot be greater than target amount.");
+      }
+
+      await onSubmit({
+        name: name.trim(),
+        description: null,
+        targetAmount: parsedTargetAmount,
+        currentAmount: parsedCurrentAmount,
+        currency: "USD",
+        targetDate: targetDate.trim() || null,
+        startDate: null,
+        type: selectedType as GoalType,
+        icon: selectedIcon,
+        color: "#00c896",
+      });
+
+      setName("");
+      setTargetAmount("");
+      setCurrentAmount("");
+      setTargetDate("");
+      setSelectedType("savings");
+      setSelectedIcon("home");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -200,9 +252,15 @@ export function CreateGoalModal({
               </View>
             </View>
 
-            <Pressable style={styles.createButton} onPress={handleMockCreate}>
-              <Text style={styles.createButtonText}>Create goal</Text>
-            </Pressable>
+          <Pressable
+            style={[styles.createButton, isSubmitting && styles.createButtonDisabled]}
+            onPress={handleCreateGoal}
+            disabled={isSubmitting}
+          >
+            <Text style={styles.createButtonText}>
+              {isSubmitting ? "Creating..." : "Create goal"}
+            </Text>
+          </Pressable>
           </ScrollView>
         </View>
       </View>
@@ -406,5 +464,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: fonts.bold,
     color: BLACK,
+  },
+
+  createButtonDisabled: {
+    opacity: 0.6,
   },
 });

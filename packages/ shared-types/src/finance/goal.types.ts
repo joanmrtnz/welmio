@@ -27,3 +27,30 @@ export type GoalsOverviewResponse = {
   mainGoal: GoalOverviewItem | null;
   goals: GoalOverviewItem[];
 };
+
+export type GoalType =
+  | "savings"
+  | "debt_payment"
+  | "emergency_fund"
+  | "purchase"
+  | "investment"
+  | "other";
+
+export type GoalStatus =
+  | "active"
+  | "completed"
+  | "paused"
+  | "cancelled";
+
+export type CreateGoalPayload = {
+  name: string;
+  description?: string | null;
+  targetAmount: number;
+  currentAmount?: number;
+  currency: string;
+  targetDate?: string | null;
+  startDate?: string | null;
+  type: GoalType;
+  icon?: string | null;
+  color?: string | null;
+};
