@@ -16,6 +16,7 @@ import { AuthInput } from "@/features/auth/components/AuthInput";
 import { AuthButton } from "@/features/auth/components/AuthButton";
 import { getUserProfile, updateUserProfile } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
+import { router } from "expo-router";
 
 export default function EditProfileScreen() {
   const [usernameLabel, setUsernameLabel] = useState("");
@@ -80,7 +81,9 @@ export default function EditProfileScreen() {
     >
 
       <View style={styles.headerArea}>
-        <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        <Pressable onPress={() => router.back()}>
+          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        </Pressable>
         <Text style={styles.title}>Edit My Profile</Text>
 
         <View style={styles.notifications}>

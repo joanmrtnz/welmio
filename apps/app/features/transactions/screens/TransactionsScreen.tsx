@@ -17,6 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { CreateTransactionModal } from "../components/create-transaction-modal/CreateTransactionModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { CalendarFilterModal } from "../components/calendar-filter-modal/CalendarFilterModal";
+import { router } from "expo-router";
 
 const GREEN = "#00c896";
 const DARK_GREEN = "#059669";
@@ -97,7 +98,9 @@ export default function TransactionScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        <Pressable onPress={() => router.back()}>
+          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        </Pressable>
         <Text style={styles.title}>Transactions</Text>
         <View style={styles.notifications}>
            <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
