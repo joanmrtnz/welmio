@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -10,6 +10,15 @@ import { UpdateGoalDto } from './dto/update-goal.dto';
 @Controller('goals')
 export class GoalsController {
   constructor(private readonly goalsService: GoalsService) {}
+
+
+  @Delete(':id')
+  deleteGoal(
+    @CurrentUser() user: JwtUser,
+    @Param('id') goalId: string,
+  ) {
+    return this.goalsService.deleteGoal(user.sub, goalId);
+  }
 
   @Post()
   createGoal(

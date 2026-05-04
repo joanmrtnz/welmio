@@ -19,6 +19,8 @@ export class GoalOverviewItemDto {
   targetDate?: string | null;
   monthlyNeeded: number;
   statusLabel: string;
+
+  contributionsCount: number;
 }
 
 export class GoalsOverviewSummaryDto {
