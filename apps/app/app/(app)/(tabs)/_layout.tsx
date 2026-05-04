@@ -22,7 +22,7 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ color }) => (
 
-            <FontAwesome size={32} name="home" color={color} />
+            <FontAwesome size={30} name="home" color={color} />
           ),
         }}
       />
@@ -32,7 +32,7 @@ export default function TabLayout() {
         options={{
           title: "Analytics",
          tabBarIcon: ({ color }) => (
-            <FontAwesome size={32} name="bar-chart" color={color} />
+            <FontAwesome size={28} name="bar-chart" color={color} />
         ),
         }}
       />
@@ -48,11 +48,11 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="categories/index"
+        name="goals/index"
         options={{
           title: "Categories",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={30} name="tags" color={color} />
+            <FontAwesome name="flag" size={28} color={color} />
           ),
         }}
       />
@@ -62,7 +62,7 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={32} name="user" color={color} />
+            <FontAwesome size={28} name="user" color={color} />
           ),
         }}
       />
