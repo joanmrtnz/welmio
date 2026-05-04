@@ -11,13 +11,14 @@ import {
   ScrollView,
 } from "react-native";
 import { fonts } from "@/theme/fonts";
-import { Icon, type IconName } from "@/components/icons/Icon";
+import { Icon} from "@/components/icons/Icon";
 import { AuthInput } from "@/features/auth/components/AuthInput";
 import { AuthButton } from "@/features/auth/components/AuthButton";
 import { getUserProfile, updateUserProfile } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { router } from "expo-router";
 import { AvatarPickerModal } from "../components/AvatarPickerModal";
+import { IconName } from "@repo/shared-types";
 
 export default function EditProfileScreen() {
   const [usernameLabel, setUsernameLabel] = useState("");
@@ -40,6 +41,8 @@ export default function EditProfileScreen() {
       const updatedUser = await updateUserProfile({
         fullName: username.trim(),
         mobileNumber: phone.trim() || null,
+        avatarIcon,
+        avatarColor,
       });
 
       setUsername(updatedUser.fullName ?? "");
@@ -47,6 +50,8 @@ export default function EditProfileScreen() {
       setPhone(updatedUser.mobileNumber ?? "");
       setEmail(updatedUser.email ?? "");
       setUserId(updatedUser.id);
+      setAvatarIcon(updatedUser.avatarIcon ?? "user");
+      setAvatarColor(updatedUser.avatarColor ?? "#00c896");
 
       feedback.success("Profile updated successfully");
     } catch (error) {
@@ -69,6 +74,8 @@ export default function EditProfileScreen() {
         setPhone(user.mobileNumber ?? "");
         setEmail(user.email ?? "");
         setUserId(user.id);
+        setAvatarColor(user.avatarColor ?? GREEN);
+        setAvatarIcon(user.avatarIcon ?? "user");
       } catch (error) {
         console.error("Error loading user profile", error);
       } finally {

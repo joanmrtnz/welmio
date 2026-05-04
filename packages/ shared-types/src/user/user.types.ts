@@ -1,7 +1,10 @@
+import { IconName } from "../ui";
+
 export type UpdateUserProfilePayload = {
   fullName?: string;
   mobileNumber?: string | null;
-  dateOfBirth?: string | null;
+  avatarIcon?: IconName;
+  avatarColor?: string | null;
 };
 
 export type ChangePasswordPayload = {

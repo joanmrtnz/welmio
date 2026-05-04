@@ -27,7 +27,9 @@ import Check from "../../assets/icons/check.svg";
 import Bin from "../../assets/icons/bin.svg";
 import Edit from "../../assets/icons/edit.svg";
 import Key from "../../assets/icons/key.svg";
-
+import { IconName } from "@repo/shared-types";
+import { SvgProps } from "react-native-svg";
+import { ComponentType } from "react";
 
 const icons = {
   arrowUp: Money,
@@ -43,8 +45,8 @@ const icons = {
   arrowRight: ArrowRight,
   bell: Bell,
   medicine: Medicine,
-  savings: Savings, 
-  plus: Plus, 
+  savings: Savings,
+  plus: Plus,
   gift: Gift,
   ticket: Ticket,
   user: User,
@@ -58,12 +60,11 @@ const icons = {
   plane: Plane,
   book: Book,
   check: Check,
-  bin: Bin, 
+  bin: Bin,
   edit: Edit,
   key: Key,
-};
+} satisfies Record<IconName, ComponentType<SvgProps>>;
 
-export type IconName = keyof typeof icons;
 type IconProps = {
   name: IconName;
   size?: number;
