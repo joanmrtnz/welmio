@@ -12,6 +12,35 @@ import { UpdateGoalDto } from './dto/update-goal.dto';
 export class GoalsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async deleteGoal(
+    userId: string,
+    goalId: string,
+  ): Promise<{ message: string }> {
+    const existingGoal = await this.prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!existingGoal) {
+      throw new NotFoundException('Goal not found');
+    }
+
+    await this.prisma.goal.delete({
+      where: {
+        id: goalId,
+      },
+    });
+
+    return {
+      message: 'Goal deleted successfully.',
+    };
+  }
+
   async createGoal(
     userId: string,
     createGoalDto: CreateGoalDto,
@@ -82,40 +111,47 @@ export class GoalsService {
     return this.toGoalOverviewItem(goal);
  }
 
- private toGoalOverviewItem(goal: Goal): GoalOverviewItemDto {
+  private toGoalOverviewItem(
+    goal: Goal & {
+      _count?: {
+        contributions: number;
+      };
+    },
+  ): GoalOverviewItemDto {
     const saved = goal.currentAmount.toNumber();
     const target = goal.targetAmount.toNumber();
 
     const progress = this.calculateProgress(saved, target);
 
     return {
-        id: goal.id,
-        name: goal.name,
-        description: goal.description,
-        icon: goal.icon,
-        color: goal.color,
-        type: goal.type,
-        status: goal.status,
-        saved,
-        target,
-        currency: goal.currency,
-        progress,
-        targetDate: goal.targetDate?.toISOString() ?? null,
-        monthlyNeeded: this.calculateMonthlyNeeded(
+      id: goal.id,
+      name: goal.name,
+      description: goal.description,
+      icon: goal.icon,
+      color: goal.color,
+      type: goal.type,
+      status: goal.status,
+      saved,
+      target,
+      currency: goal.currency,
+      progress,
+      targetDate: goal.targetDate?.toISOString() ?? null,
+      monthlyNeeded: this.calculateMonthlyNeeded(
         target,
         saved,
         goal.targetDate,
-        ),
-        statusLabel: this.getStatusLabel({
+      ),
+      statusLabel: this.getStatusLabel({
         saved,
         target,
         progress,
         startDate: goal.startDate,
         targetDate: goal.targetDate,
         status: goal.status,
-        }),
+      }),
+      contributionsCount: goal._count?.contributions ?? 0,
     };
- }
+  }
 
   async getUserGoalsOverview(userId: string): Promise<GoalsOverviewResponseDto> {
     const user = await this.prisma.user.findUnique({
@@ -132,6 +168,13 @@ export class GoalsService {
         userId,
         status: {
           in: ['active', 'paused', 'completed'],
+        },
+      },
+      include: {
+        _count: {
+          select: {
+            contributions: true,
+          },
         },
       },
       orderBy: [
