@@ -4,7 +4,7 @@ import { Icon } from "@/components/icons/Icon";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { CreateGoalPayload, GoalOverviewItem, GoalsOverviewResponse, UpdateGoalPayload } from "@repo/shared-types";
-import { createGoal, getGoalsOverview, updateGoal } from "../services/goals.service";
+import { createGoal, deleteGoal, getGoalsOverview, updateGoal } from "../services/goals.service";
 import { CreateGoalModal } from "../components/create-goal-modal/CreateGoalModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { GoalDetailsModal } from "../components/create-goal-modal/GoalDetailsModal";
@@ -96,9 +96,8 @@ export default function GoalsScreen() {
     try {
       console.log("Delete goal later", goal.id);
 
-      // TODO:
-      // await deleteGoal(goal.id);
-      // await loadGoalsOverview();
+      await deleteGoal(goal.id);
+      await loadGoalsOverview();
 
       setIsGoalDetailsModalVisible(false);
       setSelectedGoal(null);

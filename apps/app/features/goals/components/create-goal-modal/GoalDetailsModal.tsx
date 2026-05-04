@@ -53,6 +53,16 @@ export function GoalDetailsModal({
   if (!goal) return null;
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const contributionsCount = goal.contributionsCount ?? 0;
+  const deleteMessage =
+    contributionsCount > 0
+      ? `Are you sure you want to delete this goal?
+  This will also delete ${contributionsCount} contribution${
+          contributionsCount === 1 ? "" : "s"
+        } linked to this goal.
+  This action cannot be undone.`
+      : `Are you sure you want to delete this goal?
+  This action cannot be undone.`;
 
   function handleEditGoal() {
     if (!goal) return;
@@ -281,11 +291,10 @@ export function GoalDetailsModal({
           </ScrollView>
         </View>
       </View>
-      <ConfirmDialog
+     <ConfirmDialog
         visible={showDeleteDialog}
         title="Delete Goal"
-        message={`Are you sure you want to delete this goal?
-      This action cannot be undone.`}
+        message={deleteMessage}
         confirmLabel="Yes, Delete"
         cancelLabel="Cancel"
         loadingLabel="Deleting..."

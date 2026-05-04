@@ -19,3 +19,9 @@ export async function updateGoal(goalId: string, payload: UpdateGoalPayload) {
     body: JSON.stringify(payload),
   });
 }
+
+export async function deleteGoal(goalId: string) {
+  return apiFetch<void>(`/goals/${goalId}`, {
+    method: "DELETE",
+  });
+}
