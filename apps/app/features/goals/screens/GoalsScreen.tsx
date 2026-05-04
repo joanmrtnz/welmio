@@ -3,8 +3,8 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { CreateGoalPayload, GoalOverviewItem, GoalsOverviewResponse } from "@repo/shared-types";
-import { createGoal, getGoalsOverview } from "../services/goals.service";
+import { CreateGoalPayload, GoalOverviewItem, GoalsOverviewResponse, UpdateGoalPayload } from "@repo/shared-types";
+import { createGoal, getGoalsOverview, updateGoal } from "../services/goals.service";
 import { CreateGoalModal } from "../components/create-goal-modal/CreateGoalModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { GoalDetailsModal } from "../components/create-goal-modal/GoalDetailsModal";
@@ -69,15 +69,27 @@ export default function GoalsScreen() {
     }
   }
 
-  async function handleUpdateGoal(goalId: string, payload: CreateGoalPayload) {
-    console.log("Update goal later", goalId, payload);
+  async function handleUpdateGoal(
+    goalId: string,
+    payload: UpdateGoalPayload,
+  ) {
+    try {
+      await updateGoal(goalId, payload);
+      await loadGoalsOverview();
 
-    // TODO:
-    // await updateGoal(goalId, payload);
-    // await loadGoalsOverview();
+      setIsCreateGoalModalVisible(false);
+      setEditingGoal(null);
+      setCreateGoalModalMode("create");
 
-    setIsCreateGoalModalVisible(false);
-    feedback.success("Goal updated successfully.");
+      feedback.success("Goal updated successfully.");
+    } catch (error) {
+      console.warn(error);
+
+      const message =
+        error instanceof Error ? error.message : "Could not update goal.";
+
+      feedback.error(message);
+    }
   }
 
   const loadGoalsOverview = useCallback(async () => {

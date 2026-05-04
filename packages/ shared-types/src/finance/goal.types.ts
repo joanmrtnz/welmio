@@ -54,3 +54,5 @@ export type CreateGoalPayload = {
   icon?: string | null;
   color?: string | null;
 };
+
+export type UpdateGoalPayload = Partial<CreateGoalPayload>;
