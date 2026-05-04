@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'prisma/prisma.service';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { DeleteAccountDto } from './dto/delete-account.dto';
 
 @Injectable()
 export class UsersService {
@@ -113,6 +114,37 @@ export class UsersService {
 
     return {
       message: 'Password updated successfully',
+    };
+  }
+
+  async deleteAccount(userId: string, dto: DeleteAccountDto) {
+    if (dto.confirmationText.trim().toLowerCase() !== "delete") {
+      throw new BadRequestException("Invalid confirmation text");
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    await this.prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    });
+
+    return {
+      id: userId,
+      deleted: true,
+      message: "Account deleted successfully",
     };
   }
 }
