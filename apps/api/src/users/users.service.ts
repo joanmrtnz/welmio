@@ -26,6 +26,8 @@ export class UsersService {
         mobileNumber: true,
         dateOfBirth: true,
         role: true,
+        avatarIcon: true,
+        avatarColor: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -47,6 +49,8 @@ export class UsersService {
       data: {
         fullName: dto.fullName,
         mobileNumber: dto.mobileNumber,
+        avatarIcon: dto.avatarIcon,
+        avatarColor: dto.avatarColor,
       },
       select: {
         id: true,
@@ -55,6 +59,8 @@ export class UsersService {
         mobileNumber: true,
         dateOfBirth: true,
         role: true,
+        avatarIcon: true,
+        avatarColor: true,
         createdAt: true,
         updatedAt: true,
       },
