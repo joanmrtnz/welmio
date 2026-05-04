@@ -63,7 +63,6 @@ export default function ProfileScreen() {
             label="Settings"
             onPress={() => router.push("/profile/settings")}
           />
-          <ProfileOption icon="help" label="Help" />
           <ProfileOption icon="logout" label="Logout"/>
         </View>
       </View>
