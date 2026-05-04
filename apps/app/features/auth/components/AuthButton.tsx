@@ -1,5 +1,7 @@
 import { Pressable, Text, StyleSheet } from "react-native";
 
+type AuthButtonVariant = "primary" | "secondary" | "danger";
+
 export function AuthButton({
   title,
   variant = "primary",
@@ -7,26 +9,40 @@ export function AuthButton({
   disabled = false,
 }: {
   title: string;
-  variant?: "primary" | "secondary";
+  variant?: AuthButtonVariant;
   onPress?: () => void;
   disabled?: boolean;
 }) {
+  const isDanger = variant === "danger";
+
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
       style={[
         styles.base,
-        variant === "primary" ? styles.primary : styles.secondary,
+        variant === "primary" && styles.primary,
+        variant === "secondary" && styles.secondary,
+        variant === "danger" && styles.danger,
         disabled && styles.disabledButton,
       ]}
     >
-      <Text style={[styles.text, disabled && styles.disabledText]}>
+      <Text
+        style={[
+          styles.text,
+          isDanger && styles.dangerText,
+          disabled && styles.disabledText,
+        ]}
+      >
         {title}
       </Text>
     </Pressable>
   );
 }
+
+const WHITE = "#ffffff";
+const RED = "#ef4444";
+const BLACK = "#052e2b";
 
 const styles = StyleSheet.create({
   base: {
@@ -45,6 +61,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#dff7e2",
   },
 
+  danger: {
+    backgroundColor: RED,
+  },
+
   disabledButton: {
     backgroundColor: "#cfeee0",
   },
@@ -52,7 +72,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#052e2b",
+    color: BLACK,
+  },
+
+  dangerText: {
+    color: WHITE,
   },
 
   disabledText: {

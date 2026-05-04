@@ -1,10 +1,4 @@
-import {
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { fonts } from "@/theme/fonts";
 
 type ConfirmDialogProps = {
@@ -14,6 +8,8 @@ type ConfirmDialogProps = {
   confirmLabel?: string;
   cancelLabel?: string;
   destructive?: boolean;
+  isLoading?: boolean;
+  loadingLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
 };
@@ -25,6 +21,8 @@ export function ConfirmDialog({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   destructive = false,
+  isLoading = false,
+  loadingLabel = "Loading...",
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -34,10 +32,14 @@ export function ConfirmDialog({
       transparent
       animationType="fade"
       statusBarTranslucent
-      onRequestClose={onCancel}
+      onRequestClose={isLoading ? undefined : onCancel}
     >
       <View style={styles.overlay}>
-        <Pressable style={styles.backdrop} onPress={onCancel} />
+        <Pressable
+          style={styles.backdrop}
+          onPress={onCancel}
+          disabled={isLoading}
+        />
 
         <View style={styles.dialog}>
           <Text style={styles.title}>{title}</Text>
@@ -49,14 +51,33 @@ export function ConfirmDialog({
               style={[
                 styles.button,
                 destructive ? styles.destructiveButton : styles.confirmButton,
+                isLoading && styles.disabledButton,
               ]}
               onPress={onConfirm}
+              disabled={isLoading}
             >
-              <Text style={styles.confirmText}>{confirmLabel}</Text>
+              <Text
+                style={[
+                  styles.confirmText,
+                  destructive && styles.destructiveText,
+                  isLoading && styles.disabledText,
+                ]}
+              >
+                {isLoading ? loadingLabel : confirmLabel}
+              </Text>
             </Pressable>
 
-            <Pressable style={styles.cancelButton} onPress={onCancel}>
-              <Text style={styles.cancelText}>{cancelLabel}</Text>
+            <Pressable
+              style={[
+                styles.cancelButton,
+                isLoading && styles.disabledCancelButton,
+              ]}
+              onPress={onCancel}
+              disabled={isLoading}
+            >
+              <Text style={[styles.cancelText, isLoading && styles.disabledText]}>
+                {cancelLabel}
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -70,7 +91,7 @@ const LIGHT_GREEN = "#dff6e3";
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
 const OVERLAY = "rgba(0, 0, 0, 0.72)";
-const DESTRUCTIVE = "#ef4444";
+const RED = "#ef4444";
 
 const styles = StyleSheet.create({
   overlay: {
@@ -132,7 +153,11 @@ const styles = StyleSheet.create({
   },
 
   destructiveButton: {
-    backgroundColor: GREEN,
+    backgroundColor: RED,
+  },
+
+  disabledButton: {
+    backgroundColor: "#cfeee0",
   },
 
   cancelButton: {
@@ -144,15 +169,27 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  disabledCancelButton: {
+    backgroundColor: "#edf8ef",
+  },
+
   confirmText: {
     fontSize: 13,
     color: BLACK,
     fontFamily: fonts.medium,
   },
 
+  destructiveText: {
+    color: WHITE,
+  },
+
   cancelText: {
     fontSize: 13,
     color: BLACK,
     fontFamily: fonts.medium,
+  },
+
+  disabledText: {
+    color: "rgba(5, 46, 43, 0.45)",
   },
 });

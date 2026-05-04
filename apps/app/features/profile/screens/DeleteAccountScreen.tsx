@@ -14,30 +14,43 @@ import { Icon } from "@/components/icons/Icon";
 import { AuthInput } from "@/features/auth/components/AuthInput";
 import { AuthButton } from "@/features/auth/components/AuthButton";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
+import { deleteAccount } from "../services/profile-service";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
 export default function DeleteAccountScreen() {
-  const [password, setPassword] = useState("");
+  const [confirmationText, setConfirmationText] = useState("");
+  const isDeleteButtonDisabled =
+  confirmationText.trim().toLowerCase() !== "delete";
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const isDeleteButtonDisabled = !password.trim();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   function handleOpenDeleteDialog() {
-    if (!password.trim()) {
+    if (isDeleteButtonDisabled) {
       return;
     }
 
     setShowConfirmDialog(true);
   }
 
-  function handleCancelDeleteDialog() {
-    setShowConfirmDialog(false);
-  }
 
-  function handleConfirmDeleteAccount() {
-    setShowConfirmDialog(false);
+  async function handleConfirmDeleteAccount() {
+    try {
+      setIsDeleting(true);
 
-    console.log({
-      password,
-    });
+      await deleteAccount({
+        confirmationText,
+      });
+
+      feedback.success("Account deleted successfully");
+      setShowConfirmDialog(false);
+
+      router.replace("/login");
+    } catch (error) {
+      console.warn(error);
+      feedback.error("Error deleting account");
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -89,24 +102,23 @@ export default function DeleteAccountScreen() {
           </View>
 
           <Text style={styles.passwordTitle}>
-            Please Enter Your Password To Confirm{"\n"}Deletion Of Your Account.
+            Please Type "delete" To Confirm{"\n"}Deletion Of Your Account.
           </Text>
 
           <View style={styles.form}>
             <AuthInput
               label=""
-              placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
+              placeholder='Type "delete"'
+              value={confirmationText}
+              onChangeText={setConfirmationText}
               autoCapitalize="none"
               autoCorrect={false}
-              textContentType="password"
             />
 
             <View style={styles.buttons}>
               <AuthButton
                 title="Yes, Delete Account"
+                variant="danger"
                 onPress={handleOpenDeleteDialog}
                 disabled={isDeleteButtonDisabled}
               />
@@ -115,17 +127,19 @@ export default function DeleteAccountScreen() {
         </ScrollView>
       </View>
 
-      <ConfirmDialog
+     <ConfirmDialog
         visible={showConfirmDialog}
         title="Delete Account"
-        message="Are you sure you want to delete your account?
+        message={`Are you sure you want to delete your account?
 
-      By deleting your account, you agree that you understand the consequences of this action and that all associated data will be permanently deleted."
+      By deleting your account, you agree that you understand the consequences of this action and that all associated data will be permanently deleted.`}
         confirmLabel="Yes, Delete Account"
         cancelLabel="Cancel"
+        loadingLabel="Deleting..."
         destructive
+        isLoading={isDeleting}
         onConfirm={handleConfirmDeleteAccount}
-        onCancel={handleCancelDeleteDialog}
+        onCancel={() => setShowConfirmDialog(false)}
       />
     </KeyboardAvoidingView>
   );
