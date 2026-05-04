@@ -6,6 +6,7 @@ import {
 import { Goal, Prisma } from '@prisma/client';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { PrismaService } from 'prisma/prisma.service';
+import { UpdateGoalDto } from './dto/update-goal.dto';
 
 @Injectable()
 export class GoalsService {
@@ -283,5 +284,119 @@ export class GoalsService {
     }
 
     return `${globalProgress}% of your goals completed.`;
+  }
+
+  async updateGoal(
+    userId: string,
+    goalId: string,
+    updateGoalDto: UpdateGoalDto,
+  ): Promise<GoalOverviewItemDto> {
+    const existingGoal = await this.prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId,
+      },
+    });
+
+    if (!existingGoal) {
+      throw new NotFoundException('Goal not found');
+    }
+
+    const nextTargetAmount =
+      updateGoalDto.targetAmount !== undefined
+        ? new Prisma.Decimal(updateGoalDto.targetAmount)
+        : existingGoal.targetAmount;
+
+    const nextCurrentAmount =
+      updateGoalDto.currentAmount !== undefined
+        ? new Prisma.Decimal(updateGoalDto.currentAmount)
+        : existingGoal.currentAmount;
+
+    if (nextCurrentAmount.greaterThan(nextTargetAmount)) {
+      throw new BadRequestException(
+        'Current amount cannot be greater than target amount.',
+      );
+    }
+
+    const nextCurrency = updateGoalDto.currency
+      ? updateGoalDto.currency.trim().toUpperCase()
+      : existingGoal.currency;
+
+    const currentAmountHasChanged =
+      updateGoalDto.currentAmount !== undefined &&
+      !nextCurrentAmount.equals(existingGoal.currentAmount);
+
+    const amountDifference = nextCurrentAmount.minus(existingGoal.currentAmount);
+
+    const updatedGoal = await this.prisma.$transaction(async (tx) => {
+      const goal = await tx.goal.update({
+        where: {
+          id: goalId,
+        },
+        data: {
+          ...(updateGoalDto.name !== undefined && {
+            name: updateGoalDto.name.trim(),
+          }),
+
+          ...(updateGoalDto.description !== undefined && {
+            description: updateGoalDto.description?.trim() || null,
+          }),
+
+          ...(updateGoalDto.targetAmount !== undefined && {
+            targetAmount: nextTargetAmount,
+          }),
+
+          ...(updateGoalDto.currentAmount !== undefined && {
+            currentAmount: nextCurrentAmount,
+          }),
+
+          ...(updateGoalDto.currency !== undefined && {
+            currency: nextCurrency,
+          }),
+
+          ...(updateGoalDto.targetDate !== undefined && {
+            targetDate: updateGoalDto.targetDate
+              ? new Date(updateGoalDto.targetDate)
+              : null,
+          }),
+
+          ...(updateGoalDto.startDate !== undefined && {
+            startDate: updateGoalDto.startDate
+              ? new Date(updateGoalDto.startDate)
+              : existingGoal.startDate,
+          }),
+
+          ...(updateGoalDto.type !== undefined && {
+            type: updateGoalDto.type,
+          }),
+
+          ...(updateGoalDto.icon !== undefined && {
+            icon: updateGoalDto.icon?.trim() || null,
+          }),
+
+          ...(updateGoalDto.color !== undefined && {
+            color: updateGoalDto.color?.trim() || null,
+          }),
+        },
+      });
+
+      if (currentAmountHasChanged && !amountDifference.equals(0)) {
+        await tx.goalContribution.create({
+          data: {
+            goalId: goal.id,
+            userId,
+            amount: amountDifference,
+            currency: nextCurrency,
+            date: new Date(),
+            notes: 'Goal balance adjustment.',
+            transactionId: null,
+          },
+        });
+      }
+
+      return goal;
+    });
+
+    return this.toGoalOverviewItem(updatedGoal);
   }
 }
