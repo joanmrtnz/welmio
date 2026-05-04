@@ -19,6 +19,8 @@ import {
   categoryFilterModalColors,
   styles,
 } from "./categoryFilterModal.styles";
+import { useState } from "react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 
 type CategoryFilterModalProps = {
   visible: boolean;
@@ -79,6 +81,33 @@ export function CategoryFilterModal({
   const hasSelectedCategories = draftSelectedIds.length > 0;
   const canEditSelectedCategory = draftSelectedIds.length === 1;
   const isEditingCategory = Boolean(editingCategoryId);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeletingCategories, setIsDeletingCategories] = useState(false);
+
+
+  function handleOpenDeleteDialog() {
+    setShowDeleteDialog(true);
+  }
+
+  function handleCloseDeleteDialog() {
+    if (isDeletingCategories) return;
+
+    setShowDeleteDialog(false);
+  }
+
+  async function handleConfirmDeleteCategories() {
+    try {
+      setIsDeletingCategories(true);
+
+      await handleDeleteSelectedCategories();
+
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.warn("[CategoryFilterModal] delete categories error:", error);
+    } finally {
+      setIsDeletingCategories(false);
+    }
+  }
 
   return (
     <Modal
@@ -111,12 +140,13 @@ export function CategoryFilterModal({
                         </Pressable>
                       )}
 
-                      <Pressable
-                        onPress={handleDeleteSelectedCategories}
+                     <Pressable
+                        onPress={handleOpenDeleteDialog}
                         style={[
                           styles.headerIconButton,
                           styles.deleteIconButton,
                         ]}
+                        disabled={isDeletingCategories}
                       >
                         <Icon
                           name="bin"
@@ -338,6 +368,23 @@ export function CategoryFilterModal({
             </>
           )}
         </Pressable>
+        <ConfirmDialog
+          visible={showDeleteDialog}
+          title="Delete Category"
+          message={`Are you sure you want to delete ${
+            draftSelectedIds.length === 1 ? "this category" : "these categories"
+          }?
+          This action cannot be undone.`}
+          confirmLabel={
+            draftSelectedIds.length === 1 ? "Yes, Delete" : "Yes, Delete All"
+          }
+          cancelLabel="Cancel"
+          loadingLabel="Deleting..."
+          destructive
+          isLoading={isDeletingCategories}
+          onConfirm={handleConfirmDeleteCategories}
+          onCancel={handleCloseDeleteDialog}
+        />
       </Pressable>
     </Modal>
   );

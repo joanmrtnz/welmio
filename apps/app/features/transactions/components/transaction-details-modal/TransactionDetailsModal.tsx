@@ -19,6 +19,7 @@ import {
   formatDate,
   formatValue,
 } from "../../utils/transactionDetails.utils";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 
 export function TransactionDetailsModal({
   visible,
@@ -29,15 +30,30 @@ export function TransactionDetailsModal({
 }: TransactionDetailsModalProps) {
 
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   if (!transaction) return null;
   const isExpense = transaction.type === "expense";
 
-  async function handleDeleteTransaction() {
+
+  function handleOpenDeleteDialog() {
+    setShowDeleteDialog(true);
+  }
+
+  function handleCloseDeleteDialog() {
+    if (isDeleting) return;
+
+    setShowDeleteDialog(false);
+  }
+
+  async function handleConfirmDeleteTransaction() {
     if (!transaction || isDeleting) return;
 
     try {
       setIsDeleting(true);
+
       await onDelete(transaction);
+
+      setShowDeleteDialog(false);
     } catch (error) {
       console.warn("[TransactionDetailsModal] delete transaction error:", error);
     } finally {
@@ -85,7 +101,7 @@ export function TransactionDetailsModal({
 
               <Pressable
                 style={[styles.iconButton, styles.deleteIconButton]}
-                onPress={handleDeleteTransaction}
+                onPress={handleOpenDeleteDialog}
                 disabled={isDeleting}
               >
                 <Icon
@@ -206,7 +222,7 @@ export function TransactionDetailsModal({
 
               <Pressable
                 style={styles.deleteButton}
-                onPress={handleDeleteTransaction}
+                onPress={handleOpenDeleteDialog}
                 disabled={isDeleting}
               >
                 <Icon
@@ -215,12 +231,24 @@ export function TransactionDetailsModal({
                   strokeWidth={2}
                   color={RED}
                 />
-                <Text style={styles.deleteButtonText}>
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </Text>
+                <Text style={styles.deleteButtonText}>Delete</Text>
               </Pressable>
             </View>
           </ScrollView>
+
+          <ConfirmDialog
+            visible={showDeleteDialog}
+            title="Delete Transaction"
+            message={`Are you sure you want to delete this transaction?
+            This action cannot be undone.`}
+            confirmLabel="Yes, Delete"
+            cancelLabel="Cancel"
+            loadingLabel="Deleting..."
+            destructive
+            isLoading={isDeleting}
+            onConfirm={handleConfirmDeleteTransaction}
+            onCancel={handleCloseDeleteDialog}
+          />
         </View>
       </View>
     </Modal>

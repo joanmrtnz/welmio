@@ -181,6 +181,7 @@ const styles = StyleSheet.create({
 
   destructiveText: {
     color: WHITE,
+    fontFamily: fonts.bold,
   },
 
   cancelText: {
