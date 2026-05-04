@@ -16,6 +16,7 @@ import { AuthButton } from "@/features/auth/components/AuthButton";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { deleteAccount } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
+import { removeAccessToken } from "@/app/lib/auth-storage";
 
 export default function DeleteAccountScreen() {
   const [confirmationText, setConfirmationText] = useState("");
@@ -32,7 +33,6 @@ export default function DeleteAccountScreen() {
     setShowConfirmDialog(true);
   }
 
-
   async function handleConfirmDeleteAccount() {
     try {
       setIsDeleting(true);
@@ -40,6 +40,8 @@ export default function DeleteAccountScreen() {
       await deleteAccount({
         confirmationText,
       });
+
+      await removeAccessToken();
 
       feedback.success("Account deleted successfully");
       setShowConfirmDialog(false);
