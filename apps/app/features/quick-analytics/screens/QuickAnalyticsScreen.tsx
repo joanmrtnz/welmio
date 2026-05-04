@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import { router } from "expo-router";
 
 
 const GREEN = "#00c896";
@@ -16,7 +17,9 @@ export default function QuickAnalyticsScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-         <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        <Pressable onPress={() => router.back()}>
+          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        </Pressable>
         <Text style={styles.title}>Quickly Analytics</Text>
         <View style={styles.notifications}>
            <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />

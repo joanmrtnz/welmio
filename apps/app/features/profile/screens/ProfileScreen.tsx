@@ -3,6 +3,7 @@ import {
   Text,
   StyleSheet,
   Image,
+  Pressable,
 } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
@@ -20,7 +21,9 @@ export default function ProfileScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        <Pressable onPress={() => router.back()}>
+            <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        </Pressable>
         <Text style={styles.title}>Profile</Text>
 
         <View style={styles.notifications}>
