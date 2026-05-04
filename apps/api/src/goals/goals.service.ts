@@ -1,13 +1,120 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   GoalOverviewItemDto,
   GoalsOverviewResponseDto,
 } from './dto/goals-overview-response.dto';
+import { Goal, Prisma } from '@prisma/client';
+import { CreateGoalDto } from './dto/create-goal.dto';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class GoalsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async createGoal(
+    userId: string,
+    createGoalDto: CreateGoalDto,
+    ): Promise<GoalOverviewItemDto> {
+    const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true },
+    });
+
+    if (!user) {
+        throw new NotFoundException('User not found');
+    }
+
+    const targetAmount = new Prisma.Decimal(createGoalDto.targetAmount);
+    const currentAmount = new Prisma.Decimal(createGoalDto.currentAmount ?? 0);
+
+    if (currentAmount.greaterThan(targetAmount)) {
+        throw new BadRequestException(
+        'Current amount cannot be greater than target amount.',
+        );
+    }
+
+    const currency = createGoalDto.currency.trim().toUpperCase();
+
+    const startDate = createGoalDto.startDate
+        ? new Date(createGoalDto.startDate)
+        : new Date();
+
+    const targetDate = createGoalDto.targetDate
+        ? new Date(createGoalDto.targetDate)
+        : null;
+
+    const goal = await this.prisma.$transaction(async (tx) => {
+        const createdGoal = await tx.goal.create({
+        data: {
+            userId,
+            name: createGoalDto.name.trim(),
+            description: createGoalDto.description?.trim() || null,
+            targetAmount,
+            currentAmount,
+            currency,
+            targetDate,
+            startDate,
+            type: createGoalDto.type,
+            status: 'active',
+            icon: createGoalDto.icon?.trim() || null,
+            color: createGoalDto.color?.trim() || null,
+        },
+        });
+
+        if (currentAmount.greaterThan(0)) {
+        await tx.goalContribution.create({
+            data: {
+            goalId: createdGoal.id,
+            userId,
+            amount: currentAmount,
+            currency,
+            date: startDate,
+            notes: 'Initial goal amount.',
+            transactionId: null,
+            },
+        });
+      }
+
+      return createdGoal;
+    });
+
+    return this.toGoalOverviewItem(goal);
+ }
+
+ private toGoalOverviewItem(goal: Goal): GoalOverviewItemDto {
+    const saved = goal.currentAmount.toNumber();
+    const target = goal.targetAmount.toNumber();
+
+    const progress = this.calculateProgress(saved, target);
+
+    return {
+        id: goal.id,
+        name: goal.name,
+        description: goal.description,
+        icon: goal.icon,
+        color: goal.color,
+        type: goal.type,
+        status: goal.status,
+        saved,
+        target,
+        currency: goal.currency,
+        progress,
+        targetDate: goal.targetDate?.toISOString() ?? null,
+        monthlyNeeded: this.calculateMonthlyNeeded(
+        target,
+        saved,
+        goal.targetDate,
+        ),
+        statusLabel: this.getStatusLabel({
+        saved,
+        target,
+        progress,
+        startDate: goal.startDate,
+        targetDate: goal.targetDate,
+        status: goal.status,
+        }),
+    };
+ }
 
   async getUserGoalsOverview(userId: string): Promise<GoalsOverviewResponseDto> {
     const user = await this.prisma.user.findUnique({
@@ -39,41 +146,9 @@ export class GoalsService {
       ],
     });
 
-    const goalItems: GoalOverviewItemDto[] = goals.map((goal) => {
-      const saved = goal.currentAmount.toNumber();
-      const target = goal.targetAmount.toNumber();
-
-      const progress = this.calculateProgress(saved, target);
-      const monthlyNeeded = this.calculateMonthlyNeeded(
-        target,
-        saved,
-        goal.targetDate,
-      );
-
-      return {
-        id: goal.id,
-        name: goal.name,
-        description: goal.description,
-        icon: goal.icon,
-        color: goal.color,
-        type: goal.type,
-        status: goal.status,
-        saved,
-        target,
-        currency: goal.currency,
-        progress,
-        targetDate: goal.targetDate?.toISOString() ?? null,
-        monthlyNeeded,
-        statusLabel: this.getStatusLabel({
-          saved,
-          target,
-          progress,
-          startDate: goal.startDate,
-          targetDate: goal.targetDate,
-          status: goal.status,
-        }),
-      };
-    });
+    const goalItems: GoalOverviewItemDto[] = goals.map((goal) =>
+        this.toGoalOverviewItem(goal),
+    );
 
     const activeGoals = goalItems.filter((goal) => goal.status === 'active');
 
