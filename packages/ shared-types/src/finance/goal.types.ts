@@ -13,6 +13,7 @@ export type GoalOverviewItem = {
   targetDate?: string | null;
   monthlyNeeded: number;
   statusLabel: string;
+  contributionsCount: number;
 };
 
 export type GoalsOverviewResponse = {

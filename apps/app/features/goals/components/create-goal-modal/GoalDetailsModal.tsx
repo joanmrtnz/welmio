@@ -2,6 +2,8 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
 import { GoalOverviewItem } from "@repo/shared-types";
+import { useState } from "react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 
 const GREEN = "#00c896";
 const LIGHT_GREEN = "#f1fff3";
@@ -18,6 +20,7 @@ type GoalDetailsModalProps = {
   goal: GoalOverviewItem | null;
   onClose: () => void;
   onEdit?: (goal: GoalOverviewItem) => void;
+  onDelete?: (goal: GoalOverviewItem) => Promise<void>;
 };
 
 function formatCurrency(amount: number | string, currency = "USD") {
@@ -45,9 +48,21 @@ export function GoalDetailsModal({
   goal,
   onClose,
   onEdit,
+  onDelete,
 }: GoalDetailsModalProps) {
   if (!goal) return null;
-  const isDeleting = false;
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const contributionsCount = goal.contributionsCount ?? 0;
+  const deleteMessage =
+    contributionsCount > 0
+      ? `Are you sure you want to delete this goal?
+  This will also delete ${contributionsCount} contribution${
+          contributionsCount === 1 ? "" : "s"
+        } linked to this goal.
+  This action cannot be undone.`
+      : `Are you sure you want to delete this goal?
+  This action cannot be undone.`;
 
   function handleEditGoal() {
     if (!goal) return;
@@ -57,8 +72,29 @@ export function GoalDetailsModal({
     }
 
   function handleOpenDeleteDialog() {
-    // TODO: add delete goal logic
-    console.log("Delete goal later", goal?.id);
+    setShowDeleteDialog(true);
+  }
+
+  function handleCloseDeleteDialog() {
+    if (isDeleting) return;
+
+    setShowDeleteDialog(false);
+  }
+
+  async function handleConfirmDeleteGoal() {
+    if (!goal || isDeleting || !onDelete) return;
+
+    try {
+      setIsDeleting(true);
+
+      await onDelete(goal);
+
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.warn("[GoalDetailsModal] delete goal error:", error);
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   const remainingAmount = Math.max(goal.target - goal.saved, 0);
@@ -255,6 +291,18 @@ export function GoalDetailsModal({
           </ScrollView>
         </View>
       </View>
+     <ConfirmDialog
+        visible={showDeleteDialog}
+        title="Delete Goal"
+        message={deleteMessage}
+        confirmLabel="Yes, Delete"
+        cancelLabel="Cancel"
+        loadingLabel="Deleting..."
+        destructive
+        isLoading={isDeleting}
+        onConfirm={handleConfirmDeleteGoal}
+        onCancel={handleCloseDeleteDialog}
+      />
     </Modal>
   );
 }
@@ -308,18 +356,18 @@ const styles = StyleSheet.create({
     gap: 8,
     },
 
-    iconButton: {
+  iconButton: {
     width: 38,
     height: 38,
     borderRadius: 19,
     backgroundColor: WHITE,
     alignItems: "center",
     justifyContent: "center",
-    },
+  },
 
-    deleteIconButton: {
+  deleteIconButton: {
     backgroundColor: "#fee2e2",
-    },
+  },
 
   content: {
     paddingHorizontal: 28,
