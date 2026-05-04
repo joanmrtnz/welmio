@@ -63,7 +63,7 @@ const icons = {
   key: Key,
 };
 
-type IconName = keyof typeof icons;
+export type IconName = keyof typeof icons;
 type IconProps = {
   name: IconName;
   size?: number;
