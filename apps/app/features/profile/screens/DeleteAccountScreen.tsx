@@ -13,18 +13,31 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { AuthInput } from "@/features/auth/components/AuthInput";
 import { AuthButton } from "@/features/auth/components/AuthButton";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 
 export default function DeleteAccountScreen() {
   const [password, setPassword] = useState("");
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const isDeleteButtonDisabled = !password.trim();
 
-  function handleDeleteAccount() {
+  function handleOpenDeleteDialog() {
+    if (!password.trim()) {
+      return;
+    }
+
+    setShowConfirmDialog(true);
+  }
+
+  function handleCancelDeleteDialog() {
+    setShowConfirmDialog(false);
+  }
+
+  function handleConfirmDeleteAccount() {
+    setShowConfirmDialog(false);
+
     console.log({
       password,
     });
-  }
-
-  function handleCancel() {
-    router.back();
   }
 
   return (
@@ -61,17 +74,17 @@ export default function DeleteAccountScreen() {
             </Text>
 
             <Text style={styles.bulletText}>
-              • All your expenses, income and associated transactions will be
+              All your expenses, income and associated transactions will be
               eliminated.
             </Text>
 
             <Text style={styles.bulletText}>
-              • You will not be able to access your account or any related
+              You will not be able to access your account or any related
               information.
             </Text>
 
             <Text style={styles.bulletText}>
-              • This action cannot be undone.
+              This action cannot be undone.
             </Text>
           </View>
 
@@ -94,18 +107,26 @@ export default function DeleteAccountScreen() {
             <View style={styles.buttons}>
               <AuthButton
                 title="Yes, Delete Account"
-                onPress={handleDeleteAccount}
+                onPress={handleOpenDeleteDialog}
+                disabled={isDeleteButtonDisabled}
               />
-
-              <AuthButton
-                title="Cancel"
-                onPress={handleCancel}
-                variant="secondary"
-                />
             </View>
           </View>
         </ScrollView>
       </View>
+
+      <ConfirmDialog
+        visible={showConfirmDialog}
+        title="Delete Account"
+        message="Are you sure you want to delete your account?
+
+      By deleting your account, you agree that you understand the consequences of this action and that all associated data will be permanently deleted."
+        confirmLabel="Yes, Delete Account"
+        cancelLabel="Cancel"
+        destructive
+        onConfirm={handleConfirmDeleteAccount}
+        onCancel={handleCancelDeleteDialog}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -114,6 +135,7 @@ const GREEN = "#00c896";
 const LIGHT_GREEN = "#f1fff3";
 const BOX_GREEN = "#dff6e3";
 const BLACK = "#052e2b";
+const WHITE = "#ffffff";
 
 const styles = StyleSheet.create({
   screen: {
@@ -121,28 +143,26 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
   },
 
-  headerArea: {
-    height: 150,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 30,
-    paddingTop: 30,
-  },
-
-  title: {
-    fontSize: 16,
-    color: BLACK,
-    fontFamily: fonts.bold,
-  },
-
-  notifications: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+   headerArea: {
+      height: 150,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 30,
+      paddingTop: 30,
+    },
+  
+    title: {
+      fontSize: 18, //18
+      color: BLACK,
+      fontFamily: fonts.bold,
+    },
+  
+    notifications: {
+      backgroundColor: WHITE,
+      padding: 3,
+      borderRadius: 100,
+    },
 
   card: {
     flex: 1,
