@@ -10,11 +10,14 @@ const WHITE = "#ffffff";
 const BLACK = "#052e2b";
 const BUTTON_GREEN = "#1A9E6A";
 const DIVIDER_GREEN = "#00d09e";
+const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+const RED = "#dc2626";
 
 type GoalDetailsModalProps = {
   visible: boolean;
   goal: GoalOverviewItem | null;
   onClose: () => void;
+  onEdit?: (goal: GoalOverviewItem) => void;
 };
 
 function formatCurrency(amount: number | string, currency = "USD") {
@@ -36,12 +39,27 @@ function formatDate(date?: string | null) {
   }).format(new Date(date));
 }
 
+
 export function GoalDetailsModal({
   visible,
   goal,
   onClose,
+  onEdit,
 }: GoalDetailsModalProps) {
   if (!goal) return null;
+  const isDeleting = false;
+
+  function handleEditGoal() {
+    if (!goal) return;
+
+    onClose();
+    onEdit?.(goal);
+    }
+
+  function handleOpenDeleteDialog() {
+    // TODO: add delete goal logic
+    console.log("Delete goal later", goal?.id);
+  }
 
   const remainingAmount = Math.max(goal.target - goal.saved, 0);
   const progress = Math.min(goal.progress, 100);
@@ -62,9 +80,23 @@ export function GoalDetailsModal({
           <View style={styles.header}>
             <Text style={styles.title}>Goal Details</Text>
 
-            <Pressable style={styles.closeButton} onPress={onClose}>
-              <Icon name="plus" size={24} color={BLACK} strokeWidth={1.6} />
-            </Pressable>
+            <View style={styles.headerActions}>
+                <Pressable style={styles.iconButton} onPress={handleEditGoal}>
+                <Icon name="edit" size={16} strokeWidth={1.5} color={BLACK} />
+                </Pressable>
+
+                <Pressable
+                style={[styles.iconButton, styles.deleteIconButton]}
+                onPress={handleOpenDeleteDialog}
+                disabled={isDeleting}
+                >
+                <Icon name="bin" size={23} strokeWidth={1.5} color={RED} />
+                </Pressable>
+
+                <Pressable style={styles.iconButton} onPress={onClose}>
+                <Icon name="close" size={20} color={BLACK} />
+                </Pressable>
+            </View>
           </View>
 
           <ScrollView
@@ -75,7 +107,7 @@ export function GoalDetailsModal({
               <View style={styles.heroTop}>
                 <View style={styles.heroIcon}>
                   <Icon
-                    name={(goal.icon ?? "home") as never}
+                    name={(goal.icon ?? "rent") as never}
                     size={44}
                     color={WHITE}
                     strokeWidth={1.1}
@@ -204,9 +236,17 @@ export function GoalDetailsModal({
             </View>
 
             <View style={styles.actionsRow}>
-              <Pressable style={styles.secondaryButton}>
-                <Text style={styles.secondaryButtonText}>Edit goal</Text>
-              </Pressable>
+               <Pressable
+                    style={styles.secondaryButton}
+                    onPress={() => {
+                        if (!goal) return;
+
+                        onClose();
+                        onEdit?.(goal);
+                    }}
+                    >
+                    <Text style={styles.secondaryButtonText}>Edit goal</Text>
+                </Pressable>
 
               <Pressable style={styles.primaryButton}>
                 <Text style={styles.primaryButtonText}>Add contribution</Text>
@@ -262,15 +302,24 @@ const styles = StyleSheet.create({
     color: BLACK,
   },
 
-  closeButton: {
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    },
+
+    iconButton: {
     width: 38,
     height: 38,
     borderRadius: 19,
     backgroundColor: WHITE,
     alignItems: "center",
     justifyContent: "center",
-    transform: [{ rotate: "45deg" }],
-  },
+    },
+
+    deleteIconButton: {
+    backgroundColor: "#fee2e2",
+    },
 
   content: {
     paddingHorizontal: 28,
@@ -530,6 +579,8 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE,
     alignItems: "center",
     justifyContent: "center",
+    borderColor: LIGTH_GRAY,
+    borderWidth: 1,
   },
 
   secondaryButtonText: {

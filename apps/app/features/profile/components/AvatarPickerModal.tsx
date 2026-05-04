@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { AuthButton } from "@/features/auth/components/AuthButton";
-import { Icon, type IconName } from "@/components/icons/Icon";
+import { Icon} from "@/components/icons/Icon";
+import { IconName } from "@repo/shared-types";
 
 type AvatarOption = {
   id: string;

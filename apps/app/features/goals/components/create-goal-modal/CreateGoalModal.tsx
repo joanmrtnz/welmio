@@ -1,8 +1,8 @@
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
-import { CreateGoalPayload, GoalType } from "@repo/shared-types";
+import { CreateGoalPayload, GoalOverviewItem, GoalType } from "@repo/shared-types";
 
 const GREEN = "#00c896";
 const LIGHT_GREEN = "#f1fff3";
@@ -13,10 +13,15 @@ const DIVIDER_GREEN = "#00d09e";
 const LIGTH_GRAY = "rgba(0,0,0,0.1)";
 
 
+type CreateGoalModalMode = "create" | "edit";
+
 type CreateGoalModalProps = {
   visible: boolean;
+  mode?: CreateGoalModalMode;
+  goal?: GoalOverviewItem | null;
   onClose: () => void;
   onSubmit: (payload: CreateGoalPayload) => Promise<void>;
+  onUpdate?: (goalId: string, payload: CreateGoalPayload) => Promise<void>;
 };
 
 const goalTypes = [
@@ -35,23 +40,45 @@ const goalIcons = [
 
 export function CreateGoalModal({
   visible,
+  mode = "create",
+  goal = null,
   onClose,
   onSubmit,
+  onUpdate,
 }: CreateGoalModalProps) {
+
+  const isEditMode = mode === "edit";
+
   const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
   const [currentAmount, setCurrentAmount] = useState("");
   const [targetDate, setTargetDate] = useState("");
-  const [selectedType, setSelectedType] = useState("savings");
-  const [selectedIcon, setSelectedIcon] = useState("home");
+  const [selectedType, setSelectedType] = useState<GoalType>("savings");
+  const [selectedIcon, setSelectedIcon] = useState("rent");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  type FeedbackState = {
-  type: "success" | "error";
-  message: string;
-  } | null;
-  const [feedback, setFeedback] = useState<FeedbackState>(null);
 
-  async function handleCreateGoal() {
+  useEffect(() => {
+    if (!visible) return;
+
+    if (isEditMode && goal) {
+      setName(goal.name);
+      setTargetAmount(String(goal.target));
+      setCurrentAmount(String(goal.saved));
+      setTargetDate(goal.targetDate ? goal.targetDate.slice(0, 10) : "");
+      setSelectedType(goal.type as GoalType);
+      setSelectedIcon(goal.icon ?? "home");
+      return;
+    }
+
+    setName("");
+    setTargetAmount("");
+    setCurrentAmount("");
+    setTargetDate("");
+    setSelectedType("savings");
+    setSelectedIcon("home");
+  }, [visible, isEditMode, goal]);
+
+  async function handleSubmitGoal() {
     try {
       setIsSubmitting(true);
 
@@ -76,25 +103,25 @@ export function CreateGoalModal({
         throw new Error("Current amount cannot be greater than target amount.");
       }
 
-      await onSubmit({
+      const payload: CreateGoalPayload = {
         name: name.trim(),
-        description: null,
+        description: goal?.description ?? null,
         targetAmount: parsedTargetAmount,
         currentAmount: parsedCurrentAmount,
-        currency: "USD",
+        currency: goal?.currency ?? "USD",
         targetDate: targetDate.trim() || null,
         startDate: null,
-        type: selectedType as GoalType,
+        type: selectedType,
         icon: selectedIcon,
-        color: "#00c896",
-      });
+        color: goal?.color ?? "#00c896",
+      };
 
-      setName("");
-      setTargetAmount("");
-      setCurrentAmount("");
-      setTargetDate("");
-      setSelectedType("savings");
-      setSelectedIcon("home");
+      if (isEditMode && goal) {
+        await onUpdate?.(goal.id, payload);
+        return;
+      }
+
+      await onSubmit(payload);
     } finally {
       setIsSubmitting(false);
     }
@@ -114,10 +141,10 @@ export function CreateGoalModal({
           <View style={styles.handle} />
 
           <View style={styles.header}>
-            <Text style={styles.title}>Create Goal</Text>
+            <Text style={styles.title}>{isEditMode ? "Edit Goal" : "Create Goal"}</Text>
 
             <Pressable style={styles.closeButton} onPress={onClose}>
-              <Icon name="plus" size={24} color={BLACK} strokeWidth={1.6} />
+              <Icon name="close" size={20} color={BLACK} />
             </Pressable>
           </View>
 
@@ -136,7 +163,9 @@ export function CreateGoalModal({
               </View>
 
               <View style={styles.previewInfo}>
-                <Text style={styles.previewLabel}>New goal</Text>
+                <Text style={styles.previewLabel}>
+                  {isEditMode ? "Editing goal" : "New goal"}
+                </Text>
                 <Text style={styles.previewTitle}>
                   {name.trim() || "House Deposit"}
                 </Text>
@@ -208,7 +237,7 @@ export function CreateGoalModal({
                         styles.chip,
                         isSelected && styles.chipSelected,
                       ]}
-                      onPress={() => setSelectedType(type.value)}
+                      onPress={() => setSelectedType(type.value as GoalType)}
                     >
                       <Text
                         style={[
@@ -254,11 +283,17 @@ export function CreateGoalModal({
 
           <Pressable
             style={[styles.createButton, isSubmitting && styles.createButtonDisabled]}
-            onPress={handleCreateGoal}
+            onPress={handleSubmitGoal}
             disabled={isSubmitting}
           >
-            <Text style={styles.createButtonText}>
-              {isSubmitting ? "Creating..." : "Create goal"}
+           <Text style={styles.createButtonText}>
+              {isSubmitting
+                ? isEditMode
+                  ? "Saving..."
+                  : "Creating..."
+                : isEditMode
+                  ? "Save changes"
+                  : "Create goal"}
             </Text>
           </Pressable>
           </ScrollView>
@@ -312,13 +347,12 @@ const styles = StyleSheet.create({
   },
 
   closeButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: WHITE,
     alignItems: "center",
     justifyContent: "center",
-    transform: [{ rotate: "45deg" }],
   },
 
   content: {

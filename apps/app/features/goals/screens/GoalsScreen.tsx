@@ -39,6 +39,8 @@ export default function GoalsScreen() {
   const [selectedGoal, setSelectedGoal] = useState<GoalOverviewItem | null>(null);
   const [isGoalDetailsModalVisible, setIsGoalDetailsModalVisible] =
     useState(false);
+  const [createGoalModalMode, setCreateGoalModalMode] = useState<"create" | "edit">("create");
+  const [editingGoal, setEditingGoal] = useState<GoalOverviewItem | null>(null);
 
   function openGoalDetails(goal: GoalOverviewItem) {
     setSelectedGoal(goal);
@@ -67,6 +69,17 @@ export default function GoalsScreen() {
     }
   }
 
+  async function handleUpdateGoal(goalId: string, payload: CreateGoalPayload) {
+    console.log("Update goal later", goalId, payload);
+
+    // TODO:
+    // await updateGoal(goalId, payload);
+    // await loadGoalsOverview();
+
+    setIsCreateGoalModalVisible(false);
+    feedback.success("Goal updated successfully.");
+  }
+
   const loadGoalsOverview = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -87,16 +100,25 @@ export default function GoalsScreen() {
     loadGoalsOverview();
   }, [loadGoalsOverview]);
 
- function openCreateGoalModal() {
+  function openCreateGoalModal() {
+    setCreateGoalModalMode("create");
+    setEditingGoal(null);
     setIsCreateGoalModalVisible(true);
   }
 
   function closeCreateGoalModal() {
     setIsCreateGoalModalVisible(false);
+    setEditingGoal(null);
+    setCreateGoalModalMode("create");
   }
 
-  async function handleGoalCreated(_goal: GoalOverviewItem) {
-    await loadGoalsOverview();
+  function openEditGoalModal(goal: GoalOverviewItem) {
+    setSelectedGoal(null);
+    setIsGoalDetailsModalVisible(false);
+
+    setEditingGoal(goal);
+    setCreateGoalModalMode("edit");
+    setIsCreateGoalModalVisible(true);
   }
 
   const totalSaved = data?.summary.totalSaved ?? 0;
@@ -319,14 +341,18 @@ export default function GoalsScreen() {
       </View>
       <CreateGoalModal
         visible={isCreateGoalModalVisible}
+        mode={createGoalModalMode}
+        goal={editingGoal}
         onClose={closeCreateGoalModal}
         onSubmit={handleCreateGoal}
+        onUpdate={handleUpdateGoal}
       />
 
       <GoalDetailsModal
         visible={isGoalDetailsModalVisible}
         goal={selectedGoal}
         onClose={closeGoalDetails}
+        onEdit={openEditGoalModal}
       />
     </View>
   );
