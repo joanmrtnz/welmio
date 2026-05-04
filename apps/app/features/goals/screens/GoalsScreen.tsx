@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { GoalsOverviewResponse } from "@repo/shared-types";
 import { getGoalsOverview } from "../services/goals.service";
+import { CreateGoalModal } from "../create-goal-modal/CreateGoalModal";
 
 const GREEN = "#00c896";
 const DIVIDER_GREEN = "#00d09e";
@@ -32,6 +33,19 @@ export default function GoalsScreen() {
   const [data, setData] = useState<GoalsOverviewResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isCreateGoalModalVisible, setIsCreateGoalModalVisible] = useState(false);
+
+  function openCreateGoalModal() {
+    setIsCreateGoalModalVisible(true);
+  }
+
+  function closeCreateGoalModal() {
+    setIsCreateGoalModalVisible(false);
+  }
+
+  async function handleGoalCreated() {
+    // TODO: add loadGoalsOverview() logic
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -274,10 +288,15 @@ export default function GoalsScreen() {
           </View>
         </ScrollView>
 
-        <Pressable style={styles.fab}>
+        <Pressable style={styles.fab} onPress={openCreateGoalModal}>
           <Icon name="plus" size={28} color={BLACK} strokeWidth={1.6} />
         </Pressable>
       </View>
+      <CreateGoalModal
+        visible={isCreateGoalModalVisible}
+        onClose={closeCreateGoalModal}
+        onCreated={handleGoalCreated}
+      />
     </View>
   );
 }
