@@ -11,12 +11,14 @@ import {
   ScrollView,
 } from "react-native";
 import { fonts } from "@/theme/fonts";
-import { Icon } from "@/components/icons/Icon";
+import { Icon} from "@/components/icons/Icon";
 import { AuthInput } from "@/features/auth/components/AuthInput";
 import { AuthButton } from "@/features/auth/components/AuthButton";
 import { getUserProfile, updateUserProfile } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { router } from "expo-router";
+import { AvatarPickerModal } from "../components/AvatarPickerModal";
+import { IconName } from "@repo/shared-types";
 
 export default function EditProfileScreen() {
   const [usernameLabel, setUsernameLabel] = useState("");
@@ -28,6 +30,10 @@ export default function EditProfileScreen() {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [darkTheme, setDarkTheme] = useState(false);
 
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
+  const [avatarColor, setAvatarColor] = useState(GREEN);
+
   async function handleUpdateProfile() {
     try {
       setIsLoading(true);
@@ -35,6 +41,8 @@ export default function EditProfileScreen() {
       const updatedUser = await updateUserProfile({
         fullName: username.trim(),
         mobileNumber: phone.trim() || null,
+        avatarIcon,
+        avatarColor,
       });
 
       setUsername(updatedUser.fullName ?? "");
@@ -42,6 +50,8 @@ export default function EditProfileScreen() {
       setPhone(updatedUser.mobileNumber ?? "");
       setEmail(updatedUser.email ?? "");
       setUserId(updatedUser.id);
+      setAvatarIcon(updatedUser.avatarIcon ?? "user");
+      setAvatarColor(updatedUser.avatarColor ?? "#00c896");
 
       feedback.success("Profile updated successfully");
     } catch (error) {
@@ -64,6 +74,8 @@ export default function EditProfileScreen() {
         setPhone(user.mobileNumber ?? "");
         setEmail(user.email ?? "");
         setUserId(user.id);
+        setAvatarColor(user.avatarColor ?? GREEN);
+        setAvatarIcon(user.avatarIcon ?? "user");
       } catch (error) {
         console.error("Error loading user profile", error);
       } finally {
@@ -93,20 +105,23 @@ export default function EditProfileScreen() {
       
       <View style={styles.avatarWrapper}>
         <View>
-          <Image
-            source={{ uri: "https://i.pravatar.cc/150?img=3" }}
-            style={styles.avatar}
-          />
+         <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
+          <Icon name={avatarIcon} size={42} strokeWidth={1.8} color={BLACK} />
+        </View>
 
-          <Pressable style={styles.editAvatarButton}>
-            <Text style={styles.editAvatarText}>
-                 <Icon
-                name="edit"
-                size={15}
-                strokeWidth={1.6}
-                color={BLACK}
-                />
-            </Text>
+          <Pressable
+            style={styles.editAvatarButton}
+            onPress={() => setShowAvatarModal(true)}
+          >
+            <Text 
+            style={styles.editAvatarText}>
+              <Icon
+              name="edit"
+              size={15}
+              strokeWidth={1.6}
+              color={BLACK}
+              />
+          </Text>
           </Pressable>
         </View>
       </View>
@@ -193,6 +208,14 @@ export default function EditProfileScreen() {
           </View>
         </ScrollView>
       </View>
+      <AvatarPickerModal
+        visible={showAvatarModal}
+        onClose={() => setShowAvatarModal(false)}
+        onApply={({ icon, backgroundColor }) => {
+          setAvatarIcon(icon);
+          setAvatarColor(backgroundColor);
+        }}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -201,6 +224,7 @@ const GREEN = "#00c896";
 const LIGHT_GREEN = "#f1fff3";
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
+const LIGTH_GRAY = "rgba(0,0,0,0.1)";
 
 const styles = StyleSheet.create({
   screen: {
@@ -242,7 +266,10 @@ const styles = StyleSheet.create({
     width: 92,
     height: 92,
     borderRadius: 46,
-    backgroundColor: WHITE,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: LIGTH_GRAY,
+    borderWidth: 2,
   },
 
   editAvatarButton: {
@@ -255,6 +282,8 @@ const styles = StyleSheet.create({
     backgroundColor: WHITE,
     alignItems: "center",
     justifyContent: "center",
+    borderColor: LIGTH_GRAY,
+    borderWidth: 1,
   },
 
   editAvatarText: {
