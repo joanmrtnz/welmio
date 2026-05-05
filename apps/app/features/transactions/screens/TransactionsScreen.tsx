@@ -7,7 +7,7 @@ import {
 } from "@/features/transactions/services/transactions.service";
 
 import { TransactionsOverviewResponse, TransactionOverviewItem} from "@repo/shared-types";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/app/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
 import { formatCurrency } from "../utils/formatters";
@@ -17,7 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { CreateTransactionModal } from "../components/create-transaction-modal/CreateTransactionModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { CalendarFilterModal } from "../components/calendar-filter-modal/CalendarFilterModal";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 
 const GREEN = "#00c896";
 const DARK_GREEN = "#059669";
@@ -94,6 +94,12 @@ export default function TransactionScreen() {
   useEffect(() => {
     loadTransactions();
   }, []);
+
+  useFocusEffect(
+  useCallback(() => {
+      loadTransactions();
+    }, [loadTransactions]),
+  );
 
   return (
     <View style={styles.screen}>

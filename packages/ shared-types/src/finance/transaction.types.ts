@@ -84,4 +84,5 @@ export type CreateTransactionPayload = {
   accountId: string;
   frequencyType: FrequencyType;
   transactionNature: TransactionNature;
+  goalId?: string | null;
 };
