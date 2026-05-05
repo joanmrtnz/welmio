@@ -26,7 +26,7 @@ type GoalDetailsModalProps = {
   onDeleteContribution?: (
     goal: GoalOverviewItem,
     contribution: GoalContributionItem,
-  ) => void;
+  ) => Promise<void>;
 };
 
 function formatCurrency(amount: number | string, currency = "USD") {
@@ -118,10 +118,15 @@ export function GoalDetailsModal({
     onAddContribution?.(goal);
   }
 
-  function handleDeleteContribution(contribution: GoalContributionItem) {
-    if (!goal) return;
+  async function handleDeleteContribution(contribution: GoalContributionItem) {
+    if (!goal || !onDeleteContribution) return;
 
-    onDeleteContribution?.(goal, contribution);
+    try {
+      await onDeleteContribution(goal, contribution);
+      await loadGoalContributions();
+    } catch (error) {
+      console.warn("[GoalDetailsModal] delete contribution error:", error);
+    }
   }
 
   const loadGoalContributions = useCallback(async () => {
