@@ -4,7 +4,7 @@ import { Icon } from "@/components/icons/Icon";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { CreateGoalPayload, CreateTransactionInitialValues, GoalContributionItem, GoalOverviewItem, GoalsOverviewResponse, UpdateGoalPayload } from "@repo/shared-types";
-import { createGoal, createGoalContribution, CreateGoalContributionPayload, deleteGoal, getGoalsOverview, updateGoal } from "../services/goals.service";
+import { createGoal, createGoalContribution, CreateGoalContributionPayload, deleteGoal, deleteGoalContribution, getGoalsOverview, updateGoal } from "../services/goals.service";
 import { CreateGoalModal } from "../components/create-goal-modal/CreateGoalModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { GoalDetailsModal } from "../components/create-goal-modal/GoalDetailsModal";
@@ -174,18 +174,25 @@ export default function GoalsScreen() {
     setIsCreateTransactionModalVisible(true);
   }
 
-  function handleDeleteContribution(
+ async function handleDeleteContribution(
     goal: GoalOverviewItem,
     contribution: GoalContributionItem,
   ) {
-    console.log("Delete contribution later:", {
-      goalId: goal.id,
-      contributionId: contribution.id,
-    });
+    try {
+      await deleteGoalContribution(goal.id, contribution.id);
+      await loadGoalsOverview();
 
-    // TODO:
-    // await deleteGoalContribution(goal.id, contribution.id)
-    // refresh contributions
+      feedback.success("Contribution removed successfully.");
+    } catch (error) {
+      console.warn(error);
+
+      const message =
+        error instanceof Error ? error.message : "Could not remove contribution.";
+
+      feedback.error(message);
+
+      throw error;
+    }
   }
 
   function closeCreateTransactionModal() {

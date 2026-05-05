@@ -58,7 +58,6 @@ export async function createGoalContribution(
   return transaction;
 }
 
-
 export async function createGoalContributionRecord(
   goalId: string,
   payload: CreateGoalContributionRecordPayload,
@@ -66,5 +65,14 @@ export async function createGoalContributionRecord(
   return apiFetch<GoalContributionItem>(`/goals/${goalId}/contributions`, {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteGoalContribution(
+  goalId: string,
+  contributionId: string,
+) {
+  return apiFetch<void>(`/goals/${goalId}/contributions/${contributionId}`, {
+    method: "DELETE",
   });
 }
