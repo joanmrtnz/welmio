@@ -3,7 +3,7 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { CreateGoalPayload, GoalOverviewItem, GoalsOverviewResponse, UpdateGoalPayload } from "@repo/shared-types";
+import { CreateGoalPayload, GoalContributionItem, GoalOverviewItem, GoalsOverviewResponse, UpdateGoalPayload } from "@repo/shared-types";
 import { createGoal, deleteGoal, getGoalsOverview, updateGoal } from "../services/goals.service";
 import { CreateGoalModal } from "../components/create-goal-modal/CreateGoalModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
@@ -154,6 +154,33 @@ export default function GoalsScreen() {
     setEditingGoal(goal);
     setCreateGoalModalMode("edit");
     setIsCreateGoalModalVisible(true);
+  }
+
+  function handleAddContribution(goal: GoalOverviewItem) {
+    console.log("Open create transaction modal for goal:", goal.id);
+
+    // TODO:
+    // setIsGoalDetailsModalVisible(false);
+    // setTransactionInitialValues({
+    //   type: "income",
+    //   goalId: goal.id,
+    //   description: `Contribution to ${goal.name}`,
+    // });
+    // setIsCreateTransactionModalVisible(true);
+  }
+
+  function handleDeleteContribution(
+    goal: GoalOverviewItem,
+    contribution: GoalContributionItem,
+  ) {
+    console.log("Delete contribution later:", {
+      goalId: goal.id,
+      contributionId: contribution.id,
+    });
+
+    // TODO:
+    // await deleteGoalContribution(goal.id, contribution.id)
+    // refresh contributions
   }
 
   const totalSaved = data?.summary.totalSaved ?? 0;
@@ -383,12 +410,14 @@ export default function GoalsScreen() {
         onUpdate={handleUpdateGoal}
       />
 
-      <GoalDetailsModal
+     <GoalDetailsModal
         visible={isGoalDetailsModalVisible}
         goal={selectedGoal}
         onClose={closeGoalDetails}
         onEdit={openEditGoalModal}
         onDelete={handleDeleteGoal}
+        onAddContribution={handleAddContribution}
+        onDeleteContribution={handleDeleteContribution}
       />
     </View>
   );
