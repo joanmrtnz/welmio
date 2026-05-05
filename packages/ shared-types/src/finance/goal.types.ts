@@ -68,3 +68,18 @@ export type GoalContributionItem = {
   notes?: string | null;
   description?: string | null;
 };
+
+export type CreateTransactionInitialValues = {
+  type?: "income" | "expense";
+  goalId?: string;
+  description?: string;
+  notes?: string;
+};
+
+export type CreateGoalContributionRecordPayload = {
+  transactionId?: string | null;
+  amount: number;
+  currency: string;
+  date: string;
+  notes?: string | null;
+};

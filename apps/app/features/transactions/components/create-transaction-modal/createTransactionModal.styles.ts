@@ -9,6 +9,7 @@ const DARK_GREEN = "#059669";
 const TAB_GREEN = "#14cfa1";
 const LIGTH_GRAY = "rgba(0,0,0,0.1)";
 
+
 export const createTransactionModalColors = {
   WHITE,
   BLACK,
@@ -120,7 +121,6 @@ export const styles = StyleSheet.create({
 
   typeButtonSelected: {
     backgroundColor: TAB_GREEN,
-    borderColor: TAB_GREEN,
   },
 
   typeButtonText: {
@@ -131,6 +131,7 @@ export const styles = StyleSheet.create({
 
   typeButtonTextSelected: {
     color: WHITE,
+    fontFamily: fonts.semibold,
   },
 
   selectorGrid: {

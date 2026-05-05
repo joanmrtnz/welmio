@@ -1,5 +1,6 @@
 import { apiFetch } from "@/app/lib/api/client";
-import { CreateGoalPayload, GoalContributionItem, GoalOverviewItem, GoalsOverviewResponse, UpdateGoalPayload } from "@repo/shared-types";
+import { createTransaction } from "@/features/transactions/services/transactions.service";
+import { CreateGoalContributionRecordPayload, CreateGoalPayload, CreateTransactionPayload, GoalContributionItem, GoalOverviewItem, GoalsOverviewResponse, TransactionOverviewItem, UpdateGoalPayload } from "@repo/shared-types";
 
 
 export async function getGoalsOverview() {
@@ -28,4 +29,42 @@ export async function deleteGoal(goalId: string) {
 
 export async function getGoalContributions(goalId: string) {
   return apiFetch<GoalContributionItem[]>(`/goals/${goalId}/contributions`);
+}
+
+export type CreateGoalContributionPayload = Omit<
+  CreateTransactionPayload,
+  "type" | "goalId"
+> & {
+  goalId: string;
+};
+
+export async function createGoalContribution(
+  payload: CreateGoalContributionPayload,
+) {
+  const transaction = (await createTransaction({
+    ...payload,
+    type: "income",
+    goalId: payload.goalId,
+  })) as TransactionOverviewItem;
+
+  await createGoalContributionRecord(payload.goalId, {
+    transactionId: transaction.id,
+    amount: payload.amount,
+    currency: payload.currency,
+    date: payload.date,
+    notes: payload.notes ?? null,
+  });
+
+  return transaction;
+}
+
+
+export async function createGoalContributionRecord(
+  goalId: string,
+  payload: CreateGoalContributionRecordPayload,
+) {
+  return apiFetch<GoalContributionItem>(`/goals/${goalId}/contributions`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
