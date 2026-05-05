@@ -63,6 +63,11 @@ export function GoalDetailsModal({
   const progress = Math.min(goal.progress, 100);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeletingContribution, setIsDeletingContribution] = useState(false);
+  const [showDeleteContributionDialog, setShowDeleteContributionDialog] =
+    useState(false);
+  const [selectedContributionToDelete, setSelectedContributionToDelete] =
+    useState<GoalContributionItem | null>(null);
   const [contributions, setContributions] = useState<GoalContributionItem[]>([]);
   const [isLoadingContributions, setIsLoadingContributions] = useState(false);
   const [contributionsError, setContributionsError] = useState<string | null>(
@@ -129,6 +134,45 @@ export function GoalDetailsModal({
     }
   }
 
+  function handleOpenDeleteContributionDialog(
+    contribution: GoalContributionItem,
+  ) {
+    setSelectedContributionToDelete(contribution);
+    setShowDeleteContributionDialog(true);
+  }
+
+  function handleCloseDeleteContributionDialog() {
+    if (isDeletingContribution) return;
+
+    setShowDeleteContributionDialog(false);
+    setSelectedContributionToDelete(null);
+  }
+
+  async function handleConfirmDeleteContribution() {
+    if (
+      !goal ||
+      !selectedContributionToDelete ||
+      isDeletingContribution ||
+      !onDeleteContribution
+    ) {
+      return;
+    }
+
+    try {
+      setIsDeletingContribution(true);
+
+      await onDeleteContribution(goal, selectedContributionToDelete);
+      await loadGoalContributions();
+
+      setShowDeleteContributionDialog(false);
+      setSelectedContributionToDelete(null);
+    } catch (error) {
+      console.warn("[GoalDetailsModal] delete contribution error:", error);
+    } finally {
+      setIsDeletingContribution(false);
+    }
+  }
+
   const loadGoalContributions = useCallback(async () => {
     if (!goal?.id) return;
 
@@ -179,7 +223,7 @@ export function GoalDetailsModal({
                 <Icon name="edit" size={16} strokeWidth={1.5} color={BLACK} />
                 </Pressable>
 
-                <Pressable
+               <Pressable
                 style={[styles.iconButton, styles.deleteIconButton]}
                 onPress={handleOpenDeleteDialog}
                 disabled={isDeleting}
@@ -343,7 +387,8 @@ export function GoalDetailsModal({
 
                     <Pressable
                       style={styles.deleteContributionButton}
-                      onPress={() => handleDeleteContribution(contribution)}
+                      onPress={() => handleOpenDeleteContributionDialog(contribution)}
+                      disabled={isDeletingContribution}
                     >
                       <Icon name="bin" size={17} color={RED} strokeWidth={1.5} />
                     </Pressable>
@@ -383,6 +428,20 @@ export function GoalDetailsModal({
         isLoading={isDeleting}
         onConfirm={handleConfirmDeleteGoal}
         onCancel={handleCloseDeleteDialog}
+      />
+
+      <ConfirmDialog
+        visible={showDeleteContributionDialog}
+        title="Delete Contribution"
+        message={`Are you sure you want to delete this contribution?
+      This will remove it from the goal progress, but the linked transaction will not be deleted.`}
+        confirmLabel="Yes, Delete"
+        cancelLabel="Cancel"
+        loadingLabel="Deleting..."
+        destructive
+        isLoading={isDeletingContribution}
+        onConfirm={handleConfirmDeleteContribution}
+        onCancel={handleCloseDeleteContributionDialog}
       />
     </Modal>
   );
