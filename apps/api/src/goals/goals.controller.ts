@@ -5,6 +5,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { JwtUser } from 'src/auth/types/jwt.types';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
+import { CreateGoalContributionDto } from './dto/create-goal-contribution.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('goals')
@@ -48,5 +49,18 @@ export class GoalsController {
     @Param('id') goalId: string,
   ) {
     return this.goalsService.getGoalContributions(user.sub, goalId);
+  }
+
+  @Post(':id/contributions')
+  createGoalContribution(
+    @CurrentUser() user: JwtUser,
+    @Param('id') goalId: string,
+    @Body() createGoalContributionDto: CreateGoalContributionDto,
+  ) {
+    return this.goalsService.createGoalContribution(
+      user.sub,
+      goalId,
+      createGoalContributionDto,
+    );
   }
 }
