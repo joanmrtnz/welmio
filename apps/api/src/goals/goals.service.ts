@@ -615,6 +615,68 @@ export class GoalsService {
         createdContribution.transaction?.notes ??
         null,
       description: createdContribution.transaction?.description ?? null,
-  };
-}
+    };
+  }
+
+  async deleteGoalContribution(
+    userId: string,
+    goalId: string,
+    contributionId: string,
+  ): Promise<{ message: string }> {
+    const goal = await this.prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId,
+      },
+      select: {
+        id: true,
+        currentAmount: true,
+      },
+    });
+
+    if (!goal) {
+      throw new NotFoundException('Goal not found');
+    }
+
+    const contribution = await this.prisma.goalContribution.findFirst({
+      where: {
+        id: contributionId,
+        goalId,
+        userId,
+      },
+      select: {
+        id: true,
+        amount: true,
+      },
+    });
+
+    if (!contribution) {
+      throw new NotFoundException('Contribution not found');
+    }
+
+    const nextCurrentAmount = goal.currentAmount.minus(contribution.amount);
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.goalContribution.delete({
+        where: {
+          id: contributionId,
+        },
+      });
+
+      await tx.goal.update({
+        where: {
+          id: goalId,
+        },
+        data: {
+          currentAmount: nextCurrentAmount.lessThan(0)
+            ? 0
+            : nextCurrentAmount,
+        },
+      });
+    });
+
+    return {
+      message: 'Contribution removed successfully.',
+    };
+  }
 }
