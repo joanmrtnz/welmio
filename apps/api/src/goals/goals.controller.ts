@@ -41,4 +41,12 @@ export class GoalsController {
   getUserGoalsOverview(@CurrentUser() user: JwtUser) {
     return this.goalsService.getUserGoalsOverview(user.sub);
   }
+
+  @Get(':id/contributions')
+  getGoalContributions(
+    @CurrentUser() user: JwtUser,
+    @Param('id') goalId: string,
+  ) {
+    return this.goalsService.getGoalContributions(user.sub, goalId);
+  }
 }

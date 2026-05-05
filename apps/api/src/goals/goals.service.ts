@@ -7,10 +7,61 @@ import { Goal, Prisma } from '@prisma/client';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { UpdateGoalDto } from './dto/update-goal.dto';
+import { GoalContributionResponseDto } from './dto/goal-contribution-response.dto';
 
 @Injectable()
 export class GoalsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getGoalContributions(
+    userId: string,
+    goalId: string,
+  ): Promise<GoalContributionResponseDto[]> {
+    const goal = await this.prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!goal) {
+      throw new NotFoundException('Goal not found');
+    }
+
+    const contributions = await this.prisma.goalContribution.findMany({
+      where: {
+        goalId,
+        userId,
+      },
+      include: {
+        transaction: {
+          select: {
+            id: true,
+            description: true,
+            notes: true,
+            date: true,
+          },
+        },
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+
+    return contributions.map((contribution) => ({
+      id: contribution.id,
+      goalId: contribution.goalId,
+      transactionId: contribution.transactionId,
+      amount: contribution.amount.toNumber(),
+      currency: contribution.currency,
+      date: contribution.date.toISOString(),
+      notes: contribution.notes ?? contribution.transaction?.notes ?? null,
+      description: contribution.transaction?.description ?? null,
+    }));
+  }
 
   async deleteGoal(
     userId: string,
