@@ -57,3 +57,14 @@ export type CreateGoalPayload = {
 };
 
 export type UpdateGoalPayload = Partial<CreateGoalPayload>;
+
+export type GoalContributionItem = {
+  id: string;
+  goalId: string;
+  transactionId?: string | null;
+  amount: number;
+  currency: string;
+  date: string;
+  notes?: string | null;
+  description?: string | null;
+};

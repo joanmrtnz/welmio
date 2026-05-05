@@ -1,9 +1,10 @@
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
-import { GoalOverviewItem } from "@repo/shared-types";
-import { useState } from "react";
+import { GoalContributionItem, GoalOverviewItem } from "@repo/shared-types";
+import { useCallback, useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
+import { getGoalContributions } from "../../services/goals.service";
 
 const GREEN = "#00c896";
 const LIGHT_GREEN = "#f1fff3";
@@ -21,6 +22,11 @@ type GoalDetailsModalProps = {
   onClose: () => void;
   onEdit?: (goal: GoalOverviewItem) => void;
   onDelete?: (goal: GoalOverviewItem) => Promise<void>;
+  onAddContribution?: (goal: GoalOverviewItem) => void;
+  onDeleteContribution?: (
+    goal: GoalOverviewItem,
+    contribution: GoalContributionItem,
+  ) => void;
 };
 
 function formatCurrency(amount: number | string, currency = "USD") {
@@ -49,10 +55,19 @@ export function GoalDetailsModal({
   onClose,
   onEdit,
   onDelete,
+  onAddContribution,
+  onDeleteContribution,
 }: GoalDetailsModalProps) {
   if (!goal) return null;
+  const remainingAmount = Math.max(goal.target - goal.saved, 0);
+  const progress = Math.min(goal.progress, 100);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [contributions, setContributions] = useState<GoalContributionItem[]>([]);
+  const [isLoadingContributions, setIsLoadingContributions] = useState(false);
+  const [contributionsError, setContributionsError] = useState<string | null>(
+    null,
+  );
   const contributionsCount = goal.contributionsCount ?? 0;
   const deleteMessage =
     contributionsCount > 0
@@ -97,8 +112,46 @@ export function GoalDetailsModal({
     }
   }
 
-  const remainingAmount = Math.max(goal.target - goal.saved, 0);
-  const progress = Math.min(goal.progress, 100);
+  function handleAddContribution() {
+    if (!goal) return;
+
+    onAddContribution?.(goal);
+  }
+
+  function handleDeleteContribution(contribution: GoalContributionItem) {
+    if (!goal) return;
+
+    onDeleteContribution?.(goal, contribution);
+  }
+
+  const loadGoalContributions = useCallback(async () => {
+    if (!goal?.id) return;
+
+    try {
+      setIsLoadingContributions(true);
+      setContributionsError(null);
+
+      const response = await getGoalContributions(goal.id);
+
+      setContributions(response);
+    } catch (error) {
+      console.warn("[GoalDetailsModal] load contributions error:", error);
+      setContributionsError("Could not load contributions.");
+    } finally {
+      setIsLoadingContributions(false);
+    }
+  }, [goal?.id]);
+
+  useEffect(() => {
+    if (!visible || !goal?.id) {
+      setContributions([]);
+      setContributionsError(null);
+      return;
+    }
+
+    loadGoalContributions();
+  }, [visible, goal?.id, loadGoalContributions]);
+
 
   return (
     <Modal
@@ -236,42 +289,66 @@ export function GoalDetailsModal({
 
             <View style={styles.mockHistoryCard}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Recent contributions</Text>
-                <Text style={styles.mockLabel}>Mock</Text>
+                <View>
+                  <Text style={styles.sectionTitle}>Recent contributions</Text>
+                  <Text style={styles.sectionSubtitle}>
+                    Latest money added to this goal
+                  </Text>
+                </View>
+
+                <Pressable style={styles.addContributionButton} onPress={handleAddContribution}>
+                  <Icon name="plus" size={18} color={BLACK} strokeWidth={1.8} />
+                </Pressable>
               </View>
 
-              <View style={styles.historyItem}>
-                <View style={styles.historyIcon}>
-                  <Icon name="income" size={22} color={WHITE} strokeWidth={1.3} />
-                </View>
-
-                <View style={styles.historyContent}>
-                  <Text style={styles.historyTitle}>Initial amount</Text>
-                  <Text style={styles.historyDate}>May 01, 2026</Text>
-                </View>
-
-                <Text style={styles.historyAmount}>
-                  +{formatCurrency(goal.saved, goal.currency)}
+              {isLoadingContributions ? (
+                <Text style={styles.emptyContributionsText}>
+                  Loading contributions...
                 </Text>
-              </View>
-
-              <View style={styles.historyItem}>
-                <View style={styles.historyIcon}>
-                  <Icon name="income" size={22} color={WHITE} strokeWidth={1.3} />
-                </View>
-
-                <View style={styles.historyContent}>
-                  <Text style={styles.historyTitle}>Monthly saving</Text>
-                  <Text style={styles.historyDate}>Jun 01, 2026</Text>
-                </View>
-
-                <Text style={styles.historyAmount}>
-                  +{formatCurrency(goal.monthlyNeeded, goal.currency)}
+              ) : contributionsError ? (
+                <Text style={styles.errorContributionsText}>
+                  {contributionsError}
                 </Text>
-              </View>
+              ) : contributions.length === 0 ? (
+                <Text style={styles.emptyContributionsText}>
+                  No contributions yet. Add your first one to start tracking this goal.
+                </Text>
+              ) : (
+                contributions.map((contribution) => (
+                  <View key={contribution.id} style={styles.historyItem}>
+                    <View style={styles.historyIcon}>
+                      <Icon name="income" size={22} color={WHITE} strokeWidth={1.3} />
+                    </View>
+
+                    <View style={styles.historyContent}>
+                      <Text style={styles.historyTitle} numberOfLines={1}>
+                        {contribution.description ||
+                          contribution.notes ||
+                          "Goal contribution"}
+                      </Text>
+
+                      <Text style={styles.historyDate}>
+                        {formatDate(contribution.date)}
+                      </Text>
+                    </View>
+
+                    <Text style={styles.historyAmount}>
+                      +{formatCurrency(contribution.amount, contribution.currency)}
+                    </Text>
+
+                    <Pressable
+                      style={styles.deleteContributionButton}
+                      onPress={() => handleDeleteContribution(contribution)}
+                    >
+                      <Icon name="bin" size={17} color={RED} strokeWidth={1.5} />
+                    </Pressable>
+                  </View>
+                ))
+              )}
             </View>
 
-            <View style={styles.actionsRow}>
+          </ScrollView>
+           <View style={styles.actionsRow}>
                <Pressable
                     style={styles.secondaryButton}
                     onPress={() => {
@@ -288,7 +365,6 @@ export function GoalDetailsModal({
                 <Text style={styles.primaryButtonText}>Add contribution</Text>
               </Pressable>
             </View>
-          </ScrollView>
         </View>
       </View>
      <ConfirmDialog
@@ -593,6 +669,7 @@ const styles = StyleSheet.create({
 
   historyContent: {
     flex: 1,
+    marginRight: 8,
   },
 
   historyTitle: {
@@ -618,6 +695,8 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: "row",
     gap: 12,
+    paddingHorizontal: 28,
+    paddingBottom: 34,
   },
 
   secondaryButton: {
@@ -629,6 +708,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderColor: LIGTH_GRAY,
     borderWidth: 1,
+    marginLeft: 8,
   },
 
   secondaryButtonText: {
@@ -650,5 +730,48 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fonts.bold,
     color: BLACK,
+  },
+
+
+  addContributionButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  deleteContributionButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#fee2e2",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 10,
+  },
+
+  sectionSubtitle: {
+    fontSize: 11,
+    fontFamily: fonts.regular,
+    color: BLACK,
+    opacity: 0.65,
+    marginTop: 3,
+  },
+
+  emptyContributionsText: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: BLACK,
+    opacity: 0.7,
+    lineHeight: 18,
+  },
+
+  errorContributionsText: {
+    fontSize: 12,
+    fontFamily: fonts.medium,
+    color: RED,
+    lineHeight: 18,
   },
 });
