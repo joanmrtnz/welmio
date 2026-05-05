@@ -63,4 +63,17 @@ export class GoalsController {
       createGoalContributionDto,
     );
   }
+
+  @Delete(':id/contributions/:contributionId')
+  deleteGoalContribution(
+    @CurrentUser() user: JwtUser,
+    @Param('id') goalId: string,
+    @Param('contributionId') contributionId: string,
+  ) {
+    return this.goalsService.deleteGoalContribution(
+      user.sub,
+      goalId,
+      contributionId,
+    );
+  }
 }
