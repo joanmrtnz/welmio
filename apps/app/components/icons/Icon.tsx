@@ -31,6 +31,8 @@ import ChevronRight from "../../assets/icons/chevron-right.svg";
 import FingerPrint from "../../assets/icons/fingerprint.svg";
 import Phone from "../../assets/icons/phone.svg";
 import Mail from "../../assets/icons/mail.svg";
+import Document from "../../assets/icons/document.svg";
+
 
 import { IconName } from "@repo/shared-types";
 import { SvgProps } from "react-native-svg";
@@ -72,6 +74,7 @@ const icons = {
   fingerPrint: FingerPrint,
   phone: Phone,
   mail: Mail,
+  document: Document,
 } satisfies Record<IconName, ComponentType<SvgProps>>;
 
 type IconProps = {

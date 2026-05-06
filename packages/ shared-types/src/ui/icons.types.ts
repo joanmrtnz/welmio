@@ -33,7 +33,8 @@ export const ICON_NAMES = [
   "chevronRight",
   "fingerPrint",
   "phone",
-  "mail"
+  "mail",
+  "document",
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];
