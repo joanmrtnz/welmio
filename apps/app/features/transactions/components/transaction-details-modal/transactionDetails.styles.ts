@@ -2,12 +2,15 @@ import { StyleSheet } from "react-native";
 import { fonts } from "@/theme/fonts";
 
 export const WHITE = "#ffffff";
-export const BLACK = "#052e2b";
-export const LIGHT_GREEN = "#f1fff3";
-export const BUTTON_GREEN = "#1A9E6A";
-export const DARK_GREEN = "#059669";
-export const TAB_GREEN = "#14cfa1";
-export const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+export const BLACK = "#073a36";
+export const LIGHT_GREEN = "#dff7ef";
+export const CARD_GREEN = "#f3fffa";
+export const SOFT_GREEN = "#d9f5eb";
+export const BUTTON_GREEN = "#83dcc5";
+export const DARK_GREEN = "#0a8f72";
+export const TAB_GREEN = "#12c79b";
+export const BORDER_GREEN = "rgba(7, 58, 54, 0.1)";
+export const MUTED = "rgba(7, 58, 54, 0.62)";
 export const RED = "#ef4444";
 
 export const styles = StyleSheet.create({
@@ -15,61 +18,71 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
+    backgroundColor: "rgba(223, 247, 239, 0.68)",
   },
 
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: "rgba(7, 58, 54, 0.1)",
   },
 
   modalCard: {
     width: "100%",
-    maxHeight: "84%",
-    backgroundColor: LIGHT_GREEN,
-    borderRadius: 32,
-    paddingHorizontal: 24,
-    paddingTop: 22,
-    paddingBottom: 20,
+    maxHeight: "88%",
+    backgroundColor: CARD_GREEN,
+    borderRadius: 30,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 18,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
+    shadowColor: "rgba(29, 100, 89, 0.16)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 12,
   },
 
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 18,
+    gap: 12,
   },
 
   title: {
     fontSize: 18,
     fontFamily: fonts.bold,
     color: BLACK,
+    letterSpacing: 0.2,
   },
 
   subtitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: fonts.medium,
-    color: BLACK,
-    opacity: 0.65,
-    marginTop: 3,
+    color: MUTED,
+    marginTop: 5,
   },
 
   headerActions: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
+    flexShrink: 0,
   },
 
   iconButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: LIGTH_GRAY,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
 
   deleteIconButton: {
-    backgroundColor: "rgba(239, 68, 68, 0.12)",
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
   },
 
   scrollView: {
@@ -77,30 +90,37 @@ export const styles = StyleSheet.create({
   },
 
   content: {
-    paddingBottom: 24,
+    paddingBottom: 10,
   },
 
   heroCard: {
     backgroundColor: WHITE,
-    borderRadius: 24,
-    paddingVertical: 22,
+    borderRadius: 26,
+    paddingVertical: 24,
     paddingHorizontal: 18,
     alignItems: "center",
     marginBottom: 14,
+    borderWidth: 1,
+    borderColor: "rgba(7, 58, 54, 0.06)",
+    shadowColor: "rgba(29, 100, 89, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
 
   categoryIcon: {
-    width: 76,
-    height: 76,
-    borderRadius: 22,
-    backgroundColor: BUTTON_GREEN,
+    width: 86,
+    height: 86,
+    borderRadius: 24,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
+    marginBottom: 14,
   },
 
   description: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: fonts.bold,
     color: BLACK,
     textAlign: "center",
@@ -108,9 +128,10 @@ export const styles = StyleSheet.create({
   },
 
   amount: {
-    fontSize: 24,
+    fontSize: 28,
     fontFamily: fonts.bold,
-    marginBottom: 10,
+    marginBottom: 12,
+    letterSpacing: 0.3,
   },
 
   incomeAmount: {
@@ -122,10 +143,10 @@ export const styles = StyleSheet.create({
   },
 
   typeBadge: {
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: LIGHT_GREEN,
-    paddingHorizontal: 12,
+    minHeight: 30,
+    borderRadius: 15,
+    backgroundColor: SOFT_GREEN,
+    paddingHorizontal: 14,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -134,60 +155,80 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: fonts.bold,
     color: DARK_GREEN,
+    letterSpacing: 0.5,
   },
 
   detailsCard: {
     backgroundColor: WHITE,
-    borderRadius: 22,
+    borderRadius: 24,
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 6,
     marginBottom: 14,
+    borderWidth: 1,
+    borderColor: "rgba(7, 58, 54, 0.06)",
+    shadowColor: "rgba(29, 100, 89, 0.06)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
 
   detailRow: {
-    minHeight: 44,
+    minHeight: 48,
     borderBottomWidth: 1,
-    borderBottomColor: LIGTH_GRAY,
+    borderBottomColor: "rgba(7, 58, 54, 0.08)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 14,
   },
 
+
+
+  detailRowLast: {
+    borderBottomWidth: 0,
+  },
+
   detailLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: fonts.medium,
-    color: BLACK,
-    opacity: 0.65,
+    color: MUTED,
   },
 
   detailValue: {
     flex: 1,
     textAlign: "right",
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: fonts.semibold,
     color: BLACK,
   },
 
   notesCard: {
     backgroundColor: WHITE,
-    borderRadius: 22,
+    borderRadius: 24,
     padding: 16,
-    marginBottom: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "rgba(7, 58, 54, 0.06)",
+    shadowColor: "rgba(29, 100, 89, 0.06)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
 
   notesLabel: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: fonts.semibold,
     color: BLACK,
     marginBottom: 8,
   },
 
   notesText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: fonts.regular,
-    color: BLACK,
-    lineHeight: 18,
+    color: MUTED,
+    lineHeight: 20,
   },
 
   actions: {
@@ -198,9 +239,9 @@ export const styles = StyleSheet.create({
 
   editButton: {
     flex: 1,
-    height: 48,
+    height: 52,
     borderRadius: 16,
-    backgroundColor: TAB_GREEN,
+    backgroundColor: BUTTON_GREEN,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -208,16 +249,16 @@ export const styles = StyleSheet.create({
   },
 
   editButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: fonts.bold,
-    color: WHITE,
+    color: BLACK,
   },
 
   deleteButton: {
     flex: 1,
-    height: 48,
+    height: 52,
     borderRadius: 16,
-    backgroundColor: "rgba(239, 68, 68, 0.12)",
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -225,7 +266,7 @@ export const styles = StyleSheet.create({
   },
 
   deleteButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: fonts.bold,
     color: RED,
   },

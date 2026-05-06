@@ -11,6 +11,7 @@ import type { TransactionDetailsModalProps } from "../../types/transactionDetail
 import {
   BLACK,
   RED,
+  TAB_GREEN,
   WHITE,
   styles,
 } from "./transactionDetails.styles";
@@ -93,8 +94,8 @@ export function TransactionDetailsModal({
               >
                 <Icon
                   name="edit"
-                  size={16}
-                  strokeWidth={1.5}
+                  size={17}
+                  strokeWidth={1.7}
                   color={BLACK}
                 />
               </Pressable>
@@ -106,14 +107,14 @@ export function TransactionDetailsModal({
               >
                 <Icon
                   name="bin"
-                  size={23}
-                  strokeWidth={1.5}
+                  size={22}
+                  strokeWidth={1.7}
                   color={RED}
                 />
               </Pressable>
 
               <Pressable style={styles.iconButton} onPress={onClose}>
-                <Icon name="close" size={20} color={BLACK} />
+                <Icon name="close" size={18} strokeWidth={1.8} color={BLACK} />
               </Pressable>
             </View>
           </View>
@@ -129,9 +130,9 @@ export function TransactionDetailsModal({
               <View style={styles.categoryIcon}>
                 <Icon
                   name={(transaction.category?.icon ?? "plus") as any}
-                  size={65}
+                  size={48}
                   strokeWidth={1}
-                  color={WHITE}
+                  color={TAB_GREEN}
                 />
               </View>
 
@@ -191,7 +192,7 @@ export function TransactionDetailsModal({
                 </Text>
               </View>
 
-              <View style={styles.detailRow}>
+              <View style={[styles.detailRow, styles.detailRowLast]}>
                 <Text style={styles.detailLabel}>Date</Text>
                 <Text style={styles.detailValue}>
                   {formatDate(transaction.date)}
@@ -215,7 +216,7 @@ export function TransactionDetailsModal({
                   name="edit"
                   size={16}
                   strokeWidth={1.8}
-                  color={WHITE}
+                  color={BLACK}
                 />
                 <Text style={styles.editButtonText}>Edit</Text>
               </Pressable>
