@@ -1,17 +1,29 @@
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useState, useEffect } from "react";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
-import { CreateGoalPayload, GoalOverviewItem, GoalType } from "@repo/shared-types";
+import {
+  CreateGoalPayload,
+  GoalOverviewItem,
+  GoalType,
+} from "@repo/shared-types";
 
-const GREEN = "#00c896";
-const LIGHT_GREEN = "#f1fff3";
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
-const BUTTON_GREEN = "#1A9E6A";
-const DIVIDER_GREEN = "#00d09e";
-const LIGTH_GRAY = "rgba(0,0,0,0.1)";
-
+const LIGHT_GREEN = "#eefbf6";
+const SOFT_GREEN = "#d8f5ea";
+const BUTTON_GREEN = "#93e2c9";
+const TAB_GREEN = "#12c79b";
+const BORDER_GREEN = "rgba(8, 120, 98, 0.14)";
+const MUTED = "rgba(5, 46, 43, 0.58)";
 
 type CreateGoalModalMode = "create" | "edit";
 
@@ -32,7 +44,7 @@ const goalTypes = [
 ];
 
 const goalIcons = [
-  { name: "home", label: "Home" },
+  { name: "rent", label: "Rent" },
   { name: "money", label: "Money" },
   { name: "income", label: "Income" },
   { name: "calendar", label: "Plan" },
@@ -46,7 +58,6 @@ export function CreateGoalModal({
   onSubmit,
   onUpdate,
 }: CreateGoalModalProps) {
-
   const isEditMode = mode === "edit";
 
   const [name, setName] = useState("");
@@ -141,7 +152,9 @@ export function CreateGoalModal({
           <View style={styles.handle} />
 
           <View style={styles.header}>
-            <Text style={styles.title}>{isEditMode ? "Edit Goal" : "Create Goal"}</Text>
+            <Text style={styles.title}>
+              {isEditMode ? "Edit Goal" : "Create Goal"}
+            </Text>
 
             <Pressable style={styles.closeButton} onPress={onClose}>
               <Icon name="close" size={20} color={BLACK} />
@@ -157,7 +170,7 @@ export function CreateGoalModal({
                 <Icon
                   name={selectedIcon as never}
                   size={42}
-                  color={WHITE}
+                  color={TAB_GREEN}
                   strokeWidth={1.1}
                 />
               </View>
@@ -170,7 +183,8 @@ export function CreateGoalModal({
                   {name.trim() || "House Deposit"}
                 </Text>
                 <Text style={styles.previewMeta}>
-                  Target · {targetAmount.trim() ? `$${targetAmount}` : "$30,000"}
+                  Target ·{" "}
+                  {targetAmount.trim() ? `$${targetAmount}` : "$30,000"}
                 </Text>
               </View>
             </View>
@@ -233,10 +247,7 @@ export function CreateGoalModal({
                   return (
                     <Pressable
                       key={type.value}
-                      style={[
-                        styles.chip,
-                        isSelected && styles.chipSelected,
-                      ]}
+                      style={[styles.chip, isSelected && styles.chipSelected]}
                       onPress={() => setSelectedType(type.value as GoalType)}
                     >
                       <Text
@@ -272,7 +283,7 @@ export function CreateGoalModal({
                       <Icon
                         name={icon.name as never}
                         size={40}
-                        color={isSelected ? WHITE : BUTTON_GREEN}
+                        color={TAB_GREEN}
                         strokeWidth={1}
                       />
                     </Pressable>
@@ -281,21 +292,24 @@ export function CreateGoalModal({
               </View>
             </View>
 
-          <Pressable
-            style={[styles.createButton, isSubmitting && styles.createButtonDisabled]}
-            onPress={handleSubmitGoal}
-            disabled={isSubmitting}
-          >
-           <Text style={styles.createButtonText}>
-              {isSubmitting
-                ? isEditMode
-                  ? "Saving..."
-                  : "Creating..."
-                : isEditMode
-                  ? "Save changes"
-                  : "Create goal"}
-            </Text>
-          </Pressable>
+            <Pressable
+              style={[
+                styles.createButton,
+                isSubmitting && styles.createButtonDisabled,
+              ]}
+              onPress={handleSubmitGoal}
+              disabled={isSubmitting}
+            >
+              <Text style={styles.createButtonText}>
+                {isSubmitting
+                  ? isEditMode
+                    ? "Saving..."
+                    : "Creating..."
+                  : isEditMode
+                    ? "Save changes"
+                    : "Create goal"}
+              </Text>
+            </Pressable>
           </ScrollView>
         </View>
       </View>
@@ -306,37 +320,49 @@ export function CreateGoalModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(223, 247, 239, 0.96)",
+    paddingHorizontal: 20,
+    paddingVertical: 14,
   },
 
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.32)",
+    backgroundColor: "transparent",
   },
 
   modal: {
-    maxHeight: "88%",
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 42,
-    borderTopRightRadius: 42,
-    paddingTop: 12,
+    width: "100%",
+    maxHeight: "94%",
+    backgroundColor: "rgba(255, 255, 255, 0.72)",
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
+    paddingHorizontal: 22,
+    paddingTop: 14,
+    paddingBottom: 18,
     overflow: "hidden",
+    shadowColor: "rgba(29, 100, 89, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
   },
 
   handle: {
-    width: 44,
+    width: 42,
     height: 5,
     borderRadius: 999,
-    backgroundColor: DIVIDER_GREEN,
+    backgroundColor: SOFT_GREEN,
     alignSelf: "center",
-    marginBottom: 18,
+    marginBottom: 14,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 28,
     marginBottom: 16,
   },
 
@@ -344,36 +370,38 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: fonts.bold,
     color: BLACK,
+    letterSpacing: 0.2,
   },
 
   closeButton: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: WHITE,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
 
   content: {
-    paddingHorizontal: 28,
-    paddingBottom: 34,
+    paddingBottom: 4,
   },
 
   previewCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: GREEN,
-    borderRadius: 28,
-    padding: 18,
-    marginBottom: 22,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
+    padding: 16,
+    marginBottom: 20,
   },
 
   previewIcon: {
-    width: 68,
-    height: 68,
-    borderRadius: 22,
-    backgroundColor: BUTTON_GREEN,
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 14,
@@ -381,13 +409,13 @@ const styles = StyleSheet.create({
 
   previewInfo: {
     flex: 1,
+    minWidth: 0,
   },
 
   previewLabel: {
     fontSize: 12,
-    fontFamily: fonts.medium,
-    color: BLACK,
-    opacity: 0.75,
+    fontFamily: fonts.semibold,
+    color: MUTED,
   },
 
   previewTitle: {
@@ -399,40 +427,48 @@ const styles = StyleSheet.create({
 
   previewMeta: {
     fontSize: 12,
-    fontFamily: fonts.regular,
-    color: BLACK,
+    fontFamily: fonts.medium,
+    color: TAB_GREEN,
     marginTop: 5,
   },
 
   fieldGroup: {
-    marginBottom: 18,
+    marginBottom: 16,
   },
 
   row: {
     flexDirection: "row",
-    gap: 12,
-    marginBottom: 18,
+    gap: 10,
+    marginBottom: 16,
   },
 
   halfField: {
     flex: 1,
+    minWidth: 0,
   },
 
   label: {
-    fontSize: 12,
-    fontFamily: fonts.medium,
+    fontSize: 13,
+    fontFamily: fonts.bold,
     color: BLACK,
-    marginBottom: 8,
+    marginBottom: 10,
   },
 
   input: {
-    height: 50,
-    borderRadius: 18,
+    height: 52,
+    borderRadius: 14,
     backgroundColor: WHITE,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
     paddingHorizontal: 16,
     fontSize: 14,
     fontFamily: fonts.medium,
     color: BLACK,
+    shadowColor: "rgba(29, 100, 89, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
   },
 
   chipsGrid: {
@@ -442,65 +478,69 @@ const styles = StyleSheet.create({
   },
 
   chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 16,
+    minWidth: 102,
+    height: 38,
+    borderRadius: 15,
     backgroundColor: WHITE,
+    paddingHorizontal: 16,
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
-    borderColor: "transparent",
+    borderColor: BORDER_GREEN,
   },
 
   chipSelected: {
-    backgroundColor: GREEN,
+    backgroundColor: BUTTON_GREEN,
     borderColor: BUTTON_GREEN,
   },
 
   chipText: {
-    fontSize: 12,
-    fontFamily: fonts.medium,
+    fontSize: 13,
+    fontFamily: fonts.semibold,
     color: BLACK,
   },
 
   chipTextSelected: {
-    fontFamily: fonts.bold,
+    color: BLACK,
+    fontFamily: fonts.semibold,
   },
 
   iconsRow: {
     flexDirection: "row",
-    gap: 12,
+    flexWrap: "wrap",
+    gap: 10,
   },
 
   iconOption: {
-    width: 54,
-    height: 54,
+    width: 64,
+    height: 64,
     borderRadius: 18,
-    backgroundColor: WHITE,
+    backgroundColor: LIGHT_GREEN,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: LIGTH_GRAY,
+    borderWidth: 0,
   },
 
   iconOptionSelected: {
-    backgroundColor: BUTTON_GREEN,
-    borderColor: DIVIDER_GREEN,
+    backgroundColor: SOFT_GREEN,
   },
 
   createButton: {
-    height: 56,
-    borderRadius: 22,
-    backgroundColor: GREEN,
+    height: 50,
+    borderRadius: 13,
+    backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 8,
   },
 
   createButtonText: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: fonts.bold,
     color: BLACK,
   },
 
   createButtonDisabled: {
-    opacity: 0.6,
+    opacity: 0.55,
   },
 });
