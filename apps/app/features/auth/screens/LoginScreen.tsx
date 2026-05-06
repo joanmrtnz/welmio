@@ -26,7 +26,7 @@ const DARK = "#052e2b";
 const MUTED = "#6f8586";
 const CARD = "#ffffff";
 const SOFT_GREEN = "#e3f8f1";
-const LIGTH_GRAY = "rgba(0, 0, 0, 0.2)";
+const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 export default function LoginScreen() {
   const { execute, loading } = useLogin();
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     backgroundColor: CARD,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: LIGTH_GRAY,
+    borderColor: LIGHT_GRAY,
     borderWidth: 1,
     shadowColor: "rgba(29, 100, 89, 0.18)",
     shadowOpacity: 1,

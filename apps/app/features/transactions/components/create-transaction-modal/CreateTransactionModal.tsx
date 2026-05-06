@@ -22,7 +22,6 @@ import {
 import { TransactionOverviewItem } from "@repo/shared-types";
 import { useEffect } from "react";
 
-
 type CreateTransactionModalProps = {
   visible: boolean;
   transactionToEdit?: TransactionOverviewItem | null;
@@ -34,7 +33,7 @@ type CreateTransactionModalProps = {
     description?: string;
     notes?: string;
   } | null;
-   lockType?: boolean;
+  lockType?: boolean;
 };
 
 export function CreateTransactionModal({
@@ -96,7 +95,7 @@ export function CreateTransactionModal({
     lockType,
   });
 
-  const { BLACK, WHITE } = createTransactionModalColors;
+  const { BLACK, TAB_GREEN } = createTransactionModalColors;
 
   useEffect(() => {
     if (!visible) return;
@@ -147,7 +146,7 @@ export function CreateTransactionModal({
           >
             <Text style={styles.sectionLabel}>Type</Text>
 
-           {!lockType ? (
+            {!lockType ? (
               <View style={styles.typeRow}>
                 <Pressable
                   style={[
@@ -184,12 +183,11 @@ export function CreateTransactionModal({
                 </Pressable>
               </View>
             ) : (
-               <View style={styles.typeRow}>
-                <View style={[
-                      styles.typeButton,
-                      styles.typeButtonSelected,
-                    ]}>
-                  <Text style={styles.typeButtonTextSelected}>Income contribution</Text>
+              <View style={styles.typeRow}>
+                <View style={[styles.typeButton, styles.typeButtonSelected]}>
+                  <Text style={styles.typeButtonTextSelected}>
+                    Income contribution
+                  </Text>
                 </View>
               </View>
             )}
@@ -254,8 +252,9 @@ export function CreateTransactionModal({
                   >
                     <Icon
                       name={(category.icon ?? "plus") as any}
-                      size={22}
-                      color={isSelected ? WHITE : BLACK}
+                      size={40}
+                      strokeWidth={1}
+                      color={TAB_GREEN}
                     />
 
                     <Text
@@ -308,7 +307,7 @@ export function CreateTransactionModal({
                     </View>
 
                     {isSelected ? (
-                      <Icon name="check" size={20} color={WHITE} />
+                      <Icon name="check" size={20} color={TAB_GREEN} />
                     ) : null}
                   </Pressable>
                 );
