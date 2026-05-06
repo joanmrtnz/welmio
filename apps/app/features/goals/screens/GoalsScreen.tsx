@@ -1,29 +1,44 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { CreateGoalPayload, CreateTransactionInitialValues, GoalContributionItem, GoalOverviewItem, GoalsOverviewResponse, UpdateGoalPayload } from "@repo/shared-types";
-import { createGoal, createGoalContribution, CreateGoalContributionPayload, deleteGoal, deleteGoalContribution, getGoalsOverview, updateGoal } from "../services/goals.service";
+import {
+  CreateGoalPayload,
+  CreateTransactionInitialValues,
+  GoalContributionItem,
+  GoalOverviewItem,
+  GoalsOverviewResponse,
+  UpdateGoalPayload,
+} from "@repo/shared-types";
+import {
+  createGoal,
+  createGoalContribution,
+  CreateGoalContributionPayload,
+  deleteGoal,
+  deleteGoalContribution,
+  getGoalsOverview,
+  updateGoal,
+} from "../services/goals.service";
 import { CreateGoalModal } from "../components/create-goal-modal/CreateGoalModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { GoalDetailsModal } from "../components/create-goal-modal/GoalDetailsModal";
 import { CreateTransactionModal } from "@/features/transactions/components/create-transaction-modal/CreateTransactionModal";
 
-const GREEN = "#00c896";
-const DIVIDER_GREEN = "#00d09e";
-const DARK_GREEN = "#059669";
-const LIGHT_GREEN = "#f1fff3";
-const CARD_GREEN = "#dff7e2";
+const GREEN = "#dff7ef";
+const DIVIDER_GREEN = "#7adcc8";
+const DARK_GREEN = "#0b8f78";
+const LIGHT_GREEN = "#f8fffc";
+const CARD_GREEN = "#e2f8f0";
 const WHITE = "#ffffff";
-const BLACK = "#052e2b";
-const TAB_GREEN = "#14cfa1";
-const BUTTON_GREEN = "#1A9E6A";
-
+const BLACK = "#082f33";
+const TAB_GREEN = "#16b996";
+const BUTTON_GREEN = "#10b992";
+const SOFT_SHADOW = "rgba(28, 105, 91, 0.14)";
 
 function formatCurrency(amount: number | string, currency = "USD") {
-  const numericAmount =
-    typeof amount === "string" ? Number(amount) : amount;
+  const numericAmount = typeof amount === "string" ? Number(amount) : amount;
 
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -32,15 +47,19 @@ function formatCurrency(amount: number | string, currency = "USD") {
 }
 
 export default function GoalsScreen() {
-
   const [data, setData] = useState<GoalsOverviewResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isCreateGoalModalVisible, setIsCreateGoalModalVisible] = useState(false);
-  const [selectedGoal, setSelectedGoal] = useState<GoalOverviewItem | null>(null);
+  const [isCreateGoalModalVisible, setIsCreateGoalModalVisible] =
+    useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<GoalOverviewItem | null>(
+    null,
+  );
   const [isGoalDetailsModalVisible, setIsGoalDetailsModalVisible] =
     useState(false);
-  const [createGoalModalMode, setCreateGoalModalMode] = useState<"create" | "edit">("create");
+  const [createGoalModalMode, setCreateGoalModalMode] = useState<
+    "create" | "edit"
+  >("create");
   const [editingGoal, setEditingGoal] = useState<GoalOverviewItem | null>(null);
   const [isCreateTransactionModalVisible, setIsCreateTransactionModalVisible] =
     useState(false);
@@ -74,10 +93,7 @@ export default function GoalsScreen() {
     }
   }
 
-  async function handleUpdateGoal(
-    goalId: string,
-    payload: UpdateGoalPayload,
-  ) {
+  async function handleUpdateGoal(goalId: string, payload: UpdateGoalPayload) {
     try {
       await updateGoal(goalId, payload);
       await loadGoalsOverview();
@@ -174,7 +190,7 @@ export default function GoalsScreen() {
     setIsCreateTransactionModalVisible(true);
   }
 
- async function handleDeleteContribution(
+  async function handleDeleteContribution(
     goal: GoalOverviewItem,
     contribution: GoalContributionItem,
   ) {
@@ -187,7 +203,9 @@ export default function GoalsScreen() {
       console.warn(error);
 
       const message =
-        error instanceof Error ? error.message : "Could not remove contribution.";
+        error instanceof Error
+          ? error.message
+          : "Could not remove contribution.";
 
       feedback.error(message);
 
@@ -244,12 +262,16 @@ export default function GoalsScreen() {
 
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${globalProgress}%` }]} />
+          <View
+            style={[styles.progressFill, { width: `${globalProgress}%` }]}
+          />
         </View>
         <Text style={styles.progressText}>
           {isLoading
             ? "Loading goals..."
-            : errorMessage ?? data?.summary.progressMessage ?? "No goals yet."}
+            : (errorMessage ??
+              data?.summary.progressMessage ??
+              "No goals yet.")}
         </Text>
       </View>
 
@@ -258,11 +280,11 @@ export default function GoalsScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.cardContent}
         >
-         {mainGoal ? (
-           <Pressable
-                style={styles.mainGoalCard}
-                onPress={() => openGoalDetails(mainGoal)}
-              >
+          {mainGoal ? (
+            <Pressable
+              style={styles.mainGoalCard}
+              onPress={() => openGoalDetails(mainGoal)}
+            >
               <View style={styles.mainGoalHeader}>
                 <View>
                   <Text style={styles.sectionEyebrow}>Main Goal</Text>
@@ -272,9 +294,9 @@ export default function GoalsScreen() {
                 <View style={styles.mainGoalIcon}>
                   <Icon
                     name={(mainGoal.icon ?? "target") as never}
-                    size={38}
-                    color={WHITE}
-                    strokeWidth={1.3}
+                    size={32}
+                    color={BUTTON_GREEN}
+                    strokeWidth={1.6}
                   />
                 </View>
               </View>
@@ -292,7 +314,8 @@ export default function GoalsScreen() {
                   </Text>
 
                   <Text style={styles.goalMeta}>
-                    saved of {formatCurrency(mainGoal.target, mainGoal.currency)}
+                    saved of{" "}
+                    {formatCurrency(mainGoal.target, mainGoal.currency)}
                   </Text>
 
                   <Text style={styles.goalMeta}>
@@ -322,7 +345,7 @@ export default function GoalsScreen() {
           <View style={styles.paceCard}>
             <View style={styles.paceItem}>
               <View style={styles.smallIconBox}>
-                <Icon name="calendar" size={24} color={BLACK} />
+                <Icon name="calendar" size={23} color={WHITE} />
               </View>
               <Text style={styles.paceLabel}>Monthly Needed</Text>
               <Text style={styles.paceValue}>
@@ -334,7 +357,7 @@ export default function GoalsScreen() {
 
             <View style={styles.paceItem}>
               <View style={styles.smallIconBox}>
-                <Icon name="income" size={24} color={BLACK} />
+                <Icon name="income" size={23} color={WHITE} />
               </View>
               <Text style={styles.paceLabel}>Active Goals</Text>
               <Text style={styles.paceValue}>{goals.length}</Text>
@@ -350,10 +373,11 @@ export default function GoalsScreen() {
           </View>
 
           {goals.map((goal) => (
-            <Pressable 
-            key={goal.id} 
-            style={styles.goalCard}
-            onPress={() => openGoalDetails(goal)} >
+            <Pressable
+              key={goal.id}
+              style={styles.goalCard}
+              onPress={() => openGoalDetails(goal)}
+            >
               <View style={styles.goalTopRow}>
                 <View style={styles.goalLeft}>
                   <View style={styles.iconCircle}>
@@ -422,8 +446,14 @@ export default function GoalsScreen() {
         </ScrollView>
 
         <Pressable style={styles.fab} onPress={openCreateGoalModal}>
-          <Icon name="plus" size={28} color={BLACK} strokeWidth={1.6} />
+          <Icon name="plus" size={30} color={WHITE} strokeWidth={1.8} />
         </Pressable>
+
+        <LinearGradient
+          pointerEvents="none"
+          colors={["rgba(248, 255, 252, 0)", "rgba(248, 255, 252, 0.96)"]}
+          style={styles.bottomFade}
+        />
       </View>
       <CreateGoalModal
         visible={isCreateGoalModalVisible}
@@ -434,7 +464,7 @@ export default function GoalsScreen() {
         onUpdate={handleUpdateGoal}
       />
 
-     <GoalDetailsModal
+      <GoalDetailsModal
         visible={isGoalDetailsModalVisible}
         goal={selectedGoal}
         onClose={closeGoalDetails}
@@ -444,7 +474,7 @@ export default function GoalsScreen() {
         onDeleteContribution={handleDeleteContribution}
       />
 
-     <CreateTransactionModal
+      <CreateTransactionModal
         visible={isCreateTransactionModalVisible}
         onClose={closeCreateTransactionModal}
         onCreated={handleContributionCreated}
@@ -467,40 +497,51 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 30,
     paddingVertical: 10,
-    marginTop: 50,
-    marginBottom: 20,
+    marginTop: 48,
+    marginBottom: 18,
   },
 
   title: {
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 21,
     fontFamily: fonts.bold,
     color: BLACK,
   },
 
   notifications: {
+    width: 42,
+    height: 42,
     backgroundColor: WHITE,
-    padding: 3,
-    borderRadius: 100,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: SOFT_SHADOW,
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
   },
 
   balanceRow: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 24,
-    gap: 30,
+    alignItems: "center",
+    marginBottom: 22,
+    gap: 34,
   },
 
   label: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: fonts.regular,
     color: BLACK,
+    opacity: 0.82,
+    marginBottom: 3,
   },
 
   balance: {
     fontSize: 22,
     fontFamily: fonts.bold,
-    color: WHITE,
+    color: DARK_GREEN,
   },
 
   expense: {
@@ -511,7 +552,8 @@ const styles = StyleSheet.create({
 
   separator: {
     width: 1,
-    backgroundColor: "#d1fae5",
+    height: 44,
+    backgroundColor: "rgba(16, 185, 146, 0.5)",
   },
 
   progressContainer: {
@@ -520,52 +562,59 @@ const styles = StyleSheet.create({
   },
 
   progressBar: {
-    height: 20,
-    borderRadius: 10,
-    width: "70%",
-    backgroundColor: "#d1fae5",
+    height: 18,
+    borderRadius: 12,
+    width: "71%",
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
     overflow: "hidden",
   },
 
   progressFill: {
     height: "100%",
-    backgroundColor: BLACK,
+    borderRadius: 12,
+    backgroundColor: DARK_GREEN,
   },
 
   progressText: {
-    marginTop: 8,
-    fontSize: 12,
+    marginTop: 10,
+    fontSize: 13,
     fontFamily: fonts.medium,
     color: BLACK,
+    opacity: 0.82,
   },
 
   cardWrapper: {
     flex: 1,
     backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
-    paddingTop: 38,
+    borderTopLeftRadius: 62,
+    borderTopRightRadius: 62,
+    paddingTop: 26,
     overflow: "hidden",
   },
 
   cardContent: {
-    paddingHorizontal: 32,
-    paddingTop: 8,
-    paddingBottom: 120,
+    paddingHorizontal: 30,
+    paddingTop: 0,
+    paddingBottom: 150,
   },
 
   mainGoalCard: {
     backgroundColor: GREEN,
     borderRadius: 28,
-    padding: 20,
-    marginBottom: 24,
+    padding: 19,
+    marginBottom: 20,
+    shadowColor: SOFT_SHADOW,
+    shadowOpacity: 1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 5,
   },
 
   mainGoalHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 16,
   },
 
   sectionEyebrow: {
@@ -576,7 +625,7 @@ const styles = StyleSheet.create({
   },
 
   mainGoalTitle: {
-    fontSize: 19,
+    fontSize: 20,
     fontFamily: fonts.bold,
     color: BLACK,
     marginTop: 4,
@@ -585,8 +634,8 @@ const styles = StyleSheet.create({
   mainGoalIcon: {
     width: 58,
     height: 58,
-    borderRadius: 20,
-    backgroundColor: BUTTON_GREEN,
+    borderRadius: 19,
+    backgroundColor: "rgba(187, 239, 221, 0.95)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -594,7 +643,7 @@ const styles = StyleSheet.create({
   bigProgressRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 18,
+    marginBottom: 17,
   },
 
   progressCircle: {
@@ -602,16 +651,17 @@ const styles = StyleSheet.create({
     height: 82,
     borderRadius: 41,
     borderWidth: 4,
-    borderColor: WHITE,
+    borderColor: DARK_GREEN,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 18,
+    backgroundColor: "rgba(255, 255, 255, 0.36)",
   },
 
   progressCircleValue: {
     fontSize: 21,
     fontFamily: fonts.bold,
-    color: WHITE,
+    color: DARK_GREEN,
   },
 
   mainGoalInfo: {
@@ -619,7 +669,7 @@ const styles = StyleSheet.create({
   },
 
   goalAmount: {
-    fontSize: 22,
+    fontSize: 23,
     fontFamily: fonts.bold,
     color: BLACK,
   },
@@ -628,30 +678,35 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.regular,
     color: BLACK,
-    opacity: 0.8,
+    opacity: 0.82,
     marginTop: 4,
   },
 
   mainProgressBar: {
-    height: 10,
+    height: 9,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.45)",
+    backgroundColor: "rgba(255, 255, 255, 0.72)",
     overflow: "hidden",
   },
 
   mainProgressFill: {
     height: "100%",
     borderRadius: 10,
-    backgroundColor: BLACK,
+    backgroundColor: DARK_GREEN,
   },
 
   paceCard: {
     flexDirection: "row",
-    backgroundColor: CARD_GREEN,
+    backgroundColor: GREEN,
     borderRadius: 24,
     paddingVertical: 18,
     paddingHorizontal: 16,
-    marginBottom: 24,
+    marginBottom: 20,
+    shadowColor: SOFT_SHADOW,
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 4,
   },
 
   paceItem: {
@@ -662,7 +717,7 @@ const styles = StyleSheet.create({
   smallIconBox: {
     width: 36,
     height: 36,
-    borderRadius: 12,
+    borderRadius: 11,
     backgroundColor: TAB_GREEN,
     alignItems: "center",
     justifyContent: "center",
@@ -673,6 +728,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.regular,
     color: BLACK,
+    opacity: 0.82,
   },
 
   paceValue: {
@@ -684,7 +740,7 @@ const styles = StyleSheet.create({
 
   paceSeparator: {
     width: 1,
-    backgroundColor: DIVIDER_GREEN,
+    backgroundColor: "rgba(16, 185, 146, 0.45)",
     marginHorizontal: 8,
   },
 
@@ -696,16 +752,16 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: fonts.bold,
     color: BLACK,
   },
 
   filterButton: {
-    backgroundColor: GREEN,
+    backgroundColor: CARD_GREEN,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 14,
+    borderRadius: 18,
   },
 
   filterText: {
@@ -719,6 +775,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 16,
     marginBottom: 14,
+    shadowColor: SOFT_SHADOW,
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 5,
   },
 
   goalTopRow: {
@@ -734,11 +795,12 @@ const styles = StyleSheet.create({
   },
 
   iconCircle: {
-    width: 53,
-    height: 53,
-    borderRadius: 17,
-    borderWidth: 2,
-    borderColor: DIVIDER_GREEN,
+    width: 48,
+    height: 48,
+    borderRadius: 15,
+    borderWidth: 1.3,
+    borderColor: BUTTON_GREEN,
+    backgroundColor: "rgba(226, 248, 240, 0.3)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -750,7 +812,7 @@ const styles = StyleSheet.create({
   },
 
   goalTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: fonts.medium,
     color: BLACK,
   },
@@ -759,13 +821,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: fonts.regular,
     color: BLACK,
-    opacity: 0.75,
+    opacity: 0.72,
     marginTop: 5,
+    lineHeight: 15,
   },
 
   percentBadge: {
     minWidth: 52,
-    height: 32,
+    height: 31,
     borderRadius: 16,
     backgroundColor: CARD_GREEN,
     alignItems: "center",
@@ -789,26 +852,26 @@ const styles = StyleSheet.create({
   goalProgressFill: {
     height: "100%",
     borderRadius: 8,
-    backgroundColor: GREEN,
+    backgroundColor: DARK_GREEN,
   },
 
   goalBottomRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 8,
+    marginTop: 9,
   },
 
   goalSmallText: {
     fontSize: 11,
     fontFamily: fonts.medium,
     color: BLACK,
-    opacity: 0.75,
+    opacity: 0.68,
   },
 
   tipCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: CARD_GREEN,
+    backgroundColor: GREEN,
     borderRadius: 24,
     padding: 16,
     marginTop: 10,
@@ -845,13 +908,27 @@ const styles = StyleSheet.create({
   fab: {
     position: "absolute",
     right: 28,
-    bottom: 100,
+    bottom: 120,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: GREEN,
+    backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "rgba(16, 185, 146, 0.32)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
+    zIndex: 2,
+  },
+
+  bottomFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 122,
   },
 
   emptyMainGoalCard: {
