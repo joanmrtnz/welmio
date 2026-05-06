@@ -1,11 +1,15 @@
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { useEffect, useRef } from "react";
 import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 
-const GREEN = "#00c896";
-const LIGHT_GREEN = "#f1fff3";
-const DARK_TEXT = "#052e2b";
+const SCREEN_BG = "#dff7ef";
+const CARD_BG = "rgba(255, 255, 255, 0.88)";
+const MINT_SOFT = "#d6f6ec";
+const MINT_STRONG = "#08b692";
+const TEXT = "#062f33";
+const MUTED = "#6f858a";
 
 export default function SuccessMessageScreen() {
   const scale = useRef(new Animated.Value(0.6)).current;
@@ -34,6 +38,13 @@ export default function SuccessMessageScreen() {
 
   return (
     <View style={styles.screen}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={["rgba(255,255,255,0.82)", "rgba(223,247,239,0.96)", "rgba(255,255,255,0.72)"]}
+        locations={[0, 0.58, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+
       <Animated.View
         style={[
           styles.card,
@@ -59,48 +70,64 @@ export default function SuccessMessageScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: GREEN,
+    backgroundColor: SCREEN_BG,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 36,
   },
 
   card: {
-    backgroundColor: LIGHT_GREEN,
-    borderRadius: 32,
-    paddingVertical: 40,
-    paddingHorizontal: 32,
+    width: "100%",
+    maxWidth: 330,
+    minHeight: 284,
+    backgroundColor: CARD_BG,
+    borderRadius: 30,
+    paddingVertical: 42,
+    paddingHorizontal: 28,
     alignItems: "center",
-    width: 300,
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.75)",
+    shadowColor: "rgba(30, 95, 82, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 26,
+    shadowOffset: { width: 0, height: 14 },
+    elevation: 12,
   },
 
   iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: GREEN,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: MINT_SOFT,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 24,
+    marginBottom: 34,
+    elevation: 6,
   },
 
   icon: {
     fontSize: 32,
-    color: "#ffffff",
+    lineHeight: 36,
+    color: MINT_STRONG,
     fontFamily: fonts.bold,
   },
 
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: fonts.bold,
-    color: DARK_TEXT,
-    marginBottom: 8,
+    color: TEXT,
+    marginBottom: 12,
+    textAlign: "center",
+    letterSpacing: -0.3,
   },
 
   subtitle: {
-    fontSize: 13,
+    fontSize: 15,
     fontFamily: fonts.regular,
-    color: DARK_TEXT,
+    color: MUTED,
     textAlign: "center",
-    lineHeight: 18,
+    lineHeight: 22,
+    maxWidth: 250,
   },
 });
