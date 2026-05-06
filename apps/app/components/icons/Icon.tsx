@@ -27,6 +27,7 @@ import Check from "../../assets/icons/check.svg";
 import Bin from "../../assets/icons/bin.svg";
 import Edit from "../../assets/icons/edit.svg";
 import Key from "../../assets/icons/key.svg";
+import ChevronRight from "../../assets/icons/chevron-right.svg";
 import { IconName } from "@repo/shared-types";
 import { SvgProps } from "react-native-svg";
 import { ComponentType } from "react";
@@ -63,6 +64,7 @@ const icons = {
   bin: Bin,
   edit: Edit,
   key: Key,
+  chevronRight: ChevronRight
 } satisfies Record<IconName, ComponentType<SvgProps>>;
 
 type IconProps = {
