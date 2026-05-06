@@ -1,105 +1,211 @@
-import { View, Text, StyleSheet } from "react-native";
+import { useState } from "react";
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { Link, router } from "expo-router";
-import { AuthInput } from "../components/AuthInput";
-import { AuthButton } from "../components/AuthButton";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
 import { useLogin } from "@/features/auth/hooks/useLogin";
-import { useState } from "react";
+import { Icon } from "@/components/icons/Icon";
+import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
+const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+
+
+const GREEN = "#dff7ef";
+const PRIMARY = "#00b889";
+const PRIMARY_DARK = "#079374";
+const DARK = "#052e2b";
+const MUTED = "#6f8586";
+const CARD = "#ffffff";
+const SOFT_GREEN = "#e3f8f1";
+const LIGTH_GRAY = "rgba(0, 0, 0, 0.2)";
 
 export default function LoginScreen() {
-
   const { execute, loading } = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleLogin() {
-
     try {
-      const res = await execute(
-      {
+      const res = await execute({
         email,
         password,
       });
 
       if (res) router.replace("/(app)/(tabs)/home");
-    } catch (error){
+    } catch (error) {
       console.warn(error);
     }
   }
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.headerArea}>
-        <Text style={styles.welcome}>Welcome</Text>
-      </View>
+    <KeyboardAvoidingView
+      style={styles.screen}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.brandArea}>
+          <View style={styles.brandRow}>
+            <View style={styles.logoBadge}>
+              <Image
+                source={WELMIO_LOGO}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.brandName}>Welmio</Text>
+          </View>
+        </View>
 
-
-      <View style={styles.card}>
-    
-        <View style={styles.form}>
-          <AuthInput
-            label="Username or Email"
-            placeholder="example@email.com"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
-
-          <AuthInput
-            label="Password"
-            placeholder="••••••••"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          <View style={styles.buttons}>
-            <AuthButton
-              title="Log In"
-              onPress={handleLogin} 
-              disabled={loading}
+        <View style={styles.avatarWrap}>
+          <View style={styles.avatarCircle}>
+            <Image
+              source={WELMIO_LOGO}
+              style={styles.avatarImage}
+              resizeMode="contain"
             />
+          </View>
+        </View>
 
-            <Link href="/(public)/forgot-password" style={styles.link}>
-                <Text>Forgot Password?</Text>
+        <View style={styles.card}>
+          <Text style={styles.title}>Welcome back</Text>
+          <Text style={styles.subtitle}>
+            Track your money, goals and habits in one place.
+          </Text>
+
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Email</Text>
+              <View style={styles.inputShell}>
+                <FontAwesome
+                  name="user-o"
+                  size={18}
+                  color="rgba(5, 46, 43, 0.5)"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="example@email.com"
+                  placeholderTextColor="rgba(5, 46, 43, 0.42)"
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Password</Text>
+              <View style={styles.inputShell}>
+                <FontAwesome
+                  name="lock"
+                  size={19}
+                  color="rgba(5, 46, 43, 0.5)"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.textInput}
+                  placeholderTextColor="rgba(5, 46, 43, 0.42)"
+                  secureTextEntry={!showPassword}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+                <Pressable
+                  hitSlop={8}
+                  onPress={() => setShowPassword((visible) => !visible)}
+                  style={styles.eyeButton}
+                >
+                  <FontAwesome
+                    name={showPassword ? "eye-slash" : "eye"}
+                    size={17}
+                    color="rgba(5, 46, 43, 0.52)"
+                  />
+                </Pressable>
+              </View>
+            </View>
+
+            <Link href="/(public)/forgot-password" style={styles.forgotLink}>
+              <Text>Forgot Password?</Text>
             </Link>
 
-            <AuthButton
-              title="Sign Up"
-              variant="secondary"
-              onPress={() => {
-                router.push("/(public)/signup");
-              }}
-            />
+            <Pressable
+              onPress={handleLogin}
+              disabled={loading}
+              style={({ pressed }) => [
+                styles.primaryButton,
+                pressed && !loading ? styles.buttonPressed : null,
+                loading ? styles.buttonDisabled : null,
+              ]}
+            >
+              <Text style={styles.primaryButtonText}>
+                {loading ? "Logging in..." : "Log In"}
+              </Text>
+            </Pressable>
+
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or continue with</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.googleButton,
+                pressed ? styles.buttonPressed : null,
+              ]}
+            >
+              <Text style={styles.googleIcon}>G</Text>
+              <Text style={styles.googleText}>Continue with Google</Text>
+            </Pressable>
+
+            <Link href="/(public)/finger-print" asChild>
+              <Pressable style={styles.fingerprint}>
+                <Icon name="fingerPrint" size={30} strokeWidth={8} color={PRIMARY} />{" "}
+                <Text style={styles.fingerprintText}>
+                  Continue with <Text style={styles.bold}>Touch ID</Text>
+                </Text>
+              </Pressable>
+            </Link>
+
+            <Link href="/(public)/signup" style={styles.footer}>
+              <Text>
+                Don’t have an account? <Text style={styles.link}>Sign Up</Text>
+              </Text>
+            </Link>
           </View>
-
-          <Link href="/(public)/finger-print" style={styles.fingerprint}>
-            <Text >
-              Use <Text style={styles.bold}>Fingerprint</Text> To Access
-            </Text>
-          </Link>
-
-          <Text style={styles.divider}>or sign up with</Text>
-
-          <View style={styles.socialCircle}>
-            <Text style={styles.socialText}>G</Text>
-          </View>
-
-          <Link href="/(public)/signup" style={styles.footer}>
-            <Text>
-              Don't have an account?{" "}
-              <Text style={styles.link}>Sign Up</Text>
-            </Text>
-          </Link>
         </View>
-      </View>
-    </View>
+
+         <View style={styles.adviceCard}>
+          <View style={styles.adviceIcon}>
+            <FontAwesome name="lightbulb-o" size={30} color={PRIMARY} />
+          </View>
+          <View>
+            <Text style={styles.adviceTitle}>
+              Smart Finance, Simple Life
+            </Text>
+            <Text style={styles.adviceText}>
+              Take control of your money with ease.
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
-
-const GREEN = "#00c896";
-const DARK_GREEN = "#059669"
-const LIGHT_GREEN = "#f1fff3";
 
 const styles = StyleSheet.create({
   screen: {
@@ -107,85 +213,321 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
   },
 
-  headerArea: {
-    height: 150,
-    justifyContent: "center",
-    alignItems: "center",
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 18,
+    paddingTop: 34,
+    paddingBottom: 30,
   },
 
-  welcome: {
-    marginTop: 30,
-    fontSize: 31,
-    color: "#052e2b",
+  brandArea: {
+    alignItems: "center",
+    marginTop: 4,
+    marginBottom: 34,
+  },
+
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 9,
+  },
+
+  logoBadge: {
+    width: 31,
+    height: 31,
+    borderRadius: 18,
+    backgroundColor: CARD,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: LIGTH_GRAY,
+    borderWidth: 1,
+    shadowColor: "rgba(29, 100, 89, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
+  },
+
+  logoImage: {
+    width: 30,
+    height: 29,
+  },
+
+  brandName: {
+    fontSize: 24,
+    color: DARK,
     fontFamily: fonts.bold,
+  },
+
+  avatarWrap: {
+    zIndex: 2,
+    alignItems: "center",
+    marginBottom: -42,
+  },
+
+  avatarCircle: {
+    width: 106,
+    height: 106,
+    borderRadius: 58,
+    backgroundColor: CARD,
+    borderColor: DARK_GREEN,
+    borderWidth: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "rgba(29, 100, 89, 0.16)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
+  },
+
+  avatarImage: {
+    width: 100,
+    height: 99,
   },
 
   card: {
-    flex: 1,
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
-    padding: 24,
+    backgroundColor: CARD,
+    borderRadius: 30,
+    paddingHorizontal: 20,
+    paddingTop: 66,
+    paddingBottom: 30,
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 8,
   },
 
-  form: {
-    marginTop: 74,
-    gap: 16,
-  },
-
-  link: {
-    color: DARK_GREEN,
-    fontSize: 11,
+  title: {
+    color: DARK,
+    fontSize: 25,
     textAlign: "center",
-    fontFamily: fonts.semibold,
-  },
-  buttons:{
-    marginTop: 64,
-    gap: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    fontFamily: fonts.medium,
-  },
-  fingerprint: {
-    textAlign: "center",  
-    marginTop: 12,
-    fontSize: 12,
-    fontFamily: fonts.medium,
-  },
-
-  bold: {
-    color: DARK_GREEN,
     fontFamily: fonts.bold,
   },
 
-  divider: {
+  subtitle: {
+    color: MUTED,
+    fontSize: 14,
+    lineHeight: 22,
     textAlign: "center",
-    color: "#052e2b",
-    marginTop: 15,
-    fontSize: 11,
+    fontFamily: fonts.medium,
+    marginTop: 8,
+    marginBottom: 24,
+    paddingHorizontal: 34,
+  },
+
+  form: {
+    gap: 14,
+  },
+
+  inputGroup: {
+    gap: 8,
+  },
+
+  inputLabel: {
+    color: DARK,
+    fontSize: 13,
+    fontFamily: fonts.semibold,
+  },
+
+  inputShell: {
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: "rgba(5, 46, 43, 0.12)",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    shadowColor: "rgba(29, 100, 89, 0.05)",
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
+  },
+
+  inputIcon: {
+    width: 23,
+    borderRightColor: "rgba(5, 46, 43, 0.12)",
+    borderRightWidth: 1.5,
+    marginRight: 5,
+  },
+
+  textInput: {
+    flex: 1,
+    height: "100%",
+    color: DARK,
+    fontSize: 14,
+    fontFamily: fonts.medium,
+    paddingVertical: 0,
+  },
+
+  eyeButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  forgotLink: {
+    alignSelf: "flex-end",
+    color: PRIMARY_DARK,
+    fontSize: 12,
+    marginTop: -4,
+    marginBottom: 8,
+    fontFamily: fonts.semibold,
+  },
+
+  primaryButton: {
+    width: "100%",
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: PRIMARY,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "rgba(0, 184, 137, 0.26)",
+    shadowOpacity: 1,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+
+  primaryButtonText: {
+    color: CARD,
+    fontSize: 14,
+    fontFamily: fonts.bold,
+  },
+
+  buttonPressed: {
+    opacity: 0.86,
+    transform: [{ scale: 0.99 }],
+  },
+
+  buttonDisabled: {
+    opacity: 0.65,
+  },
+
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 4,
+  },
+
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "rgba(5, 46, 43, 0.08)",
+  },
+
+  dividerText: {
+    color: MUTED,
+    fontSize: 12,
     fontFamily: fonts.regular,
   },
 
-  socialCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 22,
+  googleButton: {
+    width: "100%",
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: CARD,
     borderWidth: 1,
-    borderColor: "#052e2b",
+    borderColor: "rgba(5, 46, 43, 0.08)",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    alignSelf: "center",
+    gap: 13,
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 5,
   },
 
-  socialText: {
+  googleIcon: {
     fontSize: 20,
+    color: PRIMARY,
+    fontFamily: fonts.bold,
+  },
+
+  googleText: {
+    color: DARK,
+    fontSize: 14,
+    fontFamily: fonts.semibold,
+  },
+
+  fingerprint: {
+    alignSelf: "center",
+    marginTop: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+
+  fingerprintText: {
+    color: PRIMARY_DARK,
+    fontSize: 13,
+    fontFamily: fonts.semibold,
+  },
+
+  bold: {
+    color: PRIMARY_DARK,
+    fontFamily: fonts.bold,
   },
 
   footer: {
-    fontSize: 11,
+    marginTop: 18,
+    fontSize: 13,
     textAlign: "center",
-    color: "#052e2b",
+    color: DARK,
     fontFamily: fonts.regular,
+  },
+
+  link: {
+    color: PRIMARY_DARK,
+    fontFamily: fonts.bold,
+  },
+
+  adviceCard: {
+    marginTop: 24,
+    marginBottom: 4,
+    marginHorizontal: 2,
+    paddingVertical: 18,
+    paddingHorizontal: 40,
+    borderRadius: 22,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 13,
+    shadowColor: "rgba(29, 100, 89, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+
+  adviceIcon: {
+    width: 43,
+    height: 43,
+    borderRadius: 15,
+    backgroundColor: SOFT_GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  adviceTitle: {
+    color: DARK,
+    fontSize: 13,
+    fontFamily: fonts.bold,
+  },
+
+  adviceText: {
+    color: MUTED,
+    fontSize: 12,
+    marginTop: 3,
+    fontFamily: fonts.medium,
   },
 });
