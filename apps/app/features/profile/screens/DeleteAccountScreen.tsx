@@ -7,12 +7,11 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TextInput,
 } from "react-native";
 import { router } from "expo-router";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-import { AuthInput } from "@/features/auth/components/AuthInput";
-import { AuthButton } from "@/features/auth/components/AuthButton";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { deleteAccount } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
@@ -21,7 +20,7 @@ import { removeAccessToken } from "@/app/lib/auth-storage";
 export default function DeleteAccountScreen() {
   const [confirmationText, setConfirmationText] = useState("");
   const isDeleteButtonDisabled =
-  confirmationText.trim().toLowerCase() !== "delete";
+    confirmationText.trim().toLowerCase() !== "delete";
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -98,9 +97,7 @@ export default function DeleteAccountScreen() {
               information.
             </Text>
 
-            <Text style={styles.bulletText}>
-              This action cannot be undone.
-            </Text>
+            <Text style={styles.bulletText}>This action cannot be undone.</Text>
           </View>
 
           <Text style={styles.passwordTitle}>
@@ -108,28 +105,40 @@ export default function DeleteAccountScreen() {
           </Text>
 
           <View style={styles.form}>
-            <AuthInput
-              label=""
-              placeholder='Type "delete"'
-              value={confirmationText}
-              onChangeText={setConfirmationText}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-
-            <View style={styles.buttons}>
-              <AuthButton
-                title="Yes, Delete Account"
-                variant="danger"
-                onPress={handleOpenDeleteDialog}
-                disabled={isDeleteButtonDisabled}
+            <View style={styles.inputShell}>
+              <TextInput
+                style={styles.confirmInput}
+                placeholder='Type "delete"'
+                placeholderTextColor={MUTED}
+                value={confirmationText}
+                onChangeText={setConfirmationText}
+                autoCapitalize="none"
+                autoCorrect={false}
               />
             </View>
+
+            <Pressable
+              style={[
+                styles.deleteButton,
+                isDeleteButtonDisabled && styles.deleteButtonDisabled,
+              ]}
+              onPress={handleOpenDeleteDialog}
+              disabled={isDeleteButtonDisabled}
+            >
+              <Text
+                style={[
+                  styles.deleteButtonText,
+                  isDeleteButtonDisabled && styles.deleteButtonTextDisabled,
+                ]}
+              >
+                Yes, Delete Account
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       </View>
 
-     <ConfirmDialog
+      <ConfirmDialog
         visible={showConfirmDialog}
         title="Delete Account"
         message={`Are you sure you want to delete your account?
@@ -147,11 +156,17 @@ export default function DeleteAccountScreen() {
   );
 }
 
-const GREEN = "#00c896";
-const LIGHT_GREEN = "#f1fff3";
-const BOX_GREEN = "#dff6e3";
-const BLACK = "#052e2b";
+const GREEN = "#dff7ef";
+const PRIMARY = "#00a982";
+const PRIMARY_SOFT = "#b9eadc";
+const CARD = "#fbfffd";
+const BOX_GREEN = "#edf9f4";
+const BORDER = "rgba(4, 94, 79, 0.08)";
+const BLACK = "#073b3a";
+const MUTED = "#8da09c";
 const WHITE = "#ffffff";
+const DANGER = "#ff8f7a";
+const DANGER_DISABLED = "#ffd8d0";
 
 const styles = StyleSheet.create({
   screen: {
@@ -159,33 +174,50 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
   },
 
-   headerArea: {
-      height: 150,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingHorizontal: 30,
-      paddingTop: 30,
-    },
-  
-    title: {
-      fontSize: 18, //18
-      color: BLACK,
-      fontFamily: fonts.bold,
-    },
-  
-    notifications: {
-      backgroundColor: WHITE,
-      padding: 3,
-      borderRadius: 100,
-    },
+  headerArea: {
+    height: 104,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 22,
+  },
+
+  title: {
+    fontSize: 18,
+    color: BLACK,
+    fontFamily: fonts.bold,
+    letterSpacing: 0.2,
+  },
+
+  notifications: {
+    width: 42,
+    height: 42,
+    backgroundColor: WHITE,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "rgba(10, 58, 52, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
 
   card: {
     flex: 1,
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
-    padding: 24,
+    backgroundColor: CARD,
+    borderTopLeftRadius: 54,
+    borderTopRightRadius: 54,
+    paddingHorizontal: 24,
+    paddingTop: 26,
+    borderWidth: 1,
+    borderColor: BORDER,
+    shadowColor: "rgba(10, 58, 52, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: -6 },
+    elevation: 8,
   },
 
   cardContent: {
@@ -194,54 +226,100 @@ const styles = StyleSheet.create({
   },
 
   confirmTitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: BLACK,
     fontFamily: fonts.medium,
     textAlign: "center",
-    lineHeight: 22,
-    marginBottom: 24,
+    lineHeight: 25,
+    letterSpacing: 0.3,
+    marginBottom: 34,
   },
 
   warningBox: {
     backgroundColor: BOX_GREEN,
-    borderRadius: 12,
+    borderRadius: 14,
     paddingHorizontal: 22,
-    paddingVertical: 20,
-    marginBottom: 28,
+    paddingVertical: 22,
+    marginBottom: 36,
+    borderWidth: 1,
+    borderColor: "rgba(0, 169, 130, 0.06)",
   },
 
   warningText: {
-    fontSize: 12,
+    fontSize: 13,
     color: BLACK,
     fontFamily: fonts.regular,
-    lineHeight: 17,
-    marginBottom: 14,
+    lineHeight: 22,
+    marginBottom: 18,
   },
 
   bulletText: {
-    fontSize: 12,
+    fontSize: 13,
     color: BLACK,
     fontFamily: fonts.regular,
-    lineHeight: 17,
-    marginBottom: 10,
+    lineHeight: 22,
+    marginBottom: 18,
   },
 
   passwordTitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: BLACK,
     fontFamily: fonts.medium,
     textAlign: "center",
-    lineHeight: 20,
-    marginBottom: 22,
+    lineHeight: 23,
+    marginBottom: 24,
+    letterSpacing: 0.2,
   },
 
   form: {
-    gap: 18,
+    gap: 38,
+    alignItems: "center",
   },
 
-  buttons: {
+  inputShell: {
+    width: "100%",
+    minHeight: 54,
+    borderRadius: 14,
+    backgroundColor: BOX_GREEN,
+    borderWidth: 1,
+    borderColor: "rgba(0, 169, 130, 0.06)",
+    justifyContent: "center",
+    paddingHorizontal: 18,
+  },
+
+  confirmInput: {
+    minHeight: 54,
+    color: BLACK,
+    fontFamily: fonts.medium,
+    fontSize: 14,
+  },
+
+  deleteButton: {
+    width: "66%",
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: DANGER,
     alignItems: "center",
-    gap: 12,
-    marginTop: 8,
+    justifyContent: "center",
+    shadowColor: "rgba(255, 107, 91, 0.22)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
+
+  deleteButtonDisabled: {
+    backgroundColor: DANGER_DISABLED,
+    opacity: 0.78,
+  },
+
+  deleteButtonText: {
+    color: BLACK,
+    fontFamily: fonts.bold,
+    fontSize: 14,
+  },
+
+  deleteButtonTextDisabled: {
+    color: "rgba(7, 59, 58, 0.55)",
   },
 });

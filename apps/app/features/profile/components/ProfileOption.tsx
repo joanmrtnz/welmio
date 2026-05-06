@@ -1,55 +1,72 @@
-import {
-  View,
-  Text,
-  Pressable,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Icon } from "@/components/icons/Icon";
-import { StyleSheet } from "react-native";
 import { fonts } from "@/theme/fonts";
 
+import type { IconName } from "@repo/shared-types";
+
 type OptionProps = {
-  icon: any;
+  icon: IconName;
   label: string;
   onPress?: () => void;
 };
 
+const WHITE = "#ffffff";
+const DARK = "#082f32";
+const MINT = "#12c79b";
+const MINT_SOFT = "#e2f8f0";
+
 export function ProfileOption({ icon, label, onPress }: OptionProps) {
   return (
-    <Pressable style={styles.optionRow} onPress={onPress}>
-      <View style={styles.optionIcon}>
-        <Icon name={icon} size={26} color={WHITE} />
+    <Pressable style={styles.optionCard} onPress={onPress}>
+      <View style={styles.optionLeft}>
+        <View style={styles.optionIcon}>
+          <Icon name={icon} size={25} strokeWidth={1.9} color={MINT} />
+        </View>
+
+        <Text style={styles.optionLabel}>{label}</Text>
       </View>
 
-      <Text style={styles.optionLabel}>{label}</Text>
+      <Icon name="chevronRight" size={24} strokeWidth={2.1} color={DARK} />
     </Pressable>
   );
 }
 
-const WHITE = "#ffffff";
-const BLACK = "#052e2b";
-const BUTTON_GREEN = "#1A9E6A";
-
-
 const styles = StyleSheet.create({
-  optionRow: {
+  optionCard: {
+    minHeight: 70,
+    borderRadius: 18,
+    backgroundColor: WHITE,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
+    justifyContent: "space-between",
+    shadowColor: "rgba(34, 93, 84, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
+
+  optionLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
 
   optionIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 22,
-    backgroundColor: BUTTON_GREEN,
+    width: 50,
+    height: 50,
+    borderRadius: 16,
+    backgroundColor: MINT_SOFT,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 18,
   },
 
   optionLabel: {
-    fontSize: 15,
-    fontFamily: fonts.medium,
-    color: BLACK,
+    fontSize: 16,
+    fontFamily: fonts.semibold,
+    color: DARK,
   },
 });

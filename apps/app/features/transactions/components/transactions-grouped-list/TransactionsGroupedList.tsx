@@ -11,9 +11,11 @@ import { TransactionDetailsModal } from "../transaction-details-modal/Transactio
 import { useState } from "react";
 import { TransactionDetailsItem } from "../../types/transactionDetails.types";
 
-const DIVIDER_GREEN = "#00d09e";
-const BUTTON_GREEN = "#1A9E6A";
-const BLACK = "#052e2b";
+const DIVIDER_GREEN = "rgba(18, 199, 155, 0.35)";
+const BUTTON_GREEN = "#09a982";
+const BLACK = "#0b3437";
+const ICON_BACKGROUND = "#e2f8f0";
+const MUTED = "rgba(11, 52, 55, 0.72)";
 
 
 type TransactionsGroupedListProps = {
@@ -75,12 +77,12 @@ export function TransactionsGroupedList({
             style={styles.transactionRow}
             onPress={() => openTransactionDetails(item as TransactionDetailsItem)}>
               <View style={styles.iconCircle}>
-                  <Icon
-                    name={(item.category.icon ?? "money") as never}
-                    size={46}
-                    strokeWidth={0.8}
-                    color={BUTTON_GREEN}
-                  />
+                <Icon
+                  name={(item.category.icon ?? "money") as never}
+                  size={40}
+                  strokeWidth={0.6}
+                  color={BUTTON_GREEN}
+                />
               </View>
 
               <View style={styles.transactionInfo}>
@@ -142,50 +144,54 @@ const styles = StyleSheet.create({
   },
 
   monthLabel: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: fonts.bold,
     color: BLACK,
+    marginTop: 2,
+    marginBottom: 14,
   },
 
   transactionRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 14,
+    paddingVertical: 10,
   },
 
   iconCircle: {
-    width: 53,
-    height: 53,
-    borderRadius: 17,
-    borderWidth: 2,
-    borderColor: DIVIDER_GREEN,
+    width: 54,
+    height: 54,
+    borderRadius: 18,
+    backgroundColor: ICON_BACKGROUND,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 0,
   },
-
 
   transactionInfo: {
     flex: 1,
     marginLeft: 12,
-    marginRight: 10,
+    marginRight: 8,
+    minWidth: 0,
   },
 
   transactionTitle: {
-    fontSize: 12,
-    fontFamily: fonts.medium,
+    fontSize: 12.5,
+    lineHeight: 17,
+    fontFamily: fonts.semibold ?? fonts.medium,
     color: BLACK,
   },
 
   transactionMeta: {
-    fontSize: 11,
+    fontSize: 10.5,
+    lineHeight: 15,
     fontFamily: fonts.regular,
-    color: BLACK,
-    marginTop: 5,
+    color: MUTED,
+    marginTop: 2,
   },
 
   categoryColumn: {
     height: 32,
-    width: 80,
+    width: 72,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "center",
@@ -193,31 +199,38 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderRightColor: DIVIDER_GREEN,
     borderRightWidth: 1,
+    paddingHorizontal: 4,
   },
 
   amountColumn: {
-    width: 90,
-    alignItems: "center",
+    width: 78,
+    alignItems: "flex-end",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "flex-end",
+    paddingLeft: 8,
   },
 
   transactionCategory: {
-    fontSize: 11,
+    fontSize: 10.5,
+    lineHeight: 14,
     fontFamily: fonts.medium,
     color: BLACK,
     textAlign: "center",
   },
 
   amountPositive: {
-    fontSize: 12,
+    fontSize: 12.5,
+    lineHeight: 17,
     fontFamily: fonts.bold,
     color: BLACK,
+    textAlign: "right",
   },
 
   amountNegative: {
-    fontSize: 12,
+    fontSize: 12.5,
+    lineHeight: 17,
     fontFamily: fonts.bold,
     color: BLACK,
+    textAlign: "right",
   },
 });

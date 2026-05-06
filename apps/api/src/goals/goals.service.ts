@@ -7,10 +7,62 @@ import { Goal, Prisma } from '@prisma/client';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { UpdateGoalDto } from './dto/update-goal.dto';
+import { GoalContributionResponseDto } from './dto/goal-contribution-response.dto';
+import { CreateGoalContributionDto } from './dto/create-goal-contribution.dto';
 
 @Injectable()
 export class GoalsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getGoalContributions(
+    userId: string,
+    goalId: string,
+  ): Promise<GoalContributionResponseDto[]> {
+    const goal = await this.prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!goal) {
+      throw new NotFoundException('Goal not found');
+    }
+
+    const contributions = await this.prisma.goalContribution.findMany({
+      where: {
+        goalId,
+        userId,
+      },
+      include: {
+        transaction: {
+          select: {
+            id: true,
+            description: true,
+            notes: true,
+            date: true,
+          },
+        },
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+
+    return contributions.map((contribution) => ({
+      id: contribution.id,
+      goalId: contribution.goalId,
+      transactionId: contribution.transactionId,
+      amount: contribution.amount.toNumber(),
+      currency: contribution.currency,
+      date: contribution.date.toISOString(),
+      notes: contribution.notes ?? contribution.transaction?.notes ?? null,
+      description: contribution.transaction?.description ?? null,
+    }));
+  }
 
   async deleteGoal(
     userId: string,
@@ -441,5 +493,190 @@ export class GoalsService {
     });
 
     return this.toGoalOverviewItem(updatedGoal);
+  }
+
+  async createGoalContribution(
+    userId: string,
+    goalId: string,
+    createGoalContributionDto: CreateGoalContributionDto,
+  ): Promise<GoalContributionResponseDto> {
+    const goal = await this.prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId,
+      },
+      select: {
+        id: true,
+        currency: true,
+        currentAmount: true,
+        targetAmount: true,
+      },
+    });
+
+    if (!goal) {
+      throw new NotFoundException('Goal not found');
+    }
+
+    const amount = new Prisma.Decimal(createGoalContributionDto.amount);
+    const nextCurrentAmount = goal.currentAmount.plus(amount);
+
+    if (nextCurrentAmount.greaterThan(goal.targetAmount)) {
+      throw new BadRequestException(
+        'Contribution would exceed the goal target amount.',
+      );
+    }
+
+    const currency = createGoalContributionDto.currency.trim().toUpperCase();
+    const transactionId = createGoalContributionDto.transactionId ?? null;
+
+    if (transactionId) {
+      const transaction = await this.prisma.transaction.findFirst({
+        where: {
+          id: transactionId,
+          userId,
+        },
+        select: {
+          id: true,
+          type: true,
+          amount: true,
+          currency: true,
+          description: true,
+          notes: true,
+          date: true,
+        },
+      });
+
+      if (!transaction) {
+        throw new NotFoundException('Transaction not found');
+      }
+
+      const existingContribution = await this.prisma.goalContribution.findFirst({
+        where: {
+          goalId,
+          transactionId,
+          userId,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (existingContribution) {
+        throw new BadRequestException(
+          'This transaction is already linked to this goal.',
+        );
+      }
+    }
+
+    const createdContribution = await this.prisma.$transaction(async (tx) => {
+      const contribution = await tx.goalContribution.create({
+        data: {
+          goalId,
+          userId,
+          transactionId,
+          amount,
+          currency,
+          date: new Date(createGoalContributionDto.date),
+          notes: createGoalContributionDto.notes?.trim() || null,
+        },
+        include: {
+          transaction: {
+            select: {
+              description: true,
+              notes: true,
+            },
+          },
+        },
+      });
+
+      await tx.goal.update({
+        where: {
+          id: goalId,
+        },
+        data: {
+          currentAmount: {
+            increment: amount,
+          },
+        },
+      });
+
+      return contribution;
+    });
+
+    return {
+      id: createdContribution.id,
+      goalId: createdContribution.goalId,
+      transactionId: createdContribution.transactionId,
+      amount: createdContribution.amount.toNumber(),
+      currency: createdContribution.currency,
+      date: createdContribution.date.toISOString(),
+      notes:
+        createdContribution.notes ??
+        createdContribution.transaction?.notes ??
+        null,
+      description: createdContribution.transaction?.description ?? null,
+    };
+  }
+
+  async deleteGoalContribution(
+    userId: string,
+    goalId: string,
+    contributionId: string,
+  ): Promise<{ message: string }> {
+    const goal = await this.prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId,
+      },
+      select: {
+        id: true,
+        currentAmount: true,
+      },
+    });
+
+    if (!goal) {
+      throw new NotFoundException('Goal not found');
+    }
+
+    const contribution = await this.prisma.goalContribution.findFirst({
+      where: {
+        id: contributionId,
+        goalId,
+        userId,
+      },
+      select: {
+        id: true,
+        amount: true,
+      },
+    });
+
+    if (!contribution) {
+      throw new NotFoundException('Contribution not found');
+    }
+
+    const nextCurrentAmount = goal.currentAmount.minus(contribution.amount);
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.goalContribution.delete({
+        where: {
+          id: contributionId,
+        },
+      });
+
+      await tx.goal.update({
+        where: {
+          id: goalId,
+        },
+        data: {
+          currentAmount: nextCurrentAmount.lessThan(0)
+            ? 0
+            : nextCurrentAmount,
+        },
+      });
+    });
+
+    return {
+      message: 'Contribution removed successfully.',
+    };
   }
 }

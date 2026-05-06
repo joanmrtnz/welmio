@@ -3,17 +3,15 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   Pressable,
   Switch,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  TextInput,
 } from "react-native";
 import { fonts } from "@/theme/fonts";
-import { Icon} from "@/components/icons/Icon";
-import { AuthInput } from "@/features/auth/components/AuthInput";
-import { AuthButton } from "@/features/auth/components/AuthButton";
+import { Icon } from "@/components/icons/Icon";
 import { getUserProfile, updateUserProfile } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { router } from "expo-router";
@@ -86,42 +84,92 @@ export default function EditProfileScreen() {
     loadUserProfile();
   }, []);
 
+  const renderField = ({
+    label,
+    icon,
+    value,
+    onChangeText,
+    placeholder,
+    editable = true,
+    keyboardType = "default",
+    textContentType,
+    autoCapitalize = "sentences",
+    autoCorrect = true,
+  }: {
+    label: string;
+    icon: IconName;
+    value: string;
+    onChangeText: (text: string) => void;
+    placeholder: string;
+    editable?: boolean;
+    keyboardType?: "default" | "email-address" | "phone-pad";
+    textContentType?: "name" | "telephoneNumber" | "emailAddress";
+    autoCapitalize?: "none" | "sentences" | "words";
+    autoCorrect?: boolean;
+  }) => (
+    <View style={styles.inputGroup}>
+      <Text style={styles.inputLabel}>{label}</Text>
+      <View style={[styles.inputBox, !editable && styles.inputBoxDisabled]}>
+        <View style={styles.inputIconBox}>
+          <Icon name={icon} size={20} strokeWidth={1.8} color={PRIMARY} />
+        </View>
+        <TextInput
+          style={styles.input}
+          placeholder={placeholder}
+          placeholderTextColor={MUTED}
+          value={value}
+          onChangeText={onChangeText}
+          editable={editable}
+          keyboardType={keyboardType}
+          textContentType={textContentType}
+          autoCapitalize={autoCapitalize}
+          autoCorrect={autoCorrect}
+        />
+      </View>
+    </View>
+  );
+
   return (
     <KeyboardAvoidingView
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-
       <View style={styles.headerArea}>
-        <Pressable onPress={() => router.back()}>
-          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        <Pressable
+          style={styles.headerIconButton}
+          onPress={() => router.back()}
+        >
+          <Icon name="arrowLeft" size={22} strokeWidth={2.4} color={BLACK} />
         </Pressable>
+
         <Text style={styles.title}>Edit My Profile</Text>
 
         <View style={styles.notifications}>
-            <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
+          <Icon name="bell" size={24} strokeWidth={1.7} color={BLACK} />
         </View>
       </View>
-      
+
       <View style={styles.avatarWrapper}>
         <View>
-         <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
-          <Icon name={avatarIcon} size={42} strokeWidth={1.8} color={BLACK} />
-        </View>
+          <View
+            style={[
+              styles.avatar,
+              { backgroundColor: avatarColor || AVATAR_BG },
+            ]}
+          >
+            <Icon
+              name={avatarIcon}
+              size={48}
+              strokeWidth={1.7}
+              color={PRIMARY}
+            />
+          </View>
 
           <Pressable
             style={styles.editAvatarButton}
             onPress={() => setShowAvatarModal(true)}
           >
-            <Text 
-            style={styles.editAvatarText}>
-              <Icon
-              name="edit"
-              size={15}
-              strokeWidth={1.6}
-              color={BLACK}
-              />
-          </Text>
+            <Icon name="edit" size={18} strokeWidth={1.8} color={BLACK} />
           </Pressable>
         </View>
       </View>
@@ -132,82 +180,89 @@ export default function EditProfileScreen() {
           contentContainerStyle={styles.cardContent}
         >
           <View style={styles.nameContainer}>
-          <Text style={styles.name}>{usernameLabel || "User"}</Text>
-          <Text style={styles.userId}>
-            {email ? email : "-"}
-          </Text>
+            <Text style={styles.name}>{usernameLabel || "User"}</Text>
+            <Text style={styles.userId}>{email ? email : "-"}</Text>
           </View>
 
           <Text style={styles.sectionTitle}>Account Settings</Text>
 
           <View style={styles.form}>
-            <AuthInput
-              label="Username"
-              placeholder="John Smith"
-              autoCapitalize="words"
-              textContentType="name"
-              value={username}
-              onChangeText={setUsername}
-            />
+            {renderField({
+              label: "Username",
+              icon: "user",
+              placeholder: "John Smith",
+              autoCapitalize: "words",
+              textContentType: "name",
+              value: username,
+              onChangeText: setUsername,
+            })}
 
-            <AuthInput
-              label="Phone"
-              placeholder="+44 555 5555"
-              keyboardType="phone-pad"
-              textContentType="telephoneNumber"
-              value={phone}
-              onChangeText={setPhone}
-            />
+            {renderField({
+              label: "Phone",
+              icon: "phone",
+              placeholder: "+44 555 5555",
+              keyboardType: "phone-pad",
+              textContentType: "telephoneNumber",
+              value: phone,
+              onChangeText: setPhone,
+            })}
 
-            <AuthInput
-              label="Email Address"
-              placeholder="example@example.com"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-              autoCorrect={false}
-              value={email}
-              onChangeText={setEmail}
-              editable={false}
-            />
+            {renderField({
+              label: "Email Address",
+              icon: "mail",
+              placeholder: "example@example.com",
+              autoCapitalize: "none",
+              keyboardType: "email-address",
+              textContentType: "emailAddress",
+              autoCorrect: false,
+              value: email,
+              onChangeText: setEmail,
+              editable: false,
+            })}
 
-            <View style={styles.settingRow}>
-              <Text style={styles.settingLabel}>Push Notifications</Text>
+            <View style={styles.settingsBlock}>
+              <View style={styles.settingRow}>
+                <Text style={styles.settingLabel}>Push Notifications</Text>
 
-              <Switch
-                value={pushNotifications}
-                onValueChange={setPushNotifications}
-                trackColor={{
-                  false: "#bff3df",
-                  true: GREEN,
-                }}
-                thumbColor={WHITE}
-              />
-            </View>
+                <Switch
+                  value={pushNotifications}
+                  onValueChange={setPushNotifications}
+                  trackColor={{ false: SWITCH_OFF, true: PRIMARY }}
+                  thumbColor={WHITE}
+                />
+              </View>
 
-            <View style={styles.settingRow}>
-              <Text style={styles.settingLabel}>Turn Dark Theme</Text>
+              <View style={styles.settingRow}>
+                <Text style={styles.settingLabel}>Turn Dark Theme</Text>
 
-              <Switch
-                value={darkTheme}
-                onValueChange={setDarkTheme}
-                trackColor={{
-                  false: "#bff3df",
-                  true: GREEN,
-                }}
-                thumbColor={WHITE}
-              />
+                <Switch
+                  value={darkTheme}
+                  onValueChange={setDarkTheme}
+                  trackColor={{ false: SWITCH_OFF, true: PRIMARY }}
+                  thumbColor={WHITE}
+                />
+              </View>
             </View>
 
             <View style={styles.buttons}>
-             <AuthButton
-                title={isLoading ? "Loading..." : "Update Profile"}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.updateButton,
+                  pressed && styles.updateButtonPressed,
+                  isLoading && styles.updateButtonDisabled,
+                ]}
                 onPress={handleUpdateProfile}
-              />
+                disabled={isLoading}
+              >
+                <Text style={styles.updateButtonText}>
+                  {isLoading ? "Loading..." : "Update Profile"}
+                </Text>
+              </Pressable>
             </View>
           </View>
         </ScrollView>
       </View>
+
       <AvatarPickerModal
         visible={showAvatarModal}
         onClose={() => setShowAvatarModal(false)}
@@ -220,11 +275,14 @@ export default function EditProfileScreen() {
   );
 }
 
-const GREEN = "#00c896";
-const LIGHT_GREEN = "#f1fff3";
+const GREEN = "#dff7ef";
+const PRIMARY = "#12b895";
+const AVATAR_BG = "#e6f8f1";
 const WHITE = "#ffffff";
-const BLACK = "#052e2b";
-const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+const BLACK = "#073331";
+const MUTED = "#7b8a8c";
+const INPUT_BG = "#eef8f2";
+const SWITCH_OFF = "#d4e2df";
 
 const styles = StyleSheet.create({
   screen: {
@@ -237,25 +295,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 30,
-    paddingTop: 30,
+    paddingHorizontal: 26,
+    paddingTop: 26,
+  },
+
+  headerIconButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   title: {
-    fontSize: 18, //18
+    fontSize: 18,
     color: BLACK,
     fontFamily: fonts.bold,
+    letterSpacing: 0.2,
   },
 
   notifications: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: WHITE,
-    padding: 3,
-    borderRadius: 100,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "rgba(29, 100, 89, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
   },
 
   avatarWrapper: {
     position: "absolute",
-    top: 112,
+    top: 104,
     left: 0,
     right: 0,
     alignItems: "center",
@@ -263,76 +337,132 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
+    width: 104,
+    height: 104,
+    borderRadius: 52,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: LIGTH_GRAY,
-    borderWidth: 2,
+    borderWidth: 1,
+    borderColor: "rgba(18, 184, 149, 0.25)",
+    shadowColor: "rgba(29, 100, 89, 0.10)",
+    shadowOpacity: 1,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 4,
   },
 
   editAvatarButton: {
     position: "absolute",
-    right: 3,
-    bottom: 5,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    right: -4,
+    bottom: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: WHITE,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: LIGTH_GRAY,
-    borderWidth: 1,
-  },
-
-  editAvatarText: {
-    fontSize: 14,
-    color: BLACK,
-    fontFamily: fonts.bold,
+    shadowColor: "rgba(29, 100, 89, 0.16)",
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
   },
 
   card: {
     flex: 1,
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
-    padding: 24,
+    backgroundColor: "#fbfffc",
+    borderTopLeftRadius: 44,
+    borderTopRightRadius: 44,
+    borderWidth: 1,
+    borderColor: "rgba(18, 184, 149, 0.08)",
+    paddingHorizontal: 26,
   },
 
   cardContent: {
-    paddingTop: 55,
-    paddingBottom: 60,
+    paddingTop: 78,
+    paddingBottom: 56,
   },
 
   nameContainer: {
     alignItems: "center",
-    marginBottom: 26,
+    marginBottom: 40,
   },
 
   name: {
-    fontSize: 16,
+    fontSize: 19,
     color: BLACK,
     fontFamily: fonts.bold,
   },
 
   userId: {
-    marginTop: 3,
-    fontSize: 10,
-    color: BLACK,
-    opacity: 0.6,
+    marginTop: 8,
+    fontSize: 13,
+    color: MUTED,
     fontFamily: fonts.regular,
   },
 
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: BLACK,
     fontFamily: fonts.bold,
-    marginBottom: 20,
+    marginBottom: 22,
   },
 
   form: {
-    gap: 16,
+    gap: 18,
+  },
+
+  inputGroup: {
+    gap: 10,
+  },
+
+  inputLabel: {
+    fontSize: 13,
+    color: BLACK,
+    fontFamily: fonts.bold,
+  },
+
+  inputBox: {
+    minHeight: 50,
+    borderRadius: 13,
+    backgroundColor: INPUT_BG,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    shadowColor: "rgba(29, 100, 89, 0.05)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 1,
+  },
+
+  inputBoxDisabled: {
+    opacity: 0.9,
+  },
+
+  inputIconBox: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: "rgba(18, 184, 149, 0.10)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 10,
+  },
+
+  input: {
+    flex: 1,
+    minWidth: 0,
+    height: 50,
+    color: BLACK,
+    fontSize: 14,
+    fontFamily: fonts.medium,
+    paddingVertical: 0,
+  },
+
+  settingsBlock: {
+    gap: 18,
+    marginTop: 10,
   },
 
   settingRow: {
@@ -343,13 +473,41 @@ const styles = StyleSheet.create({
   },
 
   settingLabel: {
-    fontSize: 12,
+    fontSize: 14,
     color: BLACK,
     fontFamily: fonts.medium,
   },
 
   buttons: {
     alignItems: "center",
-    marginTop: 6,
+    marginTop: 24,
+  },
+
+  updateButton: {
+    width: 210,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#c9f3df",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "rgba(29, 100, 89, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+  },
+
+  updateButtonPressed: {
+    opacity: 0.82,
+  },
+
+  updateButtonDisabled: {
+    opacity: 0.7,
+  },
+
+  updateButtonText: {
+    color: BLACK,
+    fontSize: 14,
+    fontFamily: fonts.bold,
   },
 });

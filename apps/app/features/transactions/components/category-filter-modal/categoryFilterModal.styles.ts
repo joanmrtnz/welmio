@@ -3,11 +3,13 @@ import { fonts } from "@/theme/fonts";
 
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
-const LIGHT_GREEN = "#f1fff3";
-const BUTTON_GREEN = "#1A9E6A";
-const DARK_GREEN = "#059669";
-const TAB_GREEN = "#14cfa1";
-const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+const LIGHT_GREEN = "#dff7ef";
+const CARD_GREEN = "#f4fff9";
+const SOFT_GREEN = "#e4f7ef";
+const BUTTON_GREEN = "#80dbc0";
+const DARK_GREEN = "#087c6d";
+const TAB_GREEN = "#14a98c";
+const LIGTH_GRAY = "rgba(5, 46, 43, 0.12)";
 const RED = "#ef4444";
 
 export const categoryFilterModalColors = {
@@ -24,21 +26,29 @@ export const categoryFilterModalColors = {
 export const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    justifyContent: "center",
+    backgroundColor: LIGHT_GREEN,
+    justifyContent: "flex-end",
     alignItems: "center",
-    paddingHorizontal: 24,
+    paddingHorizontal: 0,
   },
 
   modalCard: {
     width: "100%",
-    maxHeight: "82%",
-    backgroundColor: LIGHT_GREEN,
-    borderRadius: 32,
+    maxHeight: "91%",
+    backgroundColor: CARD_GREEN,
+    borderTopLeftRadius: 34,
+    borderTopRightRadius: 34,
     paddingHorizontal: 24,
-    paddingTop: 22,
-    paddingBottom: 20,
+    paddingTop: 28,
+    paddingBottom: 24,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(20, 169, 140, 0.1)",
+    shadowColor: "rgba(29, 100, 89, 0.16)",
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 1,
+    shadowRadius: 24,
+    elevation: 12,
   },
 
   scrollView: {
@@ -46,27 +56,28 @@ export const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingBottom: 8,
+    paddingBottom: 10,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: 26,
   },
 
   title: {
-    fontSize: 18,
+    fontSize: 21,
     fontFamily: fonts.bold,
     color: BLACK,
+    letterSpacing: 0.2,
   },
 
   closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: LIGTH_GRAY,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -74,33 +85,40 @@ export const styles = StyleSheet.create({
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    rowGap: 28,
+    marginBottom: 28,
   },
 
   gridItem: {
-    width: "30%",
+    width: "31%",
     alignItems: "center",
-    marginBottom: 22,
   },
 
   gridIcon: {
     width: 64,
     height: 64,
     borderRadius: 18,
-    backgroundColor: BUTTON_GREEN,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 8,
-    borderWidth: 2,
-    borderColor: BUTTON_GREEN,
+    marginBottom: 10,
+    borderWidth: 0,
   },
 
   gridIconSelected: {
-    backgroundColor: TAB_GREEN,
+    backgroundColor: "#bdebdc",
+    shadowColor: "rgba(20, 169, 140, 0.18)",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    elevation: 5,
   },
 
   gridLabel: {
-    fontSize: 11,
+    width: "100%",
+    fontSize: 12,
+    lineHeight: 16,
     fontFamily: fonts.bold,
     color: BLACK,
     textAlign: "center",
@@ -111,47 +129,49 @@ export const styles = StyleSheet.create({
   },
 
   addMoreButton: {
-    height: 46,
+    height: 54,
     borderRadius: 16,
-    backgroundColor: LIGHT_GREEN,
+    backgroundColor: WHITE,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
-    marginTop: 4,
-    marginBottom: 12,
+    gap: 10,
+    marginTop: 2,
+    marginBottom: 26,
     borderWidth: 1,
-    borderColor: LIGTH_GRAY,
+    borderColor: "rgba(20, 169, 140, 0.18)",
   },
 
   addMoreText: {
-    fontSize: 13,
+    fontSize: 15,
     fontFamily: fonts.semibold,
     color: BLACK,
   },
 
   input: {
-    height: 44,
+    height: 50,
     borderRadius: 16,
     backgroundColor: WHITE,
     paddingHorizontal: 16,
-    marginBottom: 16,
-    fontSize: 13,
+    marginBottom: 18,
+    fontSize: 14,
     fontFamily: fonts.medium,
     color: BLACK,
+    borderWidth: 1,
+    borderColor: "rgba(5, 46, 43, 0.08)",
   },
 
   sectionLabel: {
-    fontSize: 12,
-    fontFamily: fonts.semibold,
+    fontSize: 13,
+    fontFamily: fonts.bold,
     color: BLACK,
-    marginBottom: 8,
+    marginBottom: 10,
   },
 
   typeRow: {
     flexDirection: "row",
     gap: 10,
-    marginBottom: 16,
+    marginBottom: 18,
   },
 
   typeButton: {
@@ -162,12 +182,12 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: LIGTH_GRAY,
+    borderColor: "rgba(20, 169, 140, 0.18)",
   },
 
   typeButtonSelected: {
-    backgroundColor: TAB_GREEN,
-    borderColor: TAB_GREEN,
+    backgroundColor: "#bdebdc",
+    borderColor: "transparent",
   },
 
   typeButtonText: {
@@ -177,32 +197,29 @@ export const styles = StyleSheet.create({
   },
 
   typeButtonTextSelected: {
-    color: WHITE,
+    color: BLACK,
   },
 
   iconSelectorGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-evenly",
-    gap: 10,
-    marginBottom: 16,
+    justifyContent: "space-between",
+    rowGap: 12,
+    marginBottom: 18,
   },
 
   iconOption: {
-    width: "25%",
-    height: 60,
+    width: 64,
+    height: 64,
     borderRadius: 18,
-    backgroundColor: WHITE,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
-    borderWidth: 1,
-    borderColor: LIGTH_GRAY,
+    borderWidth: 0,
   },
 
   iconOptionSelected: {
-    backgroundColor: DARK_GREEN,
-    borderColor: DARK_GREEN,
+    backgroundColor: "#bdebdc",
   },
 
   iconOptionLabel: {
@@ -212,20 +229,20 @@ export const styles = StyleSheet.create({
   },
 
   iconOptionLabelSelected: {
-    color: WHITE,
+    color: BLACK,
     fontFamily: fonts.bold,
   },
 
   colorSelectorRow: {
     flexDirection: "row",
     gap: 10,
-    marginBottom: 18,
+    marginBottom: 20,
   },
 
   colorOption: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     borderWidth: 2,
     borderColor: "transparent",
   },
@@ -236,30 +253,30 @@ export const styles = StyleSheet.create({
 
   actions: {
     flexDirection: "row",
-    gap: 12,
+    gap: 14,
     marginTop: 8,
   },
 
   clearButton: {
     flex: 1,
-    height: 48,
+    height: 54,
     borderRadius: 16,
-    backgroundColor: LIGTH_GRAY,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
 
   clearButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: fonts.semibold,
     color: BLACK,
   },
 
   applyButton: {
     flex: 1,
-    height: 48,
+    height: 54,
     borderRadius: 16,
-    backgroundColor: TAB_GREEN,
+    backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -269,9 +286,9 @@ export const styles = StyleSheet.create({
   },
 
   applyButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: fonts.bold,
-    color: WHITE,
+    color: BLACK,
   },
 
   headerActions: {
@@ -281,18 +298,16 @@ export const styles = StyleSheet.create({
   },
 
   headerIconButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: WHITE,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: LIGTH_GRAY,
+    borderWidth: 0,
   },
 
   deleteIconButton: {
-    backgroundColor: "rgba(239, 68, 68, 0.12)",
-    borderColor: "rgba(239, 68, 68, 0.25)",
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
   },
 });

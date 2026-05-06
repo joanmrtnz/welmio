@@ -76,7 +76,7 @@ export function CategoryFilterModal({
     onApply,
   });
 
-  const { BLACK, WHITE, RED } = categoryFilterModalColors;
+  const { BLACK, WHITE, RED, TAB_GREEN } = categoryFilterModalColors;
 
   const hasSelectedCategories = draftSelectedIds.length > 0;
   const canEditSelectedCategory = draftSelectedIds.length === 1;
@@ -187,9 +187,9 @@ export function CategoryFilterModal({
                         >
                           <Icon
                             name={(item.icon ?? "plus") as any}
-                            size={52}
+                            size={40}
                             strokeWidth={1}
-                            color={WHITE}
+                            color={TAB_GREEN}
                           />
                         </View>
 
@@ -198,6 +198,8 @@ export function CategoryFilterModal({
                             styles.gridLabel,
                             isSelected && styles.gridLabelSelected,
                           ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
                         >
                           {item.name}
                         </Text>
@@ -311,9 +313,9 @@ export function CategoryFilterModal({
                       >
                         <Icon
                           name={item.name as any}
-                          size={50}
+                          size={38}
                           strokeWidth={1}
-                          color={isSelected ? WHITE : BLACK}
+                          color={isSelected ? TAB_GREEN : BLACK}
                         />
                       </Pressable>
                     );

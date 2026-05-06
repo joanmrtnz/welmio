@@ -1,198 +1,282 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
-import { useState } from "react";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import WelmioAvatar from "@/assets/images/welmio-logo-no-circle.png";
 
+const SCREEN_BG = "#dff7ef";
+const CARD = "#ffffff";
+const CARD_SOFT = "#f3fbf8";
+const MINT = "#d7f5eb";
+const MINT_LIGHT = "#eaf9f4";
+const GREEN = "#0bb894";
+const GREEN_DARK = "#078a73";
+const TEXT = "#063436";
+const MUTED = "#6f8790";
+const DANGER = "#ff4265";
+const BORDER = "rgba(9, 169, 130, 0.12)";
 
-const GREEN = "#00c896";
-const DIVIDER_GREEN = "#00d09e";
-const DARK_GREEN = "#059669";
-const LIGHT_GREEN = "#f1fff3";
-const MEDIUM_GREEN = "#23C988"
-const WHITE = "#ffffff";
-const BLACK = "#052e2b";
-const BUTTON_GREEN = "#1A9E6A";
+const goalCards = [
+  { title: "New Car", icon: "car", percent: "35%", progress: "35%" },
+  { title: "Emergency Fund", icon: "money", percent: "75%", progress: "75%" },
+  { title: "New Laptop", icon: "rent", percent: "20%", progress: "20%" },
+];
 
+const analyticsBars = [
+  { label: "May 1", income: 66, expense: 44 },
+  { label: "May 8", income: 44, expense: 61 },
+  { label: "May 15", income: 68, expense: 45 },
+  { label: "May 22", income: 66, expense: 39 },
+  { label: "May 29", income: 60, expense: 35 },
+];
 
+const transactions = [
+  {
+    title: "Salary Payment",
+    meta: "May 30 · 10:30 AM",
+    icon: "money",
+    amount: "+$4,000.00",
+    positive: true,
+  },
+  {
+    title: "Groceries",
+    meta: "May 29 · 5:45 PM",
+    icon: "food",
+    amount: "-$100.00",
+    positive: false,
+  },
+  {
+    title: "Rent",
+    meta: "May 28 · 9:15 AM",
+    icon: "rent",
+    amount: "-$674.40",
+    positive: false,
+  },
+];
 
 export default function HomeScreen() {
-  const [selected, setSelected] = useState<"daily" | "weekly" | "monthly">("monthly");
-
   return (
     <View style={styles.screen}>
-      <View style={styles.headerArea}>
-        <Text style={styles.welcome}>Hi, Welcome Back</Text>
-        <Text style={styles.subtitle}>Good Morning</Text>
-      </View>
-
-      <View style={styles.balanceRow}>
-          <View>
-            <Text style={styles.label}>Total Balance</Text>
-            <Text style={styles.balance}>$7,783.00</Text>
-          </View>
-
-          <View style={styles.separator} />
-
-          <View>
-            <Text style={styles.label}>Total Expense</Text>
-            <Text style={styles.expense}>-$1,187.40</Text>
-          </View>
-        </View>
-
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View style={styles.progressFill} />
-          </View>
-          <Text style={styles.progressText}>
-            30% Of Your Expenses, Looks Good.
-          </Text>
-        </View>
-
-       <View style={styles.cardWrapper}> 
-        <ScrollView
-          contentContainerStyle={styles.cardContent}
-          showsVerticalScrollIndicator={false}
-        >                  
-
-        <View style={styles.statsCard}>
-          <View style={styles.statLeft}>
-            <View style={styles.circle}>
-              <Icon name="car" size={35} />
-            </View>
-            <Text style={styles.statTitle}>Savings{"\n"}On Goals</Text>
-          </View>
-
-          <View style={styles.separatorVertical} />
-
-          <View style={styles.statRight}>
-             <View style={styles.statItem}>
-              <View style={styles.statIcon}>
-                <Icon name="money" size={33} />
-              </View>
-              
-              <View style={styles.statText}>
-                <Text style={styles.statLabel}>Revenue Last Week</Text>
-                <Text style={styles.statPositive}>$4,000.00</Text>
-              </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        <View style={styles.header}>
+          <View style={styles.userSide}>
+            <View style={styles.avatarFrame}>
+              <Image
+                source={WelmioAvatar}
+                style={styles.avatarImage}
+                resizeMode="contain"
+              />
             </View>
 
-            <View style={styles.separatorHorizontal} />
-
-            <View style={styles.statItem}>
-               <View style={styles.statIcon}>
-                <Icon name="food" size={33} />
-               </View>
-              
-              <View style={styles.statText}>
-                <Text style={styles.statLabel}>Food Last Week</Text>
-                <Text style={styles.statNegative}>-$100.00</Text>
-              </View>
+            <View>
+              <Text style={styles.greeting}>Hi, John! 👋</Text>
+              <Text style={styles.greetingSub}>Good Morning</Text>
             </View>
           </View>
+
+          <Pressable style={styles.bellButton}>
+            <Icon name="bell" size={24} strokeWidth={1.5} color={TEXT} />
+          </Pressable>
         </View>
 
-        <View style={styles.filterRow}>
-          {["daily", "weekly", "monthly"].map((item) => {
-            const isActive = selected === item;
+        <SectionHeader title="Overview" />
 
-            return (
-              <Pressable
-                key={item}
-                onPress={() => setSelected(item as any)}
+        <View style={styles.overviewRow}>
+          <Pressable style={styles.overviewCard}>
+            <View style={styles.overviewIconWrap}>
+              <Icon
+                name="money"
+                size={38}
+                color={GREEN_DARK}
+                strokeWidth={0.8}
+              />
+            </View>
+
+            <View>
+              <Text style={styles.overviewLabel}>Total Balance</Text>
+              <Text style={styles.overviewPositive}>$7,783.00</Text>
+            </View>
+          </Pressable>
+
+          <Pressable style={styles.overviewCard}>
+            <View style={[styles.overviewIconWrap, styles.expenseIconWrap]}>
+              <Icon name="expense" size={35} color={DANGER} strokeWidth={0.8} />
+            </View>
+
+            <View>
+              <Text style={styles.overviewLabel}>Total Expense</Text>
+              <Text style={styles.overviewAmount}>-$1,187.40</Text>
+            </View>
+          </Pressable>
+        </View>
+
+        <SectionHeader title="Goals" action="View All" />
+
+        <Pressable style={styles.featureGoalCard}>
+          <View style={styles.featureGoalTop}>
+            <View style={styles.bigGoalIcon}>
+              <Icon
+                name="rent"
+                size={50}
+                color={GREEN_DARK}
+                strokeWidth={0.8}
+              />
+            </View>
+
+            <View style={styles.featureGoalText}>
+              <Text style={styles.featureGoalTitle}>Vacation Fund</Text>
+              <Text style={styles.featureGoalMeta}>$1,560.00 of $3,000.00</Text>
+            </View>
+          </View>
+
+          <View style={styles.goalProgressRow}>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: "52%" }]} />
+            </View>
+            <Text style={styles.progressPercent}>52%</Text>
+          </View>
+        </Pressable>
+
+        <View style={styles.goalGrid}>
+          {goalCards.map((goal) => (
+            <Pressable key={goal.title} style={styles.goalMiniCard}>
+              <View style={styles.goalMiniIcon}>
+                <Icon
+                  name={goal.icon as any}
+                  size={35}
+                  color={GREEN_DARK}
+                  strokeWidth={0.8}
+                />
+              </View>
+
+              <View style={styles.goalMiniContent}>
+                <Text
+                  style={styles.goalMiniTitle}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {goal.title}
+                </Text>
+                <View style={styles.miniProgressRow}>
+                  <View style={styles.miniProgressTrack}>
+                    <View
+                      style={[
+                        styles.miniProgressFill,
+                        { width: goal.progress },
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.goalMiniPercent}>{goal.percent}</Text>
+                </View>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+
+        <SectionHeader title="Analytics" action="This Month" />
+
+        <Pressable style={styles.analyticsCard}>
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={styles.legendDot} />
+              <Text style={styles.legendText}>Income</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, styles.legendDotLight]} />
+              <Text style={styles.legendText}>Expense</Text>
+            </View>
+          </View>
+
+          <View style={styles.chartArea}>
+            <View style={styles.yAxis}>
+              <Text style={styles.axisText}>$3K</Text>
+              <Text style={styles.axisText}>$2K</Text>
+              <Text style={styles.axisText}>$1K</Text>
+              <Text style={styles.axisText}>$0</Text>
+            </View>
+
+            <View style={styles.barsArea}>
+              {analyticsBars.map((bar) => (
+                <View key={bar.label} style={styles.barGroup}>
+                  <View style={styles.barColumns}>
+                    <View style={[styles.bar, { height: bar.income }]} />
+                    <View
+                      style={[
+                        styles.bar,
+                        styles.expenseBar,
+                        { height: bar.expense },
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.barLabel}>{bar.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </Pressable>
+
+        <SectionHeader title="Recent Transactions" action="View All" />
+
+        <View style={styles.transactionsCard}>
+          {transactions.map((transaction, index) => (
+            <Pressable
+              key={transaction.title}
+              style={[
+                styles.transactionRow,
+                index === transactions.length - 1 && styles.transactionRowLast,
+              ]}
+            >
+              <View style={styles.transactionIcon}>
+                <Icon
+                  name={transaction.icon as any}
+                  size={35}
+                  color={GREEN_DARK}
+                  strokeWidth={0.8}
+                />
+              </View>
+
+              <View style={styles.transactionTextWrap}>
+                <Text style={styles.transactionTitle}>{transaction.title}</Text>
+                <Text style={styles.transactionMeta}>{transaction.meta}</Text>
+              </View>
+
+              <Text
                 style={[
-                  styles.segment,
-                  isActive && styles.segmentActive,
+                  styles.transactionAmount,
+                  transaction.positive && styles.transactionAmountPositive,
                 ]}
               >
-                <Text
-                  style={[
-                    styles.segmentText,
-                    isActive && styles.segmentTextActive,
-                  ]}
-                >
-                  {item.charAt(0).toUpperCase() + item.slice(1)}
-                </Text>
-              </Pressable>
-            );
-          })}
+                {transaction.amount}
+              </Text>
+            </Pressable>
+          ))}
         </View>
+      </ScrollView>
 
-       <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="money" size={25} color={BUTTON_GREEN} /></Text>
-            </View>
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Salary Payment From Main Company
-                </Text>
-                <Text style={styles.transactionMeta}>18:27 · April 30</Text>
-            </View>
+      <LinearGradient
+        pointerEvents="none"
+        colors={["rgba(223, 247, 239, 0)", SCREEN_BG]}
+        style={styles.bottomFade}
+      />
+    </View>
+  );
+}
 
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Monthly</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>$4,000.00</Text>
-            </View>
-        </View>
-
-        <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="groceries" size={45} color={BUTTON_GREEN} /></Text>
-            </View>
-
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Groceries
-                </Text>
-                <Text style={styles.transactionMeta}>17:00 · April 24</Text>
-            </View>
-
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Pantry</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>-$100.00</Text>
-            </View>
-            
-        </View>
-
-          <View style={styles.transactionRow}>
-            <View style={styles.iconCircle}>
-                <Text style={styles.icon}><Icon name="rent" size={45} color={BUTTON_GREEN}  /></Text>
-            </View>
-
-            <View style={styles.transactionInfo}>
-                <Text
-                style={styles.transactionTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                >
-                Rent
-                </Text>
-                <Text style={styles.transactionMeta}>8:30 · April 15</Text>
-            </View>
-
-            <View style={styles.categoryColumn}>
-                <Text style={styles.transactionCategory}>Rent</Text>
-            </View>
-
-            <View style={styles.amountColumn}>
-                <Text style={styles.amountPositive}>-$674.40</Text>
-            </View>
-        </View>
-       </ScrollView>
-      </View>
+function SectionHeader({ title, action }: { title: string; action?: string }) {
+  return (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {action ? <Text style={styles.sectionAction}>{action}</Text> : null}
     </View>
   );
 }
@@ -200,298 +284,464 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: GREEN,
+    backgroundColor: SCREEN_BG,
   },
 
-  headerArea: {
-    height: 85,
+  content: {
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 128,
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+  },
+
+  userSide: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  avatarFrame: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: MINT,
+    borderWidth: 2,
+    borderColor: GREEN,
+    alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 38,
-    marginTop: 50,
-    marginBottom: 20,
-  },
-
-  welcome: {
-    fontSize: 18,
-    fontFamily: fonts.bold,
-    color: BLACK,
-  },
-
-  subtitle: {
-    fontSize: 13,
-    fontFamily: fonts.regular,
-    color: BLACK,
-    opacity: 0.8,
-  },
-
-  cardWrapper: {
-    flex: 1,
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
-    paddingTop: 40,
     overflow: "hidden",
   },
 
-  cardContent: {
-    paddingHorizontal: 32,
-    paddingTop: 30,
-    paddingBottom: 120
+  avatarImage: {
+    width: 55,
+    height: 55,
   },
 
-
-  balanceRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 24,
-
-    gap: 30,
+  greeting: {
+    fontSize: 18,
+    fontFamily: fonts.bold,
+    color: TEXT,
   },
 
-  label: {
+  greetingSub: {
+    marginTop: 2,
     fontSize: 12,
-    fontFamily: fonts.regular,
-    color: BLACK,
+    fontFamily: fonts.medium,
+    color: TEXT,
   },
 
-  balance: {
-    fontSize: 22,
-    fontFamily: fonts.bold,
-    color: WHITE,
-  },
-
-  expense: {
-    fontSize: 22,
-    fontFamily: fonts.bold,
-    color: BLACK,
-  },
-
-  separator: {
-    width: 1,
-    backgroundColor: "#d1fae5",
-  },
-
-  progressContainer: {
+  bellButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: CARD,
     alignItems: "center",
-    marginBottom: 24,
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: BORDER,
+    shadowColor: "rgba(29, 100, 89, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 7 },
+    elevation: 7,
   },
 
-  progressBar: {
-    height: 20,
-    borderRadius: 10,
-    width: "70%",
-    backgroundColor: "#d1fae5",
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 12,
+    marginBottom: 12,
+  },
+
+  sectionTitle: {
+    fontSize: 16,
+    fontFamily: fonts.bold,
+    color: TEXT,
+  },
+
+  sectionAction: {
+    fontSize: 12,
+    fontFamily: fonts.bold,
+    color: GREEN_DARK,
+  },
+
+  overviewRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 10,
+  },
+
+  overviewCard: {
+    flex: 1,
+    minHeight: 78,
+    borderRadius: 16,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+
+  overviewIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: MINT_LIGHT,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  expenseIconWrap: {
+    backgroundColor: "#fff0f3",
+  },
+
+  overviewLabel: {
+    fontSize: 10,
+    fontFamily: fonts.bold,
+    color: TEXT,
+    marginBottom: 4,
+  },
+
+  overviewPositive: {
+    fontSize: 18,
+    fontFamily: fonts.bold,
+    color: GREEN_DARK,
+  },
+
+  overviewAmount: {
+    fontSize: 18,
+    fontFamily: fonts.bold,
+    color: TEXT,
+  },
+
+  featureGoalCard: {
+    borderRadius: 16,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+
+  featureGoalTop: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  bigGoalIcon: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: MINT_LIGHT,
+    borderWidth: 1.2,
+    borderColor: GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+  featureGoalText: {
+    flex: 1,
+  },
+
+  featureGoalTitle: {
+    fontSize: 14,
+    fontFamily: fonts.bold,
+    color: TEXT,
+  },
+
+  featureGoalMeta: {
+    marginTop: 4,
+    fontSize: 12,
+    fontFamily: fonts.medium,
+    color: MUTED,
+  },
+
+  goalProgressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+
+  progressTrack: {
+    flex: 1,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: MINT,
     overflow: "hidden",
   },
 
   progressFill: {
-    width: "30%",
     height: "100%",
-    backgroundColor: BLACK,
+    borderRadius: 999,
+    backgroundColor: GREEN_DARK,
   },
 
-  progressText: {
-    marginTop: 8,
-    fontSize: 12,
-    fontFamily: fonts.medium,
-    color: BLACK,
-  },
-
-  statsCard: {
-    backgroundColor: GREEN,
-    borderRadius: 28,
-    padding: 16,
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 30,
-  },
-
-  statLeft: {
-    flex: 0.5,
-    alignItems: "center",
-  },
-
-circle: {
-  width: 70,
-  height: 70,
-  borderRadius: 35,
-  borderColor: WHITE,
-  borderWidth: 2,
-  marginBottom: 8,
-  alignItems: "center",
-  justifyContent: "center",
-},
-
-
-  statTitle: {
-    fontSize: 12,
-    fontFamily: fonts.medium,
-    color: BLACK,
-    textAlign: "center",
-  },
-
-  separatorVertical: {
-    width: 1,
-    backgroundColor: "#d1fae5",
-    marginHorizontal: 12,
-  },
-
-  separatorHorizontal: {
-    height: 1,
-    backgroundColor: "#d1fae5",
-    marginVertical: 12,
-  },
-
-  statRight: {
-    flex: 1,
-  },
-  statItem: {
-    flexDirection: "row",
-    gap: 7,
-  },
-
-  statIcon: {
-    flex: 0.3,
-  },
-
-  statText: {
-    flex: 1,
-  },
-
-  statLabel: {
+  progressPercent: {
+    width: 34,
+    textAlign: "right",
     fontSize: 11,
-    fontFamily: fonts.regular,
-    color: BLACK,
-  },
-
-  statPositive: {
-    fontSize: 14,
     fontFamily: fonts.bold,
-    color: BLACK,
+    color: TEXT,
   },
 
-  statNegative: {
-    fontSize: 14,
-    fontFamily: fonts.bold,
-    color: BLACK,
-  },
-
-  filterRow: {
+  goalGrid: {
     flexDirection: "row",
-    backgroundColor: "#dff7e2",
-    borderRadius: 18,
-    padding: 5,
-    marginBottom: 24,
+    gap: 8,
+    marginBottom: 8,
   },
 
-  segment: {
+  goalMiniCard: {
     flex: 1,
-    paddingVertical: 15,
-    marginHorizontal: 8,
-    borderRadius: 18,
+    borderRadius: 12,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 9,
+    minHeight: 58,
+    flexDirection: "row",
+    alignItems: "center",
+    shadowColor: "rgba(29, 100, 89, 0.09)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
+
+  goalMiniIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: MINT_LIGHT,
     alignItems: "center",
     justifyContent: "center",
+    marginRight: 7,
   },
 
-  segmentActive: {
-    backgroundColor: GREEN,
+  goalMiniContent: {
+    flex: 1,
+    minWidth: 0,
   },
 
-  segmentText: {
-    fontSize: 13,
-    fontFamily: fonts.medium,
-    color: "#052e2b",
-    opacity: 0.6,
+  goalMiniTitle: {
+    fontSize: 9,
+    fontFamily: fonts.bold,
+    color: TEXT,
+    marginBottom: 7,
   },
 
-  segmentTextActive: {
-    opacity: 1,
-  },
-
-  transaction: {
+  miniProgressRow: {
     flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+
+  miniProgressTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: MINT,
+    overflow: "hidden",
+  },
+
+  miniProgressFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: GREEN_DARK,
+  },
+
+  goalMiniPercent: {
+    fontSize: 9,
+    fontFamily: fonts.bold,
+    color: TEXT,
+  },
+
+  analyticsCard: {
+    borderRadius: 16,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+
+  legendRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 28,
+    marginBottom: 12,
+  },
+
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: GREEN_DARK,
+  },
+
+  legendDotLight: {
+    backgroundColor: "#cfeedd",
+  },
+
+  legendText: {
+    fontSize: 11,
+    fontFamily: fonts.medium,
+    color: TEXT,
+  },
+
+  chartArea: {
+    height: 126,
+    flexDirection: "row",
+  },
+
+  yAxis: {
+    width: 34,
     justifyContent: "space-between",
-    paddingVertical: 12,
+    paddingBottom: 20,
   },
 
-  amountPositive: {
-    fontSize: 12,
+  axisText: {
+    fontSize: 10,
     fontFamily: fonts.bold,
-    color: BLACK,
+    color: MUTED,
   },
 
-  amountNegative: {
-    fontSize: 12,
+  barsArea: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+
+  barGroup: {
+    alignItems: "center",
+    width: 42,
+  },
+
+  barColumns: {
+    height: 86,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 8,
+  },
+
+  bar: {
+    width: 10,
+    borderRadius: 4,
+    backgroundColor: GREEN_DARK,
+  },
+
+  expenseBar: {
+    backgroundColor: "#cbeed7",
+  },
+
+  barLabel: {
+    marginTop: 7,
+    fontSize: 10,
+    fontFamily: fonts.medium,
+    color: MUTED,
+  },
+
+  transactionsCard: {
+    borderRadius: 16,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
+    overflow: "hidden",
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
+
+  transactionRow: {
+    minHeight: 66,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(9, 169, 130, 0.08)",
+  },
+
+  transactionRowLast: {
+    borderBottomWidth: 0,
+  },
+
+  transactionIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: MINT_LIGHT,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+  transactionTextWrap: {
+    flex: 1,
+  },
+
+  transactionTitle: {
+    fontSize: 13,
     fontFamily: fonts.bold,
-    color: BLACK,
+    color: TEXT,
   },
 
-iconCircle: {
-  width: 53,
-  height: 53,
-  borderRadius: 17,
-  borderWidth: 2,
-  borderColor: MEDIUM_GREEN,
-  alignItems: "center",
-  justifyContent: "center",
-},
+  transactionMeta: {
+    marginTop: 4,
+    fontSize: 11,
+    fontFamily: fonts.medium,
+    color: MUTED,
+  },
 
-icon: {
-  fontSize: 18,
-},
+  transactionAmount: {
+    fontSize: 13,
+    fontFamily: fonts.bold,
+    color: TEXT,
+    marginLeft: 10,
+  },
 
+  transactionAmountPositive: {
+    color: GREEN_DARK,
+  },
 
-
-transactionRow: {
-  flexDirection: "row",
-  alignItems: "center",
-  paddingVertical: 14,
-},
-
-transactionInfo: {
-  flex: 1,
-  marginLeft: 12,
-  marginRight: 10,
-},
-
-transactionTitle: {
-  fontSize: 12,
-  fontFamily: fonts.medium,
-  color: BLACK,
-},
-
-transactionMeta: {
-  fontSize: 11,
-  fontFamily: fonts.regular,
-  color: BLACK,
-  marginTop: 5,
-},
-
-categoryColumn: {
-  height: 32,
-  width: 80,
-  alignItems: "center",
-  flexDirection: "row",
-  justifyContent: "center",
-  borderLeftColor: DIVIDER_GREEN,
-  borderLeftWidth: 1,
-  borderRightColor: DIVIDER_GREEN,
-  borderRightWidth: 1,
-},
-
-amountColumn: {
-  width: 90,
-  alignItems: "center",
-  flexDirection: "row",
-  justifyContent: "center",
-},
-
-transactionCategory: {
-  fontSize: 11,
-  fontFamily: fonts.medium,
-  color: BLACK,
-  textAlign: "center",
-},
-
+  bottomFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 120,
+  },
 });
-

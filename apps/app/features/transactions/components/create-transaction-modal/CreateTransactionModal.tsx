@@ -20,12 +20,20 @@ import {
   styles,
 } from "@/features/transactions/components/create-transaction-modal/createTransactionModal.styles";
 import { TransactionOverviewItem } from "@repo/shared-types";
+import { useEffect } from "react";
 
 type CreateTransactionModalProps = {
   visible: boolean;
   transactionToEdit?: TransactionOverviewItem | null;
   onClose: () => void;
   onCreated?: () => void | Promise<void>;
+  initialValues?: {
+    type?: "income" | "expense";
+    goalId?: string;
+    description?: string;
+    notes?: string;
+  } | null;
+  lockType?: boolean;
 };
 
 export function CreateTransactionModal({
@@ -33,6 +41,8 @@ export function CreateTransactionModal({
   transactionToEdit,
   onClose,
   onCreated,
+  initialValues,
+  lockType = false,
 }: CreateTransactionModalProps) {
   const {
     accounts,
@@ -40,6 +50,9 @@ export function CreateTransactionModal({
 
     type,
     setType,
+
+    selectedGoalId,
+    setSelectedGoalId,
 
     amount,
     setAmount,
@@ -78,9 +91,33 @@ export function CreateTransactionModal({
     transactionToEdit,
     onClose,
     onCreated,
+    initialValues,
+    lockType,
   });
 
-  const { BLACK, WHITE } = createTransactionModalColors;
+  const { BLACK, TAB_GREEN } = createTransactionModalColors;
+
+  useEffect(() => {
+    if (!visible) return;
+
+    if (!initialValues) return;
+
+    if (initialValues.type) {
+      setType(initialValues.type);
+    }
+
+    if (initialValues.description) {
+      setDescription(initialValues.description);
+    }
+
+    if (initialValues.notes) {
+      setNotes(initialValues.notes);
+    }
+
+    if (initialValues.goalId) {
+      setSelectedGoalId(initialValues.goalId);
+    }
+  }, [visible, initialValues]);
 
   return (
     <Modal
@@ -109,41 +146,51 @@ export function CreateTransactionModal({
           >
             <Text style={styles.sectionLabel}>Type</Text>
 
-            <View style={styles.typeRow}>
-              <Pressable
-                style={[
-                  styles.typeButton,
-                  type === "income" && styles.typeButtonSelected,
-                ]}
-                onPress={() => setType("income")}
-              >
-                <Text
+            {!lockType ? (
+              <View style={styles.typeRow}>
+                <Pressable
                   style={[
-                    styles.typeButtonText,
-                    type === "income" && styles.typeButtonTextSelected,
+                    styles.typeButton,
+                    type === "income" && styles.typeButtonSelected,
                   ]}
+                  onPress={() => setType("income")}
                 >
-                  Income
-                </Text>
-              </Pressable>
+                  <Text
+                    style={[
+                      styles.typeButtonText,
+                      type === "income" && styles.typeButtonTextSelected,
+                    ]}
+                  >
+                    Income
+                  </Text>
+                </Pressable>
 
-              <Pressable
-                style={[
-                  styles.typeButton,
-                  type === "expense" && styles.typeButtonSelected,
-                ]}
-                onPress={() => setType("expense")}
-              >
-                <Text
+                <Pressable
                   style={[
-                    styles.typeButtonText,
-                    type === "expense" && styles.typeButtonTextSelected,
+                    styles.typeButton,
+                    type === "expense" && styles.typeButtonSelected,
                   ]}
+                  onPress={() => setType("expense")}
                 >
-                  Expense
-                </Text>
-              </Pressable>
-            </View>
+                  <Text
+                    style={[
+                      styles.typeButtonText,
+                      type === "expense" && styles.typeButtonTextSelected,
+                    ]}
+                  >
+                    Expense
+                  </Text>
+                </Pressable>
+              </View>
+            ) : (
+              <View style={styles.typeRow}>
+                <View style={[styles.typeButton, styles.typeButtonSelected]}>
+                  <Text style={styles.typeButtonTextSelected}>
+                    Income contribution
+                  </Text>
+                </View>
+              </View>
+            )}
 
             <Text style={styles.sectionLabel}>Date</Text>
 
@@ -205,8 +252,9 @@ export function CreateTransactionModal({
                   >
                     <Icon
                       name={(category.icon ?? "plus") as any}
-                      size={22}
-                      color={isSelected ? WHITE : BLACK}
+                      size={40}
+                      strokeWidth={1}
+                      color={TAB_GREEN}
                     />
 
                     <Text
@@ -259,7 +307,7 @@ export function CreateTransactionModal({
                     </View>
 
                     {isSelected ? (
-                      <Icon name="check" size={20} color={WHITE} />
+                      <Icon name="check" size={20} color={TAB_GREEN} />
                     ) : null}
                   </Pressable>
                 );

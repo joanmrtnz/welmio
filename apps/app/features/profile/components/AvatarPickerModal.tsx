@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -9,7 +10,7 @@ import {
 } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { AuthButton } from "@/features/auth/components/AuthButton";
-import { Icon} from "@/components/icons/Icon";
+import { Icon } from "@/components/icons/Icon";
 import { IconName } from "@repo/shared-types";
 
 type AvatarOption = {
@@ -20,10 +21,7 @@ type AvatarOption = {
 type AvatarPickerModalProps = {
   visible: boolean;
   onClose: () => void;
-  onApply?: (avatar: {
-    icon: IconName;
-    backgroundColor: string;
-  }) => void;
+  onApply?: (avatar: { icon: IconName; backgroundColor: string }) => void;
 };
 
 const AVATAR_OPTIONS: AvatarOption[] = [
@@ -37,15 +35,17 @@ const AVATAR_OPTIONS: AvatarOption[] = [
   { id: "avatar-8", icon: "user" },
 ];
 
+const WELMIO_AVATAR = require("@/assets/images/welmio-logo-no-circle.png");
+
 const COLORS = [
-  "#00c896",
-  "#38bdf8",
-  "#a78bfa",
-  "#f472b6",
-  "#fb923c",
-  "#facc15",
-  "#34d399",
-  "#ef4444",
+  "#b8eadc",
+  "#dff7ef",
+  "#9ce1cf",
+  "#74d2bd",
+  "#58c5ad",
+  "#0f8f7c",
+  "#e6f8f3",
+  "#c8f1e5",
 ];
 
 export function AvatarPickerModal({
@@ -53,7 +53,9 @@ export function AvatarPickerModal({
   onClose,
   onApply,
 }: AvatarPickerModalProps) {
-  const [selectedAvatarId, setSelectedAvatarId] = useState(AVATAR_OPTIONS[0].id);
+  const [selectedAvatarId, setSelectedAvatarId] = useState(
+    AVATAR_OPTIONS[0].id,
+  );
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
 
   const selectedAvatar =
@@ -91,16 +93,12 @@ export function AvatarPickerModal({
 
           <View style={styles.previewWrapper}>
             <View
-              style={[
-                styles.previewAvatar,
-                { backgroundColor: selectedColor },
-              ]}
+              style={[styles.previewAvatar, { backgroundColor: selectedColor }]}
             >
-              <Icon
-                name={selectedAvatar.icon}
-                size={46}
-                strokeWidth={1.8}
-                color={BLACK}
+              <Image
+                source={WELMIO_AVATAR}
+                style={styles.previewAvatarImage}
+                resizeMode="contain"
               />
             </View>
 
@@ -132,11 +130,10 @@ export function AvatarPickerModal({
                         { backgroundColor: selectedColor },
                       ]}
                     >
-                      <Icon
-                        name={avatar.icon}
-                        size={28}
-                        strokeWidth={1.8}
-                        color={BLACK}
+                      <Image
+                        source={WELMIO_AVATAR}
+                        style={styles.avatarOptionImage}
+                        resizeMode="contain"
                       />
                     </View>
                   </Pressable>
@@ -160,10 +157,7 @@ export function AvatarPickerModal({
                     onPress={() => setSelectedColor(color)}
                   >
                     <View
-                      style={[
-                        styles.colorCircle,
-                        { backgroundColor: color },
-                      ]}
+                      style={[styles.colorCircle, { backgroundColor: color }]}
                     />
                   </Pressable>
                 );
@@ -186,13 +180,15 @@ export function AvatarPickerModal({
   );
 }
 
-const GREEN = "#00c896";
-const LIGHT_GREEN = "#f1fff3";
-const SOFT_GREEN = "#dff7e2";
+const GREEN = "#12c79b";
+const LIGHT_GREEN = "#dff7ef";
+const SOFT_GREEN = "#e7f8f2";
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
-const BORDER = "rgba(5, 46, 43, 0.12)";
-const OVERLAY = "rgba(0, 0, 0, 0.72)";
+const MUTED = "#5f7472";
+const BORDER = "rgba(18, 199, 155, 0.14)";
+const CARD_BORDER = "rgba(5, 46, 43, 0.06)";
+const OVERLAY = "rgba(223, 247, 239, 0.92)";
 
 const styles = StyleSheet.create({
   overlay: {
@@ -200,7 +196,7 @@ const styles = StyleSheet.create({
     backgroundColor: OVERLAY,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 22,
+    paddingHorizontal: 12,
   },
 
   backdrop: {
@@ -209,26 +205,34 @@ const styles = StyleSheet.create({
 
   modalCard: {
     width: "100%",
-    maxWidth: 350,
-    maxHeight: "78%",
-    backgroundColor: LIGHT_GREEN,
-    borderRadius: 28,
+    maxWidth: 368,
+    maxHeight: "88%",
+    backgroundColor: WHITE,
+    borderRadius: 30,
     paddingHorizontal: 22,
-    paddingTop: 22,
+    paddingTop: 24,
     paddingBottom: 18,
+    borderWidth: 1,
+    borderColor: CARD_BORDER,
+    shadowColor: "rgba(5, 46, 43, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 10,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 18,
+    marginBottom: 20,
   },
 
   title: {
     fontSize: 20,
     color: BLACK,
     fontFamily: fonts.bold,
+    letterSpacing: 0.2,
   },
 
   closeButton: {
@@ -242,7 +246,7 @@ const styles = StyleSheet.create({
 
   previewWrapper: {
     alignItems: "center",
-    marginBottom: 22,
+    marginBottom: 24,
   },
 
   previewAvatar: {
@@ -251,13 +255,19 @@ const styles = StyleSheet.create({
     borderRadius: 46,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "rgba(18, 199, 155, 0.18)",
+  },
+
+  previewAvatarImage: {
+    width: 90,
+    height: 90,
   },
 
   previewText: {
     fontSize: 13,
-    color: BLACK,
-    opacity: 0.7,
+    color: MUTED,
     fontFamily: fonts.medium,
   },
 
@@ -269,54 +279,67 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: BLACK,
     fontFamily: fonts.bold,
-    marginBottom: 12,
+    marginBottom: 14,
+    letterSpacing: 0.1,
   },
 
   avatarGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 24,
+    justifyContent: "space-between",
+    rowGap: 12,
+    marginBottom: 28,
   },
 
   avatarOption: {
-    width: 62,
-    height: 62,
-    borderRadius: 18,
+    width: 68,
+    height: 68,
+    borderRadius: 17,
     backgroundColor: WHITE,
     borderWidth: 1,
     borderColor: BORDER,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "rgba(5, 46, 43, 0.05)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
 
   selectedAvatarOption: {
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: GREEN,
+    backgroundColor: "rgba(223, 247, 239, 0.52)",
   },
 
   avatarIconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 60,
+    height: 60,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  avatarOptionImage: {
+    width: 50,
+    height: 50,
   },
 
   colorGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 26,
+    gap: 16,
+    marginBottom: 32,
   },
 
   colorOption: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: WHITE,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: BORDER,
+    borderColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -327,9 +350,9 @@ const styles = StyleSheet.create({
   },
 
   colorCircle: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
   },
 
   actions: {

@@ -1,9 +1,5 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import type { IconName } from "@repo/shared-types";
 import { getUserProfile } from "@/features/profile/services/profile-service";
@@ -16,12 +12,11 @@ import { removeAccessToken } from "@/app/lib/auth-storage";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 
-const GREEN = "#00c896";
-const LIGHT_GREEN = "#f1fff3";
+const MINT = "#12c79b";
+const GREEN = "#dff7ef";
 const WHITE = "#ffffff";
-const BLACK = "#052e2b";
-const BUTTON_GREEN = "#1A9E6A";
-const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+const DARK = "#082f32";
+const MUTED = "#7f9698";
 
 export default function ProfileScreen() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -31,14 +26,12 @@ export default function ProfileScreen() {
   const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
   const [avatarColor, setAvatarColor] = useState("#00c896");
 
-
   useEffect(() => {
     async function loadUserProfile() {
       try {
         const user = await getUserProfile();
 
         setFullName(user.fullName ?? "");
-        
         setEmail(user.email ?? "");
         setAvatarIcon(user.avatarIcon ?? "user");
         setAvatarColor(user.avatarColor ?? "#00c896");
@@ -78,54 +71,70 @@ export default function ProfileScreen() {
       setIsLoggingOut(false);
     }
   }
+
   return (
     <View style={styles.screen}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={["rgba(223, 247, 239, 0)", "#f7fffb", "#dff7ef"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.bottomGradient}
+      />
       <View style={styles.headerArea}>
-        <Pressable onPress={() => router.back()}>
-            <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        <Pressable style={styles.headerButton} onPress={() => router.back()}>
+          <Icon name="arrowLeft" size={24} strokeWidth={2.4} color={DARK} />
         </Pressable>
+
         <Text style={styles.title}>Profile</Text>
 
         <View style={styles.notifications}>
-          <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
+          <Icon name="bell" size={24} strokeWidth={1.8} color={DARK} />
         </View>
       </View>
 
-       <View style={styles.avatarWrapper}>
-         <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
-          <Icon name={avatarIcon} size={46} strokeWidth={1.8} color={BLACK} />
-        </View>
+      <View style={styles.content}>
+        <View style={styles.avatarWrapper}>
+          <View style={styles.avatarOuterRing}>
+            <View style={[styles.avatar, { borderColor: avatarColor || MINT }]}>
+              <Icon
+                name={avatarIcon}
+                size={48}
+                strokeWidth={1.8}
+                color={avatarColor || MINT}
+              />
+            </View>
+          </View>
         </View>
 
-      <View style={styles.card}>
+        <View style={styles.card}>
+          <View style={styles.nameContainer}>
+            <Text style={styles.name}>{fullName || "User"}</Text>
+            <Text style={styles.userId}>{email ? email : "-"}</Text>
+          </View>
 
-        <View style={styles.nameContainer}>
-          <Text style={styles.name}>{fullName || "User"}</Text>
-          <Text style={styles.userId}>{email ? email : "-"}</Text>
-        </View>
-       
-        {/* Options */}
-        <View style={styles.optionsContainer}>
-         <ProfileOption
-            icon="user"
-            label="Edit Profile"
-            onPress={() => router.push("/profile/edit")}
-          />
-          <ProfileOption
-            icon="shield"
-            label="Security"
-            onPress={() => router.push("/profile/security")}
-          />
-          <ProfileOption
-            icon="settings"
-            label="Settings"
-            onPress={() => router.push("/profile/settings")}
-          />
-          <ProfileOption
-            icon="logout"
-            label="Logout"
-            onPress={handleOpenLogoutDialog}
-          />
+          <View style={styles.optionsContainer}>
+            <ProfileOption
+              icon="user"
+              label="Edit Profile"
+              onPress={() => router.push("/profile/edit")}
+            />
+            <ProfileOption
+              icon="shield"
+              label="Security"
+              onPress={() => router.push("/profile/security")}
+            />
+            <ProfileOption
+              icon="settings"
+              label="Settings"
+              onPress={() => router.push("/profile/settings")}
+            />
+            <ProfileOption
+              icon="logout"
+              label="Logout"
+              onPress={handleOpenLogoutDialog}
+            />
+          </View>
         </View>
       </View>
 
@@ -150,97 +159,121 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
   },
 
+  bottomGradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 260,
+    zIndex: 0,
+  },
+
   headerArea: {
+    zIndex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 30,
-    paddingVertical: 10,
-    marginTop: 50,
+    paddingHorizontal: 20,
+    paddingTop: 34,
+    paddingBottom: 22,
+  },
+
+  headerButton: {
+    width: 42,
+    height: 42,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: fonts.bold,
+    color: DARK,
   },
 
   notifications: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: WHITE,
-    padding: 3,
-    borderRadius: 100,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "rgba(25, 89, 80, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+
+  content: {
+    zIndex: 1,
+    flex: 1,
+    paddingTop: 38,
+  },
+
+  avatarWrapper: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    zIndex: 2,
+  },
+
+  avatarOuterRing: {
+    width: 98,
+    height: 98,
+    borderRadius: 49,
+    backgroundColor: "rgba(255, 255, 255, 0.42)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  avatar: {
+    width: 94,
+    height: 94,
+    borderRadius: 47,
+    backgroundColor: WHITE,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
   },
 
   card: {
     flex: 1,
-    marginTop: 60,
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
-    paddingHorizontal: 32,
-    paddingTop: 75,
+    marginTop: 15,
+    backgroundColor: "rgba(255, 255, 255, 0.68)",
+    borderTopLeftRadius: 54,
+    borderTopRightRadius: 54,
+    paddingHorizontal: 20,
+    paddingTop: 88,
+    paddingBottom: 120,
+    shadowColor: "rgba(34, 93, 84, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: -4 },
+    elevation: 2,
   },
-
- avatarWrapper: {
-    position: "absolute",
-    top: 110,
-    left: 0,
-    right: 0,
-    alignItems: "center",
-    zIndex: 10,
-  },
-
-  avatar: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: LIGTH_GRAY,
-    borderWidth: 2,
-  },
-
 
   nameContainer: {
     alignItems: "center",
-    marginBottom: 20
+    marginBottom: 44,
   },
 
   name: {
-    fontSize: 15,
+    fontSize: 20,
     fontFamily: fonts.bold,
-    color: BLACK,
+    color: DARK,
   },
 
   userId: {
-    fontSize: 12,
-    fontFamily: fonts.regular,
-    color: BLACK,
-    opacity: 0.6,
-    marginTop: 4,
+    fontSize: 13,
+    fontFamily: fonts.medium,
+    color: MUTED,
+    marginTop: 8,
   },
 
   optionsContainer: {
-    gap: 5,
-  },
-
-  optionRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  optionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: BUTTON_GREEN,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 18,
-  },
-
-  optionLabel: {
-    fontSize: 14,
-    fontFamily: fonts.medium,
-    color: BLACK,
+    gap: 16,
   },
 });

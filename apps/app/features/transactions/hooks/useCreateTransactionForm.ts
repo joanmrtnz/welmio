@@ -18,15 +18,20 @@ import {
   TransactionType,
   Category,
   Account,
-  TransactionOverviewItem
+  TransactionOverviewItem,
+  CreateTransactionInitialValues
 } from "@repo/shared-types";
 import { feedback } from "@/components/ui/feedback/feedback.service";
+import { createGoalContribution } from "@/features/goals/services/goals.service";
+
 
 type UseCreateTransactionFormParams = {
   visible: boolean;
   transactionToEdit?: TransactionOverviewItem | null;
   onClose: () => void;
   onCreated?: () => void | Promise<void>;
+  initialValues?: CreateTransactionInitialValues | null;
+  lockType?: boolean;
 };
 
 export function useCreateTransactionForm({
@@ -34,6 +39,8 @@ export function useCreateTransactionForm({
   transactionToEdit,
   onClose,
   onCreated,
+  initialValues,
+  lockType = false,
 }: UseCreateTransactionFormParams) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -47,6 +54,8 @@ export function useCreateTransactionForm({
 
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [selectedAccountId, setSelectedAccountId] = useState("");
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
+
 
   const [frequencyType, setFrequencyType] =
     useState<FrequencyType>("one_time");
@@ -117,27 +126,59 @@ export function useCreateTransactionForm({
         if (firstAccount?.currencies?.[0]) {
           setCurrency(firstAccount.currencies[0]);
         }
+
+        if (initialValues) {
+          const nextType = initialValues.goalId ? "income" : initialValues.type ?? type;
+
+          setType(nextType);
+          setSelectedGoalId(initialValues.goalId ?? null);
+          setDescription(initialValues.description ?? "");
+          setNotes(initialValues.notes ?? "");
+
+          const firstCategoryForInitialType = nextCategories.find(
+            (category) => category.type === nextType,
+          );
+
+          setSelectedCategoryId(firstCategoryForInitialType?.id ?? "");
+        }
       } catch (error) {
         console.warn("[CreateTransactionModal] form data error:", error);
       }
     }
 
     loadFormData();
-  }, [visible, transactionToEdit]);
+  }, [visible, transactionToEdit, initialValues]);
 
   useEffect(() => {
     if (transactionToEdit) return;
 
-    const categoryExistsInCurrentType = filteredCategories.some(
+    if (lockType && selectedGoalId) {
+      setType("income");
+    }
+
+    const currentType = lockType && selectedGoalId ? "income" : type;
+
+    const categoriesForCurrentType = categories.filter(
+      (category) => category.type === currentType,
+    );
+
+   const categoryExistsInCurrentType = categoriesForCurrentType.some(
       (category) => category.id === selectedCategoryId,
     );
 
     if (!categoryExistsInCurrentType) {
-      setSelectedCategoryId(filteredCategories[0]?.id ?? "");
+      setSelectedCategoryId(categoriesForCurrentType[0]?.id ?? "");
     }
 
-    setTransactionNature(getDefaultTransactionNature(type));
-  }, [type, filteredCategories, selectedCategoryId, transactionToEdit]);
+    setTransactionNature(getDefaultTransactionNature(currentType));
+  }, [ 
+    type,
+    categories,
+    selectedCategoryId,
+    transactionToEdit,
+    lockType,
+    selectedGoalId,
+  ]);
 
   function resetForm() {
     setType("expense");
@@ -150,6 +191,7 @@ export function useCreateTransactionForm({
     setSelectedAccountId("");
     setFrequencyType("one_time");
     setTransactionNature("variable");
+    setSelectedGoalId(null);
   }
 
   function handleClose() {
@@ -179,7 +221,7 @@ export function useCreateTransactionForm({
     const payload = {
       amount: parsedAmount,
       currency: normalizeCurrency(currency),
-      type,
+      type: selectedGoalId ? "income" : type,
       description: description.trim(),
       notes: notes.trim() || undefined,
       date: parsedDate.toISOString(),
@@ -187,6 +229,7 @@ export function useCreateTransactionForm({
       accountId: selectedAccountId,
       frequencyType,
       transactionNature,
+      goalId: selectedGoalId ?? undefined,
     };
 
     try {
@@ -195,6 +238,13 @@ export function useCreateTransactionForm({
       if (transactionToEdit) {
         await updateTransaction(transactionToEdit.id, payload);
         feedback.success("Transaction updated successfully");
+      } else if (selectedGoalId) {
+        await createGoalContribution({
+          ...payload,
+          goalId: selectedGoalId,
+        });
+
+        feedback.success("Contribution added successfully");
       } else {
         await createTransaction(payload);
         feedback.success("Transaction created successfully");
@@ -218,6 +268,9 @@ export function useCreateTransactionForm({
 
     type,
     setType,
+
+    selectedGoalId,
+    setSelectedGoalId,
 
     amount,
     setAmount,
