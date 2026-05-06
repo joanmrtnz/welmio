@@ -1,4 +1,11 @@
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
 import { GoalContributionItem, GoalOverviewItem } from "@repo/shared-types";
@@ -6,14 +13,14 @@ import { useCallback, useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { getGoalContributions } from "../../services/goals.service";
 
-const GREEN = "#00c896";
-const LIGHT_GREEN = "#f1fff3";
-const CARD_GREEN = "#dff7e2";
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
-const BUTTON_GREEN = "#1A9E6A";
-const DIVIDER_GREEN = "#00d09e";
-const LIGTH_GRAY = "rgba(0,0,0,0.1)";
+const LIGHT_GREEN = "#eefbf6";
+const SOFT_GREEN = "#d8f5ea";
+const BUTTON_GREEN = "#93e2c9";
+const TAB_GREEN = "#12c79b";
+const BORDER_GREEN = "rgba(8, 120, 98, 0.14)";
+const MUTED = "rgba(5, 46, 43, 0.58)";
 const RED = "#dc2626";
 
 type GoalDetailsModalProps = {
@@ -48,7 +55,6 @@ function formatDate(date?: string | null) {
   }).format(new Date(date));
 }
 
-
 export function GoalDetailsModal({
   visible,
   goal,
@@ -68,7 +74,9 @@ export function GoalDetailsModal({
     useState(false);
   const [selectedContributionToDelete, setSelectedContributionToDelete] =
     useState<GoalContributionItem | null>(null);
-  const [contributions, setContributions] = useState<GoalContributionItem[]>([]);
+  const [contributions, setContributions] = useState<GoalContributionItem[]>(
+    [],
+  );
   const [isLoadingContributions, setIsLoadingContributions] = useState(false);
   const [contributionsError, setContributionsError] = useState<string | null>(
     null,
@@ -78,8 +86,8 @@ export function GoalDetailsModal({
     contributionsCount > 0
       ? `Are you sure you want to delete this goal?
   This will also delete ${contributionsCount} contribution${
-          contributionsCount === 1 ? "" : "s"
-        } linked to this goal.
+    contributionsCount === 1 ? "" : "s"
+  } linked to this goal.
   This action cannot be undone.`
       : `Are you sure you want to delete this goal?
   This action cannot be undone.`;
@@ -89,7 +97,7 @@ export function GoalDetailsModal({
 
     onClose();
     onEdit?.(goal);
-    }
+  }
 
   function handleOpenDeleteDialog() {
     setShowDeleteDialog(true);
@@ -201,7 +209,6 @@ export function GoalDetailsModal({
     loadGoalContributions();
   }, [visible, goal?.id, loadGoalContributions]);
 
-
   return (
     <Modal
       visible={visible}
@@ -219,21 +226,21 @@ export function GoalDetailsModal({
             <Text style={styles.title}>Goal Details</Text>
 
             <View style={styles.headerActions}>
-                <Pressable style={styles.iconButton} onPress={handleEditGoal}>
+              <Pressable style={styles.iconButton} onPress={handleEditGoal}>
                 <Icon name="edit" size={16} strokeWidth={1.5} color={BLACK} />
-                </Pressable>
+              </Pressable>
 
-               <Pressable
+              <Pressable
                 style={[styles.iconButton, styles.deleteIconButton]}
                 onPress={handleOpenDeleteDialog}
                 disabled={isDeleting}
-                >
+              >
                 <Icon name="bin" size={23} strokeWidth={1.5} color={RED} />
-                </Pressable>
+              </Pressable>
 
-                <Pressable style={styles.iconButton} onPress={onClose}>
+              <Pressable style={styles.iconButton} onPress={onClose}>
                 <Icon name="close" size={20} color={BLACK} />
-                </Pressable>
+              </Pressable>
             </View>
           </View>
 
@@ -247,7 +254,7 @@ export function GoalDetailsModal({
                   <Icon
                     name={(goal.icon ?? "rent") as never}
                     size={44}
-                    color={WHITE}
+                    color={TAB_GREEN}
                     strokeWidth={1.1}
                   />
                 </View>
@@ -256,7 +263,8 @@ export function GoalDetailsModal({
                   <Text style={styles.heroLabel}>{goal.statusLabel}</Text>
                   <Text style={styles.heroTitle}>{goal.name}</Text>
                   <Text style={styles.heroMeta}>
-                    {goal.type.replace("_", " ")} · {formatDate(goal.targetDate)}
+                    {goal.type.replace("_", " ")} ·{" "}
+                    {formatDate(goal.targetDate)}
                   </Text>
                 </View>
               </View>
@@ -299,7 +307,12 @@ export function GoalDetailsModal({
             <View style={styles.statsGrid}>
               <View style={styles.statCard}>
                 <View style={styles.statIcon}>
-                  <Icon name="money" size={24} color={BLACK} strokeWidth={1.2} />
+                  <Icon
+                    name="money"
+                    size={24}
+                    color={BLACK}
+                    strokeWidth={1.2}
+                  />
                 </View>
 
                 <Text style={styles.statLabel}>Remaining</Text>
@@ -345,7 +358,10 @@ export function GoalDetailsModal({
                   </Text>
                 </View>
 
-                <Pressable style={styles.addContributionButton} onPress={handleAddContribution}>
+                <Pressable
+                  style={styles.addContributionButton}
+                  onPress={handleAddContribution}
+                >
                   <Icon name="plus" size={18} color={BLACK} strokeWidth={1.8} />
                 </Pressable>
               </View>
@@ -360,13 +376,19 @@ export function GoalDetailsModal({
                 </Text>
               ) : contributions.length === 0 ? (
                 <Text style={styles.emptyContributionsText}>
-                  No contributions yet. Add your first one to start tracking this goal.
+                  No contributions yet. Add your first one to start tracking
+                  this goal.
                 </Text>
               ) : (
                 contributions.map((contribution) => (
                   <View key={contribution.id} style={styles.historyItem}>
                     <View style={styles.historyIcon}>
-                      <Icon name="income" size={22} color={WHITE} strokeWidth={1.3} />
+                      <Icon
+                        name="income"
+                        size={22}
+                        color={TAB_GREEN}
+                        strokeWidth={1.3}
+                      />
                     </View>
 
                     <View style={styles.historyContent}>
@@ -382,42 +404,62 @@ export function GoalDetailsModal({
                     </View>
 
                     <Text style={styles.historyAmount}>
-                      +{formatCurrency(contribution.amount, contribution.currency)}
+                      +
+                      {formatCurrency(
+                        contribution.amount,
+                        contribution.currency,
+                      )}
                     </Text>
 
                     <Pressable
                       style={styles.deleteContributionButton}
-                      onPress={() => handleOpenDeleteContributionDialog(contribution)}
+                      onPress={() =>
+                        handleOpenDeleteContributionDialog(contribution)
+                      }
                       disabled={isDeletingContribution}
                     >
-                      <Icon name="bin" size={17} color={RED} strokeWidth={1.5} />
+                      <Icon
+                        name="bin"
+                        size={17}
+                        color={RED}
+                        strokeWidth={1.5}
+                      />
                     </Pressable>
                   </View>
                 ))
               )}
             </View>
-
           </ScrollView>
-           <View style={styles.actionsRow}>
-               <Pressable
-                    style={styles.secondaryButton}
-                    onPress={() => {
-                        if (!goal) return;
+          <View style={styles.actionsRow}>
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={() => {
+                if (!goal) return;
 
-                        onClose();
-                        onEdit?.(goal);
-                    }}
-                    >
-                    <Text style={styles.secondaryButtonText}>Edit goal</Text>
-                </Pressable>
+                onClose();
+                onEdit?.(goal);
+              }}
+            >
+              <Text style={styles.secondaryButtonText}>Edit goal</Text>
+            </Pressable>
 
-              <Pressable style={styles.primaryButton}>
-                <Text style={styles.primaryButtonText}>Add contribution</Text>
-              </Pressable>
-            </View>
+             <Pressable
+              style={styles.deleteButton}
+              onPress={handleOpenDeleteDialog}
+              disabled={isDeleting}
+            >
+              <Icon
+                name="bin"
+                size={23}
+                strokeWidth={2}
+                color={RED}
+              />
+              <Text style={styles.deleteButtonText}>Delete</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
-     <ConfirmDialog
+      <ConfirmDialog
         visible={showDeleteDialog}
         title="Delete Goal"
         message={deleteMessage}
@@ -450,57 +492,72 @@ export function GoalDetailsModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(223, 247, 239, 0.96)",
+    paddingHorizontal: 20,
+    paddingVertical: 14,
   },
 
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.32)",
+    backgroundColor: "transparent",
   },
 
   modal: {
-    maxHeight: "90%",
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 42,
-    borderTopRightRadius: 42,
-    paddingTop: 12,
+    width: "100%",
+    maxHeight: "94%",
+    backgroundColor: "rgba(255, 255, 255, 0.72)",
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
+    paddingHorizontal: 22,
+    paddingTop: 14,
+    paddingBottom: 18,
     overflow: "hidden",
+    shadowColor: "rgba(29, 100, 89, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
   },
 
   handle: {
-    width: 44,
+    width: 42,
     height: 5,
     borderRadius: 999,
-    backgroundColor: DIVIDER_GREEN,
+    backgroundColor: SOFT_GREEN,
     alignSelf: "center",
-    marginBottom: 18,
+    marginBottom: 14,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 28,
     marginBottom: 16,
   },
 
   title: {
-    fontSize: 20,
+    flex: 1,
+    fontSize: 19,
     fontFamily: fonts.bold,
     color: BLACK,
+    letterSpacing: 0.2,
   },
 
   headerActions: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    },
+    flexShrink: 0,
+  },
 
   iconButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: WHITE,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -510,28 +567,29 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 28,
-    paddingBottom: 34,
+    paddingBottom: 16,
   },
 
   heroCard: {
-    backgroundColor: GREEN,
-    borderRadius: 30,
-    padding: 20,
-    marginBottom: 18,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
+    padding: 18,
+    marginBottom: 16,
   },
 
   heroTop: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 22,
+    marginBottom: 20,
   },
 
   heroIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 24,
-    backgroundColor: BUTTON_GREEN,
+    width: 66,
+    height: 66,
+    borderRadius: 20,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 14,
@@ -539,17 +597,17 @@ const styles = StyleSheet.create({
 
   heroInfo: {
     flex: 1,
+    minWidth: 0,
   },
 
   heroLabel: {
     fontSize: 12,
-    fontFamily: fonts.medium,
-    color: BLACK,
-    opacity: 0.75,
+    fontFamily: fonts.semibold,
+    color: MUTED,
   },
 
   heroTitle: {
-    fontSize: 20,
+    fontSize: 19,
     fontFamily: fonts.bold,
     color: BLACK,
     marginTop: 4,
@@ -557,77 +615,85 @@ const styles = StyleSheet.create({
 
   heroMeta: {
     fontSize: 12,
-    fontFamily: fonts.regular,
-    color: BLACK,
+    fontFamily: fonts.medium,
+    color: TAB_GREEN,
     marginTop: 5,
     textTransform: "capitalize",
   },
 
   progressCircle: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-    borderWidth: 5,
+    width: 108,
+    height: 108,
+    borderRadius: 54,
+    borderWidth: 8,
     borderColor: WHITE,
+    backgroundColor: SOFT_GREEN,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 18,
+    shadowColor: "rgba(29, 100, 89, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
   },
 
   progressValue: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: fonts.bold,
-    color: WHITE,
+    color: BLACK,
   },
 
   progressLabel: {
     fontSize: 11,
-    fontFamily: fonts.medium,
-    color: WHITE,
+    fontFamily: fonts.semibold,
+    color: MUTED,
     marginTop: 2,
   },
 
   mainProgressBar: {
     height: 10,
     borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.45)",
+    backgroundColor: WHITE,
     overflow: "hidden",
   },
 
   mainProgressFill: {
     height: "100%",
     borderRadius: 10,
-    backgroundColor: BLACK,
+    backgroundColor: TAB_GREEN,
   },
 
   amountsCard: {
     flexDirection: "row",
     backgroundColor: WHITE,
-    borderRadius: 24,
-    paddingVertical: 18,
-    marginBottom: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
+    paddingVertical: 16,
+    marginBottom: 14,
   },
 
   amountItem: {
     flex: 1,
     alignItems: "center",
+    paddingHorizontal: 8,
   },
 
   amountSeparator: {
     width: 1,
-    backgroundColor: CARD_GREEN,
+    backgroundColor: BORDER_GREEN,
   },
 
   amountLabel: {
     fontSize: 12,
-    fontFamily: fonts.regular,
-    color: BLACK,
-    opacity: 0.7,
+    fontFamily: fonts.medium,
+    color: MUTED,
   },
 
   amountValue: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: fonts.bold,
     color: BLACK,
     marginTop: 5,
@@ -636,21 +702,23 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 14,
   },
 
   statCard: {
     flex: 1,
-    backgroundColor: CARD_GREEN,
-    borderRadius: 22,
+    backgroundColor: WHITE,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
     padding: 14,
   },
 
   statIcon: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     borderRadius: 14,
-    backgroundColor: GREEN,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 10,
@@ -658,13 +726,12 @@ const styles = StyleSheet.create({
 
   statLabel: {
     fontSize: 11,
-    fontFamily: fonts.regular,
-    color: BLACK,
-    opacity: 0.75,
+    fontFamily: fonts.medium,
+    color: MUTED,
   },
 
   statValue: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: fonts.bold,
     color: BLACK,
     marginTop: 5,
@@ -672,9 +739,11 @@ const styles = StyleSheet.create({
 
   infoCard: {
     backgroundColor: WHITE,
-    borderRadius: 24,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 14,
   },
 
   sectionTitle: {
@@ -685,17 +754,19 @@ const styles = StyleSheet.create({
 
   infoText: {
     fontSize: 12,
-    fontFamily: fonts.regular,
-    color: BLACK,
+    fontFamily: fonts.medium,
+    color: MUTED,
     lineHeight: 19,
     marginTop: 8,
   },
 
   mockHistoryCard: {
     backgroundColor: WHITE,
-    borderRadius: 24,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
     padding: 16,
-    marginBottom: 18,
+    marginBottom: 4,
   },
 
   sectionHeader: {
@@ -703,13 +774,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 14,
+    gap: 12,
   },
 
   mockLabel: {
     fontSize: 11,
-    fontFamily: fonts.medium,
+    fontFamily: fonts.semibold,
     color: BLACK,
-    backgroundColor: CARD_GREEN,
+    backgroundColor: SOFT_GREEN,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 12,
@@ -718,14 +790,16 @@ const styles = StyleSheet.create({
   historyItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 14,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(8, 120, 98, 0.08)",
   },
 
   historyIcon: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: 15,
-    backgroundColor: BUTTON_GREEN,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -733,46 +807,42 @@ const styles = StyleSheet.create({
 
   historyContent: {
     flex: 1,
+    minWidth: 0,
     marginRight: 8,
   },
 
   historyTitle: {
     fontSize: 13,
-    fontFamily: fonts.medium,
+    fontFamily: fonts.semibold,
     color: BLACK,
   },
 
   historyDate: {
     fontSize: 11,
-    fontFamily: fonts.regular,
-    color: BLACK,
-    opacity: 0.65,
+    fontFamily: fonts.medium,
+    color: MUTED,
     marginTop: 3,
   },
 
   historyAmount: {
     fontSize: 13,
     fontFamily: fonts.bold,
-    color: BUTTON_GREEN,
+    color: TAB_GREEN,
   },
 
   actionsRow: {
     flexDirection: "row",
-    gap: 12,
-    paddingHorizontal: 28,
-    paddingBottom: 34,
+    gap: 14,
+    paddingTop: 10,
   },
 
   secondaryButton: {
     flex: 1,
-    height: 54,
-    borderRadius: 20,
-    backgroundColor: WHITE,
+    height: 50,
+    borderRadius: 13,
+    backgroundColor: LIGHT_GREEN,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: LIGTH_GRAY,
-    borderWidth: 1,
-    marginLeft: 8,
   },
 
   secondaryButtonText: {
@@ -783,9 +853,9 @@ const styles = StyleSheet.create({
 
   primaryButton: {
     flex: 1.2,
-    height: 54,
-    borderRadius: 20,
-    backgroundColor: GREEN,
+    height: 50,
+    borderRadius: 13,
+    backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -793,48 +863,63 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 14,
     fontFamily: fonts.bold,
-    color: BLACK,
+    color: WHITE,
   },
-
 
   addContributionButton: {
     width: 38,
     height: 38,
-    borderRadius: 19,
-    backgroundColor: GREEN,
+    borderRadius: 15,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
+    flexShrink: 0,
+  },
+
+  deleteButton: {
+    flex: 1,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+
+  deleteButtonText: {
+    fontSize: 15,
+    fontFamily: fonts.bold,
+    color: RED,
   },
 
   deleteContributionButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 32,
+    height: 32,
+    borderRadius: 14,
     backgroundColor: "#fee2e2",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 10,
+    marginLeft: 8,
   },
 
   sectionSubtitle: {
     fontSize: 11,
-    fontFamily: fonts.regular,
-    color: BLACK,
-    opacity: 0.65,
+    fontFamily: fonts.medium,
+    color: MUTED,
     marginTop: 3,
   },
 
   emptyContributionsText: {
     fontSize: 12,
-    fontFamily: fonts.regular,
-    color: BLACK,
-    opacity: 0.7,
+    fontFamily: fonts.medium,
+    color: MUTED,
     lineHeight: 18,
   },
 
   errorContributionsText: {
     fontSize: 12,
-    fontFamily: fonts.medium,
+    fontFamily: fonts.semibold,
     color: RED,
     lineHeight: 18,
   },
