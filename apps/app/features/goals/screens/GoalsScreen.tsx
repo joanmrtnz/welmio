@@ -25,6 +25,7 @@ import { CreateGoalModal } from "../components/create-goal-modal/CreateGoalModal
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { GoalDetailsModal } from "../components/create-goal-modal/GoalDetailsModal";
 import { CreateTransactionModal } from "@/features/transactions/components/create-transaction-modal/CreateTransactionModal";
+import { formatGoalTargetDate } from "../utils/formatGoalTargetDate";
 
 const GREEN = "#dff7ef";
 const DIVIDER_GREEN = "#7adcc8";
@@ -235,226 +236,226 @@ export default function GoalsScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.headerArea}>
-        <Pressable onPress={() => router.back()}>
-          <Icon name="arrowLeft" size={22} strokeWidth={2.5} color={BLACK} />
+        <Pressable hitSlop={12} onPress={() => router.back()}>
+          <Icon name="arrowLeft" size={24} strokeWidth={2.5} color={BLACK} />
         </Pressable>
 
         <Text style={styles.title}>Goals</Text>
 
         <View style={styles.notifications}>
-          <Icon name="bell" size={28} strokeWidth={1.5} color={BLACK} />
+          <Icon name="bell" size={24} strokeWidth={1.8} color={BLACK} />
         </View>
       </View>
 
-      <View style={styles.balanceRow}>
-        <View>
-          <Text style={styles.label}>Total Saved</Text>
-          <Text style={styles.balance}>{formatCurrency(totalSaved)}</Text>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        <View style={styles.balanceRow}>
+          <View style={styles.balanceColumn}>
+            <Text style={styles.label}>Total Saved</Text>
+            <Text style={styles.balance}>{formatCurrency(totalSaved)}</Text>
+          </View>
+
+          <View style={styles.separator} />
+
+          <View style={styles.balanceColumn}>
+            <Text style={styles.label}>Target Amount</Text>
+            <Text style={styles.expense}>{formatCurrency(totalTarget)}</Text>
+          </View>
         </View>
 
-        <View style={styles.separator} />
-
-        <View>
-          <Text style={styles.label}>Target Amount</Text>
-          <Text style={styles.expense}>{formatCurrency(totalTarget)}</Text>
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar}>
+            <View
+              style={[styles.progressFill, { width: `${globalProgress}%` }]}
+            />
+          </View>
+          <Text style={styles.progressText}>
+            {isLoading
+              ? "Loading goals..."
+              : (errorMessage ??
+                data?.summary.progressMessage ??
+                "No goals yet.")}
+          </Text>
         </View>
-      </View>
 
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View
-            style={[styles.progressFill, { width: `${globalProgress}%` }]}
-          />
+        {mainGoal ? (
+          <Pressable
+            style={styles.mainGoalCard}
+            onPress={() => openGoalDetails(mainGoal)}
+          >
+            <View style={styles.mainGoalHeader}>
+              <View style={styles.mainGoalTextWrap}>
+                <Text style={styles.sectionEyebrow}>Main Goal</Text>
+                <Text style={styles.mainGoalTitle} numberOfLines={1}>
+                  {mainGoal.name}
+                </Text>
+              </View>
+
+              <View style={styles.mainGoalIcon}>
+                <Icon
+                  name={(mainGoal.icon ?? "target") as never}
+                  size={32}
+                  color={BUTTON_GREEN}
+                  strokeWidth={1.6}
+                />
+              </View>
+            </View>
+
+            <View style={styles.bigProgressRow}>
+              <View style={styles.progressCircle}>
+                <Text style={styles.progressCircleValue}>
+                  {mainGoal.progress}%
+                </Text>
+              </View>
+
+              <View style={styles.mainGoalInfo}>
+                <Text style={styles.goalAmount} numberOfLines={1}>
+                  {formatCurrency(mainGoal.saved, mainGoal.currency)}
+                </Text>
+
+                <Text style={styles.goalMeta} numberOfLines={1}>
+                  saved of {formatCurrency(mainGoal.target, mainGoal.currency)}
+                </Text>
+
+                <Text style={styles.goalMeta} numberOfLines={1}>
+                  Target date · {formatGoalTargetDate(mainGoal.targetDate)}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.mainProgressBar}>
+              <View
+                style={[
+                  styles.mainProgressFill,
+                  { width: `${Math.min(mainGoal.progress, 100)}%` },
+                ]}
+              />
+            </View>
+          </Pressable>
+        ) : (
+          <View style={styles.emptyMainGoalCard}>
+            <Text style={styles.mainGoalTitle}>No goals yet</Text>
+            <Text style={styles.goalMeta}>
+              Create your first goal to start tracking your progress.
+            </Text>
+          </View>
+        )}
+
+        <View style={styles.paceCard}>
+          <View style={styles.paceItem}>
+            <View style={styles.smallIconBox}>
+              <Icon name="calendar" size={23} color={TAB_GREEN} />
+            </View>
+            <Text style={styles.paceLabel}>Monthly Needed</Text>
+            <Text style={styles.paceValue}>
+              {formatCurrency(totalMonthlyNeeded)}
+            </Text>
+          </View>
+
+          <View style={styles.paceSeparator} />
+
+          <View style={styles.paceItem}>
+            <View style={styles.smallIconBox}>
+              <Icon name="income" size={23} color={TAB_GREEN} />
+            </View>
+            <Text style={styles.paceLabel}>Active Goals</Text>
+            <Text style={styles.paceValue}>{goals.length}</Text>
+          </View>
         </View>
-        <Text style={styles.progressText}>
-          {isLoading
-            ? "Loading goals..."
-            : (errorMessage ??
-              data?.summary.progressMessage ??
-              "No goals yet.")}
-        </Text>
-      </View>
 
-      <View style={styles.cardWrapper}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.cardContent}
-        >
-          {mainGoal ? (
-            <Pressable
-              style={styles.mainGoalCard}
-              onPress={() => openGoalDetails(mainGoal)}
-            >
-              <View style={styles.mainGoalHeader}>
-                <View>
-                  <Text style={styles.sectionEyebrow}>Main Goal</Text>
-                  <Text style={styles.mainGoalTitle}>{mainGoal.name}</Text>
-                </View>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>My Goals</Text>
 
-                <View style={styles.mainGoalIcon}>
+          <Pressable style={styles.filterButton}>
+            <Text style={styles.filterText}>Active</Text>
+          </Pressable>
+        </View>
+
+        {goals.map((goal) => (
+          <Pressable
+            key={goal.id}
+            style={styles.goalCard}
+            onPress={() => openGoalDetails(goal)}
+          >
+            <View style={styles.goalTopRow}>
+              <View style={styles.goalLeft}>
+                <View style={styles.iconCircle}>
                   <Icon
-                    name={(mainGoal.icon ?? "target") as never}
-                    size={32}
+                    name={(goal.icon ?? "target") as never}
+                    size={30}
                     color={BUTTON_GREEN}
-                    strokeWidth={1.6}
+                    strokeWidth={1.2}
                   />
                 </View>
-              </View>
 
-              <View style={styles.bigProgressRow}>
-                <View style={styles.progressCircle}>
-                  <Text style={styles.progressCircleValue}>
-                    {mainGoal.progress}%
-                  </Text>
-                </View>
-
-                <View style={styles.mainGoalInfo}>
-                  <Text style={styles.goalAmount}>
-                    {formatCurrency(mainGoal.saved, mainGoal.currency)}
+                <View style={styles.goalTextContent}>
+                  <Text style={styles.goalTitle} numberOfLines={1}>
+                    {goal.name}
                   </Text>
 
-                  <Text style={styles.goalMeta}>
-                    saved of{" "}
-                    {formatCurrency(mainGoal.target, mainGoal.currency)}
-                  </Text>
-
-                  <Text style={styles.goalMeta}>
-                    Target date · {mainGoal.targetDate ?? "No date"}
+                  <Text style={styles.goalSubtitle} numberOfLines={1}>
+                    {formatGoalTargetDate(goal.targetDate)} · {goal.statusLabel}
                   </Text>
                 </View>
               </View>
 
-              <View style={styles.mainProgressBar}>
-                <View
-                  style={[
-                    styles.mainProgressFill,
-                    { width: `${Math.min(mainGoal.progress, 100)}%` },
-                  ]}
-                />
+              <View style={styles.percentBadge}>
+                <Text style={styles.percentText}>{goal.progress}%</Text>
               </View>
-            </Pressable>
-          ) : (
-            <View style={styles.emptyMainGoalCard}>
-              <Text style={styles.mainGoalTitle}>No goals yet</Text>
-              <Text style={styles.goalMeta}>
-                Create your first goal to start tracking your progress.
+            </View>
+
+            <View style={styles.goalProgressBar}>
+              <View
+                style={[
+                  styles.goalProgressFill,
+                  { width: `${Math.min(goal.progress, 100)}%` },
+                ]}
+              />
+            </View>
+
+            <View style={styles.goalBottomRow}>
+              <Text style={styles.goalSmallText} numberOfLines={1}>
+                {formatCurrency(goal.saved, goal.currency)} saved
+              </Text>
+
+              <Text style={styles.goalSmallText} numberOfLines={1}>
+                {formatCurrency(goal.target, goal.currency)}
               </Text>
             </View>
-          )}
+          </Pressable>
+        ))}
 
-          <View style={styles.paceCard}>
-            <View style={styles.paceItem}>
-              <View style={styles.smallIconBox}>
-                <Icon name="calendar" size={23} color={WHITE} />
-              </View>
-              <Text style={styles.paceLabel}>Monthly Needed</Text>
-              <Text style={styles.paceValue}>
-                {formatCurrency(totalMonthlyNeeded)}
-              </Text>
-            </View>
-
-            <View style={styles.paceSeparator} />
-
-            <View style={styles.paceItem}>
-              <View style={styles.smallIconBox}>
-                <Icon name="income" size={23} color={WHITE} />
-              </View>
-              <Text style={styles.paceLabel}>Active Goals</Text>
-              <Text style={styles.paceValue}>{goals.length}</Text>
-            </View>
+        <View style={styles.tipCard}>
+          <View style={styles.tipIcon}>
+            <Icon name="money" size={38} color={BUTTON_GREEN} strokeWidth={1} />
           </View>
 
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>My Goals</Text>
-
-            <Pressable style={styles.filterButton}>
-              <Text style={styles.filterText}>Active</Text>
-            </Pressable>
+          <View style={styles.tipContent}>
+            <Text style={styles.tipTitle}>Smart tip</Text>
+            <Text style={styles.tipText}>
+              {mainGoal
+                ? `You need around ${formatCurrency(
+                    mainGoal.monthlyNeeded,
+                    mainGoal.currency,
+                  )} per month to reach your ${mainGoal.name.toLowerCase()} goal on time.`
+                : "Create a goal to receive simple progress tips."}
+            </Text>
           </View>
+        </View>
+      </ScrollView>
 
-          {goals.map((goal) => (
-            <Pressable
-              key={goal.id}
-              style={styles.goalCard}
-              onPress={() => openGoalDetails(goal)}
-            >
-              <View style={styles.goalTopRow}>
-                <View style={styles.goalLeft}>
-                  <View style={styles.iconCircle}>
-                    <Icon
-                      name={(goal.icon ?? "target") as never}
-                      size={30}
-                      color={BUTTON_GREEN}
-                      strokeWidth={1.2}
-                    />
-                  </View>
+      <Pressable style={styles.fab} onPress={openCreateGoalModal}>
+        <Icon name="plus" size={30} color={WHITE} strokeWidth={1.8} />
+      </Pressable>
 
-                  <View style={styles.goalTextContent}>
-                    <Text style={styles.goalTitle} numberOfLines={1}>
-                      {goal.name}
-                    </Text>
+      <LinearGradient
+        pointerEvents="none"
+        colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
+        style={styles.bottomFade}
+      />
 
-                    <Text style={styles.goalSubtitle}>
-                      {goal.targetDate ?? "No date"} · {goal.statusLabel}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.percentBadge}>
-                  <Text style={styles.percentText}>{goal.progress}%</Text>
-                </View>
-              </View>
-
-              <View style={styles.goalProgressBar}>
-                <View
-                  style={[
-                    styles.goalProgressFill,
-                    { width: `${Math.min(goal.progress, 100)}%` },
-                  ]}
-                />
-              </View>
-
-              <View style={styles.goalBottomRow}>
-                <Text style={styles.goalSmallText}>
-                  {formatCurrency(goal.saved, goal.currency)} saved
-                </Text>
-
-                <Text style={styles.goalSmallText}>
-                  {formatCurrency(goal.target, goal.currency)}
-                </Text>
-              </View>
-            </Pressable>
-          ))}
-
-          <View style={styles.tipCard}>
-            <View style={styles.tipIcon}>
-              <Icon name="money" size={50} color={WHITE} strokeWidth={0.8} />
-            </View>
-
-            <View style={styles.tipContent}>
-              <Text style={styles.tipTitle}>Smart tip</Text>
-              <Text style={styles.tipText}>
-                {mainGoal
-                  ? `You need around ${formatCurrency(
-                      mainGoal.monthlyNeeded,
-                      mainGoal.currency,
-                    )} per month to reach your ${mainGoal.name.toLowerCase()} goal on time.`
-                  : "Create a goal to receive simple progress tips."}
-              </Text>
-            </View>
-          </View>
-        </ScrollView>
-
-        <Pressable style={styles.fab} onPress={openCreateGoalModal}>
-          <Icon name="plus" size={30} color={WHITE} strokeWidth={1.8} />
-        </Pressable>
-
-        <LinearGradient
-          pointerEvents="none"
-          colors={["rgba(248, 255, 252, 0)", "rgba(248, 255, 252, 0.96)"]}
-          style={styles.bottomFade}
-        />
-      </View>
       <CreateGoalModal
         visible={isCreateGoalModalVisible}
         mode={createGoalModalMode}
@@ -495,15 +496,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: 30,
-    paddingVertical: 10,
-    marginTop: 48,
-    marginBottom: 18,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    marginTop: 26,
+    marginBottom: 22,
   },
 
   title: {
     textAlign: "center",
-    fontSize: 21,
+    fontSize: 19,
     fontFamily: fonts.bold,
     color: BLACK,
   },
@@ -511,15 +512,20 @@ const styles = StyleSheet.create({
   notifications: {
     width: 42,
     height: 42,
-    backgroundColor: WHITE,
+    backgroundColor: LIGHT_GREEN,
     borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: SOFT_SHADOW,
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 3,
+  },
+
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 142,
   },
 
   balanceRow: {
@@ -527,87 +533,80 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 22,
-    gap: 34,
+    gap: 30,
+  },
+
+  balanceColumn: {
+    minWidth: 104,
+    alignItems: "center",
   },
 
   label: {
     fontSize: 13,
-    fontFamily: fonts.regular,
+    fontFamily: fonts.medium,
     color: BLACK,
-    opacity: 0.82,
-    marginBottom: 3,
+    opacity: 0.72,
+    marginBottom: 4,
   },
 
   balance: {
-    fontSize: 22,
+    fontSize: 24,
+    lineHeight: 29,
     fontFamily: fonts.bold,
     color: DARK_GREEN,
   },
 
   expense: {
-    fontSize: 22,
+    fontSize: 24,
+    lineHeight: 29,
     fontFamily: fonts.bold,
     color: BLACK,
   },
 
   separator: {
     width: 1,
-    height: 44,
-    backgroundColor: "rgba(16, 185, 146, 0.5)",
+    height: 48,
+    backgroundColor: "rgba(6, 59, 58, 0.18)",
   },
 
   progressContainer: {
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 34,
   },
 
   progressBar: {
-    height: 18,
-    borderRadius: 12,
-    width: "71%",
-    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    height: 16,
+    borderRadius: 10,
+    width: "88%",
+    backgroundColor: DIVIDER_GREEN,
     overflow: "hidden",
   },
 
   progressFill: {
     height: "100%",
-    borderRadius: 12,
-    backgroundColor: DARK_GREEN,
+    borderRadius: 10,
+    backgroundColor: TAB_GREEN,
   },
 
   progressText: {
     marginTop: 10,
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: fonts.medium,
     color: BLACK,
-    opacity: 0.82,
-  },
-
-  cardWrapper: {
-    flex: 1,
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 62,
-    borderTopRightRadius: 62,
-    paddingTop: 26,
-    overflow: "hidden",
-  },
-
-  cardContent: {
-    paddingHorizontal: 30,
-    paddingTop: 0,
-    paddingBottom: 150,
+    opacity: 0.86,
+    textAlign: "center",
   },
 
   mainGoalCard: {
-    backgroundColor: GREEN,
-    borderRadius: 28,
-    padding: 19,
-    marginBottom: 20,
-    shadowColor: SOFT_SHADOW,
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 5,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 1,
   },
 
   mainGoalHeader: {
@@ -615,13 +614,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 16,
+    gap: 12,
+  },
+
+  mainGoalTextWrap: {
+    flex: 1,
   },
 
   sectionEyebrow: {
     fontSize: 12,
     fontFamily: fonts.medium,
     color: BLACK,
-    opacity: 0.75,
+    opacity: 0.68,
   },
 
   mainGoalTitle: {
@@ -634,8 +638,8 @@ const styles = StyleSheet.create({
   mainGoalIcon: {
     width: 58,
     height: 58,
-    borderRadius: 19,
-    backgroundColor: "rgba(187, 239, 221, 0.95)",
+    borderRadius: 18,
+    backgroundColor: CARD_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -650,18 +654,18 @@ const styles = StyleSheet.create({
     width: 82,
     height: 82,
     borderRadius: 41,
-    borderWidth: 4,
-    borderColor: DARK_GREEN,
+    borderWidth: 5,
+    borderColor: "rgba(16, 185, 146, 0.25)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 18,
-    backgroundColor: "rgba(255, 255, 255, 0.36)",
+    backgroundColor: WHITE,
   },
 
   progressCircleValue: {
     fontSize: 21,
     fontFamily: fonts.bold,
-    color: DARK_GREEN,
+    color: TAB_GREEN,
   },
 
   mainGoalInfo: {
@@ -678,35 +682,35 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.regular,
     color: BLACK,
-    opacity: 0.82,
+    opacity: 0.74,
     marginTop: 4,
   },
 
   mainProgressBar: {
     height: 9,
     borderRadius: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.72)",
+    backgroundColor: CARD_GREEN,
     overflow: "hidden",
   },
 
   mainProgressFill: {
     height: "100%",
     borderRadius: 10,
-    backgroundColor: DARK_GREEN,
+    backgroundColor: TAB_GREEN,
   },
 
   paceCard: {
     flexDirection: "row",
-    backgroundColor: GREEN,
-    borderRadius: 24,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 18,
     paddingVertical: 18,
     paddingHorizontal: 16,
-    marginBottom: 20,
-    shadowColor: SOFT_SHADOW,
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 7 },
-    elevation: 4,
+    marginBottom: 22,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 1,
   },
 
   paceItem: {
@@ -718,7 +722,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 11,
-    backgroundColor: TAB_GREEN,
+    backgroundColor: GREEN,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 8,
@@ -728,7 +732,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.regular,
     color: BLACK,
-    opacity: 0.82,
+    opacity: 0.72,
   },
 
   paceValue: {
@@ -740,7 +744,7 @@ const styles = StyleSheet.create({
 
   paceSeparator: {
     width: 1,
-    backgroundColor: "rgba(16, 185, 146, 0.45)",
+    backgroundColor: "rgba(6, 59, 58, 0.12)",
     marginHorizontal: 8,
   },
 
@@ -748,17 +752,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 14,
+    marginBottom: 16,
   },
 
   sectionTitle: {
-    fontSize: 17,
+    fontSize: 15,
     fontFamily: fonts.bold,
     color: BLACK,
+    paddingBottom: 4,
   },
 
   filterButton: {
-    backgroundColor: CARD_GREEN,
+    backgroundColor: LIGHT_GREEN,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 18,
@@ -771,15 +776,15 @@ const styles = StyleSheet.create({
   },
 
   goalCard: {
-    backgroundColor: WHITE,
-    borderRadius: 24,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 18,
     padding: 16,
-    marginBottom: 14,
-    shadowColor: SOFT_SHADOW,
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 5,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 1,
   },
 
   goalTopRow: {
@@ -798,9 +803,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 15,
-    borderWidth: 1.3,
-    borderColor: BUTTON_GREEN,
-    backgroundColor: "rgba(226, 248, 240, 0.3)",
+    backgroundColor: CARD_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -821,7 +824,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: fonts.regular,
     color: BLACK,
-    opacity: 0.72,
+    opacity: 0.66,
     marginTop: 5,
     lineHeight: 15,
   },
@@ -852,16 +855,18 @@ const styles = StyleSheet.create({
   goalProgressFill: {
     height: "100%",
     borderRadius: 8,
-    backgroundColor: DARK_GREEN,
+    backgroundColor: TAB_GREEN,
   },
 
   goalBottomRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 12,
     marginTop: 9,
   },
 
   goalSmallText: {
+    flexShrink: 1,
     fontSize: 11,
     fontFamily: fonts.medium,
     color: BLACK,
@@ -871,17 +876,17 @@ const styles = StyleSheet.create({
   tipCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: GREEN,
-    borderRadius: 24,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 18,
     padding: 16,
-    marginTop: 10,
+    marginTop: 8,
   },
 
   tipIcon: {
     width: 50,
     height: 50,
-    borderRadius: 17,
-    backgroundColor: BUTTON_GREEN,
+    borderRadius: 16,
+    backgroundColor: CARD_GREEN,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 14,
@@ -903,12 +908,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: BLACK,
     lineHeight: 18,
+    opacity: 0.8,
   },
 
   fab: {
     position: "absolute",
     right: 28,
-    bottom: 120,
+    bottom: 116,
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -932,10 +938,10 @@ const styles = StyleSheet.create({
   },
 
   emptyMainGoalCard: {
-    backgroundColor: GREEN,
-    borderRadius: 28,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 20,
     padding: 22,
-    marginBottom: 24,
+    marginBottom: 14,
     minHeight: 150,
     alignItems: "center",
     justifyContent: "center",
