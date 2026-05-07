@@ -17,6 +17,8 @@ import { feedback } from "@/components/ui/feedback/feedback.service";
 import { router } from "expo-router";
 import { AvatarPickerModal } from "../components/AvatarPickerModal";
 import { IconName } from "@repo/shared-types";
+import { Image } from "react-native";
+
 
 export default function EditProfileScreen() {
   const [usernameLabel, setUsernameLabel] = useState("");
@@ -31,6 +33,8 @@ export default function EditProfileScreen() {
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
   const [avatarColor, setAvatarColor] = useState(GREEN);
+  const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+
 
   async function handleUpdateProfile() {
     try {
@@ -111,7 +115,7 @@ export default function EditProfileScreen() {
       <Text style={styles.inputLabel}>{label}</Text>
       <View style={[styles.inputBox, !editable && styles.inputBoxDisabled]}>
         <View style={styles.inputIconBox}>
-          <Icon name={icon} size={20} strokeWidth={1.8} color={PRIMARY} />
+          <Icon name={icon} size={19} strokeWidth={1.8} color={TEAL} />
         </View>
         <TextInput
           style={styles.input}
@@ -135,57 +139,52 @@ export default function EditProfileScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.headerArea}>
-        <Pressable
-          style={styles.headerIconButton}
-          onPress={() => router.back()}
-        >
-          <Icon name="arrowLeft" size={22} strokeWidth={2.4} color={BLACK} />
+        <Pressable hitSlop={12} onPress={() => router.back()}>
+          <Icon name="arrowLeft" size={24} strokeWidth={2.5} color={DARK_TEAL} />
         </Pressable>
 
         <Text style={styles.title}>Edit My Profile</Text>
 
         <View style={styles.notifications}>
-          <Icon name="bell" size={24} strokeWidth={1.7} color={BLACK} />
+          <Icon name="bell" size={24} strokeWidth={1.8} color={DARK_TEAL} />
         </View>
       </View>
 
-      <View style={styles.avatarWrapper}>
-        <View>
-          <View
-            style={[
-              styles.avatar,
-              { backgroundColor: avatarColor || AVATAR_BG },
-            ]}
-          >
-            <Icon
-              name={avatarIcon}
-              size={48}
-              strokeWidth={1.7}
-              color={PRIMARY}
-            />
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.profileCard}>
+          <View style={styles.avatarOuterRing}>
+            <View
+              style={[
+                styles.avatar,
+                { borderColor: avatarColor || TEAL, backgroundColor: avatarColor || SOFT_TEAL },
+              ]}
+            >
+              <Image
+                source={WELMIO_LOGO}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
+            </View>
+
+            <Pressable
+              style={styles.editAvatarButton}
+              onPress={() => setShowAvatarModal(true)}
+            >
+              <Icon name="edit" size={17} strokeWidth={1.9} color={DARK_TEAL} />
+            </Pressable>
           </View>
 
-          <Pressable
-            style={styles.editAvatarButton}
-            onPress={() => setShowAvatarModal(true)}
-          >
-            <Icon name="edit" size={18} strokeWidth={1.8} color={BLACK} />
-          </Pressable>
-        </View>
-      </View>
-
-      <View style={styles.card}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.cardContent}
-        >
           <View style={styles.nameContainer}>
             <Text style={styles.name}>{usernameLabel || "User"}</Text>
             <Text style={styles.userId}>{email ? email : "-"}</Text>
           </View>
+        </View>
 
-          <Text style={styles.sectionTitle}>Account Settings</Text>
-
+        <View style={styles.settingsCard}>
           <View style={styles.form}>
             {renderField({
               label: "Username",
@@ -220,48 +219,48 @@ export default function EditProfileScreen() {
               editable: false,
             })}
 
-            <View style={styles.settingsBlock}>
-              <View style={styles.settingRow}>
-                <Text style={styles.settingLabel}>Push Notifications</Text>
+            <View style={styles.divider} />
 
-                <Switch
-                  value={pushNotifications}
-                  onValueChange={setPushNotifications}
-                  trackColor={{ false: SWITCH_OFF, true: PRIMARY }}
-                  thumbColor={WHITE}
-                />
-              </View>
+            <View style={styles.settingRow}>
+              <Text style={styles.settingLabel}>Push Notifications</Text>
 
-              <View style={styles.settingRow}>
-                <Text style={styles.settingLabel}>Turn Dark Theme</Text>
-
-                <Switch
-                  value={darkTheme}
-                  onValueChange={setDarkTheme}
-                  trackColor={{ false: SWITCH_OFF, true: PRIMARY }}
-                  thumbColor={WHITE}
-                />
-              </View>
+              <Switch
+                value={pushNotifications}
+                onValueChange={setPushNotifications}
+                trackColor={{ false: SWITCH_OFF, true: TEAL }}
+                thumbColor={WHITE}
+              />
             </View>
 
-            <View style={styles.buttons}>
-              <Pressable
-                style={({ pressed }) => [
-                  styles.updateButton,
-                  pressed && styles.updateButtonPressed,
-                  isLoading && styles.updateButtonDisabled,
-                ]}
-                onPress={handleUpdateProfile}
-                disabled={isLoading}
-              >
-                <Text style={styles.updateButtonText}>
-                  {isLoading ? "Loading..." : "Update Profile"}
-                </Text>
-              </Pressable>
+            <View style={styles.divider} />
+
+            <View style={styles.settingRow}>
+              <Text style={styles.settingLabel}>Turn Dark Theme</Text>
+
+              <Switch
+                value={darkTheme}
+                onValueChange={setDarkTheme}
+                trackColor={{ false: SWITCH_OFF, true: TEAL }}
+                thumbColor={WHITE}
+              />
             </View>
           </View>
-        </ScrollView>
-      </View>
+        </View>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.updateButton,
+            pressed && styles.updateButtonPressed,
+            isLoading && styles.updateButtonDisabled,
+          ]}
+          onPress={handleUpdateProfile}
+          disabled={isLoading}
+        >
+          <Text style={styles.updateButtonText}>
+            {isLoading ? "Updating..." : "Update Profile"}
+          </Text>
+        </Pressable>
+      </ScrollView>
 
       <AvatarPickerModal
         visible={showAvatarModal}
@@ -275,165 +274,184 @@ export default function EditProfileScreen() {
   );
 }
 
-const GREEN = "#dff7ef";
-const PRIMARY = "#12b895";
-const AVATAR_BG = "#e6f8f1";
+const TEAL = "#00c896";
+const DARK_TEAL = "#063b3a";
+const SOFT_TEAL = "#a9efdf";
+const VERY_SOFT_TEAL = "#eafaf5";
+const CARD = "#fbfffd";
 const WHITE = "#ffffff";
-const BLACK = "#073331";
-const MUTED = "#7b8a8c";
+const MUTED = "#5e7b78";
 const INPUT_BG = "#eef8f2";
+const GRID = "rgba(6, 59, 58, 0.09)";
 const SWITCH_OFF = "#d4e2df";
+const GREEN = "#dff7ef";
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: GREEN,
+    backgroundColor: VERY_SOFT_TEAL,
   },
 
   headerArea: {
-    height: 150,
-    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 26,
-    paddingTop: 26,
-  },
-
-  headerIconButton: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: "row",
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    marginTop: 26,
+    marginBottom: 22,
   },
 
   title: {
-    fontSize: 18,
-    color: BLACK,
+    textAlign: "center",
+    fontSize: 19,
     fontFamily: fonts.bold,
-    letterSpacing: 0.2,
+    color: DARK_TEAL,
   },
 
   notifications: {
     width: 42,
     height: 42,
+    backgroundColor: CARD,
     borderRadius: 21,
-    backgroundColor: WHITE,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "rgba(29, 100, 89, 0.18)",
-    shadowOpacity: 1,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
     shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 3,
   },
 
-  avatarWrapper: {
-    position: "absolute",
-    top: 104,
-    left: 0,
-    right: 0,
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 118,
+  },
+
+  profileCard: {
+    backgroundColor: CARD,
+    borderRadius: 18,
+    paddingHorizontal: 20,
+    paddingTop: 26,
+    paddingBottom: 24,
     alignItems: "center",
-    zIndex: 10,
+    marginBottom: 22,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 1,
   },
 
-  avatar: {
+  avatarOuterRing: {
     width: 104,
     height: 104,
     borderRadius: 52,
+    backgroundColor: CARD,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(18, 184, 149, 0.25)",
-    shadowColor: "rgba(29, 100, 89, 0.10)",
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 4,
+    marginBottom: 16,
+  },
+
+  avatar: {
+    width: 92,
+    height: 92,
+    borderRadius: 46,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+  },
+
+  logoImage: {
+    width: 85,
+    height: 85,
   },
 
   editAvatarButton: {
     position: "absolute",
-    right: -4,
+    right: -2,
     bottom: 8,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: WHITE,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: CARD,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "rgba(29, 100, 89, 0.16)",
+    borderColor: "rgba(0, 0, 0, 0.12)",
+    borderWidth: 1,
+    shadowColor: "rgba(29, 100, 89, 0.18)",
     shadowOpacity: 1,
     shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 5 },
     elevation: 5,
-  },
-
-  card: {
-    flex: 1,
-    backgroundColor: "#fbfffc",
-    borderTopLeftRadius: 44,
-    borderTopRightRadius: 44,
-    borderWidth: 1,
-    borderColor: "rgba(18, 184, 149, 0.08)",
-    paddingHorizontal: 26,
-  },
-
-  cardContent: {
-    paddingTop: 78,
-    paddingBottom: 56,
   },
 
   nameContainer: {
     alignItems: "center",
-    marginBottom: 40,
   },
 
   name: {
-    fontSize: 19,
-    color: BLACK,
+    fontSize: 21,
+    lineHeight: 27,
     fontFamily: fonts.bold,
+    color: DARK_TEAL,
   },
 
   userId: {
-    marginTop: 8,
     fontSize: 13,
+    fontFamily: fonts.medium,
     color: MUTED,
-    fontFamily: fonts.regular,
+    marginTop: 6,
+  },
+
+  sectionHeader: {
+    marginBottom: 14,
+    paddingHorizontal: 2,
   },
 
   sectionTitle: {
-    fontSize: 18,
-    color: BLACK,
+    alignSelf: "flex-start",
+    fontSize: 15,
     fontFamily: fonts.bold,
+    color: DARK_TEAL,
+    paddingBottom: 4,
+  },
+
+  settingsCard: {
+    backgroundColor: CARD,
+    borderRadius: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 14,
     marginBottom: 22,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 1,
   },
 
   form: {
-    gap: 18,
+    gap: 16,
   },
 
   inputGroup: {
-    gap: 10,
+    gap: 9,
   },
 
   inputLabel: {
     fontSize: 13,
-    color: BLACK,
+    color: DARK_TEAL,
     fontFamily: fonts.bold,
+    paddingHorizontal: 2,
   },
 
   inputBox: {
-    minHeight: 50,
-    borderRadius: 13,
+    minHeight: 52,
+    borderRadius: 14,
     backgroundColor: INPUT_BG,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    shadowColor: "rgba(29, 100, 89, 0.05)",
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 1,
   },
 
   inputBoxDisabled: {
@@ -441,9 +459,9 @@ const styles = StyleSheet.create({
   },
 
   inputIconBox: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     backgroundColor: "rgba(18, 184, 149, 0.10)",
     alignItems: "center",
     justifyContent: "center",
@@ -453,38 +471,36 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     minWidth: 0,
-    height: 50,
-    color: BLACK,
+    height: 52,
+    color: DARK_TEAL,
     fontSize: 14,
     fontFamily: fonts.medium,
     paddingVertical: 0,
   },
 
-  settingsBlock: {
-    gap: 18,
-    marginTop: 10,
+  divider: {
+    height: 1,
+    backgroundColor: GRID,
+    marginLeft: 2,
   },
 
   settingRow: {
-    minHeight: 38,
+    minHeight: 42,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: 2,
   },
 
   settingLabel: {
     fontSize: 14,
-    color: BLACK,
+    color: DARK_TEAL,
     fontFamily: fonts.medium,
   },
 
-  buttons: {
-    alignItems: "center",
-    marginTop: 24,
-  },
-
   updateButton: {
-    width: 210,
+    alignSelf: "center",
+    width: 214,
     height: 48,
     borderRadius: 24,
     backgroundColor: "#c9f3df",
@@ -506,7 +522,7 @@ const styles = StyleSheet.create({
   },
 
   updateButtonText: {
-    color: BLACK,
+    color: DARK_TEAL,
     fontSize: 14,
     fontFamily: fonts.bold,
   },
