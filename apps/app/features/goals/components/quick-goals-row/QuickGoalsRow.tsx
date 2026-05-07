@@ -1,4 +1,12 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import { useState } from "react";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
 import type { GoalOverviewItem } from "@repo/shared-types";
@@ -11,6 +19,7 @@ const GREEN_DARK = "#078a73";
 const TEXT = "#063436";
 const MUTED = "#6f8790";
 const BORDER = "rgba(9, 169, 130, 0.12)";
+const DESKTOP_BREAKPOINT = 768;
 
 function formatCurrency(amount: string | number, currency = "USD") {
   const numericAmount = Number(amount);
@@ -31,14 +40,25 @@ type QuickGoalsRowProps = {
 function GoalPreviewCard({
   goal,
   onPress,
+  isDesktop,
+  desktopCardWidth,
 }: {
   goal: GoalOverviewItem;
   onPress?: (goal: GoalOverviewItem) => void;
+  isDesktop?: boolean;
+  desktopCardWidth?: number;
 }) {
   const progress = Math.min(Number(goal.progress) || 0, 100);
 
   return (
-    <Pressable style={styles.goalCard} onPress={() => onPress?.(goal)}>
+    <Pressable
+      style={[
+        styles.goalCard,
+        isDesktop && styles.goalCardDesktop,
+        isDesktop && desktopCardWidth ? { width: desktopCardWidth } : null,
+      ]}
+      onPress={() => onPress?.(goal)}
+    >
       <View style={styles.goalIcon}>
         <Icon
           name={(goal.icon ?? "target") as never}
@@ -80,9 +100,18 @@ export function QuickGoalsRow({
   onGoalPress,
   onEmptyPress,
 }: QuickGoalsRowProps) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
+  const [desktopRowWidth, setDesktopRowWidth] = useState(0);
+  const desktopGoals = goals.slice(0, 4);
+  const desktopCardWidth = desktopRowWidth > 0 ? (desktopRowWidth - 12) / 2 : undefined;
+
   if (goals.length === 0) {
     return (
-      <Pressable style={styles.emptyCard} onPress={onEmptyPress}>
+      <Pressable
+        style={[styles.emptyCard, isDesktop && styles.emptyCardDesktop]}
+        onPress={onEmptyPress}
+      >
         <View style={styles.goalIcon}>
           <Icon name="target" size={26} color={GREEN_DARK} strokeWidth={1.2} />
         </View>
@@ -98,10 +127,30 @@ export function QuickGoalsRow({
     );
   }
 
+  if (isDesktop) {
+    return (
+      <View
+        style={styles.rowDesktop}
+        onLayout={(event) => setDesktopRowWidth(event.nativeEvent.layout.width)}
+      >
+        {desktopGoals.map((goal) => (
+          <GoalPreviewCard
+            key={goal.id}
+            goal={goal}
+            onPress={onGoalPress}
+            isDesktop
+            desktopCardWidth={desktopCardWidth}
+          />
+        ))}
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
+      style={styles.scroller}
       contentContainerStyle={styles.row}
     >
       {goals.map((goal) => (
@@ -112,10 +161,22 @@ export function QuickGoalsRow({
 }
 
 const styles = StyleSheet.create({
+  scroller: {
+    width: "100%",
+  },
+
   row: {
     gap: 12,
     paddingRight: 18,
     paddingBottom: 2,
+    marginBottom: 22,
+  },
+
+  rowDesktop: {
+    width: "100%",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
     marginBottom: 22,
   },
 
@@ -130,6 +191,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+  },
+
+  goalCardDesktop: {
+    width: "48%",
+    minWidth: 0,
   },
 
   emptyCard: {
@@ -152,6 +218,10 @@ const styles = StyleSheet.create({
     backgroundColor: MINT,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  emptyCardDesktop: {
+    width: "100%",
   },
 
   goalContent: {
