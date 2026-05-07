@@ -5,15 +5,20 @@ import {
   StyleSheet,
   Text,
   View,
+  type DimensionValue,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import { apiFetch } from "@/app/lib/api/client";
+import { TransactionRow } from "@/features/transactions/components/transaction-row/TransactionRow";
 import WelmioAvatar from "@/assets/images/welmio-logo-no-circle.png";
+import type { TransactionsOverviewResponse } from "@repo/shared-types";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
-const CARD_SOFT = "#f3fbf8";
 const MINT = "#d7f5eb";
 const MINT_LIGHT = "#eaf9f4";
 const GREEN = "#0bb894";
@@ -23,7 +28,14 @@ const MUTED = "#6f8790";
 const DANGER = "#ff4265";
 const BORDER = "rgba(9, 169, 130, 0.12)";
 
-const goalCards = [
+type GoalCard = {
+  title: string;
+  icon: string;
+  percent: string;
+  progress: DimensionValue;
+};
+
+const goalCards: GoalCard[] = [
   { title: "New Car", icon: "car", percent: "35%", progress: "35%" },
   { title: "Emergency Fund", icon: "money", percent: "75%", progress: "75%" },
   { title: "New Laptop", icon: "rent", percent: "20%", progress: "20%" },
@@ -37,31 +49,38 @@ const analyticsBars = [
   { label: "May 29", income: 60, expense: 35 },
 ];
 
-const transactions = [
-  {
-    title: "Salary Payment",
-    meta: "May 30 · 10:30 AM",
-    icon: "money",
-    amount: "+$4,000.00",
-    positive: true,
-  },
-  {
-    title: "Groceries",
-    meta: "May 29 · 5:45 PM",
-    icon: "food",
-    amount: "-$100.00",
-    positive: false,
-  },
-  {
-    title: "Rent",
-    meta: "May 28 · 9:15 AM",
-    icon: "rent",
-    amount: "-$674.40",
-    positive: false,
-  },
-];
-
 export default function HomeScreen() {
+  const [overview, setOverview] = useState<TransactionsOverviewResponse | null>(
+    null,
+  );
+
+  const recentTransactions = useMemo(
+    () => overview?.groups.flatMap((group) => group.items).slice(0, 3) ?? [],
+    [overview],
+  );
+
+  async function loadTransactionsOverview() {
+    try {
+      const response = await apiFetch<TransactionsOverviewResponse>(
+        "/transactions/overview",
+      );
+
+      setOverview(response);
+    } catch (error) {
+      console.warn("[HomeScreen] load transactions overview error:", error);
+    }
+  }
+
+  useEffect(() => {
+    loadTransactionsOverview();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadTransactionsOverview();
+    }, []),
+  );
+
   return (
     <View style={styles.screen}>
       <ScrollView
@@ -225,41 +244,27 @@ export default function HomeScreen() {
           </View>
         </Pressable>
 
-        <SectionHeader title="Recent Transactions" action="View All" />
+        <SectionHeader
+          title="Recent Transactions"
+          action="View All"
+          onActionPress={() => router.push("/transactions")}
+        />
 
         <View style={styles.transactionsCard}>
-          {transactions.map((transaction, index) => (
-            <Pressable
-              key={transaction.title}
-              style={[
-                styles.transactionRow,
-                index === transactions.length - 1 && styles.transactionRowLast,
-              ]}
-            >
-              <View style={styles.transactionIcon}>
-                <Icon
-                  name={transaction.icon as any}
-                  size={35}
-                  color={GREEN_DARK}
-                  strokeWidth={0.8}
-                />
-              </View>
-
-              <View style={styles.transactionTextWrap}>
-                <Text style={styles.transactionTitle}>{transaction.title}</Text>
-                <Text style={styles.transactionMeta}>{transaction.meta}</Text>
-              </View>
-
-              <Text
-                style={[
-                  styles.transactionAmount,
-                  transaction.positive && styles.transactionAmountPositive,
-                ]}
-              >
-                {transaction.amount}
-              </Text>
-            </Pressable>
-          ))}
+          {recentTransactions.length > 0 ? (
+            recentTransactions.map((transaction, index) => (
+              <TransactionRow
+                key={transaction.id}
+                transaction={transaction}
+                compact
+                showCategory={false}
+                withDivider={index !== recentTransactions.length - 1}
+                onPress={() => router.push("/transactions")}
+              />
+            ))
+          ) : (
+            <Text style={styles.emptyTransactions}>No recent transactions yet.</Text>
+          )}
         </View>
       </ScrollView>
 
@@ -272,11 +277,23 @@ export default function HomeScreen() {
   );
 }
 
-function SectionHeader({ title, action }: { title: string; action?: string }) {
+function SectionHeader({
+  title,
+  action,
+  onActionPress,
+}: {
+  title: string;
+  action?: string;
+  onActionPress?: () => void;
+}) {
   return (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{title}</Text>
-      {action ? <Text style={styles.sectionAction}>{action}</Text> : null}
+      {action ? (
+        <Pressable disabled={!onActionPress} onPress={onActionPress}>
+          <Text style={styles.sectionAction}>{action}</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -686,55 +703,13 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 
-  transactionRow: {
-    minHeight: 66,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(9, 169, 130, 0.08)",
-  },
-
-  transactionRowLast: {
-    borderBottomWidth: 0,
-  },
-
-  transactionIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: MINT_LIGHT,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-
-  transactionTextWrap: {
-    flex: 1,
-  },
-
-  transactionTitle: {
-    fontSize: 13,
-    fontFamily: fonts.bold,
-    color: TEXT,
-  },
-
-  transactionMeta: {
-    marginTop: 4,
-    fontSize: 11,
+  emptyTransactions: {
+    paddingVertical: 22,
+    paddingHorizontal: 16,
+    textAlign: "center",
+    fontSize: 12,
     fontFamily: fonts.medium,
     color: MUTED,
-  },
-
-  transactionAmount: {
-    fontSize: 13,
-    fontFamily: fonts.bold,
-    color: TEXT,
-    marginLeft: 10,
-  },
-
-  transactionAmountPositive: {
-    color: GREEN_DARK,
   },
 
   bottomFade: {
