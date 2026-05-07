@@ -11,11 +11,11 @@ import {
 import { router } from "expo-router";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AuthInput } from "@/features/auth/components/AuthInput";
 import { AuthButton } from "@/features/auth/components/AuthButton";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { changePassword } from "../services/profile-service";
-
 
 export default function ChangePasswordScreen() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -57,28 +57,48 @@ export default function ChangePasswordScreen() {
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={styles.headerArea}>
-        <Pressable onPress={() => router.back()}>
-          <Icon name="arrowLeft" size={22} color={BLACK} />
-        </Pressable>
 
-        <Text style={styles.title}>Change Password</Text>
-
-        <Pressable style={styles.notifications}>
-          <Icon name="bell" size={22} color={BLACK} />
-        </Pressable>
-      </View>
+       <View style={styles.headerArea}>
+          <Pressable onPress={() => router.back()}>
+            <Icon name="arrowLeft" size={22} color={TEXT} />
+          </Pressable>
+  
+          <Text style={styles.title}>Change Password</Text>
+  
+          <Pressable style={styles.notifications}>
+            <Icon name="bell" size={22} color={TEXT} />
+          </Pressable>
+        </View>
 
       <View style={styles.card}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.cardContent}
         >
-          <Text style={styles.sectionTitle}>Password Settings</Text>
+          <View style={styles.heroIconWrap}>
+            <View style={styles.heroIcon}>
+              <FontAwesome name="key" size={36} color={PRIMARY} />
+            </View>
+          </View>
 
-          <Text style={styles.description}>
-            Update your password to keep your account secure.
-          </Text>
+          <View style={styles.headingBlock}>
+            <Text style={styles.sectionTitle}>Password Settings</Text>
+            <Text style={styles.description}>
+              Update your password regularly to keep your Welmio account protected.
+            </Text>
+          </View>
+
+          <View style={styles.noticeCard}>
+            <View style={styles.noticeIcon}>
+              <Icon name="shield" size={22} strokeWidth={1.7} color={PRIMARY} />
+            </View>
+            <View style={styles.noticeTextWrap}>
+              <Text style={styles.noticeTitle}>Use a strong password</Text>
+              <Text style={styles.noticeText}>
+                Mix letters, numbers and symbols for better security.
+              </Text>
+            </View>
+          </View>
 
           <View style={styles.form}>
             <AuthInput
@@ -127,65 +147,145 @@ export default function ChangePasswordScreen() {
   );
 }
 
-const GREEN = "#00c896";
-const LIGHT_GREEN = "#f1fff3";
-const BLACK = "#052e2b";
+const BACKGROUND = "#dff7ef";
+const PRIMARY = "#12c79b";
+const PRIMARY_SOFT = "#e7fbf5";
+const TEXT = "#052e2b";
+const MUTED = "rgba(5, 46, 43, 0.58)";
 const WHITE = "#ffffff";
+const BORDER = "rgba(18, 199, 155, 0.14)";
+const SHADOW = "rgba(29, 100, 89, 0.14)";
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: GREEN,
+    backgroundColor: BACKGROUND,
   },
 
   headerArea: {
-        height: 150,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingHorizontal: 30,
-        paddingTop: 30,
-   },
- 
-   title: {
-       fontSize: 18, //18
-       color: BLACK,
-       fontFamily: fonts.bold,
-       },
- 
-   notifications: {
-       backgroundColor: WHITE,
-       padding: 3,
-       borderRadius: 100,
-   },
- 
+    height: 142,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 34,
+  },
+
+  title: {
+    fontSize: 17,
+    color: TEXT,
+    fontFamily: fonts.bold,
+  },
+
+  notifications: {
+    width: 42,
+    height: 42,
+    backgroundColor: WHITE,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "rgba(10, 58, 52, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+
   card: {
     flex: 1,
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 70,
-    borderTopRightRadius: 70,
-    padding: 24,
+    backgroundColor: WHITE,
+    borderTopLeftRadius: 42,
+    borderTopRightRadius: 42,
+    paddingHorizontal: 22,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.72)",
+    shadowColor: SHADOW,
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: -8 },
+    elevation: 8,
   },
 
   cardContent: {
-    paddingTop: 34,
-    paddingBottom: 60,
+    paddingTop: 30,
+    paddingBottom: 52,
+  },
+
+  heroIconWrap: {
+    alignItems: "center",
+    marginBottom: 18,
+  },
+
+  heroIcon: {
+    width: 78,
+    height: 78,
+    borderRadius: 28,
+    backgroundColor: PRIMARY_SOFT,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+
+  headingBlock: {
+    alignItems: "center",
+    marginBottom: 22,
+    paddingHorizontal: 8,
   },
 
   sectionTitle: {
     fontSize: 20,
-    color: BLACK,
+    color: TEXT,
     fontFamily: fonts.bold,
-    marginBottom: 10,
+    marginBottom: 8,
   },
 
   description: {
     fontSize: 13,
-    color: BLACK,
-    opacity: 0.7,
+    color: MUTED,
     fontFamily: fonts.regular,
-    marginBottom: 28,
     lineHeight: 19,
+    textAlign: "center",
+  },
+
+  noticeCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: PRIMARY_SOFT,
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: BORDER,
+    marginBottom: 24,
+  },
+
+  noticeIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 16,
+    backgroundColor: WHITE,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  noticeTextWrap: {
+    flex: 1,
+  },
+
+  noticeTitle: {
+    fontSize: 13,
+    color: TEXT,
+    fontFamily: fonts.bold,
+    marginBottom: 3,
+  },
+
+  noticeText: {
+    fontSize: 11,
+    color: MUTED,
+    fontFamily: fonts.regular,
+    lineHeight: 16,
   },
 
   form: {
@@ -194,6 +294,6 @@ const styles = StyleSheet.create({
 
   buttons: {
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 12,
   },
 });
