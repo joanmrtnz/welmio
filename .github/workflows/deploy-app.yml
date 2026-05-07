@@ -12,6 +12,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - 'turbo.json'
+      - '.github/workflows/**'
 
 jobs:
   build-and-push:
