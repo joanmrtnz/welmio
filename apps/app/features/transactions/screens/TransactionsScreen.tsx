@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { deleteTransaction } from "@/features/transactions/services/transactions.service";
@@ -30,6 +37,8 @@ const TAB_GREEN = "#a9efdf";
 const MINT = "#00c896";
 const MUTED = "#5e7b78";
 const SHADOW = "rgba(29, 100, 89, 0.12)";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 type DateRange = {
   startDate: Date | null;
@@ -37,6 +46,9 @@ type DateRange = {
 };
 
 export default function TransactionScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
+
   function handleEditTransaction(transaction: TransactionOverviewItem) {
     setTransactionToEdit(transaction);
     setIsCreateTransactionModalVisible(true);
@@ -111,17 +123,20 @@ export default function TransactionScreen() {
       <AppScreenHeader title="Transactions" />
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          isDesktop && styles.contentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.balanceCard}>
+        <View style={[styles.balanceCard, isDesktop && styles.balanceCardDesktop]}>
           <Text style={styles.balanceCardLabel}>Total Balance</Text>
           <Text style={styles.balanceCardTitle}>
             {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
           </Text>
         </View>
 
-        <View style={styles.totalsRow}>
+        <View style={[styles.totalsRow, isDesktop && styles.totalsRowDesktop]}>
           <Pressable
             onPress={() =>
               setTotalsFilter((prev) => (prev === "income" ? "all" : "income"))
@@ -205,7 +220,7 @@ export default function TransactionScreen() {
           </Pressable>
         </View>
 
-        <View style={styles.cardWrapper}>
+        <View style={[styles.cardWrapper, isDesktop && styles.cardWrapperDesktop]}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardHeaderTitle}>Transactions</Text>
 
@@ -224,6 +239,23 @@ export default function TransactionScreen() {
                   color={selectedCategoryIds.length > 0 ? WHITE : DARK_GREEN}
                 />
               </Pressable>
+
+              {isDesktop && (
+                <Pressable
+                  onPress={() => {
+                    setTransactionToEdit(null);
+                    setIsCreateTransactionModalVisible(true);
+                  }}
+                  style={styles.listHeaderIconButton}
+                >
+                  <Icon
+                    name="plus"
+                    size={22}
+                    strokeWidth={1.8}
+                    color={DARK_GREEN}
+                  />
+                </Pressable>
+              )}
 
               <Pressable
                 onPress={() => setIsCalendarFilterModalVisible(true)}
@@ -245,6 +277,7 @@ export default function TransactionScreen() {
           <View style={styles.cardContent}>
             <TransactionsGroupedList
               groups={filteredGroups}
+              isDesktop={isDesktop}
               onChanged={loadTransactions}
               onDeleteTransaction={handleDeleteTransaction}
               onEditTransaction={handleEditTransaction}
@@ -253,17 +286,19 @@ export default function TransactionScreen() {
         </View>
       </ScrollView>
 
-      <View style={styles.floatingAddMoreButton}>
-        <Pressable
-          style={styles.floatingAddButton}
-          onPress={() => {
-            setTransactionToEdit(null);
-            setIsCreateTransactionModalVisible(true);
-          }}
-        >
-          <Icon size={34} strokeWidth={1.2} name="plus" color={BLACK} />
-        </Pressable>
-      </View>
+      {!isDesktop && (
+        <View style={styles.floatingAddMoreButton}>
+          <Pressable
+            style={styles.floatingAddButton}
+            onPress={() => {
+              setTransactionToEdit(null);
+              setIsCreateTransactionModalVisible(true);
+            }}
+          >
+            <Icon size={34} strokeWidth={1.2} name="plus" color={BLACK} />
+          </Pressable>
+        </View>
+      )}
 
       <CategoryFilterModal
         visible={isCategoryModalVisible}
@@ -310,6 +345,14 @@ const styles = StyleSheet.create({
     paddingBottom: 132,
   },
 
+  contentDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    paddingBottom: 150,
+  },
+
   balanceCard: {
     backgroundColor: LIGHT_GREEN,
     borderRadius: 18,
@@ -323,6 +366,11 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  balanceCardDesktop: {
+    paddingVertical: 30,
+    marginBottom: 20,
   },
 
   balanceCardLabel: {
@@ -377,6 +425,11 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
 
+  totalsRowDesktop: {
+    gap: 20,
+    marginBottom: 28,
+  },
+
   totalCard: {
     flex: 1,
     minHeight: 104,
@@ -418,6 +471,12 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  cardWrapperDesktop: {
+    paddingHorizontal: 22,
+    paddingTop: 18,
+    paddingBottom: 16,
   },
 
   cardHeader: {
