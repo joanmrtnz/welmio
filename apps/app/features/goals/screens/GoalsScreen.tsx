@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  useWindowDimensions,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
@@ -38,6 +45,8 @@ const BLACK = "#082f33";
 const TAB_GREEN = "#16b996";
 const BUTTON_GREEN = "#10b992";
 const SOFT_SHADOW = "rgba(28, 105, 91, 0.14)";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 function formatCurrency(amount: number | string, currency = "USD") {
   const numericAmount = typeof amount === "string" ? Number(amount) : amount;
@@ -49,6 +58,9 @@ function formatCurrency(amount: number | string, currency = "USD") {
 }
 
 export default function GoalsScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
+
   const [data, setData] = useState<GoalsOverviewResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -240,9 +252,14 @@ export default function GoalsScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          isDesktop && styles.contentDesktop,
+        ]}
       >
-        <View style={styles.balanceRow}>
+        <View
+          style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}
+        >
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>Total Saved</Text>
             <Text style={styles.balance}>{formatCurrency(totalSaved)}</Text>
@@ -257,7 +274,9 @@ export default function GoalsScreen() {
         </View>
 
         <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
+          <View
+            style={[styles.progressBar, isDesktop && styles.progressBarDesktop]}
+          >
             <View
               style={[styles.progressFill, { width: `${globalProgress}%` }]}
             />
@@ -273,7 +292,10 @@ export default function GoalsScreen() {
 
         {mainGoal ? (
           <Pressable
-            style={styles.mainGoalCard}
+            style={[
+              styles.mainGoalCard,
+              isDesktop && styles.mainGoalCardDesktop,
+            ]}
             onPress={() => openGoalDetails(mainGoal)}
           >
             <View style={styles.mainGoalHeader}>
@@ -326,7 +348,12 @@ export default function GoalsScreen() {
             </View>
           </Pressable>
         ) : (
-          <View style={styles.emptyMainGoalCard}>
+          <View
+            style={[
+              styles.emptyMainGoalCard,
+              isDesktop && styles.mainGoalCardDesktop,
+            ]}
+          >
             <Text style={styles.mainGoalTitle}>No goals yet</Text>
             <Text style={styles.goalMeta}>
               Create your first goal to start tracking your progress.
@@ -334,7 +361,7 @@ export default function GoalsScreen() {
           </View>
         )}
 
-        <View style={styles.paceCard}>
+        <View style={[styles.paceCard, isDesktop && styles.paceCardDesktop]}>
           <View style={styles.paceItem}>
             <View style={styles.smallIconBox}>
               <Icon name="calendar" size={23} color={TAB_GREEN} />
@@ -359,66 +386,81 @@ export default function GoalsScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>My Goals</Text>
 
-          <Pressable style={styles.filterButton}>
-            <Text style={styles.filterText}>Active</Text>
-          </Pressable>
+          <View style={styles.sectionActions}>
+            <Pressable style={styles.filterButton}>
+              <Text style={styles.filterText}>Active</Text>
+            </Pressable>
+
+            {isDesktop && (
+              <Pressable
+                style={styles.addGoalButton}
+                onPress={openCreateGoalModal}
+              >
+                <Icon name="plus" size={16} color={BLACK} strokeWidth={2} />
+                <Text style={styles.filterText}>New goal</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
 
-        {goals.map((goal) => (
-          <Pressable
-            key={goal.id}
-            style={styles.goalCard}
-            onPress={() => openGoalDetails(goal)}
-          >
-            <View style={styles.goalTopRow}>
-              <View style={styles.goalLeft}>
-                <View style={styles.iconCircle}>
-                  <Icon
-                    name={(goal.icon ?? "target") as never}
-                    size={30}
-                    color={BUTTON_GREEN}
-                    strokeWidth={1.2}
-                  />
+        <View style={[styles.goalsList, isDesktop && styles.goalsGrid]}>
+          {goals.map((goal) => (
+            <Pressable
+              key={goal.id}
+              style={[styles.goalCard, isDesktop && styles.goalCardDesktop]}
+              onPress={() => openGoalDetails(goal)}
+            >
+              <View style={styles.goalTopRow}>
+                <View style={styles.goalLeft}>
+                  <View style={styles.iconCircle}>
+                    <Icon
+                      name={(goal.icon ?? "target") as never}
+                      size={30}
+                      color={BUTTON_GREEN}
+                      strokeWidth={1.2}
+                    />
+                  </View>
+
+                  <View style={styles.goalTextContent}>
+                    <Text style={styles.goalTitle} numberOfLines={1}>
+                      {goal.name}
+                    </Text>
+
+                    <Text style={styles.goalSubtitle} numberOfLines={1}>
+                      {formatGoalTargetDate(goal.targetDate)} ·{" "}
+                      {goal.statusLabel}
+                    </Text>
+                  </View>
                 </View>
 
-                <View style={styles.goalTextContent}>
-                  <Text style={styles.goalTitle} numberOfLines={1}>
-                    {goal.name}
-                  </Text>
-
-                  <Text style={styles.goalSubtitle} numberOfLines={1}>
-                    {formatGoalTargetDate(goal.targetDate)} · {goal.statusLabel}
-                  </Text>
+                <View style={styles.percentBadge}>
+                  <Text style={styles.percentText}>{goal.progress}%</Text>
                 </View>
               </View>
 
-              <View style={styles.percentBadge}>
-                <Text style={styles.percentText}>{goal.progress}%</Text>
+              <View style={styles.goalProgressBar}>
+                <View
+                  style={[
+                    styles.goalProgressFill,
+                    { width: `${Math.min(goal.progress, 100)}%` },
+                  ]}
+                />
               </View>
-            </View>
 
-            <View style={styles.goalProgressBar}>
-              <View
-                style={[
-                  styles.goalProgressFill,
-                  { width: `${Math.min(goal.progress, 100)}%` },
-                ]}
-              />
-            </View>
+              <View style={styles.goalBottomRow}>
+                <Text style={styles.goalSmallText} numberOfLines={1}>
+                  {formatCurrency(goal.saved, goal.currency)} saved
+                </Text>
 
-            <View style={styles.goalBottomRow}>
-              <Text style={styles.goalSmallText} numberOfLines={1}>
-                {formatCurrency(goal.saved, goal.currency)} saved
-              </Text>
+                <Text style={styles.goalSmallText} numberOfLines={1}>
+                  {formatCurrency(goal.target, goal.currency)}
+                </Text>
+              </View>
+            </Pressable>
+          ))}
+        </View>
 
-              <Text style={styles.goalSmallText} numberOfLines={1}>
-                {formatCurrency(goal.target, goal.currency)}
-              </Text>
-            </View>
-          </Pressable>
-        ))}
-
-        <View style={styles.tipCard}>
+        <View style={[styles.tipCard, isDesktop && styles.tipCardDesktop]}>
           <View style={styles.tipIcon}>
             <Icon name="money" size={38} color={BUTTON_GREEN} strokeWidth={1} />
           </View>
@@ -437,14 +479,17 @@ export default function GoalsScreen() {
         </View>
       </ScrollView>
 
-      <Pressable style={styles.fab} onPress={openCreateGoalModal}>
+      <Pressable
+        style={[styles.fab, isDesktop && styles.hidden]}
+        onPress={openCreateGoalModal}
+      >
         <Icon name="plus" size={30} color={WHITE} strokeWidth={1.8} />
       </Pressable>
 
       <LinearGradient
         pointerEvents="none"
         colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
-        style={styles.bottomFade}
+        style={[styles.bottomFade, isDesktop && styles.hidden]}
       />
 
       <CreateGoalModal
@@ -488,12 +533,25 @@ const styles = StyleSheet.create({
     paddingBottom: 142,
   },
 
+  contentDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    paddingBottom: 130,
+  },
+
   balanceRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 22,
     gap: 30,
+  },
+
+  balanceRowDesktop: {
+    gap: 56,
+    marginBottom: 28,
   },
 
   balanceColumn: {
@@ -542,6 +600,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
+  progressBarDesktop: {
+    width: "100%",
+  },
+
   progressFill: {
     height: "100%",
     borderRadius: 10,
@@ -567,6 +629,11 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  mainGoalCardDesktop: {
+    padding: 24,
+    marginBottom: 18,
   },
 
   mainGoalHeader: {
@@ -673,6 +740,12 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
 
+  paceCardDesktop: {
+    paddingVertical: 22,
+    paddingHorizontal: 24,
+    marginBottom: 26,
+  },
+
   paceItem: {
     flex: 1,
     alignItems: "center",
@@ -722,8 +795,24 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
 
+  sectionActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+
   filterButton: {
-    backgroundColor: LIGHT_GREEN,
+    backgroundColor: DIVIDER_GREEN,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 18,
+  },
+
+  addGoalButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: DIVIDER_GREEN,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 18,
@@ -733,6 +822,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.medium,
     color: BLACK,
+  },
+
+  goalsList: {
+    width: "100%",
+  },
+
+  goalsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 16,
   },
 
   goalCard: {
@@ -745,6 +844,14 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  goalCardDesktop: {
+    flexBasis: "48%",
+    flexGrow: 1,
+    minWidth: 0,
+    marginBottom: 0,
+    padding: 18,
   },
 
   goalTopRow: {
@@ -842,6 +949,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
 
+  tipCardDesktop: {
+    marginTop: 24,
+    padding: 20,
+  },
+
   tipIcon: {
     width: 50,
     height: 50,
@@ -905,5 +1017,9 @@ const styles = StyleSheet.create({
     minHeight: 150,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  hidden: {
+    display: "none",
   },
 });
