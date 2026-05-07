@@ -8,6 +8,7 @@ import {
   normalizeChartBars,
 } from "../utils/chart";
 import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -314,6 +315,11 @@ export default function AnalyticsScreen() {
           />
         </View>
       </ScrollView>
+       <LinearGradient
+          pointerEvents="none"
+          colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
+          style={styles.bottomFade}
+        />
     </View>
   );
 }
@@ -763,4 +769,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: DARK_TEAL,
   },
+
+  bottomFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 122,
+  },
+
 });

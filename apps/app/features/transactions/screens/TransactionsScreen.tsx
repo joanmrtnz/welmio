@@ -18,6 +18,7 @@ import { CreateTransactionModal } from "../components/create-transaction-modal/C
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { CalendarFilterModal } from "../components/calendar-filter-modal/CalendarFilterModal";
 import { router, useFocusEffect } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -296,6 +297,11 @@ export default function TransactionScreen() {
         }}
         onCreated={loadTransactions}
       />
+       <LinearGradient
+          pointerEvents="none"
+          colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
+          style={styles.bottomFade}
+        />
     </View>
   );
 }
@@ -517,5 +523,13 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 8 },
     elevation: 5,
+  },
+
+  bottomFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 122,
   },
 });
