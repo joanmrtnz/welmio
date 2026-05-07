@@ -188,20 +188,23 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <View style={styles.userSide}>
-            <View style={styles.avatarFrame}>
+            <Pressable
+              style={styles.avatarFrame}
+              hitSlop={10}
+              onPress={() => router.push("/profile")}
+            >
               <Image
                 source={WelmioAvatar}
                 style={styles.avatarImage}
                 resizeMode="contain"
               />
-            </View>
+            </Pressable>
 
             <View>
               <Text style={styles.greeting}>Hi, John! 👋</Text>
               <Text style={styles.greetingSub}>Good Morning</Text>
             </View>
           </View>
-
           <Pressable style={styles.bellButton}>
             <Icon name="bell" size={24} strokeWidth={1.5} color={TEXT} />
           </Pressable>
