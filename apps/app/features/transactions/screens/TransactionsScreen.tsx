@@ -19,6 +19,7 @@ import { feedback } from "@/components/ui/feedback/feedback.service";
 import { CalendarFilterModal } from "../components/calendar-filter-modal/CalendarFilterModal";
 import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -107,15 +108,7 @@ export default function TransactionScreen() {
 
   return (
     <View style={styles.screen}>
-      <View style={styles.headerArea}>
-        <Pressable hitSlop={12} onPress={() => router.back()}>
-          <Icon name="arrowLeft" size={24} strokeWidth={2.5} color={BLACK} />
-        </Pressable>
-        <Text style={styles.title}>Transactions</Text>
-        <View style={styles.notifications}>
-          <Icon name="bell" size={24} strokeWidth={1.8} color={BLACK} />
-        </View>
-      </View>
+      <AppScreenHeader title="Transactions" />
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -310,37 +303,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: GREEN,
-  },
-
-  headerArea: {
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    marginTop: 26,
-    marginBottom: 22,
-  },
-
-  title: {
-    textAlign: "center",
-    fontSize: 19,
-    fontFamily: fonts.bold,
-    color: BLACK,
-  },
-
-  notifications: {
-    width: 42,
-    height: 42,
-    backgroundColor: LIGHT_GREEN,
-    borderRadius: 21,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 3,
   },
 
   content: {

@@ -33,6 +33,7 @@ const TEXT = "#063436";
 const MUTED = "#6f8790";
 const DANGER = "#ff4265";
 const BORDER = "rgba(9, 169, 130, 0.12)";
+const LIGHT_GREEN = "#f8fffc";
 
 const EMPTY_ANALYTICS_DATA = [
   { label: "Mon", income: 0, expense: 0 },
@@ -182,11 +183,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.screen}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        <View style={styles.header}>
+       <View style={styles.header}>
           <View style={styles.userSide}>
             <Pressable
               style={styles.avatarFrame}
@@ -205,11 +202,14 @@ export default function HomeScreen() {
               <Text style={styles.greetingSub}>Good Morning</Text>
             </View>
           </View>
-          <Pressable style={styles.bellButton}>
-            <Icon name="bell" size={24} strokeWidth={1.5} color={TEXT} />
+          <Pressable style={styles.notifications}>
+            <Icon name="bell" size={24} strokeWidth={1.8} color={TEXT} />
           </Pressable>
         </View>
-
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
         <SectionHeader title="Overview" />
 
         <View style={styles.overviewRow}>
@@ -217,9 +217,9 @@ export default function HomeScreen() {
             <View style={styles.overviewIconWrap}>
               <Icon
                 name="money"
-                size={28}
+                size={34}
                 color={GREEN_DARK}
-                strokeWidth={1.4}
+                strokeWidth={0.9}
               />
             </View>
 
@@ -314,7 +314,6 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 18,
-    paddingTop: 58,
     paddingBottom: 132,
   },
 
@@ -322,7 +321,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 28,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 5,
+    marginTop: 30,
+    marginBottom: 18,
   },
 
   userSide: {
@@ -367,15 +370,19 @@ const styles = StyleSheet.create({
     color: MUTED,
   },
 
-  bellButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 16,
-    backgroundColor: CARD,
-    borderWidth: 1,
-    borderColor: BORDER,
+
+  notifications: {
+    width: 42,
+    height: 42,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 3,
   },
 
   sectionHeader: {

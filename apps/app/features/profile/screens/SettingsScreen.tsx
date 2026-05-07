@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 const BACKGROUND = "#dff7ef";
 const CARD = "#fbfffd";
@@ -16,17 +17,7 @@ const WHITE = "#ffffff";
 export default function SettingsScreen() {
   return (
     <View style={styles.screen}>
-      <View style={styles.headerArea}>
-        <Pressable style={styles.headerButton} onPress={() => router.back()}>
-          <Icon name="arrowLeft" size={22} color={TEXT} />
-        </Pressable>
-
-        <Text style={styles.title}>Settings</Text>
-
-        <Pressable style={styles.notifications}>
-          <Icon name="bell" size={21} color={TEXT} />
-        </Pressable>
-      </View>
+      <AppScreenHeader title="Settings" />
 
       <View style={styles.card}>
         <ScrollView
@@ -104,46 +95,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: BACKGROUND,
-  },
-
-  headerArea: {
-    height: 118,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 26,
-  },
-
-  headerButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  title: {
-    fontSize: 18,
-    color: TEXT,
-    fontFamily: fonts.bold,
-    letterSpacing: 0.2,
-  },
-
-  notifications: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: WHITE,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(7, 59, 56, 0.04)",
-    shadowColor: "rgba(7, 59, 56, 0.18)",
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
   },
 
   card: {

@@ -9,6 +9,7 @@ import {
 } from "../utils/chart";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -77,20 +78,7 @@ export default function AnalyticsScreen() {
 
   return (
     <View style={styles.screen}>
-      <View style={styles.headerArea}>
-        <Pressable hitSlop={12} onPress={() => router.back()}>
-          <Icon
-            name="arrowLeft"
-            size={24}
-            strokeWidth={2.5}
-            color={DARK_TEAL}
-          />
-        </Pressable>
-        <Text style={styles.title}>Analytics</Text>
-        <View style={styles.notifications}>
-          <Icon name="bell" size={24} strokeWidth={1.8} color={DARK_TEAL} />
-        </View>
-      </View>
+     <AppScreenHeader title="Analytics" />
 
       <ScrollView
         contentContainerStyle={styles.content}
@@ -328,37 +316,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: VERY_SOFT_TEAL,
-  },
-
-  headerArea: {
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    marginTop: 26,
-    marginBottom: 22,
-  },
-
-  title: {
-    textAlign: "center",
-    fontSize: 19,
-    fontFamily: fonts.bold,
-    color: DARK_TEAL,
-  },
-
-  notifications: {
-    width: 42,
-    height: 42,
-    backgroundColor: CARD,
-    borderRadius: 21,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 3,
   },
 
   content: {
