@@ -2,20 +2,32 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { useAnalytics } from "../hooks/useAnalytics";
-import { getChartMaxValue, getChartYAxisLabels, normalizeChartBars } from "../utils/chart";
+import {
+  getChartMaxValue,
+  getChartYAxisLabels,
+  normalizeChartBars,
+} from "../utils/chart";
 import { router } from "expo-router";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
 const MID_TEAL = "#68e1c6";
 const SOFT_TEAL = "#a9efdf";
-const VERY_SOFT_TEAL = "#dff7ef";
+const VERY_SOFT_TEAL = "#eafaf5";
 const CARD = "#fbfffd";
 const WHITE = "#ffffff";
 const MUTED = "#5e7b78";
 const GRID = "rgba(6, 59, 58, 0.09)";
 
-function TargetCard({ percent, title, amountLeft }: { percent: string; title: string; amountLeft: string }) {
+function TargetCard({
+  percent,
+  title,
+  amountLeft,
+}: {
+  percent: string;
+  title: string;
+  amountLeft: string;
+}) {
   return (
     <View style={styles.targetCard}>
       <View style={styles.ringTrack}>
@@ -31,7 +43,12 @@ function TargetCard({ percent, title, amountLeft }: { percent: string; title: st
 export default function AnalyticsScreen() {
   const { selected, setSelected, data } = useAnalytics();
   const chartBars = data
-    ? normalizeChartBars(data.chart.labels, data.chart.income, data.chart.expense, 112)
+    ? normalizeChartBars(
+        data.chart.labels,
+        data.chart.income,
+        data.chart.expense,
+        112,
+      )
     : [];
 
   const maxValue = data
@@ -41,6 +58,10 @@ export default function AnalyticsScreen() {
   const yAxisLabels = getChartYAxisLabels(maxValue);
   const isYearlyChart = selected === "yearly" || chartBars.length > 6;
   const yearlyChartWidth = Math.max(chartBars.length * 42, 310);
+
+  function getVisibleBarHeight(height: number) {
+    return Math.max(height, 8);
+  }
 
   function getBarLabel(label: string) {
     return isYearlyChart && label.length > 3 ? label.slice(0, 3) : label;
@@ -57,7 +78,12 @@ export default function AnalyticsScreen() {
     <View style={styles.screen}>
       <View style={styles.headerArea}>
         <Pressable hitSlop={12} onPress={() => router.back()}>
-          <Icon name="arrowLeft" size={24} strokeWidth={2.5} color={DARK_TEAL} />
+          <Icon
+            name="arrowLeft"
+            size={24}
+            strokeWidth={2.5}
+            color={DARK_TEAL}
+          />
         </Pressable>
         <Text style={styles.title}>Analytics</Text>
         <View style={styles.notifications}>
@@ -82,7 +108,9 @@ export default function AnalyticsScreen() {
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>Total Expense</Text>
             <Text style={styles.balance}>
-              {data ? `-${formatCurrency(data.summary.totalExpense)}` : "-$0.00"}
+              {data
+                ? `-${formatCurrency(data.summary.totalExpense)}`
+                : "-$0.00"}
             </Text>
           </View>
         </View>
@@ -97,7 +125,8 @@ export default function AnalyticsScreen() {
             />
           </View>
           <Text style={styles.progressText}>
-            {data?.summary.progressMessage ?? "0% of your income has been spent."}
+            {data?.summary.progressMessage ??
+              "0% of your income has been spent."}
           </Text>
         </View>
 
@@ -110,7 +139,9 @@ export default function AnalyticsScreen() {
           ].map(([value, label]) => (
             <Pressable
               key={value}
-              onPress={() => setSelected(value as "daily" | "weekly" | "monthly" | "yearly")}
+              onPress={() =>
+                setSelected(value as "daily" | "weekly" | "monthly" | "yearly")
+              }
               style={[
                 styles.segmentItem,
                 selected === value && styles.segmentItemActive,
@@ -130,16 +161,41 @@ export default function AnalyticsScreen() {
 
         <View style={styles.graphicCard}>
           <View style={styles.graphHeader}>
-            <Text style={styles.graphTitle}>Income & Expenses</Text>
+            <View style={styles.graphTitleWrap}>
+              <Text style={styles.graphTitle}>Income & Expenses</Text>
+              <Text style={styles.graphSubtitle}>Income vs expenses</Text>
+            </View>
 
             <View style={styles.graphActions}>
               <Pressable style={styles.graphIcon}>
-                <Icon name="search" size={23} strokeWidth={1.8} color={DARK_TEAL} />
+                <Icon
+                  name="search"
+                  size={23}
+                  strokeWidth={1.8}
+                  color={DARK_TEAL}
+                />
               </Pressable>
 
               <Pressable style={styles.graphIcon}>
-                <Icon name="calendar" size={23} strokeWidth={1.8} color={DARK_TEAL} />
+                <Icon
+                  name="calendar"
+                  size={23}
+                  strokeWidth={1.8}
+                  color={DARK_TEAL}
+                />
               </Pressable>
+            </View>
+          </View>
+
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={styles.incomeDot} />
+              <Text style={styles.legendText}>Income</Text>
+            </View>
+
+            <View style={styles.legendItem}>
+              <View style={styles.expenseDot} />
+              <Text style={styles.legendText}>Expense</Text>
             </View>
           </View>
 
@@ -171,12 +227,30 @@ export default function AnalyticsScreen() {
                   ]}
                 >
                   {chartBars.map((item) => (
-                    <View key={item.label} style={[styles.barGroup, styles.yearlyBarGroup]}>
+                    <View
+                      key={item.label}
+                      style={[styles.barGroup, styles.yearlyBarGroup]}
+                    >
                       <View style={[styles.barPair, styles.yearlyBarPair]}>
-                        <View style={[styles.barIncome, styles.yearlyBar, { height: item.income }]} />
-                        <View style={[styles.barExpense, styles.yearlyBar, { height: item.expense }]} />
+                        <View
+                          style={[
+                            styles.barIncome,
+                            styles.yearlyBar,
+                            { height: getVisibleBarHeight(item.income) },
+                          ]}
+                        />
+                        <View
+                          style={[
+                            styles.barExpense,
+                            styles.yearlyBar,
+                            { height: getVisibleBarHeight(item.expense) },
+                          ]}
+                        />
                       </View>
-                      <Text numberOfLines={1} style={[styles.barLabel, styles.yearlyBarLabel]}>
+                      <Text
+                        numberOfLines={1}
+                        style={[styles.barLabel, styles.yearlyBarLabel]}
+                      >
                         {getBarLabel(item.label)}
                       </Text>
                     </View>
@@ -187,8 +261,12 @@ export default function AnalyticsScreen() {
                   {chartBars.map((item) => (
                     <View key={item.label} style={styles.barGroup}>
                       <View style={styles.barPair}>
-                        <View style={[styles.barIncome, { height: item.income }]} />
-                        <View style={[styles.barExpense, { height: item.expense }]} />
+                        <View
+                          style={[styles.barIncome, { height: getVisibleBarHeight(item.income) }]}
+                        />
+                        <View
+                          style={[styles.barExpense, { height: getVisibleBarHeight(item.expense) }]}
+                        />
                       </View>
                       <Text style={styles.barLabel}>{item.label}</Text>
                     </View>
@@ -224,8 +302,16 @@ export default function AnalyticsScreen() {
         <Text style={styles.targetsTitle}>My Targets</Text>
 
         <View style={styles.targetsRow}>
-          <TargetCard percent="30%" title="Short term goal" amountLeft="$13,560.30 left" />
-          <TargetCard percent="50%" title="Long term goal" amountLeft="$22,600.50 left" />
+          <TargetCard
+            percent="30%"
+            title="Short term goal"
+            amountLeft="$13,560.30 left"
+          />
+          <TargetCard
+            percent="50%"
+            title="Long term goal"
+            amountLeft="$22,600.50 left"
+          />
         </View>
       </ScrollView>
     </View>
@@ -370,118 +456,178 @@ const styles = StyleSheet.create({
   },
 
   graphicCard: {
-    backgroundColor: CARD,
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 16,
-    marginBottom: 14,
+    backgroundColor: WHITE,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: "rgba(9, 169, 130, 0.12)",
+    padding: 18,
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 5,
+    marginBottom: 22,
   },
 
   graphHeader: {
     flexDirection: "row",
+    alignItems: "flex-start",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 14,
+    gap: 14,
+  },
+
+  graphTitleWrap: {
+    flex: 1,
   },
 
   graphTitle: {
-    fontSize: 15,
+    fontSize: 16,
+    lineHeight: 21,
     fontFamily: fonts.bold,
     color: DARK_TEAL,
   },
 
+  graphSubtitle: {
+    marginTop: 3,
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: fonts.medium,
+    color: MUTED,
+  },
+
   graphActions: {
     flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
 
   graphIcon: {
-    width: 33,
-    height: 33,
-    backgroundColor: SOFT_TEAL,
-    borderRadius: 10,
+    width: 36,
+    height: 36,
+    backgroundColor: "#f3fbf8",
+    borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  legendRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    marginTop: 18,
+  },
+
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+
+  incomeDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 999,
+    backgroundColor: TEAL,
+  },
+
+  expenseDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 999,
+    backgroundColor: "#9ee8d6",
+  },
+
+  legendText: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: fonts.medium,
+    color: MUTED,
   },
 
   chartArea: {
     flexDirection: "row",
     alignItems: "flex-end",
+    marginTop: 2,
+    minHeight: 142,
   },
 
   chartLabels: {
-    width: 30,
-    height: 158,
+    width: 34,
+    height: 116,
     justifyContent: "space-between",
+    paddingTop: 2,
     paddingBottom: 19,
   },
 
   chartYAxis: {
     fontSize: 10,
+    lineHeight: 13,
     fontFamily: fonts.medium,
     color: MUTED,
   },
 
   chartContent: {
     flex: 1,
-    height: 158,
+    height: 128,
     position: "relative",
+    justifyContent: "flex-end",
   },
 
   chartGrid: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 20,
+    ...StyleSheet.absoluteFillObject,
+    height: 102,
     justifyContent: "space-between",
+    paddingBottom: 10,
   },
 
   gridLine: {
-    borderTopWidth: 1,
-    borderTopColor: GRID,
-    borderStyle: "dashed",
+    height: 1,
+    backgroundColor: GRID,
   },
 
   chartBarsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    height: 158,
+    height: 128,
     paddingLeft: 8,
     paddingRight: 2,
+    gap: 8,
   },
 
   barGroup: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "flex-end",
+    minWidth: 26,
   },
 
   barPair: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 9,
-    height: 116,
-    marginBottom: 10,
+    gap: 4,
+    height: 104,
+    marginBottom: 9,
   },
 
   barIncome: {
-    width: 12,
-    borderRadius: 8,
+    width: 8,
+    borderRadius: 999,
     backgroundColor: TEAL,
   },
 
   barExpense: {
-    width: 12,
-    borderRadius: 8,
-    backgroundColor: "#c7f5df",
+    width: 8,
+    borderRadius: 999,
+    backgroundColor: "#9ee8d6",
   },
 
   barLabel: {
-    fontSize: 11,
+    marginTop: 0,
+    fontSize: 10,
+    lineHeight: 13,
     fontFamily: fonts.medium,
-    color: DARK_TEAL,
+    color: MUTED,
   },
 
   yearlyChartBarsRow: {
@@ -492,6 +638,7 @@ const styles = StyleSheet.create({
 
   yearlyBarGroup: {
     width: 34,
+    flex: 0,
   },
 
   yearlyBarPair: {
