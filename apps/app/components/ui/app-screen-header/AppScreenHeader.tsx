@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { router } from "expo-router";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
@@ -9,15 +9,24 @@ type AppScreenHeaderProps = {
 
 const BLACK = "#082f33";
 const LIGHT_GREEN = "#f8fffc";
+const DESKTOP_CONTENT_WIDTH = 1040;
+const DESKTOP_BREAKPOINT = 768;
 
 export function AppScreenHeader({ title }: AppScreenHeaderProps) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
+
   return (
-    <View style={styles.headerArea}>
-      <Pressable hitSlop={12} onPress={() => router.back()}>
+    <View style={[styles.headerArea, isDesktop && styles.headerAreaDesktop]}>
+      <Pressable
+        hitSlop={12}
+        onPress={() => router.back()}
+        style={styles.backButton}
+      >
         <Icon name="arrowLeft" size={24} strokeWidth={2.5} color={BLACK} />
       </Pressable>
 
-      <Text style={styles.title} numberOfLines={1}>
+      <Text style={[styles.title, isDesktop && styles.titleDesktop]} numberOfLines={1}>
         {title}
       </Text>
 
@@ -39,6 +48,22 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
 
+  headerAreaDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    marginTop: 24,
+    marginBottom: 28,
+  },
+
+  backButton: {
+    width: 42,
+    height: 42,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   title: {
     flex: 1,
     textAlign: "center",
@@ -46,6 +71,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     color: BLACK,
     marginHorizontal: 16,
+  },
+
+  titleDesktop: {
+    fontSize: 22,
+    marginHorizontal: 24,
   },
 
   notifications: {
