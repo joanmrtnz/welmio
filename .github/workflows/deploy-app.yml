@@ -32,7 +32,7 @@ jobs:
         run: |
           docker build \
             -f apps/app/Dockerfile \
-            --build-arg EXPO_PUBLIC_API_URL=${{ secrets.EXPO_PUBLIC_API_URL }} \
+            --build-arg EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod \
             .
