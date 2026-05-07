@@ -1,5 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { View, Text, StyleSheet, Pressable, ScrollView, Image } from "react-native";
 
 import type { IconName } from "@repo/shared-types";
 import { getUserProfile } from "@/features/profile/services/profile-service";
@@ -11,12 +10,18 @@ import { useEffect, useState } from "react";
 import { removeAccessToken } from "@/app/lib/auth-storage";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
+import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
-const MINT = "#12c79b";
-const GREEN = "#dff7ef";
+const TEAL = "#00c896";
+const DARK_TEAL = "#063b3a";
+const MID_TEAL = "#68e1c6";
+const SOFT_TEAL = "#a9efdf";
+const VERY_SOFT_TEAL = "#eafaf5";
+const CARD = "#fbfffd";
 const WHITE = "#ffffff";
-const DARK = "#082f32";
-const MUTED = "#7f9698";
+const MUTED = "#5e7b78";
+const GRID = "rgba(6, 59, 58, 0.09)";
+const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 export default function ProfileScreen() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -25,6 +30,8 @@ export default function ProfileScreen() {
   const [email, setEmail] = useState("");
   const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
   const [avatarColor, setAvatarColor] = useState("#00c896");
+  const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+
 
   useEffect(() => {
     async function loadUserProfile() {
@@ -74,69 +81,56 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.screen}>
-      <LinearGradient
-        pointerEvents="none"
-        colors={["rgba(223, 247, 239, 0)", "#f7fffb", "#dff7ef"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={styles.bottomGradient}
-      />
-      <View style={styles.headerArea}>
-        <Pressable style={styles.headerButton} onPress={() => router.back()}>
-          <Icon name="arrowLeft" size={24} strokeWidth={2.4} color={DARK} />
-        </Pressable>
+      <AppScreenHeader title="Profile" />
 
-        <Text style={styles.title}>Profile</Text>
-
-        <View style={styles.notifications}>
-          <Icon name="bell" size={24} strokeWidth={1.8} color={DARK} />
-        </View>
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.avatarWrapper}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.profileCard}>
           <View style={styles.avatarOuterRing}>
-            <View style={[styles.avatar, { borderColor: avatarColor || MINT }]}>
-              <Icon
-                name={avatarIcon}
-                size={48}
-                strokeWidth={1.8}
-                color={avatarColor || MINT}
+            <View style={[styles.avatar, { borderColor: avatarColor || TEAL }]}>
+              <Image
+                source={WELMIO_LOGO}
+                style={styles.logoImage}
+                resizeMode="contain"
               />
             </View>
           </View>
-        </View>
 
-        <View style={styles.card}>
           <View style={styles.nameContainer}>
             <Text style={styles.name}>{fullName || "User"}</Text>
             <Text style={styles.userId}>{email ? email : "-"}</Text>
           </View>
-
-          <View style={styles.optionsContainer}>
-            <ProfileOption
-              icon="user"
-              label="Edit Profile"
-              onPress={() => router.push("/profile/edit")}
-            />
-            <ProfileOption
-              icon="shield"
-              label="Security"
-              onPress={() => router.push("/profile/security")}
-            />
-            <ProfileOption
-              icon="settings"
-              label="Settings"
-              onPress={() => router.push("/profile/settings")}
-            />
-            <ProfileOption
-              icon="logout"
-              label="Logout"
-              onPress={handleOpenLogoutDialog}
-            />
-          </View>
         </View>
-      </View>
+
+       
+        <View style={styles.optionsCard}>
+          <ProfileOption
+            icon="user"
+            label="Edit Profile"
+            onPress={() => router.push("/profile/edit")}
+          />
+          <View style={styles.divider} />
+          <ProfileOption
+            icon="shield"
+            label="Security"
+            onPress={() => router.push("/profile/security")}
+          />
+          <View style={styles.divider} />
+          <ProfileOption
+            icon="settings"
+            label="Settings"
+            onPress={() => router.push("/profile/settings")}
+          />
+          <View style={styles.divider} />
+          <ProfileOption
+            icon="logout"
+            label="Logout"
+            onPress={handleOpenLogoutDialog}
+          />
+        </View>
+      </ScrollView>
 
       <ConfirmDialog
         visible={showLogoutDialog}
@@ -156,124 +150,116 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: GREEN,
-  },
-
-  bottomGradient: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 260,
-    zIndex: 0,
-  },
-
-  headerArea: {
-    zIndex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 34,
-    paddingBottom: 22,
-  },
-
-  headerButton: {
-    width: 42,
-    height: 42,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  title: {
-    fontSize: 20,
-    fontFamily: fonts.bold,
-    color: DARK,
-  },
-
-  notifications: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: WHITE,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "rgba(25, 89, 80, 0.18)",
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
+    backgroundColor: VERY_SOFT_TEAL,
   },
 
   content: {
-    zIndex: 1,
-    flex: 1,
-    paddingTop: 38,
+    paddingHorizontal: 20,
+    paddingBottom: 118,
   },
 
-  avatarWrapper: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
+  profileCard: {
+    backgroundColor: CARD,
+    borderRadius: 18,
+    paddingHorizontal: 20,
+    paddingTop: 26,
+    paddingBottom: 24,
     alignItems: "center",
-    zIndex: 2,
+    marginBottom: 22,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 1,
   },
 
   avatarOuterRing: {
-    width: 98,
-    height: 98,
-    borderRadius: 49,
-    backgroundColor: "rgba(255, 255, 255, 0.42)",
+    width: 102,
+    height: 102,
+    borderRadius: 51,
+    backgroundColor: SOFT_TEAL,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 16,
   },
 
   avatar: {
-    width: 94,
-    height: 94,
-    borderRadius: 47,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: WHITE,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
   },
 
-  card: {
-    flex: 1,
-    marginTop: 15,
-    backgroundColor: "rgba(255, 255, 255, 0.68)",
-    borderTopLeftRadius: 54,
-    borderTopRightRadius: 54,
-    paddingHorizontal: 20,
-    paddingTop: 88,
-    paddingBottom: 120,
-    shadowColor: "rgba(34, 93, 84, 0.08)",
+  logoBadge: {
+    width: 31,
+    height: 31,
+    borderRadius: 18,
+    backgroundColor: CARD,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: LIGHT_GRAY,
+    borderWidth: 1,
+    shadowColor: "rgba(29, 100, 89, 0.18)",
     shadowOpacity: 1,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: -4 },
-    elevation: 2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
+  },
+
+  logoImage: {
+    width: 85,
+    height: 85,
   },
 
   nameContainer: {
     alignItems: "center",
-    marginBottom: 44,
   },
 
   name: {
-    fontSize: 20,
+    fontSize: 21,
+    lineHeight: 27,
     fontFamily: fonts.bold,
-    color: DARK,
+    color: DARK_TEAL,
   },
 
   userId: {
     fontSize: 13,
     fontFamily: fonts.medium,
     color: MUTED,
-    marginTop: 8,
+    marginTop: 6,
   },
 
-  optionsContainer: {
-    gap: 16,
+  sectionHeader: {
+    marginBottom: 14,
+    paddingHorizontal: 2,
+  },
+
+  sectionTitle: {
+    alignSelf: "flex-start",
+    fontSize: 15,
+    fontFamily: fonts.bold,
+    color: DARK_TEAL,
+    paddingBottom: 4,
+  },
+
+  optionsCard: {
+    backgroundColor: CARD,
+    borderRadius: 18,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 1,
+  },
+
+  divider: {
+    height: 1,
+    marginLeft: 60,
+    backgroundColor: GRID,
   },
 });

@@ -16,6 +16,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { deleteAccount } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { removeAccessToken } from "@/app/lib/auth-storage";
+import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 export default function DeleteAccountScreen() {
   const [confirmationText, setConfirmationText] = useState("");
@@ -59,17 +60,7 @@ export default function DeleteAccountScreen() {
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={styles.headerArea}>
-        <Pressable onPress={() => router.back()}>
-          <Icon name="arrowLeft" size={22} color={BLACK} />
-        </Pressable>
-
-        <Text style={styles.title}>Delete Account</Text>
-
-        <Pressable style={styles.notifications}>
-          <Icon name="bell" size={22} color={BLACK} />
-        </Pressable>
-      </View>
+      <AppScreenHeader title="Delete Account" />
 
       <View style={styles.card}>
         <ScrollView
@@ -172,36 +163,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: GREEN,
-  },
-
-  headerArea: {
-    height: 104,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 22,
-  },
-
-  title: {
-    fontSize: 18,
-    color: BLACK,
-    fontFamily: fonts.bold,
-    letterSpacing: 0.2,
-  },
-
-  notifications: {
-    width: 42,
-    height: 42,
-    backgroundColor: WHITE,
-    borderRadius: 21,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "rgba(10, 58, 52, 0.18)",
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
   },
 
   card: {

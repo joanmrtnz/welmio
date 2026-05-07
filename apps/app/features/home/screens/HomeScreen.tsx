@@ -7,88 +7,209 @@ import {
   View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import { apiFetch } from "@/app/lib/api/client";
 import WelmioAvatar from "@/assets/images/welmio-logo-no-circle.png";
+import type {
+  GoalsOverviewResponse,
+  TransactionsOverviewResponse,
+} from "@repo/shared-types";
+import { TransactionRow } from "@/features/transactions/components/transaction-row/TransactionRow";
+import { QuickAnalyticsCard } from "@/features/analytics/components/QuickAnalyticsCard";
+import { useAnalytics } from "@/features/analytics/hooks/useAnalytics";
+import { getGoalsOverview } from "@/features/goals/services/goals.service";
+import { QuickGoalsRow } from "@/features/goals/components/quick-goals-row/QuickGoalsRow";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
 const CARD_SOFT = "#f3fbf8";
 const MINT = "#d7f5eb";
-const MINT_LIGHT = "#eaf9f4";
 const GREEN = "#0bb894";
 const GREEN_DARK = "#078a73";
 const TEXT = "#063436";
 const MUTED = "#6f8790";
 const DANGER = "#ff4265";
 const BORDER = "rgba(9, 169, 130, 0.12)";
+const LIGHT_GREEN = "#f8fffc";
 
-const goalCards = [
-  { title: "New Car", icon: "car", percent: "35%", progress: "35%" },
-  { title: "Emergency Fund", icon: "money", percent: "75%", progress: "75%" },
-  { title: "New Laptop", icon: "rent", percent: "20%", progress: "20%" },
+const EMPTY_ANALYTICS_DATA = [
+  { label: "Mon", income: 0, expense: 0 },
+  { label: "Tue", income: 0, expense: 0 },
+  { label: "Wed", income: 0, expense: 0 },
+  { label: "Thu", income: 0, expense: 0 },
+  { label: "Fri", income: 0, expense: 0 },
+  { label: "Sat", income: 0, expense: 0 },
+  { label: "Sun", income: 0, expense: 0 },
 ];
 
-const analyticsBars = [
-  { label: "May 1", income: 66, expense: 44 },
-  { label: "May 8", income: 44, expense: 61 },
-  { label: "May 15", income: 68, expense: 45 },
-  { label: "May 22", income: 66, expense: 39 },
-  { label: "May 29", income: 60, expense: 35 },
-];
+function formatCurrency(amount: string | number, currency = "USD") {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+  }).format(Number(amount));
+}
 
-const transactions = [
-  {
-    title: "Salary Payment",
-    meta: "May 30 · 10:30 AM",
-    icon: "money",
-    amount: "+$4,000.00",
-    positive: true,
-  },
-  {
-    title: "Groceries",
-    meta: "May 29 · 5:45 PM",
-    icon: "food",
-    amount: "-$100.00",
-    positive: false,
-  },
-  {
-    title: "Rent",
-    meta: "May 28 · 9:15 AM",
-    icon: "rent",
-    amount: "-$674.40",
-    positive: false,
-  },
-];
+function formatAnalyticsLabel(label: string) {
+  const parsedDate = new Date(label);
+
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate.toLocaleDateString("en-US", { weekday: "short" });
+  }
+
+  return label.length > 3 ? label.slice(0, 3) : label;
+}
+
+function SectionHeader({
+  title,
+  action,
+  onActionPress,
+}: {
+  title: string;
+  action?: string;
+  onActionPress?: () => void;
+}) {
+  return (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {action ? (
+        <Pressable
+          disabled={!onActionPress}
+          hitSlop={10}
+          onPress={onActionPress}
+        >
+          <View style={styles.sectionActionContainer}>
+            <Text style={styles.sectionAction}>{action}</Text>
+            <Icon name="chevronRight" size={14} strokeWidth={1.8} color={GREEN_DARK} />
+          </View>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
 
 export default function HomeScreen() {
+  const [transactionsOverview, setTransactionsOverview] =
+    useState<TransactionsOverviewResponse | null>(null);
+  const [goalsOverview, setGoalsOverview] =
+    useState<GoalsOverviewResponse | null>(null);
+  const [goalsErrorMessage, setGoalsErrorMessage] = useState<string | null>(
+    null,
+  );
+
+  const { selected, setSelected, data: analyticsData } = useAnalytics();
+
+  const recentTransactions = useMemo(
+    () =>
+      transactionsOverview?.groups
+        .flatMap((group) => group.items)
+        .slice(0, 3) ?? [],
+    [transactionsOverview],
+  );
+
+  const homeGoals = useMemo(() => {
+    const goals = goalsOverview?.goals ?? [];
+
+    if (!goalsOverview?.mainGoal) {
+      return goals.slice(0, 5);
+    }
+
+    const remainingGoals = goals.filter(
+      (goal) => goal.id !== goalsOverview.mainGoal?.id,
+    );
+
+    return [goalsOverview.mainGoal, ...remainingGoals].slice(0, 5);
+  }, [goalsOverview]);
+
+  const weeklyAnalyticsData = useMemo(() => {
+    if (!analyticsData?.chart.labels.length) {
+      return EMPTY_ANALYTICS_DATA;
+    }
+
+    return analyticsData.chart.labels.map((label, index) => ({
+      label: formatAnalyticsLabel(label),
+      income: Number(analyticsData.chart.income[index] ?? 0),
+      expense: Number(analyticsData.chart.expense[index] ?? 0),
+    }));
+  }, [analyticsData]);
+
+  const totalBalance = transactionsOverview?.summary.totalBalance ?? 0;
+  const totalExpense = transactionsOverview?.summary.totalExpense ?? 0;
+
+  const loadTransactionsOverview = useCallback(async () => {
+    try {
+      const response = await apiFetch<TransactionsOverviewResponse>(
+        "/transactions/overview",
+      );
+
+      setTransactionsOverview(response);
+    } catch (error) {
+      console.warn("[HomeScreen] load transactions overview error:", error);
+    }
+  }, []);
+
+  const loadGoalsOverview = useCallback(async () => {
+    try {
+      setGoalsErrorMessage(null);
+
+      const response = await getGoalsOverview();
+
+      setGoalsOverview(response);
+    } catch (error) {
+      console.warn("[HomeScreen] load goals overview error:", error);
+      setGoalsErrorMessage("Could not load goals.");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTransactionsOverview();
+    loadGoalsOverview();
+  }, [loadGoalsOverview, loadTransactionsOverview]);
+
+  useEffect(() => {
+    if (selected !== "weekly") {
+      setSelected("weekly");
+    }
+  }, [selected, setSelected]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadTransactionsOverview();
+      loadGoalsOverview();
+    }, [loadGoalsOverview, loadTransactionsOverview]),
+  );
+
   return (
     <View style={styles.screen}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        <View style={styles.header}>
+       <View style={styles.header}>
           <View style={styles.userSide}>
-            <View style={styles.avatarFrame}>
+            <Pressable
+              style={styles.avatarFrame}
+              hitSlop={10}
+              onPress={() => router.push("/profile")}
+            >
               <Image
                 source={WelmioAvatar}
                 style={styles.avatarImage}
                 resizeMode="contain"
               />
-            </View>
+            </Pressable>
 
             <View>
               <Text style={styles.greeting}>Hi, John! 👋</Text>
               <Text style={styles.greetingSub}>Good Morning</Text>
             </View>
           </View>
-
-          <Pressable style={styles.bellButton}>
-            <Icon name="bell" size={24} strokeWidth={1.5} color={TEXT} />
+          <Pressable style={styles.notifications}>
+            <Icon name="bell" size={24} strokeWidth={1.8} color={TEXT} />
           </Pressable>
         </View>
-
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
         <SectionHeader title="Overview" />
 
         <View style={styles.overviewRow}>
@@ -96,170 +217,83 @@ export default function HomeScreen() {
             <View style={styles.overviewIconWrap}>
               <Icon
                 name="money"
-                size={38}
+                size={34}
                 color={GREEN_DARK}
-                strokeWidth={0.8}
+                strokeWidth={0.9}
               />
             </View>
 
-            <View>
+            <View style={styles.overviewTextWrap}>
               <Text style={styles.overviewLabel}>Total Balance</Text>
-              <Text style={styles.overviewPositive}>$7,783.00</Text>
+              <Text style={styles.overviewPositive}>
+                {formatCurrency(totalBalance)}
+              </Text>
             </View>
           </Pressable>
 
           <Pressable style={styles.overviewCard}>
             <View style={[styles.overviewIconWrap, styles.expenseIconWrap]}>
-              <Icon name="expense" size={35} color={DANGER} strokeWidth={0.8} />
+              <Icon name="expense" size={28} color={DANGER} strokeWidth={1.4} />
             </View>
 
-            <View>
+            <View style={styles.overviewTextWrap}>
               <Text style={styles.overviewLabel}>Total Expense</Text>
-              <Text style={styles.overviewAmount}>-$1,187.40</Text>
+              <Text style={styles.overviewAmount}>
+                -{formatCurrency(totalExpense)}
+              </Text>
             </View>
           </Pressable>
         </View>
 
-        <SectionHeader title="Goals" action="View All" />
+        <SectionHeader
+          title="Goals"
+          action="View All"
+          onActionPress={() => router.push("/goals")}
+        />
 
-        <Pressable style={styles.featureGoalCard}>
-          <View style={styles.featureGoalTop}>
-            <View style={styles.bigGoalIcon}>
-              <Icon
-                name="rent"
-                size={50}
-                color={GREEN_DARK}
-                strokeWidth={0.8}
-              />
-            </View>
+        <QuickGoalsRow
+          goals={homeGoals}
+          errorMessage={goalsErrorMessage}
+          onGoalPress={() => router.push("/goals")}
+          onEmptyPress={() => router.push("/goals")}
+        />
 
-            <View style={styles.featureGoalText}>
-              <Text style={styles.featureGoalTitle}>Vacation Fund</Text>
-              <Text style={styles.featureGoalMeta}>$1,560.00 of $3,000.00</Text>
-            </View>
-          </View>
+        <SectionHeader
+          title="Analytics"
+          action="View All"
+          onActionPress={() => router.push("/analytics")}
+        />
 
-          <View style={styles.goalProgressRow}>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: "52%" }]} />
-            </View>
-            <Text style={styles.progressPercent}>52%</Text>
-          </View>
-        </Pressable>
+        <QuickAnalyticsCard
+          data={weeklyAnalyticsData}
+          title="This week chart"
+          actionLabel="Weekly"
+          onPress={() => router.push("/analytics")}
+        />
 
-        <View style={styles.goalGrid}>
-          {goalCards.map((goal) => (
-            <Pressable key={goal.title} style={styles.goalMiniCard}>
-              <View style={styles.goalMiniIcon}>
-                <Icon
-                  name={goal.icon as any}
-                  size={35}
-                  color={GREEN_DARK}
-                  strokeWidth={0.8}
-                />
-              </View>
-
-              <View style={styles.goalMiniContent}>
-                <Text
-                  style={styles.goalMiniTitle}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {goal.title}
-                </Text>
-                <View style={styles.miniProgressRow}>
-                  <View style={styles.miniProgressTrack}>
-                    <View
-                      style={[
-                        styles.miniProgressFill,
-                        { width: goal.progress },
-                      ]}
-                    />
-                  </View>
-                  <Text style={styles.goalMiniPercent}>{goal.percent}</Text>
-                </View>
-              </View>
-            </Pressable>
-          ))}
-        </View>
-
-        <SectionHeader title="Analytics" action="This Month" />
-
-        <Pressable style={styles.analyticsCard}>
-          <View style={styles.legendRow}>
-            <View style={styles.legendItem}>
-              <View style={styles.legendDot} />
-              <Text style={styles.legendText}>Income</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, styles.legendDotLight]} />
-              <Text style={styles.legendText}>Expense</Text>
-            </View>
-          </View>
-
-          <View style={styles.chartArea}>
-            <View style={styles.yAxis}>
-              <Text style={styles.axisText}>$3K</Text>
-              <Text style={styles.axisText}>$2K</Text>
-              <Text style={styles.axisText}>$1K</Text>
-              <Text style={styles.axisText}>$0</Text>
-            </View>
-
-            <View style={styles.barsArea}>
-              {analyticsBars.map((bar) => (
-                <View key={bar.label} style={styles.barGroup}>
-                  <View style={styles.barColumns}>
-                    <View style={[styles.bar, { height: bar.income }]} />
-                    <View
-                      style={[
-                        styles.bar,
-                        styles.expenseBar,
-                        { height: bar.expense },
-                      ]}
-                    />
-                  </View>
-                  <Text style={styles.barLabel}>{bar.label}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </Pressable>
-
-        <SectionHeader title="Recent Transactions" action="View All" />
+        <SectionHeader
+          title="Recent Transactions"
+          action="View All"
+          onActionPress={() => router.push("/transactions")}
+        />
 
         <View style={styles.transactionsCard}>
-          {transactions.map((transaction, index) => (
-            <Pressable
-              key={transaction.title}
-              style={[
-                styles.transactionRow,
-                index === transactions.length - 1 && styles.transactionRowLast,
-              ]}
-            >
-              <View style={styles.transactionIcon}>
-                <Icon
-                  name={transaction.icon as any}
-                  size={35}
-                  color={GREEN_DARK}
-                  strokeWidth={0.8}
-                />
-              </View>
-
-              <View style={styles.transactionTextWrap}>
-                <Text style={styles.transactionTitle}>{transaction.title}</Text>
-                <Text style={styles.transactionMeta}>{transaction.meta}</Text>
-              </View>
-
-              <Text
-                style={[
-                  styles.transactionAmount,
-                  transaction.positive && styles.transactionAmountPositive,
-                ]}
-              >
-                {transaction.amount}
-              </Text>
-            </Pressable>
-          ))}
+          {recentTransactions.length > 0 ? (
+            recentTransactions.map((transaction, index) => (
+              <TransactionRow
+                key={transaction.id}
+                transaction={transaction}
+                compact
+                showCategory={false}
+                withDivider={index !== recentTransactions.length - 1}
+                onPress={() => router.push("/transactions")}
+              />
+            ))
+          ) : (
+            <Text style={styles.emptyTransactions}>
+              No recent transactions yet.
+            </Text>
+          )}
         </View>
       </ScrollView>
 
@@ -272,15 +306,6 @@ export default function HomeScreen() {
   );
 }
 
-function SectionHeader({ title, action }: { title: string; action?: string }) {
-  return (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {action ? <Text style={styles.sectionAction}>{action}</Text> : null}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -289,14 +314,17 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 18,
-    paddingTop: 18,
-    paddingBottom: 128,
+    paddingBottom: 132,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 5,
+    marginTop: 30,
     marginBottom: 18,
   },
 
@@ -307,67 +335,83 @@ const styles = StyleSheet.create({
   },
 
   avatarFrame: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: MINT,
-    borderWidth: 2,
-    borderColor: GREEN,
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
   },
 
   avatarImage: {
-    width: 55,
-    height: 55,
+    width: 39,
+    height: 39,
   },
 
   greeting: {
-    fontSize: 18,
+    fontSize: 20,
+    lineHeight: 25,
     fontFamily: fonts.bold,
     color: TEXT,
   },
 
   greetingSub: {
     marginTop: 2,
-    fontSize: 12,
+    fontSize: 13,
+    lineHeight: 17,
     fontFamily: fonts.medium,
-    color: TEXT,
+    color: MUTED,
   },
 
-  bellButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: CARD,
+
+  notifications: {
+    width: 42,
+    height: 42,
+    backgroundColor: LIGHT_GREEN,
+    borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: BORDER,
-    shadowColor: "rgba(29, 100, 89, 0.18)",
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 7 },
-    elevation: 7,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 3,
   },
 
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 12,
     marginBottom: 12,
+    marginTop: 4,
+    paddingHorizontal: 6,
   },
 
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 17,
+    lineHeight: 22,
     fontFamily: fonts.bold,
     color: TEXT,
+    paddingBottom: 2,
+  },
+
+  sectionActionContainer : {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
   },
 
   sectionAction: {
     fontSize: 12,
+    lineHeight: 16,
     fontFamily: fonts.bold,
     color: GREEN_DARK,
   },
@@ -375,97 +419,102 @@ const styles = StyleSheet.create({
   overviewRow: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 10,
+    marginBottom: 22,
   },
 
   overviewCard: {
     flex: 1,
-    minHeight: 78,
-    borderRadius: 16,
+    minHeight: 112,
+    borderRadius: 26,
     backgroundColor: CARD,
     borderWidth: 1,
     borderColor: BORDER,
-    padding: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    shadowColor: "rgba(29, 100, 89, 0.12)",
+    padding: 15,
+    justifyContent: "space-between",
+    shadowColor: "rgba(29, 100, 89, 0.1)",
     shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 7 },
     elevation: 4,
   },
 
   overviewIconWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 14,
-    backgroundColor: MINT_LIGHT,
+    width: 44,
+    height: 44,
+    borderRadius: 15,
+    backgroundColor: MINT,
     alignItems: "center",
     justifyContent: "center",
   },
 
   expenseIconWrap: {
-    backgroundColor: "#fff0f3",
+    backgroundColor: "#ffe7ed",
+  },
+
+  overviewTextWrap: {
+    marginTop: 12,
   },
 
   overviewLabel: {
-    fontSize: 10,
-    fontFamily: fonts.bold,
-    color: TEXT,
-    marginBottom: 4,
+    fontSize: 12,
+    lineHeight: 16,
+    fontFamily: fonts.medium,
+    color: MUTED,
   },
 
   overviewPositive: {
-    fontSize: 18,
+    marginTop: 3,
+    fontSize: 19,
+    lineHeight: 24,
     fontFamily: fonts.bold,
     color: GREEN_DARK,
   },
 
   overviewAmount: {
-    fontSize: 18,
+    marginTop: 3,
+    fontSize: 19,
+    lineHeight: 24,
     fontFamily: fonts.bold,
     color: TEXT,
   },
 
   featureGoalCard: {
-    borderRadius: 16,
+    borderRadius: 28,
     backgroundColor: CARD,
     borderWidth: 1,
     borderColor: BORDER,
-    padding: 12,
+    padding: 18,
     marginBottom: 12,
-    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowColor: "rgba(29, 100, 89, 0.1)",
     shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 7 },
     elevation: 4,
   },
 
   featureGoalTop: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    gap: 14,
   },
 
   bigGoalIcon: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: MINT_LIGHT,
-    borderWidth: 1.2,
-    borderColor: GREEN,
+    width: 62,
+    height: 62,
+    borderRadius: 20,
+    backgroundColor: MINT,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
   },
 
   featureGoalText: {
     flex: 1,
+    minWidth: 0,
   },
 
   featureGoalTitle: {
-    fontSize: 14,
+    fontSize: 17,
+    lineHeight: 22,
     fontFamily: fonts.bold,
     color: TEXT,
   },
@@ -473,6 +522,7 @@ const styles = StyleSheet.create({
   featureGoalMeta: {
     marginTop: 4,
     fontSize: 12,
+    lineHeight: 16,
     fontFamily: fonts.medium,
     color: MUTED,
   },
@@ -480,62 +530,73 @@ const styles = StyleSheet.create({
   goalProgressRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
+    marginTop: 17,
   },
 
   progressTrack: {
     flex: 1,
-    height: 8,
+    height: 11,
     borderRadius: 999,
-    backgroundColor: MINT,
+    backgroundColor: CARD_SOFT,
     overflow: "hidden",
   },
 
   progressFill: {
     height: "100%",
     borderRadius: 999,
-    backgroundColor: GREEN_DARK,
+    backgroundColor: GREEN,
   },
 
   progressPercent: {
-    width: 34,
-    textAlign: "right",
-    fontSize: 11,
+    width: 38,
+    fontSize: 12,
+    lineHeight: 16,
     fontFamily: fonts.bold,
-    color: TEXT,
+    color: GREEN_DARK,
+    textAlign: "right",
   },
 
-  goalGrid: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 8,
+  goalsRow: {
+    gap: 12,
+    paddingRight: 18,
+    paddingBottom: 2,
+    marginBottom: 22,
   },
 
   goalMiniCard: {
-    flex: 1,
-    borderRadius: 12,
+    width: 265,
+    minHeight: 96,
+    borderRadius: 22,
     backgroundColor: CARD,
     borderWidth: 1,
     borderColor: BORDER,
-    padding: 9,
-    minHeight: 58,
+    padding: 12,
     flexDirection: "row",
     alignItems: "center",
-    shadowColor: "rgba(29, 100, 89, 0.09)",
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
+    gap: 12,
+  },
+
+  emptyGoalsCard: {
+    minHeight: 82,
+    borderRadius: 22,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 22,
   },
 
   goalMiniIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: MINT_LIGHT,
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    backgroundColor: MINT,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 7,
   },
 
   goalMiniContent: {
@@ -544,197 +605,72 @@ const styles = StyleSheet.create({
   },
 
   goalMiniTitle: {
-    fontSize: 9,
+    fontSize: 13,
+    lineHeight: 17,
     fontFamily: fonts.bold,
     color: TEXT,
-    marginBottom: 7,
+  },
+
+  goalMiniMeta: {
+    marginTop: 3,
+    fontSize: 11,
+    lineHeight: 15,
+    fontFamily: fonts.medium,
+    color: MUTED,
   },
 
   miniProgressRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    gap: 8,
+    marginTop: 8,
   },
 
   miniProgressTrack: {
     flex: 1,
-    height: 6,
+    height: 8,
     borderRadius: 999,
-    backgroundColor: MINT,
+    backgroundColor: CARD_SOFT,
     overflow: "hidden",
   },
 
   miniProgressFill: {
     height: "100%",
     borderRadius: 999,
-    backgroundColor: GREEN_DARK,
+    backgroundColor: GREEN,
   },
 
   goalMiniPercent: {
-    fontSize: 9,
-    fontFamily: fonts.bold,
-    color: TEXT,
-  },
-
-  analyticsCard: {
-    borderRadius: 16,
-    backgroundColor: CARD,
-    borderWidth: 1,
-    borderColor: BORDER,
-    padding: 14,
-    marginBottom: 10,
-    shadowColor: "rgba(29, 100, 89, 0.12)",
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
-  },
-
-  legendRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 28,
-    marginBottom: 12,
-  },
-
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: GREEN_DARK,
-  },
-
-  legendDotLight: {
-    backgroundColor: "#cfeedd",
-  },
-
-  legendText: {
-    fontSize: 11,
-    fontFamily: fonts.medium,
-    color: TEXT,
-  },
-
-  chartArea: {
-    height: 126,
-    flexDirection: "row",
-  },
-
-  yAxis: {
     width: 34,
-    justifyContent: "space-between",
-    paddingBottom: 20,
-  },
-
-  axisText: {
-    fontSize: 10,
+    fontSize: 11,
+    lineHeight: 14,
     fontFamily: fonts.bold,
-    color: MUTED,
-  },
-
-  barsArea: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-  },
-
-  barGroup: {
-    alignItems: "center",
-    width: 42,
-  },
-
-  barColumns: {
-    height: 86,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 8,
-  },
-
-  bar: {
-    width: 10,
-    borderRadius: 4,
-    backgroundColor: GREEN_DARK,
-  },
-
-  expenseBar: {
-    backgroundColor: "#cbeed7",
-  },
-
-  barLabel: {
-    marginTop: 7,
-    fontSize: 10,
-    fontFamily: fonts.medium,
-    color: MUTED,
+    color: GREEN_DARK,
+    textAlign: "right",
   },
 
   transactionsCard: {
-    borderRadius: 16,
+    borderRadius: 28,
     backgroundColor: CARD,
     borderWidth: 1,
     borderColor: BORDER,
-    overflow: "hidden",
-    shadowColor: "rgba(29, 100, 89, 0.12)",
+    paddingVertical: 8,
+    marginTop: 2,
+    shadowColor: "rgba(29, 100, 89, 0.1)",
     shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 7 },
     elevation: 4,
   },
 
-  transactionRow: {
-    minHeight: 66,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(9, 169, 130, 0.08)",
-  },
-
-  transactionRowLast: {
-    borderBottomWidth: 0,
-  },
-
-  transactionIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: MINT_LIGHT,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-
-  transactionTextWrap: {
-    flex: 1,
-  },
-
-  transactionTitle: {
+  emptyTransactions: {
+    paddingVertical: 22,
+    paddingHorizontal: 18,
     fontSize: 13,
-    fontFamily: fonts.bold,
-    color: TEXT,
-  },
-
-  transactionMeta: {
-    marginTop: 4,
-    fontSize: 11,
+    lineHeight: 18,
     fontFamily: fonts.medium,
     color: MUTED,
-  },
-
-  transactionAmount: {
-    fontSize: 13,
-    fontFamily: fonts.bold,
-    color: TEXT,
-    marginLeft: 10,
-  },
-
-  transactionAmountPositive: {
-    color: GREEN_DARK,
+    textAlign: "center",
   },
 
   bottomFade: {
@@ -742,6 +678,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 120,
+    height: 115,
   },
 });
