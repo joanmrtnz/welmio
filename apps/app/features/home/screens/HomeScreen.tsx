@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Text,
   View,
-  type DimensionValue,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect } from "expo-router";
@@ -14,10 +13,15 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { apiFetch } from "@/app/lib/api/client";
 import WelmioAvatar from "@/assets/images/welmio-logo-no-circle.png";
-import type { TransactionsOverviewResponse } from "@repo/shared-types";
+import type {
+  GoalsOverviewResponse,
+  TransactionsOverviewResponse,
+} from "@repo/shared-types";
 import { TransactionRow } from "@/features/transactions/components/transaction-row/TransactionRow";
 import { QuickAnalyticsCard } from "@/features/analytics/components/QuickAnalyticsCard";
 import { useAnalytics } from "@/features/analytics/hooks/useAnalytics";
+import { getGoalsOverview } from "@/features/goals/services/goals.service";
+import { QuickGoalsRow } from "@/features/goals/components/quick-goals-row/QuickGoalsRow";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -38,19 +42,6 @@ const EMPTY_ANALYTICS_DATA = [
   { label: "Fri", income: 0, expense: 0 },
   { label: "Sat", income: 0, expense: 0 },
   { label: "Sun", income: 0, expense: 0 },
-];
-
-type GoalCard = {
-  title: string;
-  icon: string;
-  percent: string;
-  progress: DimensionValue;
-};
-
-const goalCards: GoalCard[] = [
-  { title: "New Car", icon: "car", percent: "35%", progress: "35%" },
-  { title: "Emergency Fund", icon: "money", percent: "75%", progress: "75%" },
-  { title: "New Laptop", icon: "rent", percent: "20%", progress: "20%" },
 ];
 
 function formatCurrency(amount: string | number, currency = "USD") {
@@ -101,6 +92,11 @@ function SectionHeader({
 export default function HomeScreen() {
   const [transactionsOverview, setTransactionsOverview] =
     useState<TransactionsOverviewResponse | null>(null);
+  const [goalsOverview, setGoalsOverview] =
+    useState<GoalsOverviewResponse | null>(null);
+  const [goalsErrorMessage, setGoalsErrorMessage] = useState<string | null>(
+    null,
+  );
 
   const { selected, setSelected, data: analyticsData } = useAnalytics();
 
@@ -111,6 +107,20 @@ export default function HomeScreen() {
         .slice(0, 3) ?? [],
     [transactionsOverview],
   );
+
+  const homeGoals = useMemo(() => {
+    const goals = goalsOverview?.goals ?? [];
+
+    if (!goalsOverview?.mainGoal) {
+      return goals.slice(0, 5);
+    }
+
+    const remainingGoals = goals.filter(
+      (goal) => goal.id !== goalsOverview.mainGoal?.id,
+    );
+
+    return [goalsOverview.mainGoal, ...remainingGoals].slice(0, 5);
+  }, [goalsOverview]);
 
   const weeklyAnalyticsData = useMemo(() => {
     if (!analyticsData?.chart.labels.length) {
@@ -139,9 +149,23 @@ export default function HomeScreen() {
     }
   }, []);
 
+  const loadGoalsOverview = useCallback(async () => {
+    try {
+      setGoalsErrorMessage(null);
+
+      const response = await getGoalsOverview();
+
+      setGoalsOverview(response);
+    } catch (error) {
+      console.warn("[HomeScreen] load goals overview error:", error);
+      setGoalsErrorMessage("Could not load goals.");
+    }
+  }, []);
+
   useEffect(() => {
     loadTransactionsOverview();
-  }, [loadTransactionsOverview]);
+    loadGoalsOverview();
+  }, [loadGoalsOverview, loadTransactionsOverview]);
 
   useEffect(() => {
     if (selected !== "weekly") {
@@ -152,7 +176,8 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       loadTransactionsOverview();
-    }, [loadTransactionsOverview]),
+      loadGoalsOverview();
+    }, [loadGoalsOverview, loadTransactionsOverview]),
   );
 
   return (
@@ -223,66 +248,12 @@ export default function HomeScreen() {
           onActionPress={() => router.push("/goals")}
         />
 
-        <Pressable style={styles.featureGoalCard}>
-          <View style={styles.featureGoalTop}>
-            <View style={styles.bigGoalIcon}>
-              <Icon
-                name="rent"
-                size={40}
-                color={GREEN_DARK}
-                strokeWidth={1.15}
-              />
-            </View>
-
-            <View style={styles.featureGoalText}>
-              <Text style={styles.featureGoalTitle}>Vacation Fund</Text>
-              <Text style={styles.featureGoalMeta}>$1,560.00 of $3,000.00</Text>
-            </View>
-          </View>
-
-          <View style={styles.goalProgressRow}>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: "52%" }]} />
-            </View>
-            <Text style={styles.progressPercent}>52%</Text>
-          </View>
-        </Pressable>
-
-        <View style={styles.goalGrid}>
-          {goalCards.map((goal) => (
-            <Pressable key={goal.title} style={styles.goalMiniCard}>
-              <View style={styles.goalMiniIcon}>
-                <Icon
-                  name={goal.icon as never}
-                  size={26}
-                  color={GREEN_DARK}
-                  strokeWidth={1.2}
-                />
-              </View>
-
-              <View style={styles.goalMiniContent}>
-                <Text
-                  style={styles.goalMiniTitle}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {goal.title}
-                </Text>
-                <View style={styles.miniProgressRow}>
-                  <View style={styles.miniProgressTrack}>
-                    <View
-                      style={[
-                        styles.miniProgressFill,
-                        { width: goal.progress },
-                      ]}
-                    />
-                  </View>
-                  <Text style={styles.goalMiniPercent}>{goal.percent}</Text>
-                </View>
-              </View>
-            </Pressable>
-          ))}
-        </View>
+        <QuickGoalsRow
+          goals={homeGoals}
+          errorMessage={goalsErrorMessage}
+          onGoalPress={() => router.push("/goals")}
+          onEmptyPress={() => router.push("/goals")}
+        />
 
         <SectionHeader
           title="Analytics"
@@ -576,13 +547,16 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
 
-  goalGrid: {
-    gap: 10,
+  goalsRow: {
+    gap: 12,
+    paddingRight: 18,
+    paddingBottom: 2,
     marginBottom: 22,
   },
 
   goalMiniCard: {
-    minHeight: 70,
+    width: 265,
+    minHeight: 96,
     borderRadius: 22,
     backgroundColor: CARD,
     borderWidth: 1,
@@ -591,6 +565,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+  },
+
+  emptyGoalsCard: {
+    minHeight: 82,
+    borderRadius: 22,
+    backgroundColor: CARD,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 22,
   },
 
   goalMiniIcon: {
@@ -612,6 +599,14 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     fontFamily: fonts.bold,
     color: TEXT,
+  },
+
+  goalMiniMeta: {
+    marginTop: 3,
+    fontSize: 11,
+    lineHeight: 15,
+    fontFamily: fonts.medium,
+    color: MUTED,
   },
 
   miniProgressRow: {
