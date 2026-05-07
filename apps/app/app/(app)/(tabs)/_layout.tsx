@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
@@ -7,15 +7,22 @@ const LIGHT_GREEN = "#ffffff";
 const DARK = "#0b3437";
 
 export default function TabLayout() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
   return (
     <Tabs screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: GREEN,
         tabBarInactiveTintColor: DARK,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar,
+          isDesktop ? styles.tabBarDesktop : styles.tabBarMobile,
+        ],
         tabBarItemStyle: styles.tabItem,
         tabBarShowLabel: true,
         tabBarLabelStyle: styles.tabBarLabelStyle,
+        tabBarLabelPosition: "below-icon",
       }}>
       <Tabs.Screen
         name="home/index"
@@ -23,7 +30,7 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ color }) => (
 
-            <FontAwesome size={25} name="home" color={color} />
+            <FontAwesome size={24} name="home" color={color} />
           ),
         }}
       />
@@ -33,7 +40,7 @@ export default function TabLayout() {
         options={{
           title: "Analytics",
          tabBarIcon: ({ color }) => (
-            <FontAwesome size={23} name="bar-chart" color={color} />
+            <FontAwesome size={24} name="bar-chart" color={color} />
         ),
         }}
       />
@@ -43,7 +50,7 @@ export default function TabLayout() {
         options={{
           title: "Transactions",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={25} name="exchange" color={color} />
+            <FontAwesome size={24} name="exchange" color={color} />
           ),
         }}
       />
@@ -53,7 +60,7 @@ export default function TabLayout() {
         options={{
           title: "Goals",
           tabBarIcon: ({ color }) => (
-            <FontAwesome name="flag" size={23} color={color} />
+            <FontAwesome name="flag" size={24} color={color} />
           ),
         }}
       />
@@ -63,7 +70,7 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color }) => (
-            <FontAwesome size={23} name="user" color={color} />
+            <FontAwesome size={24} name="user" color={color} />
           ),
         }}
       />
@@ -73,12 +80,8 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabBar: {
     position: "absolute",
-    left: 16,
-    right: 16,
-    bottom: 16,
     height: 90,
-    backgroundColor: "#ffffff",
-    borderRadius: 28,
+    backgroundColor: LIGHT_GREEN,
 
     borderTopWidth: 0,
     borderWidth: 1,
@@ -93,6 +96,24 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
     elevation: 10,
+  },
+
+  tabBarMobile: {
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+
+  tabBarDesktop: {
+    width: 430,
+    left: "50%",
+    bottom: 16,
+    borderRadius: 28,
+    transform: [{ translateX: -215 }],
   },
 
   tabItem: {
