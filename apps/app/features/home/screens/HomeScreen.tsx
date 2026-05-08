@@ -23,6 +23,7 @@ import { QuickAnalyticsCard } from "@/features/analytics/components/QuickAnalyti
 import { useAnalytics } from "@/features/analytics/hooks/useAnalytics";
 import { getGoalsOverview } from "@/features/goals/services/goals.service";
 import { QuickGoalsRow } from "@/features/goals/components/quick-goals-row/QuickGoalsRow";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -47,13 +48,6 @@ const EMPTY_ANALYTICS_DATA = [
   { label: "Sat", income: 0, expense: 0 },
   { label: "Sun", income: 0, expense: 0 },
 ];
-
-function formatCurrency(amount: string | number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(Number(amount));
-}
 
 function formatAnalyticsLabel(label: string) {
   const parsedDate = new Date(label);

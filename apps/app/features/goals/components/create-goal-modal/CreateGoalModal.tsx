@@ -90,7 +90,7 @@ export function CreateGoalModal({
     setCurrentAmount("");
     setTargetDate("");
     setSelectedType("savings");
-    setSelectedIcon("home");
+    setSelectedIcon("rent");
   }, [visible, isEditMode, goal]);
 
   async function handleSubmitGoal() {
@@ -189,14 +189,14 @@ export function CreateGoalModal({
 
               <View style={styles.previewInfo}>
                 <Text style={styles.previewLabel}>
-                  {isEditMode ? "Editing goal" : "New goal"}
+                  {isEditMode ? "Editing goal" : "New goal pepe"}
                 </Text>
                 <Text style={styles.previewTitle}>
                   {name.trim() || "House Deposit"}
                 </Text>
                 <Text style={styles.previewMeta}>
                   Target ·{" "}
-                  {targetAmount.trim() ? `$${targetAmount}` : "$30,000"}
+                  {targetAmount.trim() ? `€${targetAmount}` : "€30,000"}
                 </Text>
               </View>
             </View>

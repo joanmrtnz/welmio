@@ -221,14 +221,24 @@ export function CreateTransactionModal({
               />
 
               <TextInput
+                value={currency || "EUR"}
+                editable={false}
+                pointerEvents="none"
+                style={[styles.input, styles.currencyInput]}
+              />
+
+              {/* TODO: allow diferent concurrency system
+              <TextInput
                 value={currency}
                 onChangeText={setCurrency}
                 maxLength={3}
                 placeholder="EUR"
+                editable={false}
                 placeholderTextColor="rgba(5, 46, 43, 0.45)"
                 autoCapitalize="characters"
                 style={[styles.input, styles.currencyInput]}
-              />
+              /> */}
+
             </View>
 
             <Text style={styles.sectionLabel}>Description</Text>

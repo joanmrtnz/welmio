@@ -29,10 +29,10 @@ const CHART_MAX_HEIGHT = 96;
 function formatCompactAmount(value: number) {
   if (value >= 1000) {
     const amount = value / 1000;
-    return Number.isInteger(amount) ? `$${amount}K` : `$${amount.toFixed(1)}K`;
+    return Number.isInteger(amount) ? `€${amount}K` : `€${amount.toFixed(1)}K`;
   }
 
-  return `$${Math.round(value)}`;
+  return `€${Math.round(value)}`;
 }
 
 function getMaxValue(data: AnalyticsPoint[]) {

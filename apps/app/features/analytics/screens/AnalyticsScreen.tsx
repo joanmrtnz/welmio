@@ -16,6 +16,7 @@ import {
 } from "../utils/chart";
 import { LinearGradient } from "expo-linear-gradient";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -81,13 +82,6 @@ export default function AnalyticsScreen() {
     return isYearlyChart && label.length > 3 ? label.slice(0, 3) : label;
   }
 
-  function formatCurrency(amount: string, currency = "USD") {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency,
-    }).format(Number(amount));
-  }
-
   return (
     <View style={styles.screen}>
      <AppScreenHeader title="Analytics" />
@@ -100,7 +94,7 @@ export default function AnalyticsScreen() {
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>Total Balance</Text>
             <Text style={styles.balance}>
-              {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
+              {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
             </Text>
           </View>
 
@@ -111,7 +105,7 @@ export default function AnalyticsScreen() {
             <Text style={styles.balance}>
               {data
                 ? `-${formatCurrency(data.summary.totalExpense)}`
-                : "-$0.00"}
+                : "-€0.00"}
             </Text>
           </View>
         </View>
@@ -285,7 +279,7 @@ export default function AnalyticsScreen() {
             </View>
             <Text style={styles.totalLabel}>Income</Text>
             <Text style={styles.totalValue}>
-              {data ? formatCurrency(data.summary.totalIncome) : "$0.00"}
+              {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
             </Text>
           </View>
 
@@ -295,7 +289,7 @@ export default function AnalyticsScreen() {
             </View>
             <Text style={styles.totalLabel}>Expense</Text>
             <Text style={styles.totalValue}>
-              {data ? formatCurrency(data.summary.totalExpense) : "$0.00"}
+              {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
             </Text>
           </View>
         </View>
@@ -306,13 +300,13 @@ export default function AnalyticsScreen() {
           <TargetCard
             percent="30%"
             title="Short term goal"
-            amountLeft="$13,560.30 left"
+            amountLeft="€13,560.30 left"
             isDesktop={isDesktop}
           />
           <TargetCard
             percent="50%"
             title="Long term goal"
-            amountLeft="$22,600.50 left"
+            amountLeft="€22,600.50 left"
             isDesktop={isDesktop}
           />
         </View>

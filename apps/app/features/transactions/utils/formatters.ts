@@ -1,11 +1,5 @@
+import { formatCurrency } from "@/utils/formatCurrency";
 import { FrequencyType, TransactionNature } from "@repo/shared-types";
-
-export function formatCurrency(amount: string, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(Number(amount));
-}
 
 export function formatSignedAmount(
   amount: string,
