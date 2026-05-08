@@ -57,7 +57,7 @@ export default function EditProfileScreen() {
       setEmail(updatedUser.email ?? "");
       setUserId(updatedUser.id);
       setAvatarIcon(updatedUser.avatarIcon ?? "user");
-      setAvatarColor(updatedUser.avatarColor ?? "#00c896");
+      setAvatarColor(updatedUser.avatarColor ?? WHITE);
 
       feedback.success("Profile updated successfully");
     } catch (error) {

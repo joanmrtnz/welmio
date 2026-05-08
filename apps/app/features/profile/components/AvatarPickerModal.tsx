@@ -37,16 +37,16 @@ const AVATAR_OPTIONS: AvatarOption[] = [
 
 const WELMIO_AVATAR = require("@/assets/images/welmio-logo-no-circle.png");
 
-const COLORS = [
-  "#b8eadc",
-  "#dff7ef",
-  "#9ce1cf",
-  "#74d2bd",
-  "#58c5ad",
-  "#0f8f7c",
-  "#e6f8f3",
-  "#c8f1e5",
-];
+// const COLORS = [
+//   "#b8eadc",
+//   "#dff7ef",
+//   "#9ce1cf",
+//   "#74d2bd",
+//   "#58c5ad",
+//   "#0f8f7c",
+//   "#e6f8f3",
+//   "#c8f1e5",
+// ];
 
 export function AvatarPickerModal({
   visible,
@@ -56,7 +56,7 @@ export function AvatarPickerModal({
   const [selectedAvatarId, setSelectedAvatarId] = useState(
     AVATAR_OPTIONS[0].id,
   );
-  const [selectedColor, setSelectedColor] = useState(COLORS[0]);
+  const [selectedColor, setSelectedColor] = useState(WHITE);
 
   const selectedAvatar =
     AVATAR_OPTIONS.find((avatar) => avatar.id === selectedAvatarId) ??
@@ -141,7 +141,7 @@ export function AvatarPickerModal({
               })}
             </View>
 
-            <Text style={styles.sectionTitle}>Color</Text>
+            {/* <Text style={styles.sectionTitle}>Color</Text>
 
             <View style={styles.colorGrid}>
               {COLORS.map((color) => {
@@ -162,7 +162,7 @@ export function AvatarPickerModal({
                   </Pressable>
                 );
               })}
-            </View>
+            </View> */}
 
             <View style={styles.actions}>
               <AuthButton title="Apply" onPress={handleApply} />
