@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Animated } from "react-native";
+import { View, Text, StyleSheet, Animated, useWindowDimensions } from "react-native";
 import { useEffect, useRef } from "react";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -12,6 +12,8 @@ const TEXT = "#062f33";
 const MUTED = "#6f858a";
 
 export default function SuccessMessageScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const scale = useRef(new Animated.Value(0.6)).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -30,8 +32,8 @@ export default function SuccessMessageScreen() {
     ]).start();
 
     const timeout = setTimeout(() => {
-      router.replace("/(public)/login");
-    }, 1800);
+     router.replace("/(public)/login");
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, []);
@@ -45,24 +47,39 @@ export default function SuccessMessageScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      <Animated.View
-        style={[
-          styles.card,
-          {
-            transform: [{ scale }],
-            opacity,
-          },
-        ]}
-      >
-        <View style={styles.iconCircle}>
-          <Text style={styles.icon}>✓</Text>
-        </View>
+      <View style={[styles.content, isDesktop && styles.contentDesktop]}>
+        {isDesktop ? (
+          <View style={styles.desktopIntro}>
+            <Text style={styles.desktopHeadline}>Your account is secure</Text>
+            <Text style={styles.desktopText}>
+              Your password was changed successfully. You will be redirected to
+              sign in again with your new credentials.
+            </Text>
+          </View>
+        ) : null}
 
-        <Text style={styles.title}>Password Changed</Text>
-        <Text style={styles.subtitle}>
-          Your password has been updated successfully
-        </Text>
-      </Animated.View>
+        <Animated.View
+          style={[
+            styles.card,
+            isDesktop && styles.cardDesktop,
+            {
+              transform: [{ scale }],
+              opacity,
+            },
+          ]}
+        >
+          <View style={[styles.iconCircle, isDesktop && styles.iconCircleDesktop]}>
+            <Text style={[styles.icon, isDesktop && styles.iconDesktop]}>✓</Text>
+          </View>
+
+          <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
+            Password Changed
+          </Text>
+          <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
+            Your password has been updated successfully
+          </Text>
+        </Animated.View>
+      </View>
     </View>
   );
 }
@@ -74,6 +91,61 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 36,
+  },
+
+  content: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  contentDesktop: {
+    maxWidth: 1040,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 64,
+    paddingHorizontal: 32,
+  },
+
+  desktopIntro: {
+    flex: 1,
+    maxWidth: 430,
+  },
+
+  desktopBrandBadge: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
+    backgroundColor: MINT_SOFT,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "rgba(8, 182, 146, 0.16)",
+  },
+
+  desktopBrandBadgeText: {
+    fontSize: 30,
+    lineHeight: 34,
+    color: MINT_STRONG,
+    fontFamily: fonts.bold,
+  },
+
+  desktopHeadline: {
+    fontSize: 42,
+    lineHeight: 48,
+    fontFamily: fonts.bold,
+    color: TEXT,
+    letterSpacing: -0.8,
+    marginBottom: 16,
+  },
+
+  desktopText: {
+    fontSize: 17,
+    lineHeight: 27,
+    fontFamily: fonts.regular,
+    color: MUTED,
   },
 
   card: {
@@ -95,6 +167,15 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  cardDesktop: {
+    flex: 1,
+    maxWidth: 420,
+    minHeight: 340,
+    borderRadius: 34,
+    paddingVertical: 52,
+    paddingHorizontal: 40,
+  },
+
   iconCircle: {
     width: 72,
     height: 72,
@@ -106,11 +187,23 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
 
+  iconCircleDesktop: {
+    width: 86,
+    height: 86,
+    borderRadius: 43,
+    marginBottom: 38,
+  },
+
   icon: {
     fontSize: 32,
     lineHeight: 36,
     color: MINT_STRONG,
     fontFamily: fonts.bold,
+  },
+
+  iconDesktop: {
+    fontSize: 38,
+    lineHeight: 42,
   },
 
   title: {
@@ -122,6 +215,11 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
 
+  titleDesktop: {
+    fontSize: 28,
+    marginBottom: 14,
+  },
+
   subtitle: {
     fontSize: 15,
     fontFamily: fonts.regular,
@@ -129,5 +227,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
     maxWidth: 250,
+  },
+
+  subtitleDesktop: {
+    fontSize: 16,
+    lineHeight: 24,
+    maxWidth: 300,
   },
 });
