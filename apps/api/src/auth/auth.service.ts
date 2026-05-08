@@ -222,4 +222,28 @@ async resetPassword(
   };
 }
 
+async checkAccessToken(user: { sub: string; email: string }) {
+  const dbUser = await this.prisma.user.findUnique({
+    where: {
+      id: user.sub,
+    },
+    select: {
+      id: true,
+      email: true,
+      fullName: true,
+      mobileNumber: true,
+      dateOfBirth: true,
+    },
+  });
+
+  if (!dbUser) {
+    throw new UnauthorizedException('Invalid access token');
+  }
+
+  return {
+    valid: true,
+    user: dbUser,
+  };
+}
+
 }
