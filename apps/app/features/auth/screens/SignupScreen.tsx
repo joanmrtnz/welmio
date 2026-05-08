@@ -9,6 +9,7 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -26,6 +27,8 @@ const MUTED = "#6f8185";
 const INPUT_BG = "#ffffff";
 const INPUT_BORDER = "rgba(7, 59, 58, 0.12)";
 const SOFT_MINT = "#dff7ef";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 type SignupInputProps = {
   label: string;
@@ -36,7 +39,11 @@ type SignupInputProps = {
   secureTextEntry?: boolean;
   showPassword?: boolean;
   onTogglePassword?: () => void;
-  keyboardType?: "default" | "email-address" | "phone-pad" | "numbers-and-punctuation";
+  keyboardType?:
+    | "default"
+    | "email-address"
+    | "phone-pad"
+    | "numbers-and-punctuation";
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   textContentType?:
     | "none"
@@ -68,7 +75,12 @@ function SignupInput({
       <Text style={styles.inputLabel}>{label}</Text>
 
       <View style={styles.inputShell}>
-        <FontAwesome name={icon} size={18} style={styles.inputIcon} color="rgba(7, 59, 58, 0.42)" />
+        <FontAwesome
+          name={icon}
+          size={18}
+          style={styles.inputIcon}
+          color="rgba(7, 59, 58, 0.42)"
+        />
 
         <TextInput
           style={styles.input}
@@ -103,6 +115,8 @@ function SignupInput({
 
 export default function SignupScreen() {
   const { execute, loading } = useSignup();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -143,6 +157,149 @@ export default function SignupScreen() {
     }
   }
 
+  const brandHeader = (
+    <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
+      <View style={styles.brandRow}>
+        <Image source={WELMIO_LOGO} style={styles.brandLogo} />
+        <Text style={styles.brandName}>Welmio</Text>
+      </View>
+    </View>
+  );
+
+  const logoHero = (
+    <View style={[styles.logoWrap, isDesktop && styles.logoWrapDesktop]}>
+      <View style={[styles.logoCircle, isDesktop && styles.logoCircleDesktop]}>
+        <Image
+          source={WELMIO_LOGO}
+          style={[styles.heroLogo, isDesktop && styles.heroLogoDesktop]}
+        />
+      </View>
+    </View>
+  );
+
+  const signupCard = (
+    <View style={[styles.card, isDesktop && styles.cardDesktop]}>
+      <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
+        Create account
+      </Text>
+      <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
+        Start tracking your money, goals and habits in one place.
+      </Text>
+
+      <View style={[styles.form, isDesktop && styles.formDesktop]}>
+        <SignupInput
+          label="Full Name"
+          icon="user-o"
+          placeholder="John Doe"
+          autoCapitalize="words"
+          textContentType="name"
+          value={fullName}
+          onChangeText={setFullName}
+        />
+
+        <SignupInput
+          label="Email"
+          icon="envelope-o"
+          placeholder="example@email.com"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          autoCorrect={false}
+          value={email}
+          onChangeText={setEmail}
+        />
+
+        <SignupInput
+          label="Mobile Number"
+          icon="phone"
+          placeholder="+123 456 789"
+          keyboardType="phone-pad"
+          textContentType="telephoneNumber"
+          value={mobileNumber}
+          onChangeText={setMobileNumber}
+        />
+
+        <SignupInput
+          label="Date of Birth"
+          icon="calendar-o"
+          placeholder="DD / MM / YYYY"
+          keyboardType="numbers-and-punctuation"
+          value={dateOfBirth}
+          onChangeText={setDateOfBirth}
+        />
+
+        <SignupInput
+          label="Password"
+          icon="lock"
+          placeholder=""
+          secureTextEntry
+          showPassword={showPassword}
+          onTogglePassword={() => setShowPassword((current) => !current)}
+          textContentType="newPassword"
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        <SignupInput
+          label="Confirm Password"
+          icon="lock"
+          placeholder=""
+          secureTextEntry
+          showPassword={showConfirmPassword}
+          onTogglePassword={() => setShowConfirmPassword((current) => !current)}
+          textContentType="newPassword"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+        />
+      </View>
+
+      <Text style={styles.legal}>
+        By continuing, you agree to the{" "}
+        <Link href="/(public)/terms-of-use" asChild>
+          <Text style={styles.legalLink}>Terms of Use</Text>
+        </Link>{" "}
+        and{" "}
+        <Link href="/(public)/privacy-policy" asChild>
+          <Text style={styles.legalLink}>Privacy Policy</Text>
+        </Link>
+      </Text>
+
+      <Pressable
+        style={[
+          styles.primaryButton,
+          isDesktop && styles.primaryButtonDesktop,
+          loading && styles.disabledButton,
+        ]}
+        onPress={handleSignup}
+        disabled={loading}
+      >
+        <Text style={styles.primaryButtonText}>
+          {loading ? "Creating account..." : "Sign Up"}
+        </Text>
+      </Pressable>
+
+      <Link href="/(public)/login" style={styles.footer}>
+        <Text>
+          Already have an account? <Text style={styles.link}>Log in</Text>
+        </Text>
+      </Link>
+    </View>
+  );
+
+  const sloganCard = (
+    <View style={[styles.sloganCard, isDesktop && styles.sloganCardDesktop]}>
+      <View style={styles.sloganIcon}>
+        <FontAwesome name="lightbulb-o" size={23} color={PRIMARY} />
+      </View>
+      <View style={styles.sloganTextWrap}>
+        <Text style={styles.sloganTitle}>Smart Finance, Simple Life</Text>
+        <Text style={styles.sloganText}>
+          Take control of your money with ease.
+        </Text>
+      </View>
+    </View>
+  );
+
   return (
     <KeyboardAvoidingView
       style={styles.screen}
@@ -150,139 +307,41 @@ export default function SignupScreen() {
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isDesktop && styles.scrollContentDesktop,
+        ]}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.brandArea}>
-          <View style={styles.brandRow}>
-            <Image source={WELMIO_LOGO} style={styles.brandLogo} />
-            <Text style={styles.brandName}>Welmio</Text>
+        {isDesktop ? (
+          <View style={styles.desktopShell}>
+            <View style={styles.desktopHeroPane}>
+              {brandHeader}
+              <View style={styles.desktopLogoBlock}>{logoHero}</View>
+              <Text style={styles.desktopHeadline}>
+                Build better money habits from day one.
+              </Text>
+              <Text style={styles.desktopCopy}>
+                Create your Welmio account and start organizing expenses,
+                savings goals, and financial routines with a clean dashboard.
+              </Text>
+              {sloganCard}
+            </View>
+
+            <View style={styles.desktopFormPane}>{signupCard}</View>
           </View>
-        </View>
-
-        <View style={styles.logoWrap}>
-          <View style={styles.logoCircle}>
-            <Image source={WELMIO_LOGO} style={styles.heroLogo} />
-          </View>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.title}>Create account</Text>
-          <Text style={styles.subtitle}>
-            Start tracking your money, goals and habits in one place.
-          </Text>
-
-          <View style={styles.form}>
-            <SignupInput
-              label="Full Name"
-              icon="user-o"
-              placeholder="John Doe"
-              autoCapitalize="words"
-              textContentType="name"
-              value={fullName}
-              onChangeText={setFullName}
-            />
-
-            <SignupInput
-              label="Email"
-              icon="envelope-o"
-              placeholder="example@email.com"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-              autoCorrect={false}
-              value={email}
-              onChangeText={setEmail}
-            />
-
-            <SignupInput
-              label="Mobile Number"
-              icon="phone"
-              placeholder="+123 456 789"
-              keyboardType="phone-pad"
-              textContentType="telephoneNumber"
-              value={mobileNumber}
-              onChangeText={setMobileNumber}
-            />
-
-            <SignupInput
-              label="Date of Birth"
-              icon="calendar-o"
-              placeholder="DD / MM / YYYY"
-              keyboardType="numbers-and-punctuation"
-              value={dateOfBirth}
-              onChangeText={setDateOfBirth}
-            />
-
-            <SignupInput
-              label="Password"
-              icon="lock"
-              placeholder=""
-              secureTextEntry
-              showPassword={showPassword}
-              onTogglePassword={() => setShowPassword((current) => !current)}
-              textContentType="newPassword"
-              value={password}
-              onChangeText={setPassword}
-            />
-
-            <SignupInput
-              label="Confirm Password"
-              icon="lock"
-              placeholder=""
-              secureTextEntry
-              showPassword={showConfirmPassword}
-              onTogglePassword={() =>
-                setShowConfirmPassword((current) => !current)
-              }
-              textContentType="newPassword"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-          </View>
-
-          <Text style={styles.legal}>
-            By continuing, you agree to the{" "}
-            <Link href="/(public)/terms-of-use" asChild>
-              <Text style={styles.legalLink}>Terms of Use</Text>
-            </Link>{" "}
-            and{" "}
-            <Link href="/(public)/privacy-policy" asChild>
-              <Text style={styles.legalLink}>Privacy Policy</Text>
-            </Link>
-          </Text>
-
-          <Pressable
-            style={[styles.primaryButton, loading && styles.disabledButton]}
-            onPress={handleSignup}
-            disabled={loading}
-          >
-            <Text style={styles.primaryButtonText}>
-              {loading ? "Creating account..." : "Sign Up"}
-            </Text>
-          </Pressable>
-
-          <Link href="/(public)/login" style={styles.footer}>
-            <Text>
-              Already have an account? <Text style={styles.link}>Log in</Text>
-            </Text>
-          </Link>
-        </View>
-
-        <View style={styles.sloganCard}>
-          <View style={styles.sloganIcon}>
-            <FontAwesome name="lightbulb-o" size={23} color={PRIMARY} />
-          </View>
-          <View style={styles.sloganTextWrap}>
-            <Text style={styles.sloganTitle}>Smart Finance, Simple Life</Text>
-            <Text style={styles.sloganText}>Take control of your money with ease.</Text>
-          </View>
-        </View>
+        ) : (
+          <>
+            {brandHeader}
+            {logoHero}
+            {signupCard}
+            {sloganCard}
+          </>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -296,10 +355,45 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
   },
 
+  scrollContentDesktop: {
+    paddingHorizontal: 32,
+    paddingTop: 48,
+    paddingBottom: 48,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  desktopShell: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    minHeight: 680,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 44,
+  },
+
+  desktopHeroPane: {
+    flex: 1,
+    minWidth: 0,
+    alignSelf: "stretch",
+    justifyContent: "center",
+  },
+
+  desktopFormPane: {
+    flex: 1.08,
+    minWidth: 0,
+  },
+
   brandArea: {
     alignItems: "center",
     marginTop: 4,
     marginBottom: 26,
+  },
+
+  brandAreaDesktop: {
+    alignItems: "flex-start",
+    marginTop: 0,
+    marginBottom: 30,
   },
 
   brandRow: {
@@ -327,6 +421,15 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
 
+  logoWrapDesktop: {
+    alignItems: "flex-start",
+    marginBottom: 0,
+  },
+
+  desktopLogoBlock: {
+    marginBottom: 28,
+  },
+
   logoCircle: {
     width: 104,
     height: 104,
@@ -349,6 +452,35 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
 
+  logoCircleDesktop: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+  },
+
+  heroLogoDesktop: {
+    width: 121,
+    height: 120,
+  },
+
+  desktopHeadline: {
+    maxWidth: 420,
+    color: TEXT,
+    fontSize: 38,
+    lineHeight: 44,
+    letterSpacing: -1,
+    fontFamily: fonts.bold,
+  },
+
+  desktopCopy: {
+    maxWidth: 440,
+    marginTop: 16,
+    color: MUTED,
+    fontSize: 16,
+    lineHeight: 25,
+    fontFamily: fonts.regular,
+  },
+
   card: {
     backgroundColor: CARD,
     borderRadius: 28,
@@ -364,11 +496,23 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 
+  cardDesktop: {
+    paddingHorizontal: 34,
+    paddingTop: 34,
+    paddingBottom: 34,
+    borderRadius: 32,
+  },
+
   title: {
     color: TEXT,
     fontSize: 24,
     textAlign: "center",
     fontFamily: fonts.bold,
+  },
+
+  titleDesktop: {
+    textAlign: "left",
+    fontSize: 30,
   },
 
   subtitle: {
@@ -380,9 +524,19 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
   },
 
+  subtitleDesktop: {
+    textAlign: "left",
+    fontSize: 15,
+    lineHeight: 23,
+  },
+
   form: {
     marginTop: 26,
     gap: 14,
+  },
+
+  formDesktop: {
+    gap: 16,
   },
 
   inputGroup: {
@@ -422,7 +576,6 @@ const styles = StyleSheet.create({
     borderRightWidth: 1.5,
     marginRight: 5,
   },
-
 
   eyeButton: {
     width: 26,
@@ -466,6 +619,11 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
 
+  primaryButtonDesktop: {
+    alignSelf: "flex-end",
+    width: 220,
+  },
+
   primaryButtonText: {
     color: "#ffffff",
     fontSize: 15,
@@ -500,6 +658,12 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
     elevation: 2,
+  },
+
+  sloganCardDesktop: {
+    maxWidth: 440,
+    marginTop: 34,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
   },
 
   sloganIcon: {

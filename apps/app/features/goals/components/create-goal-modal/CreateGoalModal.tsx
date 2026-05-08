@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { useState, useEffect } from "react";
@@ -24,6 +25,7 @@ const BUTTON_GREEN = "#93e2c9";
 const TAB_GREEN = "#12c79b";
 const BORDER_GREEN = "rgba(8, 120, 98, 0.14)";
 const MUTED = "rgba(5, 46, 43, 0.58)";
+const DESKTOP_BREAKPOINT = 768;
 
 type CreateGoalModalMode = "create" | "edit";
 
@@ -58,6 +60,8 @@ export function CreateGoalModal({
   onSubmit,
   onUpdate,
 }: CreateGoalModalProps) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
   const isEditMode = mode === "edit";
 
   const [name, setName] = useState("");
@@ -145,11 +149,11 @@ export function CreateGoalModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
+      <View style={[styles.overlay, isDesktop && styles.overlayDesktop]}>
         <Pressable style={styles.backdrop} onPress={onClose} />
 
-        <View style={styles.modal}>
-          <View style={styles.handle} />
+        <View style={[styles.modal, isDesktop && styles.modalDesktop]}>
+          {!isDesktop && <View style={styles.handle} />}
 
           <View style={styles.header}>
             <Text style={styles.title}>
@@ -163,9 +167,17 @@ export function CreateGoalModal({
 
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.content}
+            contentContainerStyle={[
+              styles.content,
+              isDesktop && styles.contentDesktop,
+            ]}
           >
-            <View style={styles.previewCard}>
+            <View
+              style={[
+                styles.previewCard,
+                isDesktop && styles.previewCardDesktop,
+              ]}
+            >
               <View style={styles.previewIcon}>
                 <Icon
                   name={selectedIcon as never}
@@ -189,112 +201,124 @@ export function CreateGoalModal({
               </View>
             </View>
 
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Goal name</Text>
-              <TextInput
-                value={name}
-                onChangeText={setName}
-                placeholder="House Deposit"
-                placeholderTextColor="rgba(5, 46, 43, 0.45)"
-                style={styles.input}
-              />
-            </View>
+            <View style={isDesktop ? styles.desktopColumns : undefined}>
+              <View style={isDesktop ? styles.desktopColumn : undefined}>
+                <View style={styles.fieldGroup}>
+                  <Text style={styles.label}>Goal name</Text>
+                  <TextInput
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="House Deposit"
+                    placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                    style={styles.input}
+                  />
+                </View>
 
-            <View style={styles.row}>
-              <View style={styles.halfField}>
-                <Text style={styles.label}>Target amount</Text>
-                <TextInput
-                  value={targetAmount}
-                  onChangeText={setTargetAmount}
-                  placeholder="30000"
-                  keyboardType="numeric"
-                  placeholderTextColor="rgba(5, 46, 43, 0.45)"
-                  style={styles.input}
-                />
+                <View style={styles.row}>
+                  <View style={styles.halfField}>
+                    <Text style={styles.label}>Target amount</Text>
+                    <TextInput
+                      value={targetAmount}
+                      onChangeText={setTargetAmount}
+                      placeholder="30000"
+                      keyboardType="numeric"
+                      placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                      style={styles.input}
+                    />
+                  </View>
+
+                  <View style={styles.halfField}>
+                    <Text style={styles.label}>Current saved</Text>
+                    <TextInput
+                      value={currentAmount}
+                      onChangeText={setCurrentAmount}
+                      placeholder="9000"
+                      keyboardType="numeric"
+                      placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                      style={styles.input}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.fieldGroup}>
+                  <Text style={styles.label}>Target date</Text>
+                  <TextInput
+                    value={targetDate}
+                    onChangeText={setTargetDate}
+                    placeholder="2027-12-31"
+                    placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                    style={styles.input}
+                  />
+                </View>
               </View>
 
-              <View style={styles.halfField}>
-                <Text style={styles.label}>Current saved</Text>
-                <TextInput
-                  value={currentAmount}
-                  onChangeText={setCurrentAmount}
-                  placeholder="9000"
-                  keyboardType="numeric"
-                  placeholderTextColor="rgba(5, 46, 43, 0.45)"
-                  style={styles.input}
-                />
-              </View>
-            </View>
+              <View style={isDesktop ? styles.desktopColumn : undefined}>
+                <View style={styles.fieldGroup}>
+                  <Text style={styles.label}>Goal type</Text>
 
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Target date</Text>
-              <TextInput
-                value={targetDate}
-                onChangeText={setTargetDate}
-                placeholder="2027-12-31"
-                placeholderTextColor="rgba(5, 46, 43, 0.45)"
-                style={styles.input}
-              />
-            </View>
+                  <View style={styles.chipsGrid}>
+                    {goalTypes.map((type) => {
+                      const isSelected = selectedType === type.value;
 
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Goal type</Text>
+                      return (
+                        <Pressable
+                          key={type.value}
+                          style={[
+                            styles.chip,
+                            isSelected && styles.chipSelected,
+                          ]}
+                          onPress={() =>
+                            setSelectedType(type.value as GoalType)
+                          }
+                        >
+                          <Text
+                            style={[
+                              styles.chipText,
+                              isSelected && styles.chipTextSelected,
+                            ]}
+                          >
+                            {type.label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
 
-              <View style={styles.chipsGrid}>
-                {goalTypes.map((type) => {
-                  const isSelected = selectedType === type.value;
+                <View style={styles.fieldGroup}>
+                  <Text style={styles.label}>Icon</Text>
 
-                  return (
-                    <Pressable
-                      key={type.value}
-                      style={[styles.chip, isSelected && styles.chipSelected]}
-                      onPress={() => setSelectedType(type.value as GoalType)}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          isSelected && styles.chipTextSelected,
-                        ]}
-                      >
-                        {type.label}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
+                  <View style={styles.iconsRow}>
+                    {goalIcons.map((icon) => {
+                      const isSelected = selectedIcon === icon.name;
 
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Icon</Text>
-
-              <View style={styles.iconsRow}>
-                {goalIcons.map((icon) => {
-                  const isSelected = selectedIcon === icon.name;
-
-                  return (
-                    <Pressable
-                      key={icon.name}
-                      style={[
-                        styles.iconOption,
-                        isSelected && styles.iconOptionSelected,
-                      ]}
-                      onPress={() => setSelectedIcon(icon.name)}
-                    >
-                      <Icon
-                        name={icon.name as never}
-                        size={40}
-                        color={TAB_GREEN}
-                        strokeWidth={1}
-                      />
-                    </Pressable>
-                  );
-                })}
+                      return (
+                        <Pressable
+                          key={icon.name}
+                          style={[
+                            styles.iconOption,
+                            isSelected && styles.iconOptionSelected,
+                          ]}
+                          onPress={() => setSelectedIcon(icon.name)}
+                        >
+                          <Icon
+                            name={icon.name as never}
+                            size={40}
+                            color={TAB_GREEN}
+                            strokeWidth={1}
+                          />
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </View>
               </View>
             </View>
 
             <Pressable
               style={[
                 styles.createButton,
+                isDesktop && styles.createButtonDesktop,
                 isSubmitting && styles.createButtonDisabled,
               ]}
               onPress={handleSubmitGoal}
@@ -327,6 +351,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
 
+  overlayDesktop: {
+    paddingHorizontal: 32,
+    paddingVertical: 32,
+  },
+
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "transparent",
@@ -348,6 +377,14 @@ const styles = StyleSheet.create({
     shadowRadius: 22,
     shadowOffset: { width: 0, height: 10 },
     elevation: 10,
+  },
+
+  modalDesktop: {
+    maxWidth: 980,
+    maxHeight: "88%",
+    paddingHorizontal: 28,
+    paddingTop: 24,
+    paddingBottom: 24,
   },
 
   handle: {
@@ -386,6 +423,10 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
 
+  contentDesktop: {
+    paddingBottom: 0,
+  },
+
   previewCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -395,6 +436,22 @@ const styles = StyleSheet.create({
     borderColor: BORDER_GREEN,
     padding: 16,
     marginBottom: 20,
+  },
+
+  previewCardDesktop: {
+    padding: 20,
+    marginBottom: 24,
+  },
+
+  desktopColumns: {
+    flexDirection: "row",
+    gap: 18,
+    alignItems: "flex-start",
+  },
+
+  desktopColumn: {
+    flex: 1,
+    minWidth: 0,
   },
 
   previewIcon: {
@@ -532,6 +589,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 8,
+  },
+
+  createButtonDesktop: {
+    alignSelf: "flex-end",
+    minWidth: 180,
+    paddingHorizontal: 22,
   },
 
   createButtonText: {

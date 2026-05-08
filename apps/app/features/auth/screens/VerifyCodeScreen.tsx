@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   TextInput,
   View,
 } from "react-native";
@@ -29,6 +30,8 @@ const SOFT_GREEN = "#e3f8f1";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 export default function VerifyCodeScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const [code, setCode] = useState("");
   const { email } = useLocalSearchParams<{ email?: string }>();
 
@@ -83,117 +86,153 @@ export default function VerifyCodeScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isDesktop && styles.scrollContentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.brandArea}>
-          <View style={styles.brandRow}>
-            <View style={styles.logoBadge}>
-              <Image
-                source={WELMIO_LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={styles.brandName}>Welmio</Text>
-          </View>
-        </View>
-
-        <View style={styles.avatarWrap}>
-          <View style={styles.avatarCircle}>
-            <FontAwesome name="lock" size={44} color={PRIMARY} />
-          </View>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.title}>Verify code</Text>
-          <Text style={styles.subtitle}>
-            Enter the recovery code we sent to your email to continue.
-          </Text>
-
-          <View style={styles.form}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Recovery code</Text>
-              <View style={styles.inputShell}>
-                <FontAwesome
-                  name="key"
-                  size={17}
-                  color="rgba(5, 46, 43, 0.5)"
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Enter your code"
-                  placeholderTextColor="rgba(5, 46, 43, 0.42)"
-                  keyboardType="number-pad"
-                  textContentType="oneTimeCode"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  value={code}
-                  onChangeText={setCode}
+        <View
+          style={[styles.desktopShell, isDesktop && styles.desktopShellWide]}
+        >
+          <View
+            style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}
+          >
+            <View style={styles.brandRow}>
+              <View style={styles.logoBadge}>
+                <Image
+                  source={WELMIO_LOGO}
+                  style={styles.logoImage}
+                  resizeMode="contain"
                 />
               </View>
+              <Text style={styles.brandName}>Welmio</Text>
             </View>
 
-            <View style={styles.actionButtons}>
-              <Pressable
-                onPress={handleAccept}
-                disabled={loading}
-                style={({ pressed }) => [
-                  styles.primaryButton,
-                  pressed && !loading ? styles.buttonPressed : null,
-                  loading ? styles.buttonDisabled : null,
-                ]}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {loading ? "Checking..." : "Accept"}
+            {isDesktop ? (
+              <View style={styles.desktopIntroCard}>
+                <View style={styles.desktopIntroIcon}>
+                  <FontAwesome name="lock" size={30} color={PRIMARY} />
+                </View>
+                <Text style={styles.desktopIntroTitle}>
+                  Confirm your recovery code
                 </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={handleSendAgain}
-                disabled={resendLoading}
-                style={({ pressed }) => [
-                  styles.secondaryButton,
-                  pressed && !resendLoading ? styles.buttonPressed : null,
-                  resendLoading ? styles.buttonDisabled : null,
-                ]}
-              >
-                <Text style={styles.secondaryButtonText}>
-                  {resendLoading ? "Sending..." : "Send again"}
+                <Text style={styles.desktopIntroText}>
+                  Enter the verification code from your email to keep your
+                  password reset secure.
                 </Text>
-              </Pressable>
-            </View>
+              </View>
+            ) : null}
+          </View>
 
-            <Pressable
-              onPress={() => router.push("/(public)/login")}
-              style={({ pressed }) => [
-                styles.ghostButton,
-                pressed ? styles.buttonPressed : null,
-              ]}
-            >
-              <Text style={styles.ghostButtonText}>Back to Log In</Text>
-            </Pressable>
+          <View
+            style={[styles.formColumn, isDesktop && styles.formColumnDesktop]}
+          >
+            {!isDesktop ? (
+              <View style={styles.avatarWrap}>
+                <View style={styles.avatarCircle}>
+                  <FontAwesome name="lock" size={44} color={PRIMARY} />
+                </View>
+              </View>
+            ) : null}
 
-            <Link href="/(public)/signup" style={styles.footer}>
-              <Text>
-                Don’t have an account? <Text style={styles.link}>Sign Up</Text>
+            <View style={[styles.card, isDesktop && styles.cardDesktop]}>
+              <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
+                Verify code
               </Text>
-            </Link>
+              <Text
+                style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}
+              >
+                Enter the recovery code we sent to your email to continue.
+              </Text>
+
+              <View style={styles.form}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Recovery code</Text>
+                  <View style={styles.inputShell}>
+                    <FontAwesome
+                      name="key"
+                      size={17}
+                      color="rgba(5, 46, 43, 0.5)"
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="Enter your code"
+                      placeholderTextColor="rgba(5, 46, 43, 0.42)"
+                      keyboardType="number-pad"
+                      textContentType="oneTimeCode"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      value={code}
+                      onChangeText={setCode}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.actionButtons}>
+                  <Pressable
+                    onPress={handleAccept}
+                    disabled={loading}
+                    style={({ pressed }) => [
+                      styles.primaryButton,
+                      pressed && !loading ? styles.buttonPressed : null,
+                      loading ? styles.buttonDisabled : null,
+                    ]}
+                  >
+                    <Text style={styles.primaryButtonText}>
+                      {loading ? "Checking..." : "Accept"}
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={handleSendAgain}
+                    disabled={resendLoading}
+                    style={({ pressed }) => [
+                      styles.secondaryButton,
+                      pressed && !resendLoading ? styles.buttonPressed : null,
+                      resendLoading ? styles.buttonDisabled : null,
+                    ]}
+                  >
+                    <Text style={styles.secondaryButtonText}>
+                      {resendLoading ? "Sending..." : "Send again"}
+                    </Text>
+                  </Pressable>
+                </View>
+
+                <Pressable
+                  onPress={() => router.push("/(public)/login")}
+                  style={({ pressed }) => [
+                    styles.ghostButton,
+                    pressed ? styles.buttonPressed : null,
+                  ]}
+                >
+                  <Text style={styles.ghostButtonText}>Back to Log In</Text>
+                </Pressable>
+
+                <Link href="/(public)/signup" style={styles.footer}>
+                  <Text>
+                    Don’t have an account?{" "}
+                    <Text style={styles.link}>Sign Up</Text>
+                  </Text>
+                </Link>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
 
-      <LinearGradient
-        pointerEvents="none"
-        colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.92)"]}
-        style={styles.bottomFade}
-      />
+      {!isDesktop ? (
+        <LinearGradient
+          pointerEvents="none"
+          colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.92)"]}
+          style={styles.bottomFade}
+        />
+      ) : null}
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -207,10 +246,36 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
+  scrollContentDesktop: {
+    paddingHorizontal: 32,
+    paddingTop: 56,
+    paddingBottom: 56,
+    justifyContent: "center",
+  },
+
+  desktopShell: {
+    width: "100%",
+  },
+
+  desktopShellWide: {
+    maxWidth: 1040,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 52,
+  },
+
   brandArea: {
     alignItems: "center",
     marginTop: 4,
     marginBottom: 42,
+  },
+
+  brandAreaDesktop: {
+    flex: 1,
+    alignItems: "flex-start",
+    marginTop: 0,
+    marginBottom: 0,
   },
 
   brandRow: {
@@ -247,7 +312,9 @@ const styles = StyleSheet.create({
   },
 
   avatarWrap: {
-    zIndex: 2,
+    position: "relative",
+    zIndex: 20,
+    elevation: 20,
     alignItems: "center",
     marginBottom: -42,
   },
@@ -267,6 +334,8 @@ const styles = StyleSheet.create({
   },
 
   card: {
+    position: "relative",
+    zIndex: 1,
     backgroundColor: CARD,
     borderRadius: 30,
     paddingHorizontal: 20,
@@ -279,11 +348,73 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  cardDesktop: {
+    width: "100%",
+    maxWidth: 460,
+    paddingHorizontal: 28,
+    paddingTop: 34,
+    paddingBottom: 34,
+    borderRadius: 34,
+  },
+
+  formColumn: {
+    width: "100%",
+  },
+
+  formColumnDesktop: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  desktopIntroCard: {
+    marginTop: 42,
+    maxWidth: 420,
+    backgroundColor: "rgba(255, 255, 255, 0.68)",
+    borderWidth: 1,
+    borderColor: "rgba(5, 46, 43, 0.08)",
+    borderRadius: 32,
+    padding: 28,
+    shadowColor: "rgba(29, 100, 89, 0.10)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 5,
+  },
+
+  desktopIntroIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
+    backgroundColor: CARD,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 22,
+  },
+
+  desktopIntroTitle: {
+    color: DARK,
+    fontSize: 32,
+    lineHeight: 38,
+    fontFamily: fonts.bold,
+    marginBottom: 12,
+  },
+
+  desktopIntroText: {
+    color: MUTED,
+    fontSize: 16,
+    lineHeight: 25,
+    fontFamily: fonts.medium,
+  },
+
   title: {
     color: DARK,
     fontSize: 25,
     textAlign: "center",
     fontFamily: fonts.bold,
+  },
+
+  titleDesktop: {
+    fontSize: 28,
   },
 
   subtitle: {
@@ -295,6 +426,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 28,
     paddingHorizontal: 18,
+  },
+
+  subtitleDesktop: {
+    paddingHorizontal: 18,
+    marginBottom: 30,
   },
 
   form: {
@@ -346,13 +482,13 @@ const styles = StyleSheet.create({
 
   actionButtons: {
     alignItems: "center",
-    gap: 18,
+    gap: 15,
     marginTop: 16,
   },
 
   primaryButton: {
-    width: "74%",
-    height: 46,
+    width: "80%",
+    height: 52,
     borderRadius: 26,
     backgroundColor: PRIMARY,
     alignItems: "center",
@@ -360,7 +496,7 @@ const styles = StyleSheet.create({
     shadowColor: "rgba(0, 184, 137, 0.26)",
     shadowOpacity: 1,
     shadowRadius: 15,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 4 },
     elevation: 6,
   },
 
@@ -371,8 +507,8 @@ const styles = StyleSheet.create({
   },
 
   secondaryButton: {
-    width: "74%",
-    height: 46,
+    width: "80%",
+    height: 52,
     borderRadius: 26,
     backgroundColor: SOFT_GREEN,
     alignItems: "center",

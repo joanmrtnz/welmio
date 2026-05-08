@@ -32,6 +32,13 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
 
+
+  backdropDesktop: {
+    justifyContent: "center",
+    paddingHorizontal: 32,
+    paddingVertical: 32,
+  },
+
   modalCard: {
     width: "100%",
     maxHeight: "91%",
@@ -51,12 +58,32 @@ export const styles = StyleSheet.create({
     elevation: 12,
   },
 
+
+  modalCardDesktop: {
+    width: "100%",
+    maxWidth: 760,
+    maxHeight: "86%",
+    borderRadius: 34,
+    paddingHorizontal: 32,
+    paddingTop: 30,
+    paddingBottom: 28,
+  },
+
   scrollView: {
     width: "100%",
   },
 
   scrollContent: {
     paddingBottom: 10,
+  },
+
+
+  scrollContentDesktop: {
+    paddingBottom: 14,
+  },
+
+  formScrollContentDesktop: {
+    paddingBottom: 18,
   },
 
   header: {
@@ -90,9 +117,22 @@ export const styles = StyleSheet.create({
     marginBottom: 28,
   },
 
+
+  gridDesktop: {
+    justifyContent: "center",
+    columnGap: 18,
+    rowGap: 26,
+    marginBottom: 30,
+  },
+
   gridItem: {
     width: "31%",
     alignItems: "center",
+  },
+
+
+  gridItemDesktop: {
+    width: "18%",
   },
 
   gridIcon: {
@@ -140,6 +180,14 @@ export const styles = StyleSheet.create({
     marginBottom: 26,
     borderWidth: 1,
     borderColor: "rgba(20, 169, 140, 0.18)",
+  },
+
+
+  addMoreButtonDesktop: {
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 360,
+    marginBottom: 10,
   },
 
   addMoreText: {
@@ -255,6 +303,13 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 14,
     marginTop: 8,
+  },
+
+
+  actionsDesktop: {
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 460,
   },
 
   clearButton: {

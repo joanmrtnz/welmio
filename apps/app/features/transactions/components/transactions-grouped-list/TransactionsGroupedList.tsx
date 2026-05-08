@@ -16,6 +16,7 @@ type TransactionsGroupedListProps = {
   onChanged?: () => void | Promise<void>;
   onEditTransaction?: (transaction: TransactionOverviewItem) => void;
   onDeleteTransaction?: (transactionId: string) => Promise<void>;
+  isDesktop?: boolean;
 };
 
 export function TransactionsGroupedList({
@@ -23,6 +24,7 @@ export function TransactionsGroupedList({
   onChanged,
   onEditTransaction,
   onDeleteTransaction,
+  isDesktop = false,
 }: TransactionsGroupedListProps) {
   const [selectedTransaction, setSelectedTransaction] =
     useState<TransactionDetailsItem | null>(null);
@@ -54,14 +56,23 @@ export function TransactionsGroupedList({
   }
 
   if (groups.length === 0) {
-    return <Text style={styles.emptyMessage}>No transactions found.</Text>;
+    return (
+      <Text style={[styles.emptyMessage, isDesktop && styles.emptyMessageDesktop]}>
+        No transactions found.
+      </Text>
+    );
   }
 
   return (
     <>
       {groups.map((group) => (
-        <View key={group.month} style={styles.groupBlock}>
-          <Text style={styles.monthLabel}>{group.month}</Text>
+        <View
+          key={group.month}
+          style={[styles.groupBlock, isDesktop && styles.groupBlockDesktop]}
+        >
+          <Text style={[styles.monthLabel, isDesktop && styles.monthLabelDesktop]}>
+            {group.month}
+          </Text>
 
           {group.items.map((item, index) => (
             <TransactionRow
@@ -95,8 +106,16 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
 
+  emptyMessageDesktop: {
+    paddingVertical: 34,
+  },
+
   groupBlock: {
     marginBottom: 8,
+  },
+
+  groupBlockDesktop: {
+    marginBottom: 16,
   },
 
   monthLabel: {
@@ -105,5 +124,10 @@ const styles = StyleSheet.create({
     color: BLACK,
     marginTop: 2,
     marginBottom: 14,
+  },
+
+  monthLabelDesktop: {
+    marginTop: 4,
+    marginBottom: 16,
   },
 });

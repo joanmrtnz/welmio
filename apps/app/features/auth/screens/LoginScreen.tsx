@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { Link, router } from "expo-router";
@@ -16,8 +17,8 @@ import { fonts } from "@/theme/fonts";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import { Icon } from "@/components/icons/Icon";
 import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
-const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
 
+const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
 
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";
@@ -29,6 +30,8 @@ const SOFT_GREEN = "#e3f8f1";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 export default function LoginScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const { execute, loading } = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,153 +56,180 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isDesktop && styles.scrollContentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.brandArea}>
-          <View style={styles.brandRow}>
-            <View style={styles.logoBadge}>
-              <Image
-                source={WELMIO_LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={styles.brandName}>Welmio</Text>
-          </View>
-        </View>
-
-        <View style={styles.avatarWrap}>
-          <View style={styles.avatarCircle}>
-            <Image
-              source={WELMIO_LOGO}
-              style={styles.avatarImage}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>
-            Track your money, goals and habits in one place.
-          </Text>
-
-          <View style={styles.form}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Email</Text>
-              <View style={styles.inputShell}>
-                <FontAwesome
-                  name="user-o"
-                  size={18}
-                  color="rgba(5, 46, 43, 0.5)"
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="example@email.com"
-                  placeholderTextColor="rgba(5, 46, 43, 0.42)"
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                  value={email}
-                  onChangeText={setEmail}
-                />
-              </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Password</Text>
-              <View style={styles.inputShell}>
-                <FontAwesome
-                  name="lock"
-                  size={19}
-                  color="rgba(5, 46, 43, 0.5)"
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.textInput}
-                  placeholderTextColor="rgba(5, 46, 43, 0.42)"
-                  secureTextEntry={!showPassword}
-                  value={password}
-                  onChangeText={setPassword}
-                />
-                <Pressable
-                  hitSlop={8}
-                  onPress={() => setShowPassword((visible) => !visible)}
-                  style={styles.eyeButton}
-                >
-                  <FontAwesome
-                    name={showPassword ? "eye-slash" : "eye"}
-                    size={17}
-                    color="rgba(5, 46, 43, 0.52)"
+        <View style={[styles.desktopShell, isDesktop && styles.desktopShellActive]}>
+          <View style={[styles.desktopHero, isDesktop && styles.desktopHeroActive]}>
+            <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
+              <View style={styles.brandRow}>
+                <View style={styles.logoBadge}>
+                  <Image
+                    source={WELMIO_LOGO}
+                    style={styles.logoImage}
+                    resizeMode="contain"
                   />
-                </Pressable>
+                </View>
+                <Text style={[styles.brandName, isDesktop && styles.brandNameDesktop]}>
+                  Welmio
+                </Text>
               </View>
             </View>
 
-            <Link href="/(public)/forgot-password" style={styles.forgotLink}>
-              <Text>Forgot Password?</Text>
-            </Link>
-
-            <Pressable
-              onPress={handleLogin}
-              disabled={loading}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                pressed && !loading ? styles.buttonPressed : null,
-                loading ? styles.buttonDisabled : null,
-              ]}
-            >
-              <Text style={styles.primaryButtonText}>
-                {loading ? "Logging in..." : "Log In"}
-              </Text>
-            </Pressable>
-
-            <View style={styles.dividerRow}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
+            <View style={[styles.avatarWrap, isDesktop && styles.avatarWrapDesktop]}>
+              <View
+                style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
+              >
+                <Image
+                  source={WELMIO_LOGO}
+                  style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
+                  resizeMode="contain"
+                />
+              </View>
             </View>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.googleButton,
-                pressed ? styles.buttonPressed : null,
-              ]}
-            >
-              <Text style={styles.googleIcon}>G</Text>
-              <Text style={styles.googleText}>Continue with Google</Text>
-            </Pressable>
-
-            <Link href="/(public)/finger-print" asChild>
-              <Pressable style={styles.fingerprint}>
-                <Icon name="fingerPrint" size={30} strokeWidth={8} color={PRIMARY} />{" "}
-                <Text style={styles.fingerprintText}>
-                  Continue with <Text style={styles.bold}>Touch ID</Text>
+            {isDesktop ? (
+              <View style={styles.desktopCopy}>
+                <Text style={styles.desktopTitle}>Smart Finance, Simple Life</Text>
+                <Text style={styles.desktopSubtitle}>
+                  Track your money, organize your transactions, and keep your goals
+                  moving from one clean dashboard.
                 </Text>
-              </Pressable>
-            </Link>
+              </View>
+            ) : null}
+          </View>
 
-            <Link href="/(public)/signup" style={styles.footer}>
-              <Text>
-                Don’t have an account? <Text style={styles.link}>Sign Up</Text>
+          <View style={styles.desktopFormColumn}>
+            <View style={[styles.card, isDesktop && styles.cardDesktop]}>
+              <Text style={styles.title}>Welcome back</Text>
+              <Text style={styles.subtitle}>
+                Track your money, goals and habits in one place.
               </Text>
-            </Link>
-          </View>
-        </View>
 
-         <View style={styles.adviceCard}>
-          <View style={styles.adviceIcon}>
-            <FontAwesome name="lightbulb-o" size={30} color={PRIMARY} />
-          </View>
-          <View>
-            <Text style={styles.adviceTitle}>
-              Smart Finance, Simple Life
-            </Text>
-            <Text style={styles.adviceText}>
-              Take control of your money with ease.
-            </Text>
+              <View style={styles.form}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Email</Text>
+                  <View style={styles.inputShell}>
+                    <FontAwesome
+                      name="user-o"
+                      size={18}
+                      color="rgba(5, 46, 43, 0.5)"
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder="example@email.com"
+                      placeholderTextColor="rgba(5, 46, 43, 0.42)"
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      value={email}
+                      onChangeText={setEmail}
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Password</Text>
+                  <View style={styles.inputShell}>
+                    <FontAwesome
+                      name="lock"
+                      size={19}
+                      color="rgba(5, 46, 43, 0.5)"
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.textInput}
+                      placeholderTextColor="rgba(5, 46, 43, 0.42)"
+                      secureTextEntry={!showPassword}
+                      value={password}
+                      onChangeText={setPassword}
+                    />
+                    <Pressable
+                      hitSlop={8}
+                      onPress={() => setShowPassword((visible) => !visible)}
+                      style={styles.eyeButton}
+                    >
+                      <FontAwesome
+                        name={showPassword ? "eye-slash" : "eye"}
+                        size={17}
+                        color="rgba(5, 46, 43, 0.52)"
+                      />
+                    </Pressable>
+                  </View>
+                </View>
+
+                <Link href="/(public)/forgot-password" style={styles.forgotLink}>
+                  <Text>Forgot Password?</Text>
+                </Link>
+
+                <Pressable
+                  onPress={handleLogin}
+                  disabled={loading}
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    pressed && !loading ? styles.buttonPressed : null,
+                    loading ? styles.buttonDisabled : null,
+                  ]}
+                >
+                  <Text style={styles.primaryButtonText}>
+                    {loading ? "Logging in..." : "Log In"}
+                  </Text>
+                </Pressable>
+
+                <View style={styles.dividerRow}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.dividerText}>or continue with</Text>
+                  <View style={styles.dividerLine} />
+                </View>
+
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.googleButton,
+                    pressed ? styles.buttonPressed : null,
+                  ]}
+                >
+                  <Text style={styles.googleIcon}>G</Text>
+                  <Text style={styles.googleText}>Continue with Google</Text>
+                </Pressable>
+                {!isDesktop ? (
+                  <Link href="/(public)/finger-print" asChild>
+                    <Pressable style={styles.fingerprint}>
+                      <Icon
+                        name="fingerPrint"
+                        size={30}
+                        strokeWidth={8}
+                        color={PRIMARY}
+                      />{" "}
+                      <Text style={styles.fingerprintText}>
+                        Continue with <Text style={styles.bold}>Touch ID</Text>
+                      </Text>
+                    </Pressable>
+                  </Link>
+                ) : null}
+
+                <Link href="/(public)/signup" style={styles.footer}>
+                  <Text>
+                    Don’t have an account? <Text style={styles.link}>Sign Up</Text>
+                  </Text>
+                </Link>
+              </View>
+            </View>
+
+            <View style={[styles.adviceCard, isDesktop && styles.adviceCardDesktop]}>
+              <View style={styles.adviceIcon}>
+                <FontAwesome name="lightbulb-o" size={30} color={PRIMARY} />
+              </View>
+              <View style={styles.adviceTextColumn}>
+                <Text style={styles.adviceTitle}>Smart Finance, Simple Life</Text>
+                <Text style={styles.adviceText}>
+                  Take control of your money with ease.
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -220,10 +250,53 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
+  scrollContentDesktop: {
+    justifyContent: "center",
+    paddingHorizontal: 32,
+    paddingVertical: 48,
+  },
+
+  desktopShell: {
+    width: "100%",
+  },
+
+  desktopShellActive: {
+    maxWidth: 1040,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 42,
+  },
+
+  desktopHero: {
+    position: "relative",
+    zIndex: 2,
+  },
+
+  desktopHeroActive: {
+    flex: 1,
+    maxWidth: 430,
+    alignItems: "center",
+  },
+
+  desktopFormColumn: {
+    width: "100%",
+    flex: 1,
+    maxWidth: 460,
+    position: "relative",
+    zIndex: 1,
+  },
+
   brandArea: {
     alignItems: "center",
     marginTop: 4,
     marginBottom: 34,
+  },
+
+  brandAreaDesktop: {
+    marginTop: 0,
+    marginBottom: 24,
   },
 
   brandRow: {
@@ -259,13 +332,25 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
+  brandNameDesktop: {
+    fontSize: 30,
+  },
+
   avatarWrap: {
-    zIndex: 2,
+    position: "relative",
+    zIndex: 20,
+    elevation: 20,
     alignItems: "center",
     marginBottom: -42,
   },
 
+  avatarWrapDesktop: {
+    marginBottom: 22,
+  },
+
   avatarCircle: {
+    position: "relative",
+    zIndex: 20,
     width: 106,
     height: 106,
     borderRadius: 58,
@@ -281,12 +366,48 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  avatarCircleDesktop: {
+    width: 156,
+    height: 156,
+    borderRadius: 82,
+  },
+
   avatarImage: {
     width: 100,
     height: 99,
   },
 
+  avatarImageDesktop: {
+    width: 145,
+    height: 144,
+  },
+
+  desktopCopy: {
+    width: "100%",
+    paddingHorizontal: 8,
+    alignItems: "center",
+  },
+
+  desktopTitle: {
+    color: DARK,
+    fontSize: 34,
+    lineHeight: 40,
+    textAlign: "center",
+    fontFamily: fonts.bold,
+  },
+
+  desktopSubtitle: {
+    color: MUTED,
+    fontSize: 16,
+    lineHeight: 25,
+    textAlign: "center",
+    marginTop: 14,
+    fontFamily: fonts.medium,
+  },
+
   card: {
+    position: "relative",
+    zIndex: 1,
     backgroundColor: CARD,
     borderRadius: 30,
     paddingHorizontal: 20,
@@ -297,6 +418,12 @@ const styles = StyleSheet.create({
     shadowRadius: 22,
     shadowOffset: { width: 0, height: 12 },
     elevation: 8,
+  },
+
+  cardDesktop: {
+    paddingHorizontal: 34,
+    paddingTop: 38,
+    paddingBottom: 34,
   },
 
   title: {
@@ -509,6 +636,11 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 
+  adviceCardDesktop: {
+    marginHorizontal: 0,
+    paddingHorizontal: 22,
+  },
+
   adviceIcon: {
     width: 43,
     height: 43,
@@ -516,6 +648,10 @@ const styles = StyleSheet.create({
     backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  adviceTextColumn: {
+    flex: 1,
   },
 
   adviceTitle: {

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
@@ -64,9 +65,8 @@ export function GoalDetailsModal({
   onAddContribution,
   onDeleteContribution,
 }: GoalDetailsModalProps) {
-  if (!goal) return null;
-  const remainingAmount = Math.max(goal.target - goal.saved, 0);
-  const progress = Math.min(goal.progress, 100);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeletingContribution, setIsDeletingContribution] = useState(false);
@@ -81,16 +81,7 @@ export function GoalDetailsModal({
   const [contributionsError, setContributionsError] = useState<string | null>(
     null,
   );
-  const contributionsCount = goal.contributionsCount ?? 0;
-  const deleteMessage =
-    contributionsCount > 0
-      ? `Are you sure you want to delete this goal?
-  This will also delete ${contributionsCount} contribution${
-    contributionsCount === 1 ? "" : "s"
-  } linked to this goal.
-  This action cannot be undone.`
-      : `Are you sure you want to delete this goal?
-  This action cannot be undone.`;
+
 
   function handleEditGoal() {
     if (!goal) return;
@@ -209,6 +200,21 @@ export function GoalDetailsModal({
     loadGoalContributions();
   }, [visible, goal?.id, loadGoalContributions]);
 
+  if (!goal) return null;
+
+  const remainingAmount = Math.max(goal.target - goal.saved, 0);
+  const progress = Math.min(goal.progress, 100);
+  const contributionsCount = goal.contributionsCount ?? 0;
+  const deleteMessage =
+    contributionsCount > 0
+      ? `Are you sure you want to delete this goal?
+  This will also delete ${contributionsCount} contribution${
+    contributionsCount === 1 ? "" : "s"
+  } linked to this goal.
+  This action cannot be undone.`
+      : `Are you sure you want to delete this goal?
+  This action cannot be undone.`;
+
   return (
     <Modal
       visible={visible}
@@ -219,7 +225,7 @@ export function GoalDetailsModal({
       <View style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={onClose} />
 
-        <View style={styles.modal}>
+        <View style={[styles.modal, isDesktop && styles.modalDesktop]}>
           <View style={styles.handle} />
 
           <View style={styles.header}>
@@ -246,9 +252,24 @@ export function GoalDetailsModal({
 
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.content}
+            contentContainerStyle={[
+              styles.content,
+              isDesktop && styles.contentDesktop,
+            ]}
           >
-            <View style={styles.heroCard}>
+            <View
+              style={[
+                styles.contentLayout,
+                isDesktop && styles.contentLayoutDesktop,
+              ]}
+            >
+              <View
+                style={[
+                  styles.contentColumn,
+                  isDesktop && styles.contentColumnDesktop,
+                ]}
+              >
+                <View style={styles.heroCard}>
               <View style={styles.heroTop}>
                 <View style={styles.heroIcon}>
                   <Icon
@@ -309,9 +330,9 @@ export function GoalDetailsModal({
                 <View style={styles.statIcon}>
                   <Icon
                     name="money"
-                    size={24}
+                    size={30}
                     color={BLACK}
-                    strokeWidth={1.2}
+                    strokeWidth={0.8}
                   />
                 </View>
 
@@ -338,7 +359,15 @@ export function GoalDetailsModal({
               </View>
             </View>
 
-            <View style={styles.infoCard}>
+              </View>
+
+              <View
+                style={[
+                  styles.contentColumn,
+                  isDesktop && styles.contentColumnDesktop,
+                ]}
+              >
+                <View style={styles.infoCard}>
               <Text style={styles.sectionTitle}>Progress insight</Text>
 
               <Text style={styles.infoText}>
@@ -349,7 +378,7 @@ export function GoalDetailsModal({
               </Text>
             </View>
 
-            <View style={styles.mockHistoryCard}>
+                <View style={styles.mockHistoryCard}>
               <View style={styles.sectionHeader}>
                 <View>
                   <Text style={styles.sectionTitle}>Recent contributions</Text>
@@ -428,9 +457,11 @@ export function GoalDetailsModal({
                   </View>
                 ))
               )}
+                </View>
+              </View>
             </View>
           </ScrollView>
-          <View style={styles.actionsRow}>
+          <View style={[styles.actionsRow, isDesktop && styles.actionsRowDesktop]}>
             <Pressable
               style={styles.secondaryButton}
               onPress={() => {
@@ -522,6 +553,14 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
 
+  modalDesktop: {
+    maxWidth: 980,
+    maxHeight: "88%",
+    paddingHorizontal: 26,
+    paddingTop: 18,
+    paddingBottom: 20,
+  },
+
   handle: {
     width: 42,
     height: 5,
@@ -568,6 +607,29 @@ const styles = StyleSheet.create({
 
   content: {
     paddingBottom: 16,
+  },
+
+  contentDesktop: {
+    paddingBottom: 18,
+  },
+
+  contentLayout: {
+    width: "100%",
+  },
+
+  contentLayoutDesktop: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 18,
+  },
+
+  contentColumn: {
+    width: "100%",
+  },
+
+  contentColumnDesktop: {
+    flex: 1,
+    width: "auto",
   },
 
   heroCard: {
@@ -834,6 +896,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 14,
     paddingTop: 10,
+  },
+
+  actionsRowDesktop: {
+    alignSelf: "flex-end",
+    width: "50%",
+    maxWidth: 420,
   },
 
   secondaryButton: {

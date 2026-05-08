@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { router } from "expo-router";
 import { fonts } from "@/theme/fonts";
@@ -19,6 +20,9 @@ import { removeAccessToken } from "@/app/lib/auth-storage";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 export default function DeleteAccountScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
   const [confirmationText, setConfirmationText] = useState("");
   const isDeleteButtonDisabled =
     confirmationText.trim().toLowerCase() !== "delete";
@@ -62,69 +66,83 @@ export default function DeleteAccountScreen() {
     >
       <AppScreenHeader title="Delete Account" />
 
-      <View style={styles.card}>
+      <View style={[styles.card, isDesktop && styles.cardDesktop]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.cardContent}
+          contentContainerStyle={[
+            styles.cardContent,
+            isDesktop && styles.cardContentDesktop,
+          ]}
         >
-          <Text style={styles.confirmTitle}>
-            Are You Sure You Want To Delete{"\n"}Your Account?
+          <Text style={[styles.confirmTitle, isDesktop && styles.confirmTitleDesktop]}>
+            Are You Sure You Want To Delete{isDesktop ? " " : "\n"}Your Account?
           </Text>
 
-          <View style={styles.warningBox}>
-            <Text style={styles.warningText}>
-              This action will permanently delete all of your data, and you will
-              not be able to recover it. Please keep the following in mind
-              before proceeding:
-            </Text>
+          <View style={[styles.desktopGrid, !isDesktop && styles.mobileGrid]}>
+            <View style={[styles.warningBox, isDesktop && styles.warningBoxDesktop]}>
 
-            <Text style={styles.bulletText}>
-              All your expenses, income and associated transactions will be
-              eliminated.
-            </Text>
+              <Text style={[styles.warningText, isDesktop && styles.warningTextDesktop]}>
+                This action will permanently delete all of your data, and you will
+                not be able to recover it. Please keep the following in mind
+                before proceeding:
+              </Text>
 
-            <Text style={styles.bulletText}>
-              You will not be able to access your account or any related
-              information.
-            </Text>
+              <Text style={styles.bulletText}>
+                All your expenses, income and associated transactions will be
+                eliminated.
+              </Text>
 
-            <Text style={styles.bulletText}>This action cannot be undone.</Text>
-          </View>
+              <Text style={styles.bulletText}>
+                You will not be able to access your account or any related
+                information.
+              </Text>
 
-          <Text style={styles.passwordTitle}>
-            Please Type "delete" To Confirm{"\n"}Deletion Of Your Account.
-          </Text>
-
-          <View style={styles.form}>
-            <View style={styles.inputShell}>
-              <TextInput
-                style={styles.confirmInput}
-                placeholder='Type "delete"'
-                placeholderTextColor={MUTED}
-                value={confirmationText}
-                onChangeText={setConfirmationText}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+              <Text style={[styles.bulletText, styles.lastBulletText]}>
+                This action cannot be undone.
+              </Text>
             </View>
 
-            <Pressable
-              style={[
-                styles.deleteButton,
-                isDeleteButtonDisabled && styles.deleteButtonDisabled,
-              ]}
-              onPress={handleOpenDeleteDialog}
-              disabled={isDeleteButtonDisabled}
-            >
+            <View style={[styles.confirmPanel, isDesktop && styles.confirmPanelDesktop]}>
               <Text
-                style={[
-                  styles.deleteButtonText,
-                  isDeleteButtonDisabled && styles.deleteButtonTextDisabled,
-                ]}
+                style={[styles.passwordTitle, isDesktop && styles.passwordTitleDesktop]}
               >
-                Yes, Delete Account
+                Please Type "delete" To Confirm{isDesktop ? " " : "\n"}
+                Deletion Of Your Account.
               </Text>
-            </Pressable>
+
+              <View style={[styles.form, isDesktop && styles.formDesktop]}>
+                <View style={styles.inputShell}>
+                  <TextInput
+                    style={styles.confirmInput}
+                    placeholder='Type "delete"'
+                    placeholderTextColor={MUTED}
+                    value={confirmationText}
+                    onChangeText={setConfirmationText}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+
+                <Pressable
+                  style={[
+                    styles.deleteButton,
+                    isDesktop && styles.deleteButtonDesktop,
+                    isDeleteButtonDisabled && styles.deleteButtonDisabled,
+                  ]}
+                  onPress={handleOpenDeleteDialog}
+                  disabled={isDeleteButtonDisabled}
+                >
+                  <Text
+                    style={[
+                      styles.deleteButtonText,
+                      isDeleteButtonDisabled && styles.deleteButtonTextDisabled,
+                    ]}
+                  >
+                    Yes, Delete Account
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
           </View>
         </ScrollView>
       </View>
@@ -181,9 +199,32 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  cardDesktop: {
+    width: "100%",
+    maxWidth: 1040,
+    alignSelf: "center",
+    flex: 0,
+    marginTop: 24,
+    marginBottom: 40,
+    borderRadius: 36,
+    paddingHorizontal: 32,
+    paddingTop: 30,
+    minHeight: 560,
+    shadowColor: "rgba(10, 58, 52, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
+  },
+
   cardContent: {
     paddingTop: 28,
     paddingBottom: 70,
+  },
+
+  cardContentDesktop: {
+    paddingTop: 18,
+    paddingBottom: 36,
   },
 
   confirmTitle: {
@@ -196,6 +237,23 @@ const styles = StyleSheet.create({
     marginBottom: 34,
   },
 
+  confirmTitleDesktop: {
+    fontSize: 24,
+    lineHeight: 32,
+    marginBottom: 32,
+  },
+
+  desktopGrid: {
+    flexDirection: "row",
+    gap: 28,
+    alignItems: "stretch",
+  },
+
+  mobileGrid: {
+    flexDirection: "column",
+    gap: 0,
+  },
+
   warningBox: {
     backgroundColor: BOX_GREEN,
     borderRadius: 14,
@@ -206,6 +264,24 @@ const styles = StyleSheet.create({
     borderColor: "rgba(0, 169, 130, 0.06)",
   },
 
+  warningBoxDesktop: {
+    flex: 1,
+    marginBottom: 0,
+    borderRadius: 22,
+    paddingHorizontal: 28,
+    paddingVertical: 28,
+  },
+
+  warningIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    backgroundColor: WHITE,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 22,
+  },
+
   warningText: {
     fontSize: 13,
     color: BLACK,
@@ -214,12 +290,34 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
 
+  warningTextDesktop: {
+    fontSize: 14,
+    lineHeight: 24,
+  },
+
   bulletText: {
     fontSize: 13,
     color: BLACK,
     fontFamily: fonts.regular,
     lineHeight: 22,
     marginBottom: 18,
+  },
+
+  lastBulletText: {
+    marginBottom: 0,
+  },
+
+  confirmPanel: {},
+
+  confirmPanelDesktop: {
+    flex: 1,
+    borderRadius: 22,
+    paddingHorizontal: 28,
+    paddingVertical: 28,
+    backgroundColor: WHITE,
+    borderWidth: 1,
+    borderColor: BORDER,
+    justifyContent: "center",
   },
 
   passwordTitle: {
@@ -232,8 +330,20 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
+  passwordTitleDesktop: {
+    textAlign: "left",
+    fontSize: 20,
+    lineHeight: 28,
+    marginBottom: 30,
+  },
+
   form: {
     gap: 38,
+    alignItems: "center",
+  },
+
+  formDesktop: {
+    gap: 24,
     alignItems: "center",
   },
 
@@ -267,6 +377,10 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 3,
+  },
+
+  deleteButtonDesktop: {
+    width: 240,
   },
 
   deleteButtonDisabled: {

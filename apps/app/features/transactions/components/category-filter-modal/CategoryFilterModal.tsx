@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
@@ -77,6 +78,8 @@ export function CategoryFilterModal({
   });
 
   const { BLACK, WHITE, RED, TAB_GREEN } = categoryFilterModalColors;
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   const hasSelectedCategories = draftSelectedIds.length > 0;
   const canEditSelectedCategory = draftSelectedIds.length === 1;
@@ -116,8 +119,11 @@ export function CategoryFilterModal({
       animationType="fade"
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.backdrop} onPress={handleClose}>
-        <Pressable style={styles.modalCard}>
+      <Pressable
+        style={[styles.backdrop, isDesktop && styles.backdropDesktop]}
+        onPress={handleClose}
+      >
+        <Pressable style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
           {mode === "filter" ? (
             <>
               <View style={styles.header}>
@@ -166,17 +172,20 @@ export function CategoryFilterModal({
 
               <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[
+                  styles.scrollContent,
+                  isDesktop && styles.scrollContentDesktop,
+                ]}
                 showsVerticalScrollIndicator={false}
               >
-                <View style={styles.grid}>
+                <View style={[styles.grid, isDesktop && styles.gridDesktop]}>
                   {categories.map((item) => {
                     const isSelected = draftSelectedIds.includes(item.id);
 
                     return (
                       <Pressable
                         key={item.id}
-                        style={styles.gridItem}
+                        style={[styles.gridItem, isDesktop && styles.gridItemDesktop]}
                         onPress={() => handleToggleCategory(item.id)}
                       >
                         <View
@@ -209,7 +218,7 @@ export function CategoryFilterModal({
                 </View>
 
                 <Pressable
-                  style={styles.addMoreButton}
+                  style={[styles.addMoreButton, isDesktop && styles.addMoreButtonDesktop]}
                   onPress={handleOpenCreateCategory}
                 >
                   <Icon name="plus" size={23} color={BLACK} />
@@ -217,7 +226,7 @@ export function CategoryFilterModal({
                 </Pressable>
               </ScrollView>
 
-              <View style={styles.actions}>
+              <View style={[styles.actions, isDesktop && styles.actionsDesktop]}>
                 <Pressable style={styles.clearButton} onPress={clearFilters}>
                   <Text style={styles.clearButtonText}>Clear</Text>
                 </Pressable>
@@ -244,7 +253,10 @@ export function CategoryFilterModal({
 
               <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[
+                  styles.scrollContent,
+                  isDesktop && styles.formScrollContentDesktop,
+                ]}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
               >
@@ -343,7 +355,7 @@ export function CategoryFilterModal({
                 </View>
               </ScrollView>
 
-              <View style={styles.actions}>
+              <View style={[styles.actions, isDesktop && styles.actionsDesktop]}>
                 <Pressable
                   style={styles.clearButton}
                   onPress={handleBackToFilter}

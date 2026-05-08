@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  useWindowDimensions,
+} from "react-native";
 
 import type { IconName } from "@repo/shared-types";
 import { getUserProfile } from "@/features/profile/services/profile-service";
@@ -22,8 +29,13 @@ const WHITE = "#ffffff";
 const MUTED = "#5e7b78";
 const GRID = "rgba(6, 59, 58, 0.09)";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 export default function ProfileScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
+
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -31,7 +43,6 @@ export default function ProfileScreen() {
   const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
   const [avatarColor, setAvatarColor] = useState("#00c896");
   const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
-
 
   useEffect(() => {
     async function loadUserProfile() {
@@ -84,51 +95,61 @@ export default function ProfileScreen() {
       <AppScreenHeader title="Profile" />
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          isDesktop && styles.contentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.profileCard}>
-          <View style={styles.avatarOuterRing}>
-            <View style={[styles.avatar, { borderColor: avatarColor || TEAL }]}>
-              <Image
-                source={WELMIO_LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
+        <View style={[styles.desktopGrid, !isDesktop && styles.mobileGrid]}>
+          <View
+            style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}
+          >
+            <View style={styles.avatarOuterRing}>
+              <View
+                style={[styles.avatar, { borderColor: avatarColor || TEAL }]}
+              >
+                <Image
+                  source={WELMIO_LOGO}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
+
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{fullName || "User"}</Text>
+              <Text style={styles.userId}>{email ? email : "-"}</Text>
             </View>
           </View>
 
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>{fullName || "User"}</Text>
-            <Text style={styles.userId}>{email ? email : "-"}</Text>
+          <View
+            style={[styles.optionsCard, isDesktop && styles.optionsCardDesktop]}
+          >
+            <ProfileOption
+              icon="user"
+              label="Edit Profile"
+              onPress={() => router.push("/profile/edit")}
+            />
+            <View style={styles.divider} />
+            <ProfileOption
+              icon="shield"
+              label="Security"
+              onPress={() => router.push("/profile/security")}
+            />
+            <View style={styles.divider} />
+            <ProfileOption
+              icon="settings"
+              label="Settings"
+              onPress={() => router.push("/profile/settings")}
+            />
+            <View style={styles.divider} />
+            <ProfileOption
+              icon="logout"
+              label="Logout"
+              onPress={handleOpenLogoutDialog}
+            />
           </View>
-        </View>
-
-       
-        <View style={styles.optionsCard}>
-          <ProfileOption
-            icon="user"
-            label="Edit Profile"
-            onPress={() => router.push("/profile/edit")}
-          />
-          <View style={styles.divider} />
-          <ProfileOption
-            icon="shield"
-            label="Security"
-            onPress={() => router.push("/profile/security")}
-          />
-          <View style={styles.divider} />
-          <ProfileOption
-            icon="settings"
-            label="Settings"
-            onPress={() => router.push("/profile/settings")}
-          />
-          <View style={styles.divider} />
-          <ProfileOption
-            icon="logout"
-            label="Logout"
-            onPress={handleOpenLogoutDialog}
-          />
         </View>
       </ScrollView>
 
@@ -158,6 +179,23 @@ const styles = StyleSheet.create({
     paddingBottom: 118,
   },
 
+  contentDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    paddingBottom: 150,
+  },
+
+  mobileGrid: {
+    width: "100%",
+  },
+
+  desktopGrid: {
+    width: "100%",
+    gap: 24,
+  },
+
   profileCard: {
     backgroundColor: CARD,
     borderRadius: 18,
@@ -171,6 +209,14 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  profileCardDesktop: {
+    flex: 0.9,
+    minHeight: 292,
+    justifyContent: "center",
+    marginBottom: 0,
+    paddingVertical: 36,
   },
 
   avatarOuterRing: {
@@ -255,6 +301,12 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  optionsCardDesktop: {
+    flex: 1.4,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
 
   divider: {

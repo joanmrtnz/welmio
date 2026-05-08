@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { fonts } from "@/theme/fonts";
@@ -13,25 +13,43 @@ const BORDER = "rgba(20, 184, 148, 0.13)";
 const TEXT = "#073b38";
 const MUTED = "#6f8580";
 const WHITE = "#ffffff";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 export default function SettingsScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
+
   return (
     <View style={styles.screen}>
       <AppScreenHeader title="Settings" />
 
-      <View style={styles.card}>
+      <View style={[styles.card, isDesktop && styles.cardDesktop]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.cardContent}
+          contentContainerStyle={[
+            styles.cardContent,
+            isDesktop && styles.cardContentDesktop,
+          ]}
         >
-          <Text style={styles.sectionTitle}>Account Settings</Text>
+          <View style={isDesktop && styles.desktopHeaderBlock}>
+            <Text style={[styles.sectionTitle, isDesktop && styles.sectionTitleDesktop]}>
+              Account Settings
+            </Text>
+            {isDesktop ? (
+              <Text style={styles.sectionDescriptionDesktop}>
+                Manage your account access, security, and profile lifecycle.
+              </Text>
+            ) : null}
+          </View>
 
-          <View style={styles.optionsContainer}>
+          <View style={[styles.optionsContainer, isDesktop && styles.optionsContainerDesktop]}>
             <SettingsOption
               icon="key"
               label="Change Password"
               description="Update your account password"
               onPress={() => router.push("/profile/change-password")}
+              isDesktop={isDesktop}
             />
 
             <SettingsOption
@@ -40,16 +58,19 @@ export default function SettingsScreen() {
               description="Permanently remove your profile"
               danger
               onPress={() => router.push("/profile/delete-account")}
+              isDesktop={isDesktop}
             />
           </View>
         </ScrollView>
       </View>
 
-      <LinearGradient
-        pointerEvents="none"
-        colors={["rgba(223, 247, 239, 0)", BACKGROUND]}
-        style={styles.bottomFade}
-      />
+      {!isDesktop ? (
+        <LinearGradient
+          pointerEvents="none"
+          colors={["rgba(223, 247, 239, 0)", BACKGROUND]}
+          style={styles.bottomFade}
+        />
+      ) : null}
     </View>
   );
 }
@@ -60,6 +81,7 @@ type SettingsOptionProps = {
   description?: string;
   danger?: boolean;
   onPress?: () => void;
+  isDesktop?: boolean;
 };
 
 function SettingsOption({
@@ -68,18 +90,21 @@ function SettingsOption({
   description,
   danger,
   onPress,
+  isDesktop,
 }: SettingsOptionProps) {
   return (
-    <Pressable style={styles.optionRow} onPress={onPress}>
+    <Pressable style={[styles.optionRow, isDesktop && styles.optionRowDesktop]} onPress={onPress}>
       <View style={styles.optionLeft}>
         <View style={[styles.optionIcon, danger && styles.optionIconDanger]}>
           <Icon name={icon} size={21} color={danger ? "#d64b42" : MINT_STRONG} />
         </View>
 
         <View style={styles.optionTextWrap}>
-          <Text style={styles.optionLabel}>{label}</Text>
+          <Text style={[styles.optionLabel, isDesktop && styles.optionLabelDesktop]}>{label}</Text>
           {description ? (
-            <Text style={styles.optionDescription}>{description}</Text>
+            <Text style={[styles.optionDescription, isDesktop && styles.optionDescriptionDesktop]}>
+              {description}
+            </Text>
           ) : null}
         </View>
       </View>
@@ -113,9 +138,35 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 
+  cardDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    flex: 0,
+    minHeight: 420,
+    marginHorizontal: 32,
+    marginTop: 18,
+    borderRadius: 34,
+    paddingHorizontal: 28,
+    shadowColor: "rgba(7, 59, 56, 0.08)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 4,
+  },
+
   cardContent: {
     paddingTop: 30,
     paddingBottom: 120,
+  },
+
+  cardContentDesktop: {
+    paddingTop: 34,
+    paddingBottom: 44,
+  },
+
+  desktopHeaderBlock: {
+    marginBottom: 24,
   },
 
   sectionTitle: {
@@ -126,8 +177,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
 
+  sectionTitleDesktop: {
+    fontSize: 24,
+    marginBottom: 8,
+    paddingHorizontal: 0,
+  },
+
+  sectionDescriptionDesktop: {
+    fontSize: 14,
+    color: MUTED,
+    fontFamily: fonts.regular,
+  },
+
   optionsContainer: {
     gap: 14,
+  },
+
+  optionsContainerDesktop: {
+    marginTop: 20,
+    gap:20,
   },
 
   optionRow: {
@@ -144,8 +212,15 @@ const styles = StyleSheet.create({
     shadowColor: "rgba(7, 59, 56, 0.08)",
     shadowOpacity: 1,
     shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 5 },
     elevation: 3,
+  },
+
+  optionRowDesktop: {
+    minHeight: 92,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    borderRadius: 24,
   },
 
   optionLeft: {
@@ -179,10 +254,18 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
+  optionLabelDesktop: {
+    fontSize: 16,
+  },
+
   optionDescription: {
     fontSize: 12,
     color: MUTED,
     fontFamily: fonts.regular,
+  },
+
+  optionDescriptionDesktop: {
+    fontSize: 13,
   },
 
   chevronWrap: {

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect } from "expo-router";
@@ -34,6 +35,8 @@ const MUTED = "#6f8790";
 const DANGER = "#ff4265";
 const BORDER = "rgba(9, 169, 130, 0.12)";
 const LIGHT_GREEN = "#f8fffc";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 const EMPTY_ANALYTICS_DATA = [
   { label: "Mon", income: 0, expense: 0 },
@@ -91,6 +94,8 @@ function SectionHeader({
 }
 
 export default function HomeScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
   const [transactionsOverview, setTransactionsOverview] =
     useState<TransactionsOverviewResponse | null>(null);
   const [goalsOverview, setGoalsOverview] =
@@ -183,7 +188,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.screen}>
-       <View style={styles.header}>
+       <View style={[styles.header, isDesktop && styles.headerDesktop]}>
           <View style={styles.userSide}>
             <Pressable
               style={styles.avatarFrame}
@@ -208,12 +213,12 @@ export default function HomeScreen() {
         </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
       >
         <SectionHeader title="Overview" />
 
-        <View style={styles.overviewRow}>
-          <Pressable style={styles.overviewCard}>
+        <View style={[styles.overviewRow, isDesktop && styles.overviewRowDesktop]}>
+          <Pressable style={[styles.overviewCard, isDesktop && styles.overviewCardDesktop]}>
             <View style={styles.overviewIconWrap}>
               <Icon
                 name="money"
@@ -231,7 +236,7 @@ export default function HomeScreen() {
             </View>
           </Pressable>
 
-          <Pressable style={styles.overviewCard}>
+          <Pressable style={[styles.overviewCard, isDesktop && styles.overviewCardDesktop]}>
             <View style={[styles.overviewIconWrap, styles.expenseIconWrap]}>
               <Icon name="expense" size={28} color={DANGER} strokeWidth={1.4} />
             </View>
@@ -317,6 +322,14 @@ const styles = StyleSheet.create({
     paddingBottom: 132,
   },
 
+  contentDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    paddingBottom: 150,
+  },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -326,6 +339,14 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     marginTop: 30,
     marginBottom: 18,
+  },
+
+  headerDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    marginTop: 24,
   },
 
   userSide: {
@@ -422,6 +443,10 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
 
+  overviewRowDesktop: {
+    gap: 18,
+  },
+
   overviewCard: {
     flex: 1,
     minHeight: 112,
@@ -436,6 +461,11 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 7 },
     elevation: 4,
+  },
+
+  overviewCardDesktop: {
+    minHeight: 128,
+    padding: 20,
   },
 
   overviewIconWrap: {

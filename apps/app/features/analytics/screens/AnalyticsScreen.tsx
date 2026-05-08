@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  useWindowDimensions,
+} from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { useAnalytics } from "../hooks/useAnalytics";
@@ -7,7 +14,6 @@ import {
   getChartYAxisLabels,
   normalizeChartBars,
 } from "../utils/chart";
-import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
@@ -20,18 +26,22 @@ const CARD = "#fbfffd";
 const WHITE = "#ffffff";
 const MUTED = "#5e7b78";
 const GRID = "rgba(6, 59, 58, 0.09)";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 function TargetCard({
   percent,
   title,
   amountLeft,
+  isDesktop,
 }: {
   percent: string;
   title: string;
   amountLeft: string;
+  isDesktop?: boolean;
 }) {
   return (
-    <View style={styles.targetCard}>
+    <View style={[styles.targetCard, isDesktop && styles.targetCardDesktop]}>
       <View style={styles.ringTrack}>
         <View style={styles.ringArc} />
         <Text style={styles.progressValue}>{percent}</Text>
@@ -43,6 +53,8 @@ function TargetCard({
 }
 
 export default function AnalyticsScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
   const { selected, setSelected, data } = useAnalytics();
   const chartBars = data
     ? normalizeChartBars(
@@ -58,7 +70,7 @@ export default function AnalyticsScreen() {
     : 1;
 
   const yAxisLabels = getChartYAxisLabels(maxValue);
-  const isYearlyChart = selected === "yearly" || chartBars.length > 6;
+  const isYearlyChart = (selected === "yearly" || chartBars.length > 6 ) && !isDesktop;
   const yearlyChartWidth = Math.max(chartBars.length * 42, 310);
 
   function getVisibleBarHeight(height: number) {
@@ -81,10 +93,10 @@ export default function AnalyticsScreen() {
      <AppScreenHeader title="Analytics" />
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.balanceRow}>
+        <View style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}>
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>Total Balance</Text>
             <Text style={styles.balance}>
@@ -104,7 +116,7 @@ export default function AnalyticsScreen() {
           </View>
         </View>
 
-        <View style={styles.progressContainer}>
+        <View style={[styles.progressContainer, isDesktop && styles.progressContainerDesktop]}>
           <View style={styles.progressBar}>
             <View
               style={[
@@ -119,7 +131,7 @@ export default function AnalyticsScreen() {
           </Text>
         </View>
 
-        <View style={styles.segmentedControl}>
+        <View style={[styles.segmentedControl, isDesktop && styles.segmentedControlDesktop]}>
           {[
             ["daily", "Daily"],
             ["weekly", "Weekly"],
@@ -148,7 +160,7 @@ export default function AnalyticsScreen() {
           ))}
         </View>
 
-        <View style={styles.graphicCard}>
+        <View style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}>
           <View style={styles.graphHeader}>
             <View style={styles.graphTitleWrap}>
               <Text style={styles.graphTitle}>Income & Expenses</Text>
@@ -266,8 +278,8 @@ export default function AnalyticsScreen() {
           </View>
         </View>
 
-        <View style={styles.totalsRow}>
-          <View style={styles.totalItem}>
+        <View style={[styles.totalsRow, isDesktop && styles.totalsRowDesktop]}>
+          <View style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}>
             <View style={styles.totalIcon}>
               <Icon name="income" size={27} strokeWidth={1.4} color={TEAL} />
             </View>
@@ -277,7 +289,7 @@ export default function AnalyticsScreen() {
             </Text>
           </View>
 
-          <View style={styles.totalItem}>
+          <View style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}>
             <View style={styles.totalIcon}>
               <Icon name="expense" size={27} strokeWidth={1.4} color={TEAL} />
             </View>
@@ -290,16 +302,18 @@ export default function AnalyticsScreen() {
 
         <Text style={styles.targetsTitle}>My Targets</Text>
 
-        <View style={styles.targetsRow}>
+        <View style={[styles.targetsRow, isDesktop && styles.targetsRowDesktop]}>
           <TargetCard
             percent="30%"
             title="Short term goal"
             amountLeft="$13,560.30 left"
+            isDesktop={isDesktop}
           />
           <TargetCard
             percent="50%"
             title="Long term goal"
             amountLeft="$22,600.50 left"
+            isDesktop={isDesktop}
           />
         </View>
       </ScrollView>
@@ -323,12 +337,26 @@ const styles = StyleSheet.create({
     paddingBottom: 118,
   },
 
+  contentDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    paddingBottom: 150,
+  },
+
   balanceRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 22,
     gap: 30,
+  },
+
+  balanceRowDesktop: {
+    marginTop: 4,
+    marginBottom: 28,
+    gap: 56,
   },
 
   balanceColumn: {
@@ -359,6 +387,12 @@ const styles = StyleSheet.create({
   progressContainer: {
     alignItems: "center",
     marginBottom: 34,
+  },
+
+  progressContainerDesktop: {
+    width: "100%",
+    maxWidth: 760,
+    alignSelf: "center",
   },
 
   progressBar: {
@@ -396,6 +430,13 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
 
+  segmentedControlDesktop: {
+    width: "100%",
+    maxWidth: 620,
+    alignSelf: "center",
+    marginBottom: 30,
+  },
+
   segmentItem: {
     flex: 1,
     alignItems: "center",
@@ -430,6 +471,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 5,
     marginBottom: 22,
+  },
+
+  graphicCardDesktop: {
+    padding: 24,
+    marginBottom: 26,
   },
 
   graphHeader: {
@@ -624,6 +670,11 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
 
+  totalsRowDesktop: {
+    gap: 20,
+    marginBottom: 26,
+  },
+
   totalItem: {
     width: "48%",
     minHeight: 102,
@@ -636,6 +687,13 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  totalItemDesktop: {
+    flex: 1,
+    width: undefined,
+    minHeight: 118,
+    borderRadius: 20,
   },
 
   totalIcon: {
@@ -674,6 +732,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
 
+  targetsRowDesktop: {
+    gap: 20,
+  },
+
   targetCard: {
     width: "48%",
     backgroundColor: SOFT_TEAL,
@@ -681,6 +743,12 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  targetCardDesktop: {
+    flex: 1,
+    width: undefined,
+    minHeight: 176,
   },
 
   ringTrack: {

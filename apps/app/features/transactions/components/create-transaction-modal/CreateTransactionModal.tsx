@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
@@ -95,6 +96,9 @@ export function CreateTransactionModal({
     lockType,
   });
 
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
   const { BLACK, TAB_GREEN } = createTransactionModalColors;
 
   useEffect(() => {
@@ -127,7 +131,7 @@ export function CreateTransactionModal({
       onRequestClose={handleClose}
     >
       <Pressable style={styles.backdrop} onPress={handleClose}>
-        <Pressable style={styles.modalCard}>
+        <Pressable style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
           <View style={styles.header}>
             <Text style={styles.title}>
               {transactionToEdit ? "Edit Transaction" : "New Transaction"}
@@ -140,14 +144,16 @@ export function CreateTransactionModal({
 
           <ScrollView
             style={styles.scrollView}
-            contentContainerStyle={styles.content}
+            contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
+            <View style={[isDesktop && styles.desktopColumns]}>
+              <View style={[isDesktop && styles.desktopColumn]}>
             <Text style={styles.sectionLabel}>Type</Text>
 
             {!lockType ? (
-              <View style={styles.typeRow}>
+              <View style={[styles.typeRow, isDesktop && styles.typeRowDesktop]}>
                 <Pressable
                   style={[
                     styles.typeButton,
@@ -183,7 +189,7 @@ export function CreateTransactionModal({
                 </Pressable>
               </View>
             ) : (
-              <View style={styles.typeRow}>
+              <View style={[styles.typeRow, isDesktop && styles.typeRowDesktop]}>
                 <View style={[styles.typeButton, styles.typeButtonSelected]}>
                   <Text style={styles.typeButtonTextSelected}>
                     Income contribution
@@ -237,7 +243,7 @@ export function CreateTransactionModal({
 
             <Text style={styles.sectionLabel}>Category</Text>
 
-            <View style={styles.selectorGrid}>
+            <View style={[styles.selectorGrid, isDesktop && styles.selectorGridDesktop]}>
               {filteredCategories.map((category) => {
                 const isSelected = selectedCategoryId === category.id;
 
@@ -246,6 +252,7 @@ export function CreateTransactionModal({
                     key={category.id}
                     style={[
                       styles.selectorOption,
+                      isDesktop && styles.selectorOptionDesktop,
                       isSelected && styles.selectorOptionSelected,
                     ]}
                     onPress={() => setSelectedCategoryId(category.id)}
@@ -270,10 +277,12 @@ export function CreateTransactionModal({
                 );
               })}
             </View>
+              </View>
 
+              <View style={[isDesktop && styles.desktopColumn]}>
             <Text style={styles.sectionLabel}>Account</Text>
 
-            <View style={styles.optionColumn}>
+            <View style={[styles.optionColumn, isDesktop && styles.optionColumnDesktop]}>
               {accounts.map((account) => {
                 const isSelected = selectedAccountId === account.id;
 
@@ -316,7 +325,7 @@ export function CreateTransactionModal({
 
             <Text style={styles.sectionLabel}>Nature</Text>
 
-            <View style={styles.chipsRow}>
+            <View style={[styles.chipsRow, isDesktop && styles.chipsRowDesktop]}>
               {NATURE_OPTIONS.map((item) => {
                 const isSelected = transactionNature === item.value;
 
@@ -341,7 +350,7 @@ export function CreateTransactionModal({
 
             <Text style={styles.sectionLabel}>Frequency</Text>
 
-            <View style={styles.chipsRow}>
+            <View style={[styles.chipsRow, isDesktop && styles.chipsRowDesktop]}>
               {FREQUENCY_OPTIONS.map((item) => {
                 const isSelected = frequencyType === item.value;
 
@@ -398,6 +407,8 @@ export function CreateTransactionModal({
                       : "Save"}
                 </Text>
               </Pressable>
+            </View>
+              </View>
             </View>
           </ScrollView>
         </Pressable>

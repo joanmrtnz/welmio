@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { router } from "expo-router";
@@ -23,87 +24,156 @@ const CARD = "#ffffff";
 const SOFT_GREEN = "#e3f8f1";
 
 export default function FingerprintScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
   return (
     <View style={styles.screen}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isDesktop && styles.scrollContentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.brandArea}>
-          <View style={styles.brandRow}>
-            <View style={styles.logoBadge}>
-              <Image
-                source={WELMIO_LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
+        <View
+          style={[styles.desktopShell, isDesktop && styles.desktopShellActive]}
+        >
+          <View
+            style={[styles.desktopHero, isDesktop && styles.desktopHeroActive]}
+          >
+            <View
+              style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}
+            >
+              <View style={styles.brandRow}>
+                <View style={styles.logoBadge}>
+                  <Image
+                    source={WELMIO_LOGO}
+                    style={styles.logoImage}
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text
+                  style={[
+                    styles.brandName,
+                    isDesktop && styles.brandNameDesktop,
+                  ]}
+                >
+                  Welmio
+                </Text>
+              </View>
             </View>
-            <Text style={styles.brandName}>Welmio</Text>
-          </View>
-        </View>
 
-        <View style={styles.avatarWrap}>
-          <View style={styles.avatarCircle}>
-            <Ionicons name="finger-print-outline" size={58} color={PRIMARY} />
-          </View>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.title}>Use Touch ID</Text>
-
-          <Text style={styles.subtitle}>
-            Unlock Welmio faster and keep your account protected with biometric
-            access.
-          </Text>
-
-          <View style={styles.infoCard}>
-            <View style={styles.infoIcon}>
-              <FontAwesome name="lock" size={19} color={PRIMARY} />
+            <View
+              style={[styles.avatarWrap, isDesktop && styles.avatarWrapDesktop]}
+            >
+              <View
+                style={[
+                  styles.avatarCircle,
+                  isDesktop && styles.avatarCircleDesktop,
+                ]}
+              >
+                <Ionicons
+                  name="finger-print-outline"
+                  size={isDesktop ? 82 : 58}
+                  color={PRIMARY}
+                />
+              </View>
             </View>
-            <View style={styles.infoTextWrap}>
-              <Text style={styles.infoTitle}>Secure access</Text>
-              <Text style={styles.infoText}>
-                Your fingerprint stays on this device and is never shared with
-                Welmio.
+
+            {isDesktop ? (
+              <View style={styles.desktopCopy}>
+                <Text style={styles.desktopTitle}>
+                  Secure access in one touch
+                </Text>
+                <Text style={styles.desktopSubtitle}>
+                  Keep your financial dashboard protected while making sign in
+                  fast and effortless on trusted devices.
+                </Text>
+              </View>
+            ) : null}
+          </View>
+
+          <View style={styles.desktopFormColumn}>
+            <View style={[styles.card, isDesktop && styles.cardDesktop]}>
+              <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
+                Use Touch ID
               </Text>
+
+              <Text
+                style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}
+              >
+                Unlock Welmio faster and keep your account protected with
+                biometric access.
+              </Text>
+
+              <View
+                style={[styles.infoCard, isDesktop && styles.infoCardDesktop]}
+              >
+                <View style={styles.infoIcon}>
+                  <FontAwesome name="lock" size={19} color={PRIMARY} />
+                </View>
+                <View style={styles.infoTextWrap}>
+                  <Text style={styles.infoTitle}>Secure access</Text>
+                  <Text style={styles.infoText}>
+                    Your fingerprint stays on this device and is never shared
+                    with Welmio.
+                  </Text>
+                </View>
+              </View>
+
+              <View
+                style={[
+                  styles.actionButtons,
+                  isDesktop && styles.actionButtonsDesktop,
+                ]}
+              >
+                <Pressable
+                  onPress={() => {
+                    // TODO: trigger biometric auth
+                    router.replace("/(public)/login");
+                  }}
+                  style={({ pressed }) => [
+                    styles.primaryButton,
+                    isDesktop && styles.primaryButtonDesktop,
+                    pressed ? styles.buttonPressed : null,
+                  ]}
+                >
+                  <Ionicons
+                    name="finger-print-outline"
+                    size={22}
+                    color="#ffffff"
+                  />
+                  <Text style={styles.primaryButtonText}>Use Touch ID</Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => {
+                    router.push("/(public)/login");
+                  }}
+                  style={({ pressed }) => [
+                    styles.secondaryButton,
+                    isDesktop && styles.secondaryButtonDesktop,
+                    pressed ? styles.buttonPressed : null,
+                  ]}
+                >
+                  <Text style={styles.secondaryButtonText}>
+                    Use pin code instead
+                  </Text>
+                </Pressable>
+              </View>
             </View>
-          </View>
-
-          <View style={styles.actionButtons}>
-            <Pressable
-              onPress={() => {
-                // TODO: trigger biometric auth
-                router.replace("/(public)/login");
-              }}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                pressed ? styles.buttonPressed : null,
-              ]}
-            >
-              <Ionicons name="finger-print-outline" size={22} color="#ffffff" />
-              <Text style={styles.primaryButtonText}>Use Touch ID</Text>
-            </Pressable>
-
-            <Pressable
-              onPress={() => {
-                router.push("/(public)/login");
-              }}
-              style={({ pressed }) => [
-                styles.secondaryButton,
-                pressed ? styles.buttonPressed : null,
-              ]}
-            >
-              <Text style={styles.secondaryButtonText}>Use pin code instead</Text>
-            </Pressable>
           </View>
         </View>
       </ScrollView>
 
-      <LinearGradient
-        pointerEvents="none"
-        colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.92)"]}
-        style={styles.bottomFade}
-      />
+      {!isDesktop ? (
+        <LinearGradient
+          pointerEvents="none"
+          colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.92)"]}
+          style={styles.bottomFade}
+        />
+      ) : null}
     </View>
   );
 }
@@ -121,10 +191,53 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
+  scrollContentDesktop: {
+    justifyContent: "center",
+    paddingHorizontal: 32,
+    paddingVertical: 48,
+  },
+
+  desktopShell: {
+    width: "100%",
+  },
+
+  desktopShellActive: {
+    maxWidth: 1040,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 42,
+  },
+
+  desktopHero: {
+    position: "relative",
+    zIndex: 2,
+  },
+
+  desktopHeroActive: {
+    flex: 1,
+    maxWidth: 430,
+    alignItems: "center",
+  },
+
+  desktopFormColumn: {
+    width: "100%",
+    flex: 1,
+    maxWidth: 460,
+    position: "relative",
+    zIndex: 1,
+  },
+
   brandArea: {
     alignItems: "center",
     marginTop: 4,
     marginBottom: 72,
+  },
+
+  brandAreaDesktop: {
+    marginTop: 0,
+    marginBottom: 24,
   },
 
   brandRow: {
@@ -158,13 +271,25 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
+  brandNameDesktop: {
+    fontSize: 30,
+  },
+
   avatarWrap: {
-    zIndex: 2,
+    position: "relative",
+    zIndex: 20,
+    elevation: 20,
     alignItems: "center",
     marginBottom: -42,
   },
 
+  avatarWrapDesktop: {
+    marginBottom: 22,
+  },
+
   avatarCircle: {
+    position: "relative",
+    zIndex: 20,
     width: 112,
     height: 112,
     borderRadius: 60,
@@ -180,7 +305,38 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  avatarCircleDesktop: {
+    width: 156,
+    height: 156,
+    borderRadius: 82,
+  },
+
+  desktopCopy: {
+    width: "100%",
+    paddingHorizontal: 8,
+    alignItems: "center",
+  },
+
+  desktopTitle: {
+    color: DARK,
+    fontSize: 34,
+    lineHeight: 40,
+    textAlign: "center",
+    fontFamily: fonts.bold,
+  },
+
+  desktopSubtitle: {
+    color: MUTED,
+    fontSize: 16,
+    lineHeight: 25,
+    textAlign: "center",
+    marginTop: 14,
+    fontFamily: fonts.medium,
+  },
+
   card: {
+    position: "relative",
+    zIndex: 1,
     backgroundColor: CARD,
     borderRadius: 30,
     paddingHorizontal: 20,
@@ -193,12 +349,22 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  cardDesktop: {
+    paddingHorizontal: 34,
+    paddingTop: 38,
+    paddingBottom: 34,
+  },
+
   title: {
     fontSize: 26,
     color: DARK,
     fontFamily: fonts.bold,
     textAlign: "center",
     marginBottom: 10,
+  },
+
+  titleDesktop: {
+    fontSize: 28,
   },
 
   subtitle: {
@@ -212,6 +378,11 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
 
+  subtitleDesktop: {
+    maxWidth: 340,
+    fontFamily: fonts.medium,
+  },
+
   infoCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -222,6 +393,11 @@ const styles = StyleSheet.create({
     marginBottom: 26,
     borderWidth: 1,
     borderColor: "rgba(0, 184, 137, 0.08)",
+  },
+
+  infoCardDesktop: {
+    padding: 18,
+    marginBottom: 30,
   },
 
   infoIcon: {
@@ -256,6 +432,10 @@ const styles = StyleSheet.create({
     gap: 20,
   },
 
+  actionButtonsDesktop: {
+    gap: 14,
+  },
+
   primaryButton: {
     width: "90%",
     height: 54,
@@ -268,8 +448,13 @@ const styles = StyleSheet.create({
     shadowColor: "rgba(0, 184, 137, 0.25)",
     shadowOpacity: 1,
     shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6},
+    shadowOffset: { width: 0, height: 6 },
     elevation: 6,
+  },
+
+  primaryButtonDesktop: {
+    width: "100%",
+    maxWidth: 320,
   },
 
   primaryButtonText: {
@@ -286,6 +471,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 22,
+  },
+
+  secondaryButtonDesktop: {
+    minWidth: 0,
+    width: "100%",
+    maxWidth: 320,
   },
 
   secondaryButtonText: {

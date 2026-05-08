@@ -47,6 +47,15 @@ export const styles = StyleSheet.create({
     elevation: 10,
   },
 
+  modalCardDesktop: {
+    width: "100%",
+    maxWidth: 980,
+    maxHeight: "90%",
+    paddingHorizontal: 28,
+    paddingTop: 26,
+    paddingBottom: 24,
+  },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -76,6 +85,21 @@ export const styles = StyleSheet.create({
 
   content: {
     paddingBottom: 4,
+  },
+
+  contentDesktop: {
+    paddingBottom: 0,
+  },
+
+  desktopColumns: {
+    flexDirection: "row",
+    gap: 28,
+    alignItems: "flex-start",
+  },
+
+  desktopColumn: {
+    flex: 1,
+    minWidth: 0,
   },
 
   sectionLabel: {
@@ -130,6 +154,10 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
+  typeRowDesktop: {
+    marginBottom: 18,
+  },
+
   typeButton: {
     minWidth: 102,
     height: 38,
@@ -163,7 +191,12 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 10,
     marginBottom: 18,
-    justifyContent: "space-around"
+    justifyContent: "space-around",
+  },
+
+  selectorGridDesktop: {
+    justifyContent: "flex-start",
+    marginBottom: 0,
   },
 
   selectorOption: {
@@ -177,6 +210,12 @@ export const styles = StyleSheet.create({
     borderWidth: 0,
     paddingHorizontal: 8,
     overflow: "hidden",
+  },
+
+  selectorOptionDesktop: {
+    flexGrow: 1,
+    flexBasis: 104,
+    maxWidth: 126,
   },
 
   selectorOptionSelected: {
@@ -199,6 +238,10 @@ export const styles = StyleSheet.create({
   optionColumn: {
     gap: 12,
     marginBottom: 18,
+  },
+
+  optionColumnDesktop: {
+    marginBottom: 20,
   },
 
   accountOption: {
@@ -246,6 +289,10 @@ export const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 10,
     marginBottom: 18,
+  },
+
+  chipsRowDesktop: {
+    marginBottom: 20,
   },
 
   chip: {

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, Text, useWindowDimensions, View } from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
 
@@ -20,6 +20,8 @@ export function CalendarFilterModal({
 }: CalendarFilterModalProps) {
   const [currentMonth, setCurrentMonth] = useState(() => new Date());
   const [draftRange, setDraftRange] = useState<DateRange>(selectedRange);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   const { BLACK } = calendarFilterModalColors;
 
@@ -104,10 +106,13 @@ export function CalendarFilterModal({
       animationType="fade"
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.backdrop} onPress={handleClose}>
-        <Pressable style={styles.modalCard}>
+      <Pressable
+        style={[styles.backdrop, isDesktop && styles.backdropDesktop]}
+        onPress={handleClose}
+      >
+        <Pressable style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
           <View style={styles.header}>
-            <Text style={styles.title}>Filter by date</Text>
+            <Text style={[styles.title, isDesktop && styles.titleDesktop]}>Filter by date</Text>
 
             <Pressable onPress={handleClose} style={styles.closeButton}>
               <Icon name="close"  size={15} color={BLACK} />
@@ -122,7 +127,7 @@ export function CalendarFilterModal({
               <Icon name="arrowLeft" size={16} strokeWidth={1.5} color={BLACK} />
             </Pressable>
 
-            <Text style={styles.monthTitle}>{monthTitle}</Text>
+            <Text style={[styles.monthTitle, isDesktop && styles.monthTitleDesktop]}>{monthTitle}</Text>
 
             <Pressable
               onPress={handleNextMonth}
@@ -140,10 +145,10 @@ export function CalendarFilterModal({
             ))}
           </View>
 
-          <View style={styles.daysGrid}>
-            {monthDays.map((day) => {
+          <View style={[styles.daysGrid, isDesktop && styles.daysGridDesktop]}>
+            {monthDays.map((day, index) => {
               if (!day) {
-                return <View key={Math.random()} style={styles.dayCell} />;
+                return <View key={`empty-${index}`} style={[styles.dayCell, isDesktop && styles.dayCellDesktop]} />;
               }
 
               const isStart =
@@ -165,8 +170,10 @@ export function CalendarFilterModal({
                   key={day.toISOString()}
                   style={[
                     styles.dayCell,
+                    isDesktop && styles.dayCellDesktop,
                     isBetween && styles.dayCellBetween,
                     isSelected && styles.dayCellSelected,
+                    isSelected && isDesktop && styles.dayCellSelectedDesktop,
                     isStart && draftRange.endDate && styles.dayCellStart,
                     isEnd && styles.dayCellEnd,
                   ]}
@@ -186,7 +193,7 @@ export function CalendarFilterModal({
             })}
           </View>
 
-          <View style={styles.actions}>
+          <View style={[styles.actions, isDesktop && styles.actionsDesktop]}>
             <Pressable style={styles.clearButton} onPress={handleClear}>
               <Text style={styles.clearButtonText}>Clear</Text>
             </Pressable>
