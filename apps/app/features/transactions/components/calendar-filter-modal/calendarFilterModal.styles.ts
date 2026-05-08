@@ -1,35 +1,72 @@
 import { StyleSheet } from "react-native";
+import { fonts } from "@/theme/fonts";
 
-const WHITE = "#FFFFFF";
-const BLACK = "#052E2B";
-const LIGHT_GREEN = "#EAF8F3";
-const BUTTON_GREEN = "#052E2B";
-const TAB_GREEN = "#14CFA1";
-const LIGTH_GRAY = "#E6E6E6";
+const WHITE = "#ffffff";
+const BLACK = "#052e2b";
+const LIGHT_GREEN = "#eefbf6";
+const CARD_GREEN = "rgba(255, 255, 255, 0.78)";
+const SOFT_GREEN = "#d8f5ea";
+const BUTTON_GREEN = "#93e2c9";
+const DARK_GREEN = "#00a87d";
+const TAB_GREEN = "#12c79b";
+const BORDER_GREEN = "rgba(8, 120, 98, 0.14)";
 
 export const calendarFilterModalColors = {
   WHITE,
   BLACK,
   LIGHT_GREEN,
   BUTTON_GREEN,
+  DARK_GREEN,
   TAB_GREEN,
-  LIGTH_GRAY,
+  LIGTH_GRAY: BORDER_GREEN,
 };
 
 export const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.25)",
+    backgroundColor: "rgba(223, 247, 239, 0.96)",
     justifyContent: "flex-end",
+    alignItems: "center",
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+
+  backdropDesktop: {
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 24,
   },
 
   modalCard: {
-    backgroundColor: LIGHT_GREEN,
-    borderTopLeftRadius: 36,
-    borderTopRightRadius: 36,
+    width: "100%",
+    maxHeight: "94%",
+    backgroundColor: CARD_GREEN,
+    borderTopLeftRadius: 34,
+    borderTopRightRadius: 34,
+    borderWidth: 1,
+    borderColor: BORDER_GREEN,
     paddingHorizontal: 24,
-    paddingTop: 22,
+    paddingTop: 28,
+    paddingBottom: 24,
+    overflow: "hidden",
+    shadowColor: "rgba(29, 100, 89, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: -8 },
+    elevation: 10,
+  },
+
+  modalCardDesktop: {
+    maxWidth: 620,
+    borderRadius: 30,
+    paddingHorizontal: 32,
+    paddingTop: 30,
     paddingBottom: 28,
+    shadowColor: "rgba(29, 100, 89, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 10,
   },
 
   header: {
@@ -41,15 +78,20 @@ export const styles = StyleSheet.create({
 
   title: {
     fontSize: 20,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: BLACK,
+    letterSpacing: 0.2,
+  },
+
+  titleDesktop: {
+    fontSize: 22,
   },
 
   closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: WHITE,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: SOFT_GREEN,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -62,18 +104,22 @@ export const styles = StyleSheet.create({
   },
 
   monthArrowButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: WHITE,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: SOFT_GREEN,
     justifyContent: "center",
     alignItems: "center",
   },
 
   monthTitle: {
     fontSize: 17,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: BLACK,
+  },
+
+  monthTitleDesktop: {
+    fontSize: 18,
   },
 
   weekDaysRow: {
@@ -85,7 +131,7 @@ export const styles = StyleSheet.create({
     width: `${100 / 7}%`,
     textAlign: "center",
     fontSize: 12,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: "rgba(5, 46, 43, 0.55)",
   },
 
@@ -96,6 +142,11 @@ export const styles = StyleSheet.create({
     marginBottom: 24,
   },
 
+  daysGridDesktop: {
+    rowGap: 10,
+    marginBottom: 28,
+  },
+
   dayCell: {
     width: `${100 / 7}%`,
     height: 42,
@@ -103,13 +154,21 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  dayCellDesktop: {
+    height: 48,
+  },
+
   dayCellBetween: {
-    backgroundColor: "rgba(20, 207, 161, 0.18)",
+    backgroundColor: "rgba(18, 199, 155, 0.18)",
   },
 
   dayCellSelected: {
     backgroundColor: TAB_GREEN,
     borderRadius: 21,
+  },
+
+  dayCellSelectedDesktop: {
+    borderRadius: 24,
   },
 
   dayCellStart: {
@@ -124,7 +183,7 @@ export const styles = StyleSheet.create({
 
   dayText: {
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.semibold,
     color: BLACK,
   },
 
@@ -138,36 +197,43 @@ export const styles = StyleSheet.create({
 
   actions: {
     flexDirection: "row",
-    gap: 12,
+    gap: 14,
+    marginTop: 4,
+  },
+
+  actionsDesktop: {
+    maxWidth: 420,
+    width: "100%",
+    alignSelf: "center",
   },
 
   clearButton: {
     flex: 1,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: WHITE,
+    height: 50,
+    borderRadius: 13,
+    backgroundColor: LIGHT_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
 
   clearButtonText: {
     color: BLACK,
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 14,
+    fontFamily: fonts.bold,
   },
 
   applyButton: {
     flex: 1,
-    height: 52,
-    borderRadius: 26,
+    height: 50,
+    borderRadius: 13,
     backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },
 
   applyButtonText: {
-    color: WHITE,
-    fontSize: 15,
-    fontWeight: "700",
+    color: BLACK,
+    fontSize: 14,
+    fontFamily: fonts.bold,
   },
 });
