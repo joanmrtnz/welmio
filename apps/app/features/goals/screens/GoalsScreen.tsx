@@ -30,7 +30,7 @@ import {
 } from "../services/goals.service";
 import { CreateGoalModal } from "../components/create-goal-modal/CreateGoalModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { GoalDetailsModal } from "../components/create-goal-modal/GoalDetailsModal";
+import { GoalDetailsModal } from "../components/goal-details-modal/GoalDetailsModal";
 import { CreateTransactionModal } from "@/features/transactions/components/create-transaction-modal/CreateTransactionModal";
 import { formatGoalTargetDate } from "../utils/formatGoalTargetDate";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
