@@ -13,6 +13,7 @@ import { GoalContributionItem, GoalOverviewItem } from "@repo/shared-types";
 import { useCallback, useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { getGoalContributions } from "../../services/goals.service";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
@@ -36,15 +37,6 @@ type GoalDetailsModalProps = {
     contribution: GoalContributionItem,
   ) => Promise<void>;
 };
-
-function formatCurrency(amount: number | string, currency = "USD") {
-  const numericAmount = typeof amount === "string" ? Number(amount) : amount;
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(Number.isFinite(numericAmount) ? numericAmount : 0);
-}
 
 function formatDate(date?: string | null) {
   if (!date) return "No deadline";
@@ -311,7 +303,7 @@ export function GoalDetailsModal({
               <View style={styles.amountItem}>
                 <Text style={styles.amountLabel}>Saved</Text>
                 <Text style={styles.amountValue}>
-                  {formatCurrency(goal.saved, goal.currency)}
+                  {formatCurrency(goal.saved)}
                 </Text>
               </View>
 
@@ -320,7 +312,7 @@ export function GoalDetailsModal({
               <View style={styles.amountItem}>
                 <Text style={styles.amountLabel}>Target</Text>
                 <Text style={styles.amountValue}>
-                  {formatCurrency(goal.target, goal.currency)}
+                  {formatCurrency(goal.target)}
                 </Text>
               </View>
             </View>
@@ -338,7 +330,7 @@ export function GoalDetailsModal({
 
                 <Text style={styles.statLabel}>Remaining</Text>
                 <Text style={styles.statValue}>
-                  {formatCurrency(remainingAmount, goal.currency)}
+                  {formatCurrency(remainingAmount)}
                 </Text>
               </View>
 
@@ -354,7 +346,7 @@ export function GoalDetailsModal({
 
                 <Text style={styles.statLabel}>Monthly needed</Text>
                 <Text style={styles.statValue}>
-                  {formatCurrency(goal.monthlyNeeded, goal.currency)}
+                  {formatCurrency(goal.monthlyNeeded)}
                 </Text>
               </View>
             </View>
@@ -371,10 +363,10 @@ export function GoalDetailsModal({
               <Text style={styles.sectionTitle}>Progress insight</Text>
 
               <Text style={styles.infoText}>
-                You have saved {formatCurrency(goal.saved, goal.currency)} of{" "}
-                {formatCurrency(goal.target, goal.currency)}. To reach this goal
+                You have saved {formatCurrency(goal.saved)} of{" "}
+                {formatCurrency(goal.target)}. To reach this goal
                 on time, you need around{" "}
-                {formatCurrency(goal.monthlyNeeded, goal.currency)} per month.
+                {formatCurrency(goal.monthlyNeeded)} per month.
               </Text>
             </View>
 
@@ -436,7 +428,6 @@ export function GoalDetailsModal({
                       +
                       {formatCurrency(
                         contribution.amount,
-                        contribution.currency,
                       )}
                     </Text>
 

@@ -17,7 +17,6 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/app/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
-import { formatCurrency } from "../utils/formatters";
 import { TransactionsGroupedList } from "../components/transactions-grouped-list/TransactionsGroupedList";
 import { CategoryFilterModal } from "../components/category-filter-modal/CategoryFilterModal";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -27,6 +26,7 @@ import { CalendarFilterModal } from "../components/calendar-filter-modal/Calenda
 import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -132,7 +132,7 @@ export default function TransactionScreen() {
         <View style={[styles.balanceCard, isDesktop && styles.balanceCardDesktop]}>
           <Text style={styles.balanceCardLabel}>Total Balance</Text>
           <Text style={styles.balanceCardTitle}>
-            {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
+            {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
           </Text>
         </View>
 
@@ -173,7 +173,7 @@ export default function TransactionScreen() {
                 totalsFilter === "income" && styles.totalLabelActive,
               ]}
             >
-              {data ? formatCurrency(data.summary.totalIncome) : "$0.00"}
+              {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
             </Text>
           </Pressable>
 
@@ -215,7 +215,7 @@ export default function TransactionScreen() {
                 totalsFilter === "expense" && styles.totalLabelActive,
               ]}
             >
-              {data ? formatCurrency(data.summary.totalExpense) : "$0.00"}
+              {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
             </Text>
           </Pressable>
         </View>
