@@ -24,6 +24,8 @@ import { useAnalytics } from "@/features/analytics/hooks/useAnalytics";
 import { getGoalsOverview } from "@/features/goals/services/goals.service";
 import { QuickGoalsRow } from "@/features/goals/components/quick-goals-row/QuickGoalsRow";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { getUserProfile } from "@/features/profile/services/profile-service";
+import { getGreetingLabel } from "./utils/getGreetingLabel";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -94,11 +96,22 @@ export default function HomeScreen() {
     useState<TransactionsOverviewResponse | null>(null);
   const [goalsOverview, setGoalsOverview] =
     useState<GoalsOverviewResponse | null>(null);
+  const [fullName, setFullName] = useState("");
   const [goalsErrorMessage, setGoalsErrorMessage] = useState<string | null>(
     null,
   );
 
   const { selected, setSelected, data: analyticsData } = useAnalytics();
+
+  const loadUserProfile = useCallback(async () => {
+    try {
+      const user = await getUserProfile();
+
+      setFullName(user.fullName ?? "");
+    } catch (error) {
+      console.warn("[HomeScreen] load user profile error:", error);
+    }
+  }, []);
 
   const recentTransactions = useMemo(
     () =>
@@ -165,7 +178,8 @@ export default function HomeScreen() {
   useEffect(() => {
     loadTransactionsOverview();
     loadGoalsOverview();
-  }, [loadGoalsOverview, loadTransactionsOverview]);
+    loadUserProfile();
+  }, [loadGoalsOverview, loadTransactionsOverview, loadUserProfile]);
 
   useEffect(() => {
     if (selected !== "weekly") {
@@ -197,8 +211,8 @@ export default function HomeScreen() {
             </Pressable>
 
             <View>
-              <Text style={styles.greeting}>Hi, John! 👋</Text>
-              <Text style={styles.greetingSub}>Good Morning</Text>
+             <Text style={styles.greeting}>Hi, {fullName || "User"}</Text>
+              <Text style={styles.greetingSub}>{getGreetingLabel()}</Text>
             </View>
           </View>
           { !isDesktop ? (
