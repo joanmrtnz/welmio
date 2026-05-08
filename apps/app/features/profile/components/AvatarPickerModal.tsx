@@ -165,13 +165,13 @@ export function AvatarPickerModal({
             </View> */}
 
             <View style={styles.actions}>
-              <AuthButton title="Apply" onPress={handleApply} />
+                <Pressable style={styles.clearButton} onPress={onClose}>
+                  <Text style={styles.clearButtonText}>Cancel</Text>
+                </Pressable>
 
-              <AuthButton
-                title="Cancel"
-                variant="secondary"
-                onPress={onClose}
-              />
+                <Pressable style={styles.applyButton} onPress={handleApply}>
+                  <Text style={styles.applyButtonText}>Apply</Text>
+                </Pressable>
             </View>
           </ScrollView>
         </View>
@@ -189,6 +189,7 @@ const MUTED = "#5f7472";
 const BORDER = "rgba(18, 199, 155, 0.14)";
 const CARD_BORDER = "rgba(5, 46, 43, 0.06)";
 const OVERLAY = "rgba(223, 247, 239, 0.92)";
+const BUTTON_GREEN = "#c9f3df";
 
 const styles = StyleSheet.create({
   overlay: {
@@ -356,7 +357,42 @@ const styles = StyleSheet.create({
   },
 
   actions: {
-    alignItems: "center",
-    gap: 12,
+    flexDirection: "row",
+    gap: 14,
+    marginTop: 8,
   },
+
+    clearButton: {
+      flex: 1,
+      height: 54,
+      borderRadius: 16,
+      backgroundColor: SOFT_GREEN,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  
+    clearButtonText: {
+      fontSize: 15,
+      fontFamily: fonts.semibold,
+      color: BLACK,
+    },
+  
+    applyButton: {
+      flex: 1,
+      height: 54,
+      borderRadius: 16,
+      backgroundColor: BUTTON_GREEN,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  
+    applyButtonDisabled: {
+      opacity: 0.5,
+    },
+  
+    applyButtonText: {
+      fontSize: 15,
+      fontFamily: fonts.bold,
+      color: BLACK,
+    },
 });

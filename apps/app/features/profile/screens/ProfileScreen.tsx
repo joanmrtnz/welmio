@@ -160,6 +160,7 @@ export default function ProfileScreen() {
         confirmLabel="Yes, End Session"
         cancelLabel="Cancel"
         loadingLabel="Ending..."
+        destructive={true}
         isLoading={isLoggingOut}
         onConfirm={handleConfirmLogout}
         onCancel={handleCloseLogoutDialog}
