@@ -22,6 +22,10 @@ export const styles = StyleSheet.create({
     backgroundColor: "rgba(223, 247, 239, 0.68)",
   },
 
+  modalRootDesktop: {
+    paddingHorizontal: 32,
+  },
+
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(7, 58, 54, 0.1)",
@@ -42,6 +46,14 @@ export const styles = StyleSheet.create({
     shadowRadius: 22,
     shadowOffset: { width: 0, height: 12 },
     elevation: 12,
+  },
+
+  modalCardDesktop: {
+    maxWidth: 900,
+    maxHeight: "82%",
+    paddingHorizontal: 26,
+    paddingTop: 24,
+    paddingBottom: 22,
   },
 
   header: {
@@ -93,6 +105,20 @@ export const styles = StyleSheet.create({
     paddingBottom: 10,
   },
 
+  contentDesktop: {
+    paddingBottom: 0,
+  },
+
+  bodyLayout: {
+    width: "100%",
+  },
+
+  bodyLayoutDesktop: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 18,
+  },
+
   heroCard: {
     backgroundColor: WHITE,
     borderRadius: 26,
@@ -107,6 +133,22 @@ export const styles = StyleSheet.create({
     shadowRadius: 15,
     shadowOffset: { width: 0, height: 8 },
     elevation: 4,
+  },
+
+  heroCardDesktop: {
+    flex: 0.9,
+    marginBottom: 0,
+    minHeight: 390,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+
+  detailsColumn: {
+    width: "100%",
+  },
+
+  detailsColumnDesktop: {
+    flex: 1.15,
   },
 
   categoryIcon: {
@@ -173,6 +215,11 @@ export const styles = StyleSheet.create({
     elevation: 3,
   },
 
+  detailsCardDesktop: {
+    paddingHorizontal: 18,
+    marginBottom: 16,
+  },
+
   detailRow: {
     minHeight: 48,
     borderBottomWidth: 1,
@@ -182,8 +229,6 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 14,
   },
-
-
 
   detailRowLast: {
     borderBottomWidth: 0,
@@ -215,6 +260,11 @@ export const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 3,
+  },
+
+  notesCardDesktop: {
+    minHeight: 104,
+    marginBottom: 18,
   },
 
   notesLabel: {

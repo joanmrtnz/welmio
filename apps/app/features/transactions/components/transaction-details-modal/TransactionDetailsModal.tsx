@@ -5,16 +5,11 @@ import {
   ScrollView,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { Icon } from "@/components/icons/Icon";
 import type { TransactionDetailsModalProps } from "../../types/transactionDetails.types";
-import {
-  BLACK,
-  RED,
-  TAB_GREEN,
-  WHITE,
-  styles,
-} from "./transactionDetails.styles";
+import { BLACK, RED, TAB_GREEN, styles } from "./transactionDetails.styles";
 import {
   formatAmount,
   formatDate,
@@ -29,12 +24,15 @@ export function TransactionDetailsModal({
   onEdit,
   onDelete,
 }: TransactionDetailsModalProps) {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  if (!transaction) return null;
-  const isExpense = transaction.type === "expense";
 
+  if (!transaction) return null;
+
+  const isExpense = transaction.type === "expense";
 
   function handleOpenDeleteDialog() {
     setShowDeleteDialog(true);
@@ -56,7 +54,10 @@ export function TransactionDetailsModal({
 
       setShowDeleteDialog(false);
     } catch (error) {
-      console.warn("[TransactionDetailsModal] delete transaction error:", error);
+      console.warn(
+        "[TransactionDetailsModal] delete transaction error:",
+        error,
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -75,10 +76,10 @@ export function TransactionDetailsModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.modalRoot}>
+      <View style={[styles.modalRoot, isDesktop && styles.modalRootDesktop]}>
         <Pressable style={styles.backdrop} onPress={onClose} />
 
-        <View style={styles.modalCard}>
+        <View style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>Transaction details</Text>
@@ -92,12 +93,7 @@ export function TransactionDetailsModal({
                 style={styles.iconButton}
                 onPress={handleEditTransaction}
               >
-                <Icon
-                  name="edit"
-                  size={17}
-                  strokeWidth={1.7}
-                  color={BLACK}
-                />
+                <Icon name="edit" size={17} strokeWidth={1.7} color={BLACK} />
               </Pressable>
 
               <Pressable
@@ -105,12 +101,7 @@ export function TransactionDetailsModal({
                 onPress={handleOpenDeleteDialog}
                 disabled={isDeleting}
               >
-                <Icon
-                  name="bin"
-                  size={22}
-                  strokeWidth={1.7}
-                  color={RED}
-                />
+                <Icon name="bin" size={22} strokeWidth={1.7} color={RED} />
               </Pressable>
 
               <Pressable style={styles.iconButton} onPress={onClose}>
@@ -121,119 +112,140 @@ export function TransactionDetailsModal({
 
           <ScrollView
             style={styles.scrollView}
-            contentContainerStyle={styles.content}
+            contentContainerStyle={[
+              styles.content,
+              isDesktop && styles.contentDesktop,
+            ]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             nestedScrollEnabled
           >
-            <View style={styles.heroCard}>
-              <View style={styles.categoryIcon}>
-                <Icon
-                  name={(transaction.category?.icon ?? "plus") as any}
-                  size={48}
-                  strokeWidth={1}
-                  color={TAB_GREEN}
-                />
+            <View
+              style={[styles.bodyLayout, isDesktop && styles.bodyLayoutDesktop]}
+            >
+              <View
+                style={[styles.heroCard, isDesktop && styles.heroCardDesktop]}
+              >
+                <View style={styles.categoryIcon}>
+                  <Icon
+                    name={(transaction.category?.icon ?? "plus") as any}
+                    size={48}
+                    strokeWidth={1}
+                    color={TAB_GREEN}
+                  />
+                </View>
+
+                <Text style={styles.description}>
+                  {transaction.description}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.amount,
+                    isExpense ? styles.expenseAmount : styles.incomeAmount,
+                  ]}
+                >
+                  {formatAmount(transaction)}
+                </Text>
+
+                <View style={styles.typeBadge}>
+                  <Text style={styles.typeBadgeText}>
+                    {transaction.type.toUpperCase()}
+                  </Text>
+                </View>
               </View>
 
-              <Text style={styles.description}>
-                {transaction.description}
-              </Text>
-
-              <Text
+              <View
                 style={[
-                  styles.amount,
-                  isExpense ? styles.expenseAmount : styles.incomeAmount,
+                  styles.detailsColumn,
+                  isDesktop && styles.detailsColumnDesktop,
                 ]}
               >
-                {formatAmount(transaction)}
-              </Text>
+                <View
+                  style={[
+                    styles.detailsCard,
+                    isDesktop && styles.detailsCardDesktop,
+                  ]}
+                >
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Category</Text>
+                    <Text style={styles.detailValue}>
+                      {transaction.category?.name ?? "Not set"}
+                    </Text>
+                  </View>
 
-              <View style={styles.typeBadge}>
-                <Text style={styles.typeBadgeText}>
-                  {transaction.type.toUpperCase()}
-                </Text>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Account</Text>
+                    <Text style={styles.detailValue}>
+                      {transaction.account?.name ?? "Not set"}
+                    </Text>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Currency</Text>
+                    <Text style={styles.detailValue}>
+                      {transaction.currency}
+                    </Text>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Nature</Text>
+                    <Text style={styles.detailValue}>
+                      {formatValue(transaction.transactionNature)}
+                    </Text>
+                  </View>
+
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Frequency</Text>
+                    <Text style={styles.detailValue}>
+                      {formatValue(transaction.frequencyType)}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.detailRow, styles.detailRowLast]}>
+                    <Text style={styles.detailLabel}>Date</Text>
+                    <Text style={styles.detailValue}>
+                      {formatDate(transaction.date)}
+                    </Text>
+                  </View>
+                </View>
+
+                <View
+                  style={[
+                    styles.notesCard,
+                    isDesktop && styles.notesCardDesktop,
+                  ]}
+                >
+                  <Text style={styles.notesLabel}>Notes</Text>
+                  <Text style={styles.notesText}>
+                    {transaction.notes?.trim() || "No notes added."}
+                  </Text>
+                </View>
+
+                <View style={styles.actions}>
+                  <Pressable
+                    style={styles.editButton}
+                    onPress={handleEditTransaction}
+                  >
+                    <Icon
+                      name="edit"
+                      size={16}
+                      strokeWidth={1.8}
+                      color={BLACK}
+                    />
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={styles.deleteButton}
+                    onPress={handleOpenDeleteDialog}
+                    disabled={isDeleting}
+                  >
+                    <Icon name="bin" size={23} strokeWidth={2} color={RED} />
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </Pressable>
+                </View>
               </View>
-            </View>
-
-            <View style={styles.detailsCard}>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Category</Text>
-                <Text style={styles.detailValue}>
-                  {transaction.category?.name ?? "Not set"}
-                </Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Account</Text>
-                <Text style={styles.detailValue}>
-                  {transaction.account?.name ?? "Not set"}
-                </Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Currency</Text>
-                <Text style={styles.detailValue}>
-                  {transaction.currency}
-                </Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Nature</Text>
-                <Text style={styles.detailValue}>
-                  {formatValue(transaction.transactionNature)}
-                </Text>
-              </View>
-
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Frequency</Text>
-                <Text style={styles.detailValue}>
-                  {formatValue(transaction.frequencyType)}
-                </Text>
-              </View>
-
-              <View style={[styles.detailRow, styles.detailRowLast]}>
-                <Text style={styles.detailLabel}>Date</Text>
-                <Text style={styles.detailValue}>
-                  {formatDate(transaction.date)}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.notesCard}>
-              <Text style={styles.notesLabel}>Notes</Text>
-              <Text style={styles.notesText}>
-                {transaction.notes?.trim() || "No notes added."}
-              </Text>
-            </View>
-
-            <View style={styles.actions}>
-              <Pressable
-                style={styles.editButton}
-                onPress={handleEditTransaction}
-              >
-                <Icon
-                  name="edit"
-                  size={16}
-                  strokeWidth={1.8}
-                  color={BLACK}
-                />
-                <Text style={styles.editButtonText}>Edit</Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.deleteButton}
-                onPress={handleOpenDeleteDialog}
-                disabled={isDeleting}
-              >
-                <Icon
-                  name="bin"
-                  size={23}
-                  strokeWidth={2}
-                  color={RED}
-                />
-                <Text style={styles.deleteButtonText}>Delete</Text>
-              </Pressable>
             </View>
           </ScrollView>
 
