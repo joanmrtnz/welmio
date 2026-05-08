@@ -149,7 +149,7 @@ export default function EditProfileScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={[styles.desktopLayout, !isDesktop && styles.desktopLayoutMobile]}>
+        <View style={[styles.desktopLayoutMobile, isDesktop && styles.desktopLayout]}>
           <View style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
             <View style={styles.avatarOuterRing}>
               <View
