@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   TextInput,
   View,
 } from "react-native";
@@ -25,8 +26,13 @@ const DARK = "#052e2b";
 const MUTED = "#6f8586";
 const CARD = "#ffffff";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 export default function NewPasswordScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -72,36 +78,58 @@ export default function NewPasswordScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isDesktop && styles.scrollContentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.brandArea}>
-          <View style={styles.brandRow}>
-            <View style={styles.logoBadge}>
-              <Image
-                source={WELMIO_LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
+        <View style={[styles.authLayout, isDesktop && styles.authLayoutDesktop]}>
+          <View style={[styles.brandColumn, isDesktop && styles.brandColumnDesktop]}>
+            <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
+              <View style={styles.brandRow}>
+                <View style={styles.logoBadge}>
+                  <Image
+                    source={WELMIO_LOGO}
+                    style={styles.logoImage}
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text style={styles.brandName}>Welmio</Text>
+              </View>
             </View>
-            <Text style={styles.brandName}>Welmio</Text>
+
+            {isDesktop ? (
+              <View style={styles.desktopIntroCard}>
+                <View style={styles.desktopIntroIcon}>
+                  <FontAwesome name="shield" size={30} color={PRIMARY} />
+                </View>
+                <Text style={styles.desktopIntroTitle}>Set a new password</Text>
+                <Text style={styles.desktopIntroText}>
+                  Choose a strong password to protect your account and keep your
+                  financial workspace secure.
+                </Text>
+              </View>
+            ) : null}
           </View>
-        </View>
 
-        <View style={styles.avatarWrap}>
-          <View style={styles.avatarCircle}>
-            <FontAwesome name="shield" size={43} color={PRIMARY} />
-          </View>
-        </View>
+          <View style={[styles.formColumn, isDesktop && styles.formColumnDesktop]}>
+            <View style={[styles.avatarWrap, isDesktop && styles.avatarWrapDesktop]}>
+              <View style={styles.avatarCircle}>
+                <FontAwesome name="shield" size={43} color={PRIMARY} />
+              </View>
+            </View>
 
-        <View style={styles.card}>
-          <Text style={styles.title}>New password</Text>
-          <Text style={styles.subtitle}>
-            Create a secure new password to recover access to your account.
-          </Text>
+            <View style={[styles.card, isDesktop && styles.cardDesktop]}>
+              <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
+                New password
+              </Text>
+              <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
+                Create a secure new password to recover access to your account.
+              </Text>
 
-          <View style={styles.form}>
+              <View style={styles.form}>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>New password</Text>
               <View style={styles.inputShell}>
@@ -194,20 +222,24 @@ export default function NewPasswordScreen() {
               <Text style={styles.ghostButtonText}>Back to Log In</Text>
             </Pressable>
 
-            <Link href="/(public)/signup" style={styles.footer}>
-              <Text>
-                Don’t have an account? <Text style={styles.link}>Sign Up</Text>
-              </Text>
-            </Link>
+              <Link href="/(public)/signup" style={styles.footer}>
+                <Text>
+                  Don’t have an account? <Text style={styles.link}>Sign Up</Text>
+                </Text>
+              </Link>
+            </View>
           </View>
         </View>
+      </View>
       </ScrollView>
 
-      <LinearGradient
-        pointerEvents="none"
-        colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.92)"]}
-        style={styles.bottomFade}
-      />
+      {!isDesktop ? (
+        <LinearGradient
+          pointerEvents="none"
+          colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.92)"]}
+          style={styles.bottomFade}
+        />
+      ) : null}
     </KeyboardAvoidingView>
   );
 }
@@ -225,10 +257,46 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
+  scrollContentDesktop: {
+    justifyContent: "center",
+    paddingHorizontal: 32,
+    paddingVertical: 48,
+  },
+
+  authLayout: {
+    width: "100%",
+  },
+
+  authLayoutDesktop: {
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 56,
+  },
+
+  brandColumn: {},
+
+  brandColumnDesktop: {
+    flex: 1,
+  },
+
+  formColumn: {},
+
+  formColumnDesktop: {
+    width: 460,
+  },
+
   brandArea: {
     alignItems: "center",
     marginTop: 4,
     marginBottom: 42,
+  },
+
+  brandAreaDesktop: {
+    alignItems: "flex-start",
+    marginTop: 0,
+    marginBottom: 28,
   },
 
   brandRow: {
@@ -265,9 +333,15 @@ const styles = StyleSheet.create({
   },
 
   avatarWrap: {
-    zIndex: 2,
+    position: "relative",
+    zIndex: 20,
+    elevation: 20,
     alignItems: "center",
     marginBottom: -42,
+  },
+
+  avatarWrapDesktop: {
+    marginBottom: -40,
   },
 
   avatarCircle: {
@@ -285,6 +359,8 @@ const styles = StyleSheet.create({
   },
 
   card: {
+    position: "relative",
+    zIndex: 1,
     backgroundColor: CARD,
     borderRadius: 30,
     paddingHorizontal: 20,
@@ -297,11 +373,21 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  cardDesktop: {
+    width: "100%",
+    paddingHorizontal: 34,
+    paddingBottom: 34,
+  },
+
   title: {
     color: DARK,
     fontSize: 25,
     textAlign: "center",
     fontFamily: fonts.bold,
+  },
+
+  titleDesktop: {
+    fontSize: 28,
   },
 
   subtitle: {
@@ -313,6 +399,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 28,
     paddingHorizontal: 18,
+  },
+
+  subtitleDesktop: {
+    paddingHorizontal: 8,
   },
 
   form: {
@@ -427,6 +517,45 @@ const styles = StyleSheet.create({
   link: {
     color: PRIMARY_DARK,
     fontFamily: fonts.bold,
+  },
+
+  desktopIntroCard: {
+    maxWidth: 470,
+    borderRadius: 34,
+    backgroundColor: "rgba(255, 255, 255, 0.58)",
+    borderWidth: 1,
+    borderColor: "rgba(5, 46, 43, 0.08)",
+    padding: 32,
+    shadowColor: "rgba(29, 100, 89, 0.1)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 5,
+  },
+
+  desktopIntroIcon: {
+    width: 68,
+    height: 68,
+    borderRadius: 24,
+    backgroundColor: CARD,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 22,
+  },
+
+  desktopIntroTitle: {
+    color: DARK,
+    fontSize: 34,
+    lineHeight: 40,
+    fontFamily: fonts.bold,
+    marginBottom: 12,
+  },
+
+  desktopIntroText: {
+    color: MUTED,
+    fontSize: 16,
+    lineHeight: 26,
+    fontFamily: fonts.medium,
   },
 
   bottomFade: {
