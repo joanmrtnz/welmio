@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   TextInput,
   View,
 } from "react-native";
@@ -28,6 +29,8 @@ const SOFT_GREEN = "#e3f8f1";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 export default function ForgotPasswordScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const [email, setEmail] = useState("");
   const { execute, loading } = useSendResetPasswordCode();
 
@@ -57,37 +60,55 @@ export default function ForgotPasswordScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isDesktop && styles.scrollContentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.brandArea}>
-          <View style={styles.brandRow}>
-            <View style={styles.logoBadge}>
-              <Image
-                source={WELMIO_LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
+        <View style={[styles.desktopShell, isDesktop && styles.desktopShellWide]}>
+          <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
+            <View style={styles.brandRow}>
+              <View style={styles.logoBadge}>
+                <Image
+                  source={WELMIO_LOGO}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={styles.brandName}>Welmio</Text>
             </View>
-            <Text style={styles.brandName}>Welmio</Text>
+
+            {isDesktop ? (
+              <View style={styles.desktopIntroCard}>
+                <View style={styles.desktopIntroIcon}>
+                  <FontAwesome name="key" size={30} color={PRIMARY} />
+                </View>
+                <Text style={styles.desktopIntroTitle}>Reset your password safely</Text>
+                <Text style={styles.desktopIntroText}>
+                  We’ll send a secure verification code to your email so you can create a new password.
+                </Text>
+              </View>
+            ) : null}
           </View>
-        </View>
 
+          <View style={[styles.formColumn, isDesktop && styles.formColumnDesktop]}>
+            {!isDesktop ? (
+              <View style={styles.avatarWrap}>
+                <View style={styles.avatarCircle}>
+                  <FontAwesome name="key" size={44} color={PRIMARY} />
+                </View>
+              </View>
+            ) : null}
 
-        <View style={styles.avatarWrap}>
-          <View style={styles.avatarCircle}>
-            <FontAwesome name="key" size={44} color={PRIMARY} />
-          </View>
-        </View>
+            <View style={[styles.card, isDesktop && styles.cardDesktop]}>
+              <Text style={[styles.title, isDesktop && styles.titleDesktop]}>Forgot password?</Text>
+              <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
+                Enter your email and we’ll send you a code to reset your password.
+              </Text>
 
-        <View style={styles.card}>
-          <Text style={styles.title}>Forgot password?</Text>
-          <Text style={styles.subtitle}>
-            Enter your email and we’ll send you a code to reset your password.
-          </Text>
-
-          <View style={styles.form}>
+              <View style={styles.form}>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Email</Text>
               <View style={styles.inputShell}>
@@ -111,44 +132,50 @@ export default function ForgotPasswordScreen() {
               </View>
             </View>
 
-            <Pressable
-              onPress={handleNextStep}
-              disabled={loading}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                pressed && !loading ? styles.buttonPressed : null,
-                loading ? styles.buttonDisabled : null,
-              ]}
-            >
-              <Text style={styles.primaryButtonText}>
-                {loading ? "Sending code..." : "Next step"}
-              </Text>
-            </Pressable>
+            <View style={styles.actionButtons}>
+              <Pressable
+                onPress={handleNextStep}
+                disabled={loading}
+                style={({ pressed }) => [
+                  styles.primaryButton,
+                  pressed && !loading ? styles.buttonPressed : null,
+                  loading ? styles.buttonDisabled : null,
+                ]}
+              >
+                <Text style={styles.primaryButtonText}>
+                  {loading ? "Sending code..." : "Next step"}
+                </Text>
+              </Pressable>
 
-            <Pressable
-              onPress={() => router.push("/(public)/login")}
-              style={({ pressed }) => [
-                styles.secondaryButton,
-                pressed ? styles.buttonPressed : null,
-              ]}
-            >
-              <Text style={styles.secondaryButtonText}>Back to Log In</Text>
-            </Pressable>
+              <Pressable
+                onPress={() => router.push("/(public)/login")}
+                style={({ pressed }) => [
+                  styles.secondaryButton,
+                  pressed ? styles.buttonPressed : null,
+                ]}
+              >
+                <Text style={styles.secondaryButtonText}>Back to Log In</Text>
+              </Pressable>
+            </View>
 
             <Link href="/(public)/signup" style={styles.footer}>
               <Text>
                 Don’t have an account? <Text style={styles.link}>Sign Up</Text>
               </Text>
             </Link>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
 
-      <LinearGradient
-        pointerEvents="none"
-        colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.92)"]}
-        style={styles.bottomFade}
-      />
+      {!isDesktop ? (
+        <LinearGradient
+          pointerEvents="none"
+          colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.92)"]}
+          style={styles.bottomFade}
+        />
+      ) : null}
     </KeyboardAvoidingView>
   );
 }
@@ -166,10 +193,36 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
 
+  scrollContentDesktop: {
+    paddingHorizontal: 32,
+    paddingTop: 56,
+    paddingBottom: 56,
+    justifyContent: "center",
+  },
+
+  desktopShell: {
+    width: "100%",
+  },
+
+  desktopShellWide: {
+    maxWidth: 1040,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 52,
+  },
+
   brandArea: {
     alignItems: "center",
     marginTop: 4,
     marginBottom: 42,
+  },
+
+  brandAreaDesktop: {
+    flex: 1,
+    alignItems: "flex-start",
+    marginTop: 0,
+    marginBottom: 0,
   },
 
   brandRow: {
@@ -206,7 +259,9 @@ const styles = StyleSheet.create({
   },
 
   avatarWrap: {
-    zIndex: 2,
+    position: "relative",
+    zIndex: 20,
+    elevation: 20,
     alignItems: "center",
     marginBottom: -42,
   },
@@ -226,6 +281,8 @@ const styles = StyleSheet.create({
   },
 
   card: {
+    position: "relative",
+    zIndex: 1,
     backgroundColor: CARD,
     borderRadius: 30,
     paddingHorizontal: 20,
@@ -238,11 +295,73 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
 
+  cardDesktop: {
+    width: "100%",
+    maxWidth: 460,
+    paddingHorizontal: 28,
+    paddingTop: 34,
+    paddingBottom: 34,
+    borderRadius: 34,
+  },
+
+  formColumn: {
+    width: "100%",
+  },
+
+  formColumnDesktop: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  desktopIntroCard: {
+    marginTop: 42,
+    maxWidth: 420,
+    backgroundColor: "rgba(255, 255, 255, 0.68)",
+    borderWidth: 1,
+    borderColor: "rgba(5, 46, 43, 0.08)",
+    borderRadius: 32,
+    padding: 28,
+    shadowColor: "rgba(29, 100, 89, 0.10)",
+    shadowOpacity: 1,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 5,
+  },
+
+  desktopIntroIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
+    backgroundColor: CARD,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 22,
+  },
+
+  desktopIntroTitle: {
+    color: DARK,
+    fontSize: 32,
+    lineHeight: 38,
+    fontFamily: fonts.bold,
+    marginBottom: 12,
+  },
+
+  desktopIntroText: {
+    color: MUTED,
+    fontSize: 16,
+    lineHeight: 25,
+    fontFamily: fonts.medium,
+  },
+
   title: {
     color: DARK,
     fontSize: 25,
     textAlign: "center",
     fontFamily: fonts.bold,
+  },
+
+  titleDesktop: {
+    fontSize: 28,
   },
 
   subtitle: {
@@ -254,6 +373,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 28,
     paddingHorizontal: 22,
+  },
+
+  subtitleDesktop: {
+    paddingHorizontal: 18,
+    marginBottom: 30,
   },
 
   form: {
@@ -302,8 +426,13 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
 
+  actionButtons: {
+    alignItems: "center",
+    gap: 15,
+  },
+
   primaryButton: {
-    width: "100%",
+    width: "80%",
     height: 52,
     borderRadius: 26,
     backgroundColor: PRIMARY,
@@ -313,7 +442,7 @@ const styles = StyleSheet.create({
     shadowColor: "rgba(0, 184, 137, 0.26)",
     shadowOpacity: 1,
     shadowRadius: 15,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 4 },
     elevation: 6,
   },
 
@@ -324,7 +453,7 @@ const styles = StyleSheet.create({
   },
 
   secondaryButton: {
-    width: "100%",
+    width: "80%",
     height: 52,
     borderRadius: 26,
     backgroundColor: SOFT_GREEN,
