@@ -41,7 +41,7 @@ export default function ProfileScreen() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
-  const [avatarColor, setAvatarColor] = useState("#00c896");
+  const [avatarColor, setAvatarColor] = useState(WHITE);
   const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
 
   useEffect(() => {
