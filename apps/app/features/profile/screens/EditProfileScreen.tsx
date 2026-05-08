@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
@@ -22,6 +23,8 @@ import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHead
 
 
 export default function EditProfileScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
   const [usernameLabel, setUsernameLabel] = useState("");
   const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
@@ -142,117 +145,121 @@ export default function EditProfileScreen() {
       <AppScreenHeader title="Edit My Profile" />
   
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.profileCard}>
-          <View style={styles.avatarOuterRing}>
-            <View
-              style={[
-                styles.avatar,
-                { borderColor: avatarColor || TEAL, backgroundColor: avatarColor || SOFT_TEAL },
-              ]}
-            >
-              <Image
-                source={WELMIO_LOGO}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
+        <View style={[styles.desktopLayout, !isDesktop && styles.desktopLayoutMobile]}>
+          <View style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
+            <View style={styles.avatarOuterRing}>
+              <View
+                style={[
+                  styles.avatar,
+                  { borderColor: avatarColor || TEAL, backgroundColor: avatarColor || SOFT_TEAL },
+                ]}
+              >
+                <Image
+                  source={WELMIO_LOGO}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
+              </View>
+
+              <Pressable
+                style={styles.editAvatarButton}
+                onPress={() => setShowAvatarModal(true)}
+              >
+                <Icon name="edit" size={17} strokeWidth={1.9} color={DARK_TEAL} />
+              </Pressable>
+            </View>
+
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{usernameLabel || "User"}</Text>
+              <Text style={styles.userId}>{email ? email : "-"}</Text>
+            </View>
+          </View>
+
+          <View style={[styles.settingsColumn, isDesktop && styles.settingsColumnDesktop]}>
+            <View style={[styles.settingsCard, isDesktop && styles.settingsCardDesktop]}>
+              <View style={styles.form}>
+                {renderField({
+                  label: "Username",
+                  icon: "user",
+                  placeholder: "John Smith",
+                  autoCapitalize: "words",
+                  textContentType: "name",
+                  value: username,
+                  onChangeText: setUsername,
+                })}
+
+                {renderField({
+                  label: "Phone",
+                  icon: "phone",
+                  placeholder: "+44 555 5555",
+                  keyboardType: "phone-pad",
+                  textContentType: "telephoneNumber",
+                  value: phone,
+                  onChangeText: setPhone,
+                })}
+
+                {renderField({
+                  label: "Email Address",
+                  icon: "mail",
+                  placeholder: "example@example.com",
+                  autoCapitalize: "none",
+                  keyboardType: "email-address",
+                  textContentType: "emailAddress",
+                  autoCorrect: false,
+                  value: email,
+                  onChangeText: setEmail,
+                  editable: false,
+                })}
+
+                <View style={styles.divider} />
+
+                <View style={styles.settingRow}>
+                  <Text style={styles.settingLabel}>Push Notifications</Text>
+
+                  <Switch
+                    value={pushNotifications}
+                    onValueChange={setPushNotifications}
+                    trackColor={{ false: SWITCH_OFF, true: TEAL }}
+                    thumbColor={WHITE}
+                  />
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.settingRow}>
+                  <Text style={styles.settingLabel}>Turn Dark Theme</Text>
+
+                  <Switch
+                    value={darkTheme}
+                    onValueChange={setDarkTheme}
+                    trackColor={{ false: SWITCH_OFF, true: TEAL }}
+                    thumbColor={WHITE}
+                  />
+                </View>
+              </View>
             </View>
 
             <Pressable
-              style={styles.editAvatarButton}
-              onPress={() => setShowAvatarModal(true)}
+              style={({ pressed }) => [
+                styles.updateButton,
+                isDesktop && styles.updateButtonDesktop,
+                pressed && styles.updateButtonPressed,
+                isLoading && styles.updateButtonDisabled,
+              ]}
+              onPress={handleUpdateProfile}
+              disabled={isLoading}
             >
-              <Icon name="edit" size={17} strokeWidth={1.9} color={DARK_TEAL} />
+              <Text style={styles.updateButtonText}>
+                {isLoading ? "Updating..." : "Update Profile"}
+              </Text>
             </Pressable>
           </View>
-
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>{usernameLabel || "User"}</Text>
-            <Text style={styles.userId}>{email ? email : "-"}</Text>
-          </View>
         </View>
-
-        <View style={styles.settingsCard}>
-          <View style={styles.form}>
-            {renderField({
-              label: "Username",
-              icon: "user",
-              placeholder: "John Smith",
-              autoCapitalize: "words",
-              textContentType: "name",
-              value: username,
-              onChangeText: setUsername,
-            })}
-
-            {renderField({
-              label: "Phone",
-              icon: "phone",
-              placeholder: "+44 555 5555",
-              keyboardType: "phone-pad",
-              textContentType: "telephoneNumber",
-              value: phone,
-              onChangeText: setPhone,
-            })}
-
-            {renderField({
-              label: "Email Address",
-              icon: "mail",
-              placeholder: "example@example.com",
-              autoCapitalize: "none",
-              keyboardType: "email-address",
-              textContentType: "emailAddress",
-              autoCorrect: false,
-              value: email,
-              onChangeText: setEmail,
-              editable: false,
-            })}
-
-            <View style={styles.divider} />
-
-            <View style={styles.settingRow}>
-              <Text style={styles.settingLabel}>Push Notifications</Text>
-
-              <Switch
-                value={pushNotifications}
-                onValueChange={setPushNotifications}
-                trackColor={{ false: SWITCH_OFF, true: TEAL }}
-                thumbColor={WHITE}
-              />
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.settingRow}>
-              <Text style={styles.settingLabel}>Turn Dark Theme</Text>
-
-              <Switch
-                value={darkTheme}
-                onValueChange={setDarkTheme}
-                trackColor={{ false: SWITCH_OFF, true: TEAL }}
-                thumbColor={WHITE}
-              />
-            </View>
-          </View>
-        </View>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.updateButton,
-            pressed && styles.updateButtonPressed,
-            isLoading && styles.updateButtonDisabled,
-          ]}
-          onPress={handleUpdateProfile}
-          disabled={isLoading}
-        >
-          <Text style={styles.updateButtonText}>
-            {isLoading ? "Updating..." : "Update Profile"}
-          </Text>
-        </Pressable>
       </ScrollView>
-
       <AvatarPickerModal
         visible={showAvatarModal}
         onClose={() => setShowAvatarModal(false)}
@@ -276,6 +283,8 @@ const INPUT_BG = "#eef8f2";
 const GRID = "rgba(6, 59, 58, 0.09)";
 const SWITCH_OFF = "#d4e2df";
 const GREEN = "#dff7ef";
+const DESKTOP_BREAKPOINT = 768;
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 const styles = StyleSheet.create({
   screen: {
@@ -286,6 +295,26 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 20,
     paddingBottom: 118,
+  },
+
+  contentDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    paddingBottom: 80,
+  },
+
+  desktopLayout: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 24,
+  },
+
+  desktopLayoutMobile: {
+    flexDirection: "column",
+    gap: 0,
   },
 
   profileCard: {
@@ -301,6 +330,15 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  profileCardDesktop: {
+    width: 320,
+    minHeight: 378,
+    marginBottom: 0,
+    paddingTop: 34,
+    paddingBottom: 34,
+    justifyContent: "center",
   },
 
   avatarOuterRing: {
@@ -377,6 +415,14 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
 
+  settingsColumn: {
+    width: "100%",
+  },
+
+  settingsColumnDesktop: {
+    flex: 1,
+  },
+
   settingsCard: {
     backgroundColor: CARD,
     borderRadius: 18,
@@ -388,6 +434,13 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  settingsCardDesktop: {
+    flex: 1,
+    marginBottom: 0,
+    paddingVertical: 24,
+    paddingHorizontal: 24,
   },
 
   form: {
@@ -471,6 +524,12 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     elevation: 2,
+  },
+
+  updateButtonDesktop: {
+    alignSelf: "center",
+    width: 220,
+    marginTop: 25,
   },
 
   updateButtonPressed: {
