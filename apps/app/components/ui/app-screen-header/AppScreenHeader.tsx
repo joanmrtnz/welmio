@@ -30,9 +30,11 @@ export function AppScreenHeader({ title }: AppScreenHeaderProps) {
         {title}
       </Text>
 
+    { !isDesktop ? (
       <View style={styles.notifications}>
         <Icon name="bell" size={24} strokeWidth={1.8} color={BLACK} />
       </View>
+      ):  <View></View>}
     </View>
   );
 }

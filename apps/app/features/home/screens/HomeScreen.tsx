@@ -201,9 +201,11 @@ export default function HomeScreen() {
               <Text style={styles.greetingSub}>Good Morning</Text>
             </View>
           </View>
+          { !isDesktop ? (
           <Pressable style={styles.notifications}>
             <Icon name="bell" size={24} strokeWidth={1.8} color={TEXT} />
           </Pressable>
+          ):  <View></View>}
         </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
