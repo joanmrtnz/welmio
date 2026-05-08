@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { router } from "expo-router";
 import { fonts } from "@/theme/fonts";
@@ -18,6 +19,9 @@ import { changePassword } from "../services/profile-service";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 export default function ChangePasswordScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -97,77 +101,94 @@ export default function ChangePasswordScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          isDesktop && styles.contentDesktop,
+        ]}
       >
-        <View style={styles.securityCard}>
-          <View style={styles.heroIconWrap}>
-            <View style={styles.heroIcon}>
-              <FontAwesome name="key" size={36} color={TEAL} />
+        <View style={[styles.mobileStack, isDesktop && styles.desktopGrid]}>
+          <View
+            style={[styles.mobileStack, isDesktop && styles.desktopLeftColumn]}
+          >
+            <View
+              style={[
+                styles.securityCard,
+                isDesktop && styles.securityCardDesktop,
+              ]}
+            >
+              <View style={styles.heroIconWrap}>
+                <View style={styles.heroIcon}>
+                  <FontAwesome name="key" size={36} color={TEAL} />
+                </View>
+              </View>
+
+              <View style={styles.headingBlock}>
+                <Text style={styles.sectionTitle}>Password Settings</Text>
+                <Text style={styles.description}>
+                  Update your password regularly to keep your Welmio account
+                  protected.
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={[styles.noticeCard, isDesktop && styles.noticeCardDesktop]}
+            >
+              <View style={styles.noticeIcon}>
+                <Icon name="shield" size={22} strokeWidth={1.7} color={TEAL} />
+              </View>
+              <View style={styles.noticeTextWrap}>
+                <Text style={styles.noticeTitle}>Use a strong password</Text>
+                <Text style={styles.noticeText}>
+                  Mix letters, numbers and symbols for better security.
+                </Text>
+              </View>
             </View>
           </View>
 
-          <View style={styles.headingBlock}>
-            <Text style={styles.sectionTitle}>Password Settings</Text>
-            <Text style={styles.description}>
-              Update your password regularly to keep your Welmio account
-              protected.
-            </Text>
-          </View>
-        </View>
+          <View style={[styles.formCard, isDesktop && styles.formCardDesktop]}>
+            <Text style={styles.formTitle}>Update password</Text>
 
-        <View style={styles.noticeCard}>
-          <View style={styles.noticeIcon}>
-            <Icon name="shield" size={22} strokeWidth={1.7} color={TEAL} />
-          </View>
-          <View style={styles.noticeTextWrap}>
-            <Text style={styles.noticeTitle}>Use a strong password</Text>
-            <Text style={styles.noticeText}>
-              Mix letters, numbers and symbols for better security.
-            </Text>
-          </View>
-        </View>
+            <View style={styles.form}>
+              {renderPasswordField({
+                label: "Current Password",
+                placeholder: "Enter current password",
+                value: currentPassword,
+                onChangeText: setCurrentPassword,
+                textContentType: "password",
+              })}
 
-        <View style={styles.formCard}>
-          <Text style={styles.formTitle}>Update password</Text>
+              {renderPasswordField({
+                label: "New Password",
+                placeholder: "Enter new password",
+                value: newPassword,
+                onChangeText: setNewPassword,
+                textContentType: "newPassword",
+              })}
 
-          <View style={styles.form}>
-            {renderPasswordField({
-              label: "Current Password",
-              placeholder: "Enter current password",
-              value: currentPassword,
-              onChangeText: setCurrentPassword,
-              textContentType: "password",
-            })}
+              {renderPasswordField({
+                label: "Confirm Password",
+                placeholder: "Repeat new password",
+                value: repeatPassword,
+                onChangeText: setRepeatPassword,
+                textContentType: "newPassword",
+              })}
 
-            {renderPasswordField({
-              label: "New Password",
-              placeholder: "Enter new password",
-              value: newPassword,
-              onChangeText: setNewPassword,
-              textContentType: "newPassword",
-            })}
-
-            {renderPasswordField({
-              label: "Confirm Password",
-              placeholder: "Repeat new password",
-              value: repeatPassword,
-              onChangeText: setRepeatPassword,
-              textContentType: "newPassword",
-            })}
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.updateButton,
-                pressed && styles.updateButtonPressed,
-                isLoading && styles.updateButtonDisabled,
-              ]}
-              onPress={handleChangePassword}
-              disabled={isLoading}
-            >
-              <Text style={styles.updateButtonText}>
-                {isLoading ? "Updating..." : "Update Password"}
-              </Text>
-            </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.updateButton,
+                  isDesktop && styles.updateButtonDesktop,
+                  pressed && styles.updateButtonPressed,
+                  isLoading && styles.updateButtonDisabled,
+                ]}
+                onPress={handleChangePassword}
+                disabled={isLoading}
+              >
+                <Text style={styles.updateButtonText}>
+                  {isLoading ? "Updating..." : "Update Password"}
+                </Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -184,6 +205,7 @@ const WHITE = "#ffffff";
 const MUTED = "#5e7b78";
 const INPUT_BG = "#eef8f2";
 const GRID = "rgba(6, 59, 58, 0.09)";
+const DESKTOP_CONTENT_WIDTH = 1040;
 
 const styles = StyleSheet.create({
   screen: {
@@ -194,6 +216,30 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 20,
     paddingBottom: 118,
+  },
+
+  contentDesktop: {
+    width: "100%",
+    maxWidth: DESKTOP_CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingHorizontal: 32,
+    paddingBottom: 150,
+  },
+
+  mobileStack: {
+    width: "100%",
+  },
+
+  desktopGrid: {
+    width: "100%",
+    flexDirection: "row",
+    gap: 24,
+    alignItems: "flex-start",
+  },
+
+  desktopLeftColumn: {
+    flex: 0.9,
+    gap: 18,
   },
 
   securityCard: {
@@ -209,6 +255,14 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  securityCardDesktop: {
+    minHeight: 252,
+    justifyContent: "center",
+    marginBottom: 0,
+    paddingHorizontal: 28,
+    paddingVertical: 30,
   },
 
   heroIconWrap: {
@@ -268,6 +322,12 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
 
+  noticeCardDesktop: {
+    marginBottom: 0,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+  },
+
   noticeIcon: {
     width: 46,
     height: 46,
@@ -306,6 +366,13 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
     elevation: 1,
+  },
+
+  formCardDesktop: {
+    flex: 1.15,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 24,
   },
 
   formTitle: {
@@ -381,6 +448,12 @@ const styles = StyleSheet.create({
 
   updateButtonDisabled: {
     opacity: 0.7,
+  },
+
+  updateButtonDesktop: {
+    alignSelf: "center",
+    width: 220,
+    marginTop: 16,
   },
 
   updateButtonText: {
