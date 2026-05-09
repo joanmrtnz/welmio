@@ -203,7 +203,7 @@ export default function LoginScreen() {
                         size={30}
                         strokeWidth={8}
                         color={PRIMARY}
-                      />{" "}
+                      />
                       <Text style={styles.fingerprintText}>
                         Continue with <Text style={styles.bold}>Touch ID</Text>
                       </Text>
