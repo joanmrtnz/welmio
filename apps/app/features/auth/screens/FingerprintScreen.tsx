@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     width: 31,
     height: 31,
     borderRadius: 18,
-    backgroundColor: CARD,
+    backgroundColor: GREEN,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "rgba(29, 100, 89, 0.18)",
