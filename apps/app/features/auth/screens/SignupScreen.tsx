@@ -16,6 +16,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
 import { useSignup } from "@/features/auth/hooks/useSignup";
 import { toIsoDate } from "@/app/lib/date";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
 
 const BACKGROUND = "#dff7ef";
@@ -127,35 +128,35 @@ export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  async function handleSignup() {
-    try {
-      if (password !== confirmPassword) {
-        console.warn("Las contraseñas no coinciden");
-        return;
-      }
-
-      const formattedDateOfBirth = toIsoDate(dateOfBirth);
-
-      if (!formattedDateOfBirth) {
-        console.warn("Invalid date format");
-        return;
-      }
-
-      const res = await execute({
-        fullName,
-        email,
-        mobileNumber,
-        dateOfBirth: formattedDateOfBirth,
-        password,
-      });
-
-      if (res) {
-        router.replace("/(app)/(tabs)/home");
-      }
-    } catch (error) {
-      console.warn(error);
+ async function handleSignup() {
+  try {
+    if (!fullName.trim() || !email.trim() || !password.trim()) {
+      feedback.error("Fill the required form fields before submitting");
+      return;
     }
+
+    if (password !== confirmPassword) {
+      feedback.error("The passwords don't match");
+      return;
+    }
+
+    const formattedDateOfBirth = toIsoDate(dateOfBirth);
+
+    const res = await execute({
+      fullName,
+      email,
+      mobileNumber: mobileNumber.trim() || undefined,
+      dateOfBirth: formattedDateOfBirth || undefined,
+      password,
+    });
+
+    if (res) {
+      router.replace("/(app)/(tabs)/home");
+    }
+  } catch (error) {
+    console.warn(error);
   }
+}
 
   const brandHeader = (
     <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
@@ -188,7 +189,7 @@ export default function SignupScreen() {
 
       <View style={[styles.form, isDesktop && styles.formDesktop]}>
         <SignupInput
-          label="Full Name"
+          label="Full Name *"
           icon="user-o"
           placeholder="John Doe"
           autoCapitalize="words"
@@ -198,7 +199,7 @@ export default function SignupScreen() {
         />
 
         <SignupInput
-          label="Email"
+          label="Email *"
           icon="envelope-o"
           placeholder="example@email.com"
           autoCapitalize="none"
@@ -229,7 +230,7 @@ export default function SignupScreen() {
         />
 
         <SignupInput
-          label="Password"
+          label="Password *"
           icon="lock"
           placeholder=""
           secureTextEntry
@@ -241,7 +242,7 @@ export default function SignupScreen() {
         />
 
         <SignupInput
-          label="Confirm Password"
+          label="Confirm Password *"
           icon="lock"
           placeholder=""
           secureTextEntry

@@ -1,4 +1,5 @@
 import { RegisterInput } from '@repo/shared-types';
+import { Transform } from 'class-transformer';
 import {
   IsDateString,
   IsEmail,
@@ -15,11 +16,13 @@ export class RegisterDto implements RegisterInput {
   @IsEmail()
   email: string;
 
+  @Transform(({ value }) => value === '' ? undefined : value)
   @IsOptional()
   @IsString()
   @MinLength(6)
   mobileNumber?: string;
 
+  @Transform(({ value }) => value === '' ? undefined : value)
   @IsOptional()
   @IsDateString()
   dateOfBirth?: string;
