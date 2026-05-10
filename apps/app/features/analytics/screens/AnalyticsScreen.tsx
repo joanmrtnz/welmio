@@ -19,6 +19,8 @@ import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHead
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useExpensesByCategoryAnalytics } from "../hooks/useExpensesByCategoryAnalytics";
 import type { ExpenseCategoryChartItem } from "../hooks/useExpensesByCategoryAnalytics";
+import { useGoalContributionsAnalytics } from "../hooks/useGoalContributionsAnalytics";
+import type { GoalContributionChartItem } from "../hooks/useGoalContributionsAnalytics";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -42,30 +44,6 @@ const PERIOD_LABELS = {
 } as const;
 
 type AnalyticsPeriod = keyof typeof PERIOD_LABELS;
-
-const MOCK_GOAL_CONTRIBUTIONS = [
-  {
-    id: "emergency",
-    label: "Emergency fund",
-    current: 3200,
-    target: 5000,
-    percent: 64,
-  },
-  {
-    id: "holiday",
-    label: "Summer trip",
-    current: 1450,
-    target: 2500,
-    percent: 58,
-  },
-  {
-    id: "home",
-    label: "Home deposit",
-    current: 8200,
-    target: 20000,
-    percent: 41,
-  },
-];
 
 function PeriodBadge({ label }: { label: string }) {
   return (
@@ -157,47 +135,95 @@ function ExpensesByCategoryCard({
 }
 
 function GoalContributionsCard({
+  goals,
   isDesktop,
+  isLoading,
+  hasError,
   periodLabel,
 }: {
+  goals: GoalContributionChartItem[];
   isDesktop?: boolean;
+  isLoading: boolean;
+  hasError: boolean;
   periodLabel: string;
 }) {
+  const showEmptyState = !isLoading && !hasError && goals.length === 0;
+
   return (
     <View style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}>
       <View style={styles.graphHeader}>
         <View style={styles.graphTitleWrap}>
           <Text style={styles.graphTitle}>Goal Contributions</Text>
           <Text style={styles.graphSubtitle}>
-            Mocked progress toward your goals
+            Contributions received by goal
           </Text>
         </View>
         <PeriodBadge label={periodLabel} />
       </View>
 
-      <View style={styles.goalContributionList}>
-        {MOCK_GOAL_CONTRIBUTIONS.map((goal) => (
-          <View key={goal.id} style={styles.goalContributionItem}>
-            <View style={styles.goalContributionHeader}>
-              <View style={styles.goalRingTrack}>
-                <View style={styles.goalRingArc} />
-                <Text style={styles.goalRingText}>{goal.percent}%</Text>
-              </View>
+      {isLoading ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>Loading contributions...</Text>
+          <Text style={styles.chartStateText}>
+            Getting your goal contribution totals for this period.
+          </Text>
+        </View>
+      ) : hasError ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>Could not load goals</Text>
+          <Text style={styles.chartStateText}>
+            Try changing the period or refreshing the screen.
+          </Text>
+        </View>
+      ) : showEmptyState ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>No contributions yet</Text>
+          <Text style={styles.chartStateText}>
+            Add goal contributions to see this chart.
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.goalContributionList}>
+          {goals.map((goal) => (
+            <View key={goal.id} style={styles.goalContributionItem}>
+              <View style={styles.goalContributionHeader}>
+                <View style={styles.goalRingTrack}>
+                  <View
+                    style={[
+                      styles.goalRingArc,
+                      { borderColor: TEAL },
+                    ]}
+                  />
+                  <Text style={styles.goalRingText}>{goal.percent}%</Text>
+                </View>
               <View style={styles.goalContributionInfo}>
                 <Text style={styles.goalContributionTitle}>{goal.label}</Text>
                 <Text style={styles.goalContributionAmount}>
-                  {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
+                  {formatCurrency(goal.amount)} contributed
                 </Text>
                 <View style={styles.horizontalBarTrack}>
                   <View
-                    style={[styles.goalBarFill, { width: `${goal.percent}%` }]}
+                    style={[
+                      styles.goalBarFill,
+                      {
+                        width: `${goal.percent}%`,
+                        backgroundColor: goal.color ?? TEAL,
+                      },
+                    ]}
                   />
                 </View>
+                <Text style={styles.goalContributionMeta}>
+                  {goal.percent}% of goal contributions · {goal.contributionsCount}{" "}
+                  {goal.contributionsCount === 1
+                    ? "contribution"
+                    : "contributions"}
+                </Text>
+              </View>
               </View>
             </View>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -253,6 +279,11 @@ export default function AnalyticsScreen() {
     isLoading: isLoadingExpenseCategories,
     error: expenseCategoriesError,
   } = useExpensesByCategoryAnalytics({ period: selectedPeriod });
+  const {
+    goals: goalContributions,
+    isLoading: isLoadingGoalContributions,
+    error: goalContributionsError,
+  } = useGoalContributionsAnalytics({ period: selectedPeriod });
 
   function getVisibleBarHeight(height: number) {
     return Math.max(height, 8);
@@ -456,30 +487,22 @@ export default function AnalyticsScreen() {
             </View>
           </View>
         </View>
-
-        <View
-          style={[
-            styles.analyticsChartsGrid,
-            isDesktop && styles.analyticsChartsGridDesktop,
-          ]}
-        >
-          <View style={styles.analyticsChartColumn}>
-            <ExpensesByCategoryCard
-              categories={expenseCategories}
-              hasError={Boolean(expenseCategoriesError)}
-              isDesktop={isDesktop}
-              isLoading={isLoadingExpenseCategories}
-              periodLabel={selectedPeriodLabel}
-            />
-          </View>
-          <View style={styles.analyticsChartColumn}>
-            <GoalContributionsCard
-              isDesktop={isDesktop}
-              periodLabel={selectedPeriodLabel}
-            />
-          </View>
-        </View>
-
+       
+        <ExpensesByCategoryCard
+          categories={expenseCategories}
+          hasError={Boolean(expenseCategoriesError)}
+          isDesktop={isDesktop}
+          isLoading={isLoadingExpenseCategories}
+          periodLabel={selectedPeriodLabel}
+        />
+        <GoalContributionsCard
+          goals={goalContributions}
+          hasError={Boolean(goalContributionsError)}
+          isDesktop={isDesktop}
+          isLoading={isLoadingGoalContributions}
+          periodLabel={selectedPeriodLabel}
+        />
+      
         <View style={[styles.totalsRow, isDesktop && styles.totalsRowDesktop]}>
           <View
             style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}
@@ -888,19 +911,6 @@ const styles = StyleSheet.create({
     color: GREEN_DARK,
   },
 
-  analyticsChartsGrid: {
-    gap: 32,
-  },
-
-  analyticsChartsGridDesktop: {
-    flexDirection: "row",
-    gap: 20,
-  },
-
-  analyticsChartColumn: {
-    flex: 1,
-  },
-
   chartStateBox: {
     marginTop: 20,
     padding: 16,
@@ -1009,11 +1019,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 58,
     height: 58,
-    borderRadius: 29,
-    borderTopWidth: 5,
-    borderRightWidth: 5,
     borderColor: TEAL,
-    transform: [{ rotate: "35deg" }],
   },
 
   goalRingText: {
@@ -1036,6 +1042,13 @@ const styles = StyleSheet.create({
   },
 
   goalContributionAmount: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: fonts.medium,
+    color: MUTED,
+  },
+
+  goalContributionMeta: {
     fontSize: 11,
     lineHeight: 14,
     fontFamily: fonts.medium,
