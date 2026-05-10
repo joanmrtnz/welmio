@@ -16,7 +16,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
-const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
 
 const GREEN = "#dff7ef";
@@ -235,11 +235,9 @@ const styles = StyleSheet.create({
     width: 31,
     height: 31,
     borderRadius: 18,
-    backgroundColor: CARD,
+    backgroundColor: GREEN,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: LIGHT_GRAY,
-    borderWidth: 1,
     shadowColor: "rgba(29, 100, 89, 0.18)",
     shadowOpacity: 1,
     shadowRadius: 10,

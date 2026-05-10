@@ -40,6 +40,7 @@ const GREEN = "#dff7ef";
 const DIVIDER_GREEN = "#7adcc8";
 const DARK_GREEN = "#0b8f78";
 const LIGHT_GREEN = "#f8fffc";
+const LIGHT_GRAY = "rgba(0, 0, 0, 0.1)";
 const CARD_GREEN = "#e2f8f0";
 const WHITE = "#ffffff";
 const BLACK = "#082f33";
@@ -984,6 +985,8 @@ const styles = StyleSheet.create({
     backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
+    borderColor: LIGHT_GRAY,
+    borderWidth: 1,
     shadowColor: "rgba(16, 185, 146, 0.32)",
     shadowOpacity: 1,
     shadowRadius: 16,

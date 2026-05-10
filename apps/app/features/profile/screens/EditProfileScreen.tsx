@@ -16,11 +16,18 @@ import { Icon } from "@/components/icons/Icon";
 import { getUserProfile, updateUserProfile } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { router } from "expo-router";
-import { AvatarPickerModal } from "../components/AvatarPickerModal";
+import {
+  AVATAR_IMAGES,
+  AvatarId,
+  AvatarPickerModal,
+} from "../components/AvatarPickerModal";
 import { IconName } from "@repo/shared-types";
 import { Image } from "react-native";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
+function getAvatarId(value?: string | null): AvatarId {
+  return value && value in AVATAR_IMAGES ? (value as AvatarId) : "avatar-0";
+}
 
 export default function EditProfileScreen() {
   const { width } = useWindowDimensions();
@@ -35,10 +42,11 @@ export default function EditProfileScreen() {
   const [darkTheme, setDarkTheme] = useState(false);
 
   const [showAvatarModal, setShowAvatarModal] = useState(false);
-  const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
+  const [avatarId, setAvatarId] = useState<AvatarId>("avatar-0");
   const [avatarColor, setAvatarColor] = useState(GREEN);
-  const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
 
+  const selectedAvatarImage =
+    AVATAR_IMAGES[avatarId] ?? AVATAR_IMAGES["avatar-0"];
 
   async function handleUpdateProfile() {
     try {
@@ -47,7 +55,7 @@ export default function EditProfileScreen() {
       const updatedUser = await updateUserProfile({
         fullName: username.trim(),
         mobileNumber: phone.trim() || null,
-        avatarIcon,
+        avatarIcon: avatarId as unknown as IconName,
         avatarColor,
       });
 
@@ -56,10 +64,11 @@ export default function EditProfileScreen() {
       setPhone(updatedUser.mobileNumber ?? "");
       setEmail(updatedUser.email ?? "");
       setUserId(updatedUser.id);
-      setAvatarIcon(updatedUser.avatarIcon ?? "user");
-      setAvatarColor(updatedUser.avatarColor ?? "#00c896");
+      setAvatarId(getAvatarId(updatedUser.avatarIcon));
+      setAvatarColor(updatedUser.avatarColor ?? WHITE);
 
       feedback.success("Profile updated successfully");
+      router.push("/profile");
     } catch (error) {
       console.warn(error);
       feedback.error("Error updating profile");
@@ -81,7 +90,7 @@ export default function EditProfileScreen() {
         setEmail(user.email ?? "");
         setUserId(user.id);
         setAvatarColor(user.avatarColor ?? GREEN);
-        setAvatarIcon(user.avatarIcon ?? "user");
+        setAvatarId(getAvatarId(user.avatarIcon));
       } catch (error) {
         console.error("Error loading user profile", error);
       } finally {
@@ -143,23 +152,36 @@ export default function EditProfileScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <AppScreenHeader title="Edit My Profile" />
-  
+
       <ScrollView
-        contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
+        contentContainerStyle={[
+          styles.content,
+          isDesktop && styles.contentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={[styles.desktopLayoutMobile, isDesktop && styles.desktopLayout]}>
-          <View style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
+        <View
+          style={[
+            styles.desktopLayoutMobile,
+            isDesktop && styles.desktopLayout,
+          ]}
+        >
+          <View
+            style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}
+          >
             <View style={styles.avatarOuterRing}>
               <View
                 style={[
                   styles.avatar,
-                  { borderColor: avatarColor || TEAL, backgroundColor: avatarColor || SOFT_TEAL },
+                  {
+                    borderColor: avatarColor || TEAL,
+                    backgroundColor: avatarColor || SOFT_TEAL,
+                  },
                 ]}
               >
                 <Image
-                  source={WELMIO_LOGO}
+                  source={selectedAvatarImage}
                   style={styles.logoImage}
                   resizeMode="contain"
                 />
@@ -169,7 +191,12 @@ export default function EditProfileScreen() {
                 style={styles.editAvatarButton}
                 onPress={() => setShowAvatarModal(true)}
               >
-                <Icon name="edit" size={17} strokeWidth={1.9} color={DARK_TEAL} />
+                <Icon
+                  name="edit"
+                  size={17}
+                  strokeWidth={1.9}
+                  color={DARK_TEAL}
+                />
               </Pressable>
             </View>
 
@@ -179,8 +206,18 @@ export default function EditProfileScreen() {
             </View>
           </View>
 
-          <View style={[styles.settingsColumn, isDesktop && styles.settingsColumnDesktop]}>
-            <View style={[styles.settingsCard, isDesktop && styles.settingsCardDesktop]}>
+          <View
+            style={[
+              styles.settingsColumn,
+              isDesktop && styles.settingsColumnDesktop,
+            ]}
+          >
+            <View
+              style={[
+                styles.settingsCard,
+                isDesktop && styles.settingsCardDesktop,
+              ]}
+            >
               <View style={styles.form}>
                 {renderField({
                   label: "Username",
@@ -263,8 +300,9 @@ export default function EditProfileScreen() {
       <AvatarPickerModal
         visible={showAvatarModal}
         onClose={() => setShowAvatarModal(false)}
-        onApply={({ icon, backgroundColor }) => {
-          setAvatarIcon(icon);
+        selectedAvatarId={avatarId}
+        onApply={({ id, backgroundColor }) => {
+          setAvatarId(id);
           setAvatarColor(backgroundColor);
         }}
       />
@@ -275,7 +313,7 @@ export default function EditProfileScreen() {
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
 const SOFT_TEAL = "#a9efdf";
-const VERY_SOFT_TEAL = "#eafaf5";
+const VERY_SOFT_TEAL = "#dff7ef";
 const CARD = "#fbfffd";
 const WHITE = "#ffffff";
 const MUTED = "#5e7b78";

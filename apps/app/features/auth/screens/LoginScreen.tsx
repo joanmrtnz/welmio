@@ -18,7 +18,7 @@ import { useLogin } from "@/features/auth/hooks/useLogin";
 import { Icon } from "@/components/icons/Icon";
 import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
 
-const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";
@@ -203,7 +203,7 @@ export default function LoginScreen() {
                         size={30}
                         strokeWidth={8}
                         color={PRIMARY}
-                      />{" "}
+                      />
                       <Text style={styles.fingerprintText}>
                         Continue with <Text style={styles.bold}>Touch ID</Text>
                       </Text>
@@ -309,11 +309,9 @@ const styles = StyleSheet.create({
     width: 31,
     height: 31,
     borderRadius: 18,
-    backgroundColor: CARD,
+    backgroundColor: GREEN,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: LIGHT_GRAY,
-    borderWidth: 1,
     shadowColor: "rgba(29, 100, 89, 0.18)",
     shadowOpacity: 1,
     shadowRadius: 10,
@@ -354,7 +352,7 @@ const styles = StyleSheet.create({
     width: 106,
     height: 106,
     borderRadius: 58,
-    backgroundColor: CARD,
+    backgroundColor: GREEN,
     borderColor: DARK_GREEN,
     borderWidth: 4,
     alignItems: "center",

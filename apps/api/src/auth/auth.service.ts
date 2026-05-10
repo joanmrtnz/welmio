@@ -22,46 +22,54 @@ export class AuthService {
   ) {}
 
 
-  async register(dto: RegisterDto) {
-    const { fullName, email, mobileNumber, dateOfBirth, password } = dto;
+async register(dto: RegisterDto) {
+  const { fullName, email, mobileNumber, dateOfBirth, password } = dto;
 
-    if (!fullName || !email || !password) {
-      throw new BadRequestException(
-        'fullName, email and password are required',
-      );
-    }
-
-    if (password.length < 6) {
-      throw new BadRequestException(
-        'Password must be at least 6 characters long',
-      );
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    try {
-      const user = await this.prisma.user.create({
-        data: {
-          fullName,
-          email,
-          mobileNumber: mobileNumber ?? null,
-          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
-          password: hashedPassword,
-        },
-      });
-
-      return this.generateToken(user.id, user.email);
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        throw new ConflictException('Email already registered');
-      }
-
-      throw error;
-    }
+  if (!fullName || !email || !password) {
+    throw new BadRequestException(
+      'fullName, email and password are required',
+    );
   }
+
+  if (password.length < 6) {
+    throw new BadRequestException(
+      'Password must be at least 6 characters long',
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    const user = await this.prisma.user.create({
+      data: {
+        fullName,
+        email,
+        mobileNumber: mobileNumber ?? null,
+        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+        password: hashedPassword,
+
+        accounts: {
+          create: {
+            name: 'Cash',
+            type: 'cash',
+            currencies: ['EUR'],
+          },
+        },
+      },
+    });
+
+    return this.generateToken(user.id, user.email);
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      throw new ConflictException('Email already registered');
+    }
+
+    throw error;
+  }
+}
 
   async login(dto: LoginDto) {
     try {

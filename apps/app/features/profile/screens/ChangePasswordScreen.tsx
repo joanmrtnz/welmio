@@ -199,7 +199,7 @@ export default function ChangePasswordScreen() {
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
 const SOFT_TEAL = "#a9efdf";
-const VERY_SOFT_TEAL = "#eafaf5";
+const VERY_SOFT_TEAL = "#dff7ef";
 const CARD = "#fbfffd";
 const WHITE = "#ffffff";
 const MUTED = "#5e7b78";

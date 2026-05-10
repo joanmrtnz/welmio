@@ -17,18 +17,188 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useExpensesByCategoryAnalytics } from "../hooks/useExpensesByCategoryAnalytics";
+import type { ExpenseCategoryChartItem } from "../hooks/useExpensesByCategoryAnalytics";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
 const MID_TEAL = "#68e1c6";
 const SOFT_TEAL = "#a9efdf";
-const VERY_SOFT_TEAL = "#eafaf5";
+const VERY_SOFT_TEAL = "#dff7ef";
 const CARD = "#fbfffd";
 const WHITE = "#ffffff";
 const MUTED = "#5e7b78";
 const GRID = "rgba(6, 59, 58, 0.09)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
+
+const PERIOD_LABELS = {
+  daily: "Daily",
+  weekly: "Weekly",
+  monthly: "Monthly",
+  yearly: "Yearly",
+} as const;
+
+type AnalyticsPeriod = keyof typeof PERIOD_LABELS;
+
+const MOCK_GOAL_CONTRIBUTIONS = [
+  {
+    id: "emergency",
+    label: "Emergency fund",
+    current: 3200,
+    target: 5000,
+    percent: 64,
+  },
+  {
+    id: "holiday",
+    label: "Summer trip",
+    current: 1450,
+    target: 2500,
+    percent: 58,
+  },
+  {
+    id: "home",
+    label: "Home deposit",
+    current: 8200,
+    target: 20000,
+    percent: 41,
+  },
+];
+
+function PeriodBadge({ label }: { label: string }) {
+  return (
+    <View style={styles.periodBadge}>
+      <Text style={styles.periodBadgeText}>{label}</Text>
+    </View>
+  );
+}
+
+function ExpensesByCategoryCard({
+  categories,
+  isDesktop,
+  isLoading,
+  hasError,
+  periodLabel,
+}: {
+  categories: ExpenseCategoryChartItem[];
+  isDesktop?: boolean;
+  isLoading: boolean;
+  hasError: boolean;
+  periodLabel: string;
+}) {
+  const showEmptyState = !isLoading && !hasError && categories.length === 0;
+
+  return (
+    <View style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}>
+      <View style={styles.graphHeader}>
+        <View style={styles.graphTitleWrap}>
+          <Text style={styles.graphTitle}>Expenses by Category</Text>
+          <Text style={styles.graphSubtitle}>Distribution by category</Text>
+        </View>
+        <PeriodBadge label={periodLabel} />
+      </View>
+
+      {isLoading ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>Loading expenses...</Text>
+          <Text style={styles.chartStateText}>
+            Getting your category totals for this period.
+          </Text>
+        </View>
+      ) : hasError ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>Could not load categories</Text>
+          <Text style={styles.chartStateText}>
+            Try changing the period or refreshing the screen.
+          </Text>
+        </View>
+      ) : showEmptyState ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>No expenses yet</Text>
+          <Text style={styles.chartStateText}>
+            Add expense transactions to see this chart.
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.categoryChartList}>
+          {categories.map((category) => (
+            <View key={category.id} style={styles.categoryChartItem}>
+              <View style={styles.categoryChartTopRow}>
+                <Text style={styles.categoryLabel}>{category.label}</Text>
+                <Text style={styles.categoryAmount}>
+                  {formatCurrency(category.amount)}
+                </Text>
+              </View>
+              <View style={styles.horizontalBarTrack}>
+                <View
+                  style={[
+                    styles.horizontalBarFill,
+                    {
+                      width: `${category.percent}%`,
+                      backgroundColor: TEAL,
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.categoryPercent}>
+                {category.percent}% of expenses · {category.transactionsCount}{" "}
+                {category.transactionsCount === 1
+                  ? "transaction"
+                  : "transactions"}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+function GoalContributionsCard({
+  isDesktop,
+  periodLabel,
+}: {
+  isDesktop?: boolean;
+  periodLabel: string;
+}) {
+  return (
+    <View style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}>
+      <View style={styles.graphHeader}>
+        <View style={styles.graphTitleWrap}>
+          <Text style={styles.graphTitle}>Goal Contributions</Text>
+          <Text style={styles.graphSubtitle}>
+            Mocked progress toward your goals
+          </Text>
+        </View>
+        <PeriodBadge label={periodLabel} />
+      </View>
+
+      <View style={styles.goalContributionList}>
+        {MOCK_GOAL_CONTRIBUTIONS.map((goal) => (
+          <View key={goal.id} style={styles.goalContributionItem}>
+            <View style={styles.goalContributionHeader}>
+              <View style={styles.goalRingTrack}>
+                <View style={styles.goalRingArc} />
+                <Text style={styles.goalRingText}>{goal.percent}%</Text>
+              </View>
+              <View style={styles.goalContributionInfo}>
+                <Text style={styles.goalContributionTitle}>{goal.label}</Text>
+                <Text style={styles.goalContributionAmount}>
+                  {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
+                </Text>
+                <View style={styles.horizontalBarTrack}>
+                  <View
+                    style={[styles.goalBarFill, { width: `${goal.percent}%` }]}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
 
 function TargetCard({
   percent,
@@ -71,8 +241,16 @@ export default function AnalyticsScreen() {
     : 1;
 
   const yAxisLabels = getChartYAxisLabels(maxValue);
-  const isYearlyChart = (selected === "yearly" || chartBars.length > 6 ) && !isDesktop;
+  const isYearlyChart =
+    (selected === "yearly" || chartBars.length > 6) && !isDesktop;
   const yearlyChartWidth = Math.max(chartBars.length * 42, 310);
+  const selectedPeriod = selected as AnalyticsPeriod;
+  const selectedPeriodLabel = PERIOD_LABELS[selectedPeriod] ?? "Daily";
+  const {
+    categories: expenseCategories,
+    isLoading: isLoadingExpenseCategories,
+    error: expenseCategoriesError,
+  } = useExpensesByCategoryAnalytics({ period: selectedPeriod });
 
   function getVisibleBarHeight(height: number) {
     return Math.max(height, 8);
@@ -84,13 +262,18 @@ export default function AnalyticsScreen() {
 
   return (
     <View style={styles.screen}>
-     <AppScreenHeader title="Analytics" />
+      <AppScreenHeader title="Analytics" />
 
       <ScrollView
-        contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
+        contentContainerStyle={[
+          styles.content,
+          isDesktop && styles.contentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}>
+        <View
+          style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}
+        >
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>Total Balance</Text>
             <Text style={styles.balance}>
@@ -110,7 +293,12 @@ export default function AnalyticsScreen() {
           </View>
         </View>
 
-        <View style={[styles.progressContainer, isDesktop && styles.progressContainerDesktop]}>
+        <View
+          style={[
+            styles.progressContainer,
+            isDesktop && styles.progressContainerDesktop,
+          ]}
+        >
           <View style={styles.progressBar}>
             <View
               style={[
@@ -125,7 +313,12 @@ export default function AnalyticsScreen() {
           </Text>
         </View>
 
-        <View style={[styles.segmentedControl, isDesktop && styles.segmentedControlDesktop]}>
+        <View
+          style={[
+            styles.segmentedControl,
+            isDesktop && styles.segmentedControlDesktop,
+          ]}
+        >
           {[
             ["daily", "Daily"],
             ["weekly", "Weekly"],
@@ -154,32 +347,16 @@ export default function AnalyticsScreen() {
           ))}
         </View>
 
-        <View style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}>
+        <View
+          style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}
+        >
           <View style={styles.graphHeader}>
             <View style={styles.graphTitleWrap}>
               <Text style={styles.graphTitle}>Income & Expenses</Text>
               <Text style={styles.graphSubtitle}>Income vs expenses</Text>
             </View>
 
-            <View style={styles.graphActions}>
-              <Pressable style={styles.graphIcon}>
-                <Icon
-                  name="search"
-                  size={23}
-                  strokeWidth={1.8}
-                  color={DARK_TEAL}
-                />
-              </Pressable>
-
-              <Pressable style={styles.graphIcon}>
-                <Icon
-                  name="calendar"
-                  size={23}
-                  strokeWidth={1.8}
-                  color={DARK_TEAL}
-                />
-              </Pressable>
-            </View>
+            <PeriodBadge label={selectedPeriodLabel} />
           </View>
 
           <View style={styles.legendRow}>
@@ -257,10 +434,16 @@ export default function AnalyticsScreen() {
                     <View key={item.label} style={styles.barGroup}>
                       <View style={styles.barPair}>
                         <View
-                          style={[styles.barIncome, { height: getVisibleBarHeight(item.income) }]}
+                          style={[
+                            styles.barIncome,
+                            { height: getVisibleBarHeight(item.income) },
+                          ]}
                         />
                         <View
-                          style={[styles.barExpense, { height: getVisibleBarHeight(item.expense) }]}
+                          style={[
+                            styles.barExpense,
+                            { height: getVisibleBarHeight(item.expense) },
+                          ]}
                         />
                       </View>
                       <Text style={styles.barLabel}>{item.label}</Text>
@@ -272,8 +455,33 @@ export default function AnalyticsScreen() {
           </View>
         </View>
 
+        <View
+          style={[
+            styles.analyticsChartsGrid,
+            isDesktop && styles.analyticsChartsGridDesktop,
+          ]}
+        >
+          <View style={styles.analyticsChartColumn}>
+            <ExpensesByCategoryCard
+              categories={expenseCategories}
+              hasError={Boolean(expenseCategoriesError)}
+              isDesktop={isDesktop}
+              isLoading={isLoadingExpenseCategories}
+              periodLabel={selectedPeriodLabel}
+            />
+          </View>
+          <View style={styles.analyticsChartColumn}>
+            <GoalContributionsCard
+              isDesktop={isDesktop}
+              periodLabel={selectedPeriodLabel}
+            />
+          </View>
+        </View>
+
         <View style={[styles.totalsRow, isDesktop && styles.totalsRowDesktop]}>
-          <View style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}>
+          <View
+            style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}
+          >
             <View style={styles.totalIcon}>
               <Icon name="income" size={27} strokeWidth={1.4} color={TEAL} />
             </View>
@@ -283,7 +491,9 @@ export default function AnalyticsScreen() {
             </Text>
           </View>
 
-          <View style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}>
+          <View
+            style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}
+          >
             <View style={styles.totalIcon}>
               <Icon name="expense" size={27} strokeWidth={1.4} color={TEAL} />
             </View>
@@ -296,7 +506,9 @@ export default function AnalyticsScreen() {
 
         <Text style={styles.targetsTitle}>My Targets</Text>
 
-        <View style={[styles.targetsRow, isDesktop && styles.targetsRowDesktop]}>
+        <View
+          style={[styles.targetsRow, isDesktop && styles.targetsRowDesktop]}
+        >
           <TargetCard
             percent="30%"
             title="Short term goal"
@@ -311,11 +523,11 @@ export default function AnalyticsScreen() {
           />
         </View>
       </ScrollView>
-       <LinearGradient
-          pointerEvents="none"
-          colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
-          style={styles.bottomFade}
-        />
+      <LinearGradient
+        pointerEvents="none"
+        colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
+        style={styles.bottomFade}
+      />
     </View>
   );
 }
@@ -658,6 +870,180 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
 
+  periodBadge: {
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "#f3fbf8",
+  },
+
+  periodBadgeText: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: fonts.bold,
+    color: TEAL,
+  },
+
+  analyticsChartsGrid: {
+    gap: 32,
+  },
+
+  analyticsChartsGridDesktop: {
+    flexDirection: "row",
+    gap: 20,
+  },
+
+  analyticsChartColumn: {
+    flex: 1,
+  },
+
+  chartStateBox: {
+    marginTop: 20,
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: "#f6fcfa",
+    borderWidth: 1,
+    borderColor: "rgba(9, 169, 130, 0.1)",
+  },
+
+  chartStateTitle: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: fonts.bold,
+    color: DARK_TEAL,
+  },
+
+  chartStateText: {
+    marginTop: 4,
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: fonts.medium,
+    color: MUTED,
+  },
+
+  categoryChartList: {
+    marginTop: 20,
+    gap: 16,
+  },
+
+  categoryChartItem: {
+    gap: 7,
+  },
+
+  categoryChartTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 14,
+  },
+
+  categoryLabel: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 17,
+    fontFamily: fonts.medium,
+    color: DARK_TEAL,
+  },
+
+  categoryAmount: {
+    fontSize: 13,
+    lineHeight: 17,
+    fontFamily: fonts.bold,
+    color: DARK_TEAL,
+  },
+
+  horizontalBarTrack: {
+    height: 10,
+    width: "100%",
+    borderRadius: 999,
+    backgroundColor: "rgba(0, 200, 150, 0.14)",
+    overflow: "hidden",
+  },
+
+  horizontalBarFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: TEAL,
+  },
+
+  categoryPercent: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: fonts.medium,
+    color: MUTED,
+  },
+
+  goalContributionList: {
+    marginTop: 20,
+    gap: 14,
+  },
+
+  goalContributionItem: {
+    padding: 13,
+    borderRadius: 20,
+    backgroundColor: "#f6fcfa",
+  },
+
+  goalContributionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 13,
+  },
+
+  goalRingTrack: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    borderWidth: 5,
+    borderColor: "rgba(0, 200, 150, 0.18)",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+
+  goalRingArc: {
+    position: "absolute",
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    borderTopWidth: 5,
+    borderRightWidth: 5,
+    borderColor: TEAL,
+    transform: [{ rotate: "35deg" }],
+  },
+
+  goalRingText: {
+    fontSize: 12,
+    lineHeight: 15,
+    fontFamily: fonts.bold,
+    color: DARK_TEAL,
+  },
+
+  goalContributionInfo: {
+    flex: 1,
+    gap: 7,
+  },
+
+  goalContributionTitle: {
+    fontSize: 13,
+    lineHeight: 17,
+    fontFamily: fonts.bold,
+    color: DARK_TEAL,
+  },
+
+  goalContributionAmount: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: fonts.medium,
+    color: MUTED,
+  },
+
+  goalBarFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: TEAL,
+  },
+
   totalsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -796,5 +1182,4 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: 122,
   },
-
 });
