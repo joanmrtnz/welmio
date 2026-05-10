@@ -17,11 +17,11 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useExpensesByCategoryAnalytics } from "../hooks/useExpensesByCategoryAnalytics";
+import type { ExpenseCategoryChartItem } from "../hooks/useExpensesByCategoryAnalytics";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
-const CARD_SOFT = "#f3fbf8";
-const GREEN_DARK = "#078a73";
 const MID_TEAL = "#68e1c6";
 const SOFT_TEAL = "#a9efdf";
 const VERY_SOFT_TEAL = "#dff7ef";
@@ -40,14 +40,6 @@ const PERIOD_LABELS = {
 } as const;
 
 type AnalyticsPeriod = keyof typeof PERIOD_LABELS;
-
-const MOCK_EXPENSE_CATEGORIES = [
-  { id: "housing", label: "Housing", amount: 1280, percent: 42 },
-  { id: "food", label: "Food", amount: 520, percent: 17 },
-  { id: "transport", label: "Transport", amount: 360, percent: 12 },
-  { id: "shopping", label: "Shopping", amount: 310, percent: 10 },
-  { id: "health", label: "Health", amount: 180, percent: 6 },
-];
 
 const MOCK_GOAL_CONTRIBUTIONS = [
   {
@@ -82,47 +74,82 @@ function PeriodBadge({ label }: { label: string }) {
 }
 
 function ExpensesByCategoryCard({
+  categories,
   isDesktop,
+  isLoading,
+  hasError,
   periodLabel,
 }: {
+  categories: ExpenseCategoryChartItem[];
   isDesktop?: boolean;
+  isLoading: boolean;
+  hasError: boolean;
   periodLabel: string;
 }) {
+  const showEmptyState = !isLoading && !hasError && categories.length === 0;
+
   return (
     <View style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}>
       <View style={styles.graphHeader}>
         <View style={styles.graphTitleWrap}>
           <Text style={styles.graphTitle}>Expenses by Category</Text>
-          <Text style={styles.graphSubtitle}>
-            Mocked distribution by category
-          </Text>
+          <Text style={styles.graphSubtitle}>Distribution by category</Text>
         </View>
         <PeriodBadge label={periodLabel} />
       </View>
 
-      <View style={styles.categoryChartList}>
-        {MOCK_EXPENSE_CATEGORIES.map((category) => (
-          <View key={category.id} style={styles.categoryChartItem}>
-            <View style={styles.categoryChartTopRow}>
-              <Text style={styles.categoryLabel}>{category.label}</Text>
-              <Text style={styles.categoryAmount}>
-                {formatCurrency(category.amount)}
+      {isLoading ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>Loading expenses...</Text>
+          <Text style={styles.chartStateText}>
+            Getting your category totals for this period.
+          </Text>
+        </View>
+      ) : hasError ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>Could not load categories</Text>
+          <Text style={styles.chartStateText}>
+            Try changing the period or refreshing the screen.
+          </Text>
+        </View>
+      ) : showEmptyState ? (
+        <View style={styles.chartStateBox}>
+          <Text style={styles.chartStateTitle}>No expenses yet</Text>
+          <Text style={styles.chartStateText}>
+            Add expense transactions to see this chart.
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.categoryChartList}>
+          {categories.map((category) => (
+            <View key={category.id} style={styles.categoryChartItem}>
+              <View style={styles.categoryChartTopRow}>
+                <Text style={styles.categoryLabel}>{category.label}</Text>
+                <Text style={styles.categoryAmount}>
+                  {formatCurrency(category.amount)}
+                </Text>
+              </View>
+              <View style={styles.horizontalBarTrack}>
+                <View
+                  style={[
+                    styles.horizontalBarFill,
+                    {
+                      width: `${category.percent}%`,
+                      backgroundColor: TEAL,
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.categoryPercent}>
+                {category.percent}% of expenses · {category.transactionsCount}{" "}
+                {category.transactionsCount === 1
+                  ? "transaction"
+                  : "transactions"}
               </Text>
             </View>
-            <View style={styles.horizontalBarTrack}>
-              <View
-                style={[
-                  styles.horizontalBarFill,
-                  { width: `${category.percent}%` },
-                ]}
-              />
-            </View>
-            <Text style={styles.categoryPercent}>
-              {category.percent}% of expenses
-            </Text>
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -217,8 +244,13 @@ export default function AnalyticsScreen() {
   const isYearlyChart =
     (selected === "yearly" || chartBars.length > 6) && !isDesktop;
   const yearlyChartWidth = Math.max(chartBars.length * 42, 310);
-  const selectedPeriodLabel =
-    PERIOD_LABELS[selected as AnalyticsPeriod] ?? "Daily";
+  const selectedPeriod = selected as AnalyticsPeriod;
+  const selectedPeriodLabel = PERIOD_LABELS[selectedPeriod] ?? "Daily";
+  const {
+    categories: expenseCategories,
+    isLoading: isLoadingExpenseCategories,
+    error: expenseCategoriesError,
+  } = useExpensesByCategoryAnalytics({ period: selectedPeriod });
 
   function getVisibleBarHeight(height: number) {
     return Math.max(height, 8);
@@ -323,6 +355,7 @@ export default function AnalyticsScreen() {
               <Text style={styles.graphTitle}>Income & Expenses</Text>
               <Text style={styles.graphSubtitle}>Income vs expenses</Text>
             </View>
+
             <PeriodBadge label={selectedPeriodLabel} />
           </View>
 
@@ -424,17 +457,20 @@ export default function AnalyticsScreen() {
 
         <View
           style={[
-            styles.mockChartsGrid,
-            isDesktop && styles.mockChartsGridDesktop,
+            styles.analyticsChartsGrid,
+            isDesktop && styles.analyticsChartsGridDesktop,
           ]}
         >
-          <View style={styles.mockChartColumn}>
+          <View style={styles.analyticsChartColumn}>
             <ExpensesByCategoryCard
+              categories={expenseCategories}
+              hasError={Boolean(expenseCategoriesError)}
               isDesktop={isDesktop}
+              isLoading={isLoadingExpenseCategories}
               periodLabel={selectedPeriodLabel}
             />
           </View>
-          <View style={styles.mockChartColumn}>
+          <View style={styles.analyticsChartColumn}>
             <GoalContributionsCard
               isDesktop={isDesktop}
               periodLabel={selectedPeriodLabel}
@@ -674,23 +710,19 @@ const styles = StyleSheet.create({
     color: MUTED,
   },
 
-
-
-
-  periodBadge: {
-    minHeight: 30,
-    borderRadius: 999,
-    backgroundColor: CARD_SOFT,
-    paddingHorizontal: 12,
+  graphActions: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    gap: 10,
   },
 
-  periodBadgeText: {
-   fontSize: 11,
-    lineHeight: 14,
-    fontFamily: fonts.bold,
-    color: GREEN_DARK,
+  graphIcon: {
+    width: 36,
+    height: 36,
+    backgroundColor: "#f3fbf8",
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   legendRow: {
@@ -838,39 +870,78 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
 
-  mockChartsGrid: {
+  periodBadge: {
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "#f3fbf8",
+  },
+
+  periodBadgeText: {
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: fonts.bold,
+    color: TEAL,
+  },
+
+  analyticsChartsGrid: {
     gap: 32,
   },
 
-  mockChartsGridDesktop: {
+  analyticsChartsGridDesktop: {
     flexDirection: "row",
     gap: 20,
   },
 
-  mockChartColumn: {
+  analyticsChartColumn: {
     flex: 1,
+  },
+
+  chartStateBox: {
+    marginTop: 20,
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: "#f6fcfa",
+    borderWidth: 1,
+    borderColor: "rgba(9, 169, 130, 0.1)",
+  },
+
+  chartStateTitle: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: fonts.bold,
+    color: DARK_TEAL,
+  },
+
+  chartStateText: {
+    marginTop: 4,
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: fonts.medium,
+    color: MUTED,
   },
 
   categoryChartList: {
     marginTop: 20,
-    gap: 18,
+    gap: 16,
   },
 
   categoryChartItem: {
-    gap: 8,
+    gap: 7,
   },
 
   categoryChartTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 12,
+    gap: 14,
   },
 
   categoryLabel: {
+    flex: 1,
     fontSize: 13,
     lineHeight: 17,
-    fontFamily: fonts.bold,
+    fontFamily: fonts.medium,
     color: DARK_TEAL,
   },
 
@@ -878,11 +949,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 17,
     fontFamily: fonts.bold,
-    color: TEAL,
+    color: DARK_TEAL,
   },
 
   horizontalBarTrack: {
     height: 10,
+    width: "100%",
     borderRadius: 999,
     backgroundColor: "rgba(0, 200, 150, 0.14)",
     overflow: "hidden",
@@ -907,22 +979,22 @@ const styles = StyleSheet.create({
   },
 
   goalContributionItem: {
-    borderRadius: 18,
-    backgroundColor: "#f3fbf8",
-    padding: 14,
+    padding: 13,
+    borderRadius: 20,
+    backgroundColor: "#f6fcfa",
   },
 
   goalContributionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 13,
   },
 
   goalRingTrack: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    borderWidth: 4,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    borderWidth: 5,
     borderColor: "rgba(0, 200, 150, 0.18)",
     alignItems: "center",
     justifyContent: "center",
@@ -931,20 +1003,18 @@ const styles = StyleSheet.create({
 
   goalRingArc: {
     position: "absolute",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    borderWidth: 4,
-    borderLeftColor: "transparent",
-    borderBottomColor: "transparent",
-    borderTopColor: TEAL,
-    borderRightColor: TEAL,
-    transform: [{ rotate: "26deg" }],
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    borderTopWidth: 5,
+    borderRightWidth: 5,
+    borderColor: TEAL,
+    transform: [{ rotate: "35deg" }],
   },
 
   goalRingText: {
-    fontSize: 13,
-    lineHeight: 16,
+    fontSize: 12,
+    lineHeight: 15,
     fontFamily: fonts.bold,
     color: DARK_TEAL,
   },
@@ -962,8 +1032,8 @@ const styles = StyleSheet.create({
   },
 
   goalContributionAmount: {
-    fontSize: 12,
-    lineHeight: 15,
+    fontSize: 11,
+    lineHeight: 14,
     fontFamily: fonts.medium,
     color: MUTED,
   },
