@@ -201,7 +201,7 @@ function GoalContributionsCard({
                         styles.goalBarFill,
                         {
                           width: `${goal.percent}%`,
-                          backgroundColor: goal.color ?? TEAL,
+                          backgroundColor: TEAL,
                         },
                       ]}
                     />
