@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -6,6 +6,7 @@ import type { JwtUser } from 'src/auth/types/jwt.types';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
 import { CreateGoalContributionDto } from './dto/create-goal-contribution.dto';
+import { GetGoalContributionsAnalyticsQueryDto } from './dto/get-goal-contributions-analytics-query.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('goals')
@@ -41,6 +42,14 @@ export class GoalsController {
   @Get('overview')
   getUserGoalsOverview(@CurrentUser() user: JwtUser) {
     return this.goalsService.getUserGoalsOverview(user.sub);
+  }
+
+  @Get('analytics/contributions')
+  getGoalContributionsAnalytics(
+    @CurrentUser() user: JwtUser,
+    @Query() query: GetGoalContributionsAnalyticsQueryDto,
+  ) {
+    return this.goalsService.getGoalContributionsAnalytics(user.sub, query);
   }
 
   @Get(':id/contributions')
