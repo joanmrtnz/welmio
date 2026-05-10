@@ -18,7 +18,7 @@ import { useLogin } from "@/features/auth/hooks/useLogin";
 import { Icon } from "@/components/icons/Icon";
 import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
 
-const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";

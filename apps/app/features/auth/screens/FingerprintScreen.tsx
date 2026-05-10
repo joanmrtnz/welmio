@@ -13,7 +13,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 
-const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";

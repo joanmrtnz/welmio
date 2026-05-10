@@ -7,10 +7,8 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-import type { IconName } from "@repo/shared-types";
 import { getUserProfile } from "@/features/profile/services/profile-service";
 import { fonts } from "@/theme/fonts";
-import { Icon } from "@/components/icons/Icon";
 import { ProfileOption } from "../components/ProfileOption";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -18,6 +16,7 @@ import { removeAccessToken } from "@/app/lib/auth-storage";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { AVATAR_IMAGES, type AvatarId } from "../components/AvatarPickerModal";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -32,6 +31,10 @@ const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
+function getAvatarId(value?: string | null): AvatarId {
+  return value && value in AVATAR_IMAGES ? (value as AvatarId) : "avatar-0";
+}
+
 export default function ProfileScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
@@ -40,9 +43,11 @@ export default function ProfileScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
+  const [avatarIcon, setAvatarIcon] = useState<AvatarId>("avatar-0");
   const [avatarColor, setAvatarColor] = useState(WHITE);
-  const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+
+  const selectedAvatarImage =
+    AVATAR_IMAGES[avatarIcon] ?? AVATAR_IMAGES["avatar-0"];
 
   useEffect(() => {
     async function loadUserProfile() {
@@ -51,7 +56,7 @@ export default function ProfileScreen() {
 
         setFullName(user.fullName ?? "");
         setEmail(user.email ?? "");
-        setAvatarIcon(user.avatarIcon ?? "user");
+        setAvatarIcon(getAvatarId(user.avatarIcon));
         setAvatarColor(user.avatarColor ?? "#00c896");
       } catch (error) {
         console.warn("Error loading profile", error);
@@ -110,7 +115,7 @@ export default function ProfileScreen() {
                 style={[styles.avatar, { borderColor: avatarColor || TEAL }]}
               >
                 <Image
-                  source={WELMIO_LOGO}
+                  source={selectedAvatarImage}
                   style={styles.logoImage}
                   resizeMode="contain"
                 />

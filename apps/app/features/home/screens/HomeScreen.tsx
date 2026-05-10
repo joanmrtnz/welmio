@@ -13,7 +13,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { apiFetch } from "@/app/lib/api/client";
-import WelmioAvatar from "@/assets/images/welmio-logo-no-circle.png";
 import type {
   GoalsOverviewResponse,
   TransactionsOverviewResponse,
@@ -26,6 +25,7 @@ import { QuickGoalsRow } from "@/features/goals/components/quick-goals-row/Quick
 import { formatCurrency } from "@/utils/formatCurrency";
 import { getUserProfile } from "@/features/profile/services/profile-service";
 import { getGreetingLabel } from "./utils/getGreetingLabel";
+import { AVATAR_IMAGES, type AvatarId } from "@/features/profile/components/AvatarPickerModal";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -50,6 +50,11 @@ const EMPTY_ANALYTICS_DATA = [
   { label: "Sat", income: 0, expense: 0 },
   { label: "Sun", income: 0, expense: 0 },
 ];
+
+
+function isAvatarId(value: unknown): value is AvatarId {
+  return typeof value === "string" && value in AVATAR_IMAGES;
+}
 
 function formatAnalyticsLabel(label: string) {
   const parsedDate = new Date(label);
@@ -97,6 +102,7 @@ export default function HomeScreen() {
   const [goalsOverview, setGoalsOverview] =
     useState<GoalsOverviewResponse | null>(null);
   const [fullName, setFullName] = useState("");
+  const [avatarId, setAvatarId] = useState<AvatarId>("avatar-0");
   const [goalsErrorMessage, setGoalsErrorMessage] = useState<string | null>(
     null,
   );
@@ -108,6 +114,7 @@ export default function HomeScreen() {
       const user = await getUserProfile();
 
       setFullName(user.fullName ?? "");
+      setAvatarId(isAvatarId(user.avatarIcon) ? user.avatarIcon : "avatar-0");
     } catch (error) {
       console.warn("[HomeScreen] load user profile error:", error);
     }
@@ -146,6 +153,8 @@ export default function HomeScreen() {
       expense: Number(analyticsData.chart.expense[index] ?? 0),
     }));
   }, [analyticsData]);
+
+  const selectedAvatarImage = AVATAR_IMAGES[avatarId];
 
   const totalBalance = transactionsOverview?.summary.totalBalance ?? 0;
   const totalExpense = transactionsOverview?.summary.totalExpense ?? 0;
@@ -191,7 +200,8 @@ export default function HomeScreen() {
     useCallback(() => {
       loadTransactionsOverview();
       loadGoalsOverview();
-    }, [loadGoalsOverview, loadTransactionsOverview]),
+      loadUserProfile();
+    }, [loadGoalsOverview, loadTransactionsOverview, loadUserProfile]),
   );
 
   return (
@@ -204,7 +214,7 @@ export default function HomeScreen() {
               onPress={() => router.push("/profile")}
             >
               <Image
-                source={WelmioAvatar}
+                source={selectedAvatarImage}
                 style={styles.avatarImage}
                 resizeMode="contain"
               />
@@ -366,12 +376,12 @@ const styles = StyleSheet.create({
   },
 
   avatarFrame: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
+    width: 47,
+    height: 47,
+    borderRadius: 25,
     backgroundColor: CARD,
-    borderWidth: 1,
-    borderColor: BORDER,
+    borderWidth: 5,
+    borderColor: CARD,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "rgba(29, 100, 89, 0.12)",
@@ -382,8 +392,8 @@ const styles = StyleSheet.create({
   },
 
   avatarImage: {
-    width: 39,
-    height: 39,
+    width: 45,
+    height: 45,
   },
 
   greeting: {
