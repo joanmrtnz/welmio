@@ -22,6 +22,8 @@ import type { ExpenseCategoryChartItem } from "../hooks/useExpensesByCategoryAna
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
+const CARD_SOFT = "#f3fbf8";
+const GREEN_DARK = "#078a73";
 const MID_TEAL = "#68e1c6";
 const SOFT_TEAL = "#a9efdf";
 const VERY_SOFT_TEAL = "#dff7ef";
@@ -871,17 +873,19 @@ const styles = StyleSheet.create({
   },
 
   periodBadge: {
-    paddingHorizontal: 11,
-    paddingVertical: 6,
+    minHeight: 30,
     borderRadius: 999,
-    backgroundColor: "#f3fbf8",
+    backgroundColor: CARD_SOFT,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   periodBadgeText: {
     fontSize: 11,
     lineHeight: 14,
     fontFamily: fonts.bold,
-    color: TEAL,
+    color: GREEN_DARK,
   },
 
   analyticsChartsGrid: {
