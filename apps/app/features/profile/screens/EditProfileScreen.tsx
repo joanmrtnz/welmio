@@ -170,10 +170,10 @@ export default function EditProfileScreen() {
           <View
             style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}
           >
-            <View style={styles.avatarOuterRing}>
+            <View style={[styles.avatarOuterRing, isDesktop && styles.avatarOuterRingDesktop]}>
               <View
                 style={[
-                  styles.avatar,
+                  styles.avatar, isDesktop && styles.avatarDesktop,
                   {
                     borderColor: avatarColor || TEAL,
                     backgroundColor: avatarColor || SOFT_TEAL,
@@ -182,7 +182,7 @@ export default function EditProfileScreen() {
               >
                 <Image
                   source={selectedAvatarImage}
-                  style={styles.logoImage}
+                  style={[styles.logoImage, isDesktop && styles.logoImageDesktop]}
                   resizeMode="contain"
                 />
               </View>
@@ -252,6 +252,21 @@ export default function EditProfileScreen() {
                   editable: false,
                 })}
 
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.updateButton,
+                    isDesktop && styles.updateButtonDesktop,
+                    pressed && styles.updateButtonPressed,
+                    isLoading && styles.updateButtonDisabled,
+                  ]}
+                  onPress={handleUpdateProfile}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.updateButtonText}>
+                    {isLoading ? "Updating..." : "Update Profile"}
+                  </Text>
+                </Pressable>
+
                 {/* <View style={styles.divider} />
 
                 <View style={styles.settingRow}>
@@ -279,21 +294,6 @@ export default function EditProfileScreen() {
                 </View> */}
               </View>
             </View>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.updateButton,
-                isDesktop && styles.updateButtonDesktop,
-                pressed && styles.updateButtonPressed,
-                isLoading && styles.updateButtonDisabled,
-              ]}
-              onPress={handleUpdateProfile}
-              disabled={isLoading}
-            >
-              <Text style={styles.updateButtonText}>
-                {isLoading ? "Updating..." : "Update Profile"}
-              </Text>
-            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
 
   profileCardDesktop: {
     width: 320,
-    minHeight: 378,
+    minHeight: 400,
     marginBottom: 0,
     paddingTop: 34,
     paddingBottom: 34,
@@ -389,6 +389,25 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
+  avatarOuterRingDesktop: {
+    width: 124,
+    height: 124,
+    borderRadius: 52,
+    backgroundColor: CARD,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+
+  avatarDesktop: {
+    width: 112,
+    height: 112,
+    borderRadius: 46,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+  },
+
   avatar: {
     width: 92,
     height: 92,
@@ -401,6 +420,11 @@ const styles = StyleSheet.create({
   logoImage: {
     width: 85,
     height: 85,
+  },
+
+  logoImageDesktop: {
+    width: 115,
+    height: 115,
   },
 
   editAvatarButton: {
@@ -479,6 +503,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     paddingVertical: 24,
     paddingHorizontal: 24,
+    minHeight: 400,
   },
 
   form: {
