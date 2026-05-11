@@ -136,12 +136,12 @@ export default function ProfileScreen() {
               label="Edit Profile"
               onPress={() => router.push("/profile/edit")}
             />
-            <View style={styles.divider} />
+            {/* <View style={styles.divider} />
             <ProfileOption
               icon="shield"
               label="Security"
               onPress={() => router.push("/profile/security")}
-            />
+            /> */}
             <View style={styles.divider} />
             <ProfileOption
               icon="settings"

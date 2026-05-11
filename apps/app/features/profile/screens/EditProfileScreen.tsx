@@ -252,7 +252,7 @@ export default function EditProfileScreen() {
                   editable: false,
                 })}
 
-                <View style={styles.divider} />
+                {/* <View style={styles.divider} />
 
                 <View style={styles.settingRow}>
                   <Text style={styles.settingLabel}>Push Notifications</Text>
@@ -276,7 +276,7 @@ export default function EditProfileScreen() {
                     trackColor={{ false: SWITCH_OFF, true: TEAL }}
                     thumbColor={WHITE}
                   />
-                </View>
+                </View> */}
               </View>
             </View>
 
@@ -464,8 +464,8 @@ const styles = StyleSheet.create({
   settingsCard: {
     backgroundColor: CARD,
     borderRadius: 18,
-    paddingVertical: 18,
-    paddingHorizontal: 14,
+    paddingVertical: 35,
+    paddingHorizontal: 15,
     marginBottom: 22,
     shadowColor: "#000",
     shadowOpacity: 0.04,

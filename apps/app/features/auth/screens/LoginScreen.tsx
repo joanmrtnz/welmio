@@ -180,6 +180,7 @@ export default function LoginScreen() {
                   </Text>
                 </Pressable>
 
+                {/*             
                 <View style={styles.dividerRow}>
                   <View style={styles.dividerLine} />
                   <Text style={styles.dividerText}>or continue with</Text>
@@ -209,7 +210,8 @@ export default function LoginScreen() {
                       </Text>
                     </Pressable>
                   </Link>
-                ) : null}
+                ) : null} 
+                */}
 
                 <Link href="/(public)/signup" style={styles.footer}>
                   <Text>
