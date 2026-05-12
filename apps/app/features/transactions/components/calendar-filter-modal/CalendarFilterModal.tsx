@@ -124,7 +124,7 @@ export function CalendarFilterModal({
               onPress={handlePreviousMonth}
               style={styles.monthArrowButton}
             >
-              <Icon name="arrowLeft" size={16} strokeWidth={1.5} color={BLACK} />
+              <Icon name="arrowLeft" size={20} strokeWidth={1.5} color={BLACK} />
             </Pressable>
 
             <Text style={[styles.monthTitle, isDesktop && styles.monthTitleDesktop]}>{monthTitle}</Text>
@@ -133,7 +133,7 @@ export function CalendarFilterModal({
               onPress={handleNextMonth}
               style={styles.monthArrowButton}
             >
-              <Icon name="arrowRight" size={16} strokeWidth={1.5} color={BLACK} />
+              <Icon name="arrowRight" size={20} strokeWidth={1.5} color={BLACK} />
             </Pressable>
           </View>
 

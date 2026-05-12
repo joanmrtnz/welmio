@@ -23,7 +23,7 @@ export function AppScreenHeader({ title }: AppScreenHeaderProps) {
         onPress={() => router.back()}
         style={[styles.backButton, isDesktop && styles.backButtonDesktop]}
       >
-        <Icon name="arrowLeft" size={24} strokeWidth={2.5} color={BLACK} />
+        <Icon name="arrowLeft" size={28} strokeWidth={1.5} color={BLACK} />
       </Pressable>
 
       <Text
