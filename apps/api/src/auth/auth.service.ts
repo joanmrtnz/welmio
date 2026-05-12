@@ -6,12 +6,123 @@ import {
   InternalServerErrorException
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { AccountType, Prisma, TransactionType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { MailService } from 'src/mail/mail.service';
+
+const DEFAULT_CATEGORIES: Prisma.CategoryCreateWithoutUserInput[] = [
+  {
+    name: 'Food & Dining',
+    type: TransactionType.expense,
+    icon: 'food',
+    color: '#F97316',
+  },
+  {
+    name: 'Groceries',
+    type: TransactionType.expense,
+    icon: 'groceries',
+    color: '#22C55E',
+  },
+  {
+    name: 'Transport',
+    type: TransactionType.expense,
+    icon: 'car',
+    color: '#3B82F6',
+  },
+  {
+    name: 'Housing',
+    type: TransactionType.expense,
+    icon: 'rent',
+    color: '#8B5CF6',
+  },
+  {
+    name: 'Utilities',
+    type: TransactionType.expense,
+    icon: 'document',
+    color: '#EAB308',
+  },
+  {
+    name: 'Health',
+    type: TransactionType.expense,
+    icon: 'medicine',
+    color: '#EF4444',
+  },
+  {
+    name: 'Entertainment',
+    type: TransactionType.expense,
+    icon: 'ticket',
+    color: '#EC4899',
+  },
+  {
+    name: 'Shopping',
+    type: TransactionType.expense,
+    icon: 'gift',
+    color: '#A855F7',
+  },
+  {
+    name: 'Education',
+    type: TransactionType.expense,
+    icon: 'book',
+    color: '#14B8A6',
+  },
+  {
+    name: 'Travel',
+    type: TransactionType.expense,
+    icon: 'plane',
+    color: '#06B6D4',
+  },
+  {
+    name: 'Subscriptions',
+    type: TransactionType.expense,
+    icon: 'ticket',
+    color: '#64748B',
+  },
+  {
+    name: 'Other Expense',
+    type: TransactionType.expense,
+    icon: 'expense',
+    color: '#94A3B8',
+  },
+  {
+    name: 'Salary',
+    type: TransactionType.income,
+    icon: 'income',
+    color: '#16A34A',
+  },
+  {
+    name: 'Freelance',
+    type: TransactionType.income,
+    icon: 'document',
+    color: '#2563EB',
+  },
+  {
+    name: 'Refunds',
+    type: TransactionType.income,
+    icon: 'arrowLeft',
+    color: '#0D9488',
+  },
+  {
+    name: 'Investments',
+    type: TransactionType.income,
+    icon: 'savings',
+    color: '#7C3AED',
+  },
+  {
+    name: 'Gifts',
+    type: TransactionType.income,
+    icon: 'gift',
+    color: '#DB2777',
+  },
+  {
+    name: 'Other Income',
+    type: TransactionType.income,
+    icon: 'plus',
+    color: '#94A3B8',
+  },
+];
 
 @Injectable()
 export class AuthService {
@@ -51,9 +162,13 @@ async register(dto: RegisterDto) {
         accounts: {
           create: {
             name: 'Cash',
-            type: 'cash',
+            type: AccountType.cash,
             currencies: ['EUR'],
           },
+        },
+
+        categories: {
+          create: DEFAULT_CATEGORIES,
         },
       },
     });

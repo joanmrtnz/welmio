@@ -10,7 +10,6 @@ export class AuthController {
 
   @Post('register')
   register(@Body() dto: RegisterDto) {
-    console.log("API: setting new registration...");
     return this.authService.register(dto);
    
   }
