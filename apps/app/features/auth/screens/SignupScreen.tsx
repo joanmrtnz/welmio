@@ -18,6 +18,7 @@ import { useSignup } from "@/features/auth/hooks/useSignup";
 import { toIsoDate } from "@/app/lib/date";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
+import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
 
 const BACKGROUND = "#dff7ef";
 const CARD = "#ffffff";
@@ -220,11 +221,10 @@ export default function SignupScreen() {
           onChangeText={setMobileNumber}
         />
 
-        <SignupInput
+        <DateOfBirthInput
           label="Date of Birth"
           icon="calendar-o"
           placeholder="DD / MM / YYYY"
-          keyboardType="numbers-and-punctuation"
           value={dateOfBirth}
           onChangeText={setDateOfBirth}
         />

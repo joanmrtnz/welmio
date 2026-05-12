@@ -7,7 +7,6 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { fonts } from "@/theme/fonts";
-import { Icon } from "@/components/icons/Icon";
 import { useAnalytics } from "../hooks/useAnalytics";
 import {
   getChartMaxValue,
@@ -188,65 +187,38 @@ function GoalContributionsCard({
             <View key={goal.id} style={styles.goalContributionItem}>
               <View style={styles.goalContributionHeader}>
                 <View style={styles.goalRingTrack}>
-                  <View
-                    style={[
-                      styles.goalRingArc,
-                      { borderColor: TEAL },
-                    ]}
-                  />
+                  <View style={[styles.goalRingArc, { borderColor: TEAL }]} />
                   <Text style={styles.goalRingText}>{goal.percent}%</Text>
                 </View>
-              <View style={styles.goalContributionInfo}>
-                <Text style={styles.goalContributionTitle}>{goal.label}</Text>
-                <Text style={styles.goalContributionAmount}>
-                  {formatCurrency(goal.amount)} contributed
-                </Text>
-                <View style={styles.horizontalBarTrack}>
-                  <View
-                    style={[
-                      styles.goalBarFill,
-                      {
-                        width: `${goal.percent}%`,
-                        backgroundColor: goal.color ?? TEAL,
-                      },
-                    ]}
-                  />
+                <View style={styles.goalContributionInfo}>
+                  <Text style={styles.goalContributionTitle}>{goal.label}</Text>
+                  <Text style={styles.goalContributionAmount}>
+                    {formatCurrency(goal.amount)} contributed
+                  </Text>
+                  <View style={styles.horizontalBarTrack}>
+                    <View
+                      style={[
+                        styles.goalBarFill,
+                        {
+                          width: `${goal.percent}%`,
+                          backgroundColor: TEAL,
+                        },
+                      ]}
+                    />
+                  </View>
+                  <Text style={styles.goalContributionMeta}>
+                    {goal.percent}% of goal contributions ·{" "}
+                    {goal.contributionsCount}{" "}
+                    {goal.contributionsCount === 1
+                      ? "contribution"
+                      : "contributions"}
+                  </Text>
                 </View>
-                <Text style={styles.goalContributionMeta}>
-                  {goal.percent}% of goal contributions · {goal.contributionsCount}{" "}
-                  {goal.contributionsCount === 1
-                    ? "contribution"
-                    : "contributions"}
-                </Text>
-              </View>
               </View>
             </View>
           ))}
         </View>
       )}
-    </View>
-  );
-}
-
-function TargetCard({
-  percent,
-  title,
-  amountLeft,
-  isDesktop,
-}: {
-  percent: string;
-  title: string;
-  amountLeft: string;
-  isDesktop?: boolean;
-}) {
-  return (
-    <View style={[styles.targetCard, isDesktop && styles.targetCardDesktop]}>
-      <View style={styles.ringTrack}>
-        <View style={styles.ringArc} />
-        <Text style={styles.progressValue}>{percent}</Text>
-      </View>
-      <Text style={styles.targetLabel}>{title}</Text>
-      <Text style={styles.targetAmount}>{amountLeft}</Text>
     </View>
   );
 }
@@ -487,7 +459,7 @@ export default function AnalyticsScreen() {
             </View>
           </View>
         </View>
-       
+
         <ExpensesByCategoryCard
           categories={expenseCategories}
           hasError={Boolean(expenseCategoriesError)}
@@ -502,51 +474,6 @@ export default function AnalyticsScreen() {
           isLoading={isLoadingGoalContributions}
           periodLabel={selectedPeriodLabel}
         />
-      
-        <View style={[styles.totalsRow, isDesktop && styles.totalsRowDesktop]}>
-          <View
-            style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}
-          >
-            <View style={styles.totalIcon}>
-              <Icon name="income" size={27} strokeWidth={1.4} color={TEAL} />
-            </View>
-            <Text style={styles.totalLabel}>Income</Text>
-            <Text style={styles.totalValue}>
-              {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
-            </Text>
-          </View>
-
-          <View
-            style={[styles.totalItem, isDesktop && styles.totalItemDesktop]}
-          >
-            <View style={styles.totalIcon}>
-              <Icon name="expense" size={27} strokeWidth={1.4} color={TEAL} />
-            </View>
-            <Text style={styles.totalLabel}>Expense</Text>
-            <Text style={styles.totalValue}>
-              {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
-            </Text>
-          </View>
-        </View>
-
-        <Text style={styles.targetsTitle}>My Targets</Text>
-
-        <View
-          style={[styles.targetsRow, isDesktop && styles.targetsRowDesktop]}
-        >
-          <TargetCard
-            percent="30%"
-            title="Short term goal"
-            amountLeft="€13,560.30 left"
-            isDesktop={isDesktop}
-          />
-          <TargetCard
-            percent="50%"
-            title="Long term goal"
-            amountLeft="€22,600.50 left"
-            isDesktop={isDesktop}
-          />
-        </View>
       </ScrollView>
       <LinearGradient
         pointerEvents="none"
@@ -733,21 +660,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     fontFamily: fonts.medium,
     color: MUTED,
-  },
-
-  graphActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-
-  graphIcon: {
-    width: 36,
-    height: 36,
-    backgroundColor: "#f3fbf8",
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
   },
 
   legendRow: {
@@ -1019,6 +931,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 58,
     height: 58,
+
     borderColor: TEAL,
   },
 
@@ -1059,137 +972,6 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 999,
     backgroundColor: TEAL,
-  },
-
-  totalsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 22,
-  },
-
-  totalsRowDesktop: {
-    gap: 20,
-    marginBottom: 26,
-  },
-
-  totalItem: {
-    width: "48%",
-    minHeight: 102,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: CARD,
-    borderRadius: 13,
-    shadowColor: "#000",
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 1,
-  },
-
-  totalItemDesktop: {
-    flex: 1,
-    width: undefined,
-    minHeight: 118,
-    borderRadius: 20,
-  },
-
-  totalIcon: {
-    width: 28,
-    height: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    borderColor: TEAL,
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-
-  totalLabel: {
-    fontSize: 12,
-    fontFamily: fonts.regular,
-    color: DARK_TEAL,
-  },
-
-  totalValue: {
-    marginTop: 2,
-    fontSize: 17,
-    fontFamily: fonts.bold,
-    color: DARK_TEAL,
-  },
-
-  targetsTitle: {
-    fontSize: 15,
-    fontFamily: fonts.bold,
-    color: DARK_TEAL,
-    marginBottom: 16,
-  },
-
-  targetsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  targetsRowDesktop: {
-    gap: 20,
-  },
-
-  targetCard: {
-    width: "48%",
-    backgroundColor: SOFT_TEAL,
-    borderRadius: 20,
-    paddingVertical: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  targetCardDesktop: {
-    flex: 1,
-    width: undefined,
-    minHeight: 176,
-  },
-
-  ringTrack: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 5,
-    borderColor: "rgba(0, 200, 150, 0.24)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
-    position: "relative",
-  },
-
-  ringArc: {
-    position: "absolute",
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 5,
-    borderLeftColor: "transparent",
-    borderBottomColor: "transparent",
-    borderTopColor: TEAL,
-    borderRightColor: TEAL,
-    transform: [{ rotate: "28deg" }],
-  },
-
-  progressValue: {
-    fontSize: 19,
-    fontFamily: fonts.bold,
-    color: TEAL,
-  },
-
-  targetLabel: {
-    fontSize: 13,
-    fontFamily: fonts.regular,
-    color: DARK_TEAL,
-  },
-
-  targetAmount: {
-    marginTop: 3,
-    fontSize: 13,
-    fontFamily: fonts.medium,
-    color: DARK_TEAL,
   },
 
   bottomFade: {

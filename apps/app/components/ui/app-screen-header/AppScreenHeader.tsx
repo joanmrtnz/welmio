@@ -21,33 +21,42 @@ export function AppScreenHeader({ title }: AppScreenHeaderProps) {
       <Pressable
         hitSlop={12}
         onPress={() => router.back()}
-        style={styles.backButton}
+        style={[styles.backButton, isDesktop && styles.backButtonDesktop]}
       >
-        <Icon name="arrowLeft" size={24} strokeWidth={2.5} color={BLACK} />
+        <Icon name="arrowLeft" size={28} strokeWidth={1.5} color={BLACK} />
       </Pressable>
 
-      <Text style={[styles.title, isDesktop && styles.titleDesktop]} numberOfLines={1}>
+      <Text
+        pointerEvents="none"
+        style={[styles.title, isDesktop && styles.titleDesktop]}
+        numberOfLines={1}
+      >
         {title}
       </Text>
 
-    { !isDesktop ? (
-      <View style={styles.notifications}>
-        <Icon name="bell" size={24} strokeWidth={1.8} color={BLACK} />
-      </View>
-      ):  <View></View>}
+      {/* Future implementation: notifications button */}
+      {/* {!isDesktop ? (
+        <View style={styles.notifications}>
+          <Icon name="bell" size={24} strokeWidth={1.8} color={BLACK} />
+        </View>
+      ) : (
+        <View />
+      )} */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   headerArea: {
-    justifyContent: "space-between",
+    position: "relative",
+    justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 25,
     marginTop: 26,
-    marginBottom: 22,
+    marginBottom: 30,
+    minHeight: 42,
   },
 
   headerAreaDesktop: {
@@ -60,24 +69,33 @@ const styles = StyleSheet.create({
   },
 
   backButton: {
+    position: "absolute",
+    left: 24,
+    top: 15,
     width: 42,
     height: 42,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 10,
+    elevation: 10,
+  },
+
+  backButtonDesktop: {
+    left: 32,
   },
 
   title: {
-    flex: 1,
+    width: "100%",
     textAlign: "center",
     fontSize: 19,
     fontFamily: fonts.bold,
     color: BLACK,
-    marginHorizontal: 16,
+    paddingHorizontal: 58,
   },
 
   titleDesktop: {
     fontSize: 22,
-    marginHorizontal: 24,
+    paddingHorizontal: 66,
   },
 
   notifications: {

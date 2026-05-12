@@ -31,7 +31,7 @@ const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 export default function LoginScreen() {
   const { width } = useWindowDimensions();
-  const isDesktop = width >= 768;
+  const isDesktop = width >= 1024;
   const { execute, loading } = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -180,6 +180,7 @@ export default function LoginScreen() {
                   </Text>
                 </Pressable>
 
+                {/*             
                 <View style={styles.dividerRow}>
                   <View style={styles.dividerLine} />
                   <Text style={styles.dividerText}>or continue with</Text>
@@ -209,7 +210,8 @@ export default function LoginScreen() {
                       </Text>
                     </Pressable>
                   </Link>
-                ) : null}
+                ) : null} 
+                */}
 
                 <Link href="/(public)/signup" style={styles.footer}>
                   <Text>
@@ -284,6 +286,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flex: 1,
     maxWidth: 460,
+    alignSelf: "center",
     position: "relative",
     zIndex: 1,
   },
