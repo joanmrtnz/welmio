@@ -135,7 +135,7 @@ export default function ChangePasswordScreen() {
               style={[styles.noticeCard, isDesktop && styles.noticeCardDesktop]}
             >
               <View style={styles.noticeIcon}>
-                <Icon name="shield" size={22} strokeWidth={1.7} color={TEAL} />
+                <Icon name="shield" size={40} strokeWidth={1} color={TEAL} />
               </View>
               <View style={styles.noticeTextWrap}>
                 <Text style={styles.noticeTitle}>Use a strong password</Text>

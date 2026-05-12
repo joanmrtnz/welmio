@@ -46,9 +46,15 @@ const goalTypes = [
 ];
 
 const goalIcons = [
-  { name: "rent", label: "Rent" },
+  { name: "savings", label: "Savings" },
+  { name: "shield", label: "Emergency" },
+  { name: "gift", label: "Purchase" },
+  { name: "income", label: "Investment" },
   { name: "money", label: "Money" },
-  { name: "income", label: "Income" },
+  { name: "rent", label: "Home" },
+  { name: "car", label: "Car" },
+  { name: "plane", label: "Travel" },
+  { name: "book", label: "Education" },
   { name: "calendar", label: "Plan" },
 ];
 
