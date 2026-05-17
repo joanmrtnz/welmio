@@ -53,7 +53,7 @@ function GoalPreviewCard({
     >
       <View style={styles.goalIcon}>
         <Icon
-          name={(goal.icon ?? "target") as never}
+          name={(goal.icon ?? "money") as never}
           size={26}
           color={GREEN_DARK}
           strokeWidth={1.2}
@@ -105,7 +105,7 @@ export function QuickGoalsRow({
         onPress={onEmptyPress}
       >
         <View style={styles.goalIcon}>
-          <Icon name="target" size={26} color={GREEN_DARK} strokeWidth={1.2} />
+          <Icon name="money" size={34} color={GREEN_DARK} strokeWidth={0.9} />
         </View>
 
         <View style={styles.goalContent}>
