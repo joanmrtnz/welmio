@@ -6,12 +6,13 @@ import {
   InternalServerErrorException
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { AccountType, Prisma, TransactionType } from '@prisma/client';
+import { AccountType, Prisma, TransactionType, VerificationTokenType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { MailService } from 'src/mail/mail.service';
+import { VerificationTokenService } from 'src/verification-token/verification-token.service';
 
 const DEFAULT_CATEGORIES: Prisma.CategoryCreateWithoutUserInput[] = [
   {
@@ -130,61 +131,94 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private verificationTokenService: VerificationTokenService,
   ) {}
 
+  async register(dto: RegisterDto) {
+    const { fullName, email, mobileNumber, dateOfBirth, password } = dto;
 
-async register(dto: RegisterDto) {
-  const { fullName, email, mobileNumber, dateOfBirth, password } = dto;
+    if (!fullName || !email || !password) {
+      throw new BadRequestException(
+        'fullName, email and password are required',
+      );
+    }
 
-  if (!fullName || !email || !password) {
-    throw new BadRequestException(
-      'fullName, email and password are required',
-    );
-  }
+    if (password.length < 6) {
+      throw new BadRequestException(
+        'Password must be at least 6 characters long',
+      );
+    }
 
-  if (password.length < 6) {
-    throw new BadRequestException(
-      'Password must be at least 6 characters long',
-    );
-  }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          fullName,
+          email,
+          mobileNumber: mobileNumber ?? null,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+          password: hashedPassword,
+          emailVerifiedAt: null,
 
-  try {
-    const user = await this.prisma.user.create({
-      data: {
-        fullName,
-        email,
-        mobileNumber: mobileNumber ?? null,
-        dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
-        password: hashedPassword,
+          accounts: {
+            create: {
+              name: 'Cash',
+              type: AccountType.cash,
+              currencies: ['EUR'],
+            },
+          },
 
-        accounts: {
-          create: {
-            name: 'Cash',
-            type: AccountType.cash,
-            currencies: ['EUR'],
+          categories: {
+            create: DEFAULT_CATEGORIES,
           },
         },
+      });
 
-        categories: {
-          create: DEFAULT_CATEGORIES,
-        },
+      const verificationToken = await this.verificationTokenService.createToken(
+        user.id,
+        VerificationTokenType.email_verification,
+      );
+
+      await this.mailService.sendEmailVerification({
+        to: user.email,
+        token: verificationToken,
+      });
+
+      return {
+        message: 'Account created. Please verify your email.',
+      };
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new ConflictException('Email already registered');
+      }
+
+      throw error;
+    }
+  }
+
+   async verifyEmail(token: string) {
+    const verificationToken = await this.verificationTokenService.verifyToken(
+      token,
+      VerificationTokenType.email_verification,
+    );
+
+    await this.prisma.user.update({
+      where: {
+        id: verificationToken.userId,
+      },
+      data: {
+        emailVerifiedAt: new Date(),
       },
     });
 
-    return this.generateToken(user.id, user.email);
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === 'P2002'
-    ) {
-      throw new ConflictException('Email already registered');
-    }
-
-    throw error;
+    return {
+      message: 'Email verified successfully.',
+    };
   }
-}
 
   async login(dto: LoginDto) {
     try {
@@ -194,6 +228,10 @@ async register(dto: RegisterDto) {
 
       if (!user) {
         throw new UnauthorizedException('Invalid credentials');
+      }
+
+      if (!user.emailVerifiedAt) {
+        throw new UnauthorizedException('Please verify your email before logging in');
       }
 
       const passwordMatch = await bcrypt.compare(
