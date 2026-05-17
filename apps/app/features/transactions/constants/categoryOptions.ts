@@ -1,14 +1,20 @@
 export const CATEGORY_ICONS = [
-  { name: "groceries", label: "Food" },
+  { name: "food", label: "Food & Dining" },
+  { name: "groceries", label: "Groceries" },
   { name: "car", label: "Transport" },
-  { name: "rent", label: "Rent" },
-  { name: "medicine", label: "Medicine" },
-  { name: "gift", label: "Gifts" },
-  { name: "ticket", label: "Fun" },
-  { name: "savings", label: "Savings" },
-  { name: "money", label: "Money" },
+  { name: "rent", label: "Housing" },
+  { name: "document", label: "Utilities" },
+  { name: "medicine", label: "Health" },
+  { name: "ticket", label: "Entertainment" },
+  { name: "gift", label: "Shopping / Gifts" },
+  { name: "book", label: "Education" },
   { name: "plane", label: "Travel" },
-  { name: "book", label: "Books" },
+  { name: "expense", label: "Other Expense" },
+  { name: "income", label: "Salary" },
+  { name: "savings", label: "Investments" },
+  { name: "arrowLeft", label: "Refunds" },
+  { name: "plus", label: "Other Income" },
+  { name: "money", label: "Money" },
 ] as const;
 
 export const CATEGORY_COLORS = [

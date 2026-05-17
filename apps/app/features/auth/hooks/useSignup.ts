@@ -2,7 +2,6 @@ import { useState } from "react";
 import { signup } from "@/app/lib/api/auth";
 import type { RegisterInput } from "@repo/shared-types";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { setAccessToken } from "@/app/lib/auth-storage";
 
 export function useSignup() {
   const [loading, setLoading] = useState(false);
@@ -13,9 +12,8 @@ export function useSignup() {
     try {
       const res = await signup(data);
       
-      if (res?.accessToken) {
-        await setAccessToken(res.accessToken);
-        feedback.success("Account created successfully");
+      if (res) {
+        feedback.success("Account created. Please verify your email.");
       }
       return res;
     } catch (error) {
