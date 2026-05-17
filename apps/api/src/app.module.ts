@@ -10,9 +10,10 @@ import { AccountsModule } from './accounts/accounts.module';
 import { UsersModule } from './users/users.module';
 import { GoalsService } from './goals/goals.service';
 import { GoalsModule } from './goals/goals.module';
+import { VerificationTokenModule } from './verification-token/verification-token.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, TransactionsModule, CategoriesModule, AnalyticsModule, AccountsModule, UsersModule, GoalsModule],
+  imports: [AuthModule, PrismaModule, TransactionsModule, CategoriesModule, AnalyticsModule, AccountsModule, UsersModule, GoalsModule, VerificationTokenModule],
   controllers: [AppController],
   providers: [AppService, GoalsService],
 })
