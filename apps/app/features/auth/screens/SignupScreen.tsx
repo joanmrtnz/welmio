@@ -152,7 +152,7 @@ export default function SignupScreen() {
     });
 
     if (res) {
-      router.replace("/(app)/(tabs)/home");
+      router.replace("/(public)/login");
     }
   } catch (error) {
     console.warn(error);
