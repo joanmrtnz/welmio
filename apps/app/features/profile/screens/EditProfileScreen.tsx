@@ -36,6 +36,7 @@ export default function EditProfileScreen() {
   const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [currentEmail, setCurrentEmail] = useState("");
   const [userId, setUserId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
@@ -52,8 +53,13 @@ export default function EditProfileScreen() {
     try {
       setIsLoading(true);
 
+      const emailValue = email.trim().toLowerCase();
+      const currentEmailValue = currentEmail.trim().toLowerCase();
+      const hasEmailChanged = Boolean(emailValue) && emailValue !== currentEmailValue;
+
       const updatedUser = await updateUserProfile({
         fullName: username.trim(),
+        email: emailValue,
         mobileNumber: phone.trim() || null,
         avatarIcon: avatarId as unknown as IconName,
         avatarColor,
@@ -62,12 +68,17 @@ export default function EditProfileScreen() {
       setUsername(updatedUser.fullName ?? "");
       setUsernameLabel(updatedUser.fullName ?? "");
       setPhone(updatedUser.mobileNumber ?? "");
-      setEmail(updatedUser.email ?? "");
+      setEmail(hasEmailChanged ? emailValue : updatedUser.email ?? "");
+      setCurrentEmail(updatedUser.email ?? "");
       setUserId(updatedUser.id);
       setAvatarId(getAvatarId(updatedUser.avatarIcon));
       setAvatarColor(updatedUser.avatarColor ?? WHITE);
 
-      feedback.success("Profile updated successfully");
+      feedback.success(
+        hasEmailChanged
+          ? "Profile updated. Check your new email to verify the change"
+          : "Profile updated successfully"
+      );
       router.push("/profile");
     } catch (error) {
       console.warn(error);
@@ -88,6 +99,7 @@ export default function EditProfileScreen() {
         setUsernameLabel(user.fullName ?? "");
         setPhone(user.mobileNumber ?? "");
         setEmail(user.email ?? "");
+        setCurrentEmail(user.email ?? "");
         setUserId(user.id);
         setAvatarColor(user.avatarColor ?? GREEN);
         setAvatarId(getAvatarId(user.avatarIcon));
@@ -249,7 +261,6 @@ export default function EditProfileScreen() {
                   autoCorrect: false,
                   value: email,
                   onChangeText: setEmail,
-                  editable: false,
                 })}
 
                 <Pressable
