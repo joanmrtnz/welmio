@@ -2,6 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 import { resetPasswordEmailTemplate } from './templates/reset-password-email';
 import { emailVerificationTemplate } from './templates/email-verification-email';
+import { emailChangeVerificationTemplate } from './templates/email-change-verification-email';
+
+type VerificationEmailTemplateType = 'email_verification' | 'email_change';
 
 @Injectable()
 export class MailService {
@@ -30,16 +33,18 @@ export class MailService {
     to,
     token,
     fullName,
+    templateType = 'email_verification',
   }: {
     to: string;
     token: string;
     fullName?: string;
+    templateType?: VerificationEmailTemplateType;
   }) {
-    const verificationUrl = `${process.env.APP_URL}/auth/verify-email?token=${token}`;
-
-    const { subject, html } = emailVerificationTemplate({
+    const verificationUrl = this.buildVerificationUrl(token, templateType);
+    const { subject, html } = this.getVerificationEmailTemplate({
       verificationUrl,
       fullName,
+      templateType,
     });
 
     const { data, error } = await this.resend.emails.send({
@@ -55,5 +60,37 @@ export class MailService {
     }
 
     return data;
+  }
+
+  private buildVerificationUrl(
+    token: string,
+    templateType: VerificationEmailTemplateType,
+  ) {
+    const appUrl = process.env.APP_URL + "/auth";
+
+    if (!appUrl) {
+      throw new Error('APP_URL is not configured');
+    }
+
+    const verificationPath =
+      templateType === 'email_change' ? 'verify-email-change' : 'verify-email';
+
+    return `${appUrl}/${verificationPath}?token=${token}`;
+  }
+
+  private getVerificationEmailTemplate({
+    verificationUrl,
+    fullName,
+    templateType,
+  }: {
+    verificationUrl: string;
+    fullName?: string;
+    templateType: VerificationEmailTemplateType;
+  }) {
+    if (templateType === 'email_change') {
+      return emailChangeVerificationTemplate({ verificationUrl, fullName });
+    }
+
+    return emailVerificationTemplate({ verificationUrl, fullName });
   }
 }

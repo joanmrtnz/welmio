@@ -17,6 +17,7 @@ import { fonts } from "@/theme/fonts";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import { Icon } from "@/components/icons/Icon";
 import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -28,6 +29,40 @@ const MUTED = "#6f8586";
 const CARD = "#ffffff";
 const SOFT_GREEN = "#e3f8f1";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
+
+type BackendErrorResponse = {
+  response?: {
+    data?: {
+      message?: string | string[];
+      code?: string;
+    };
+  };
+  data?: {
+    message?: string | string[];
+    code?: string;
+  };
+  message?: string;
+};
+
+function getLoginErrorMessage(error: unknown) {
+  const backendError = error as BackendErrorResponse;
+  const responseMessage =
+    backendError.response?.data?.message ?? backendError.data?.message;
+
+  if (Array.isArray(responseMessage)) {
+    return responseMessage.join("\n");
+  }
+
+  if (typeof responseMessage === "string" && responseMessage.trim()) {
+    return responseMessage;
+  }
+
+  if (typeof backendError.message === "string" && backendError.message.trim()) {
+    return backendError.message;
+  }
+
+  return "Invalid email or password";
+}
 
 export default function LoginScreen() {
   const { width } = useWindowDimensions();
@@ -46,6 +81,7 @@ export default function LoginScreen() {
 
       if (res) router.replace("/(app)/(tabs)/home");
     } catch (error) {
+      feedback.error(getLoginErrorMessage(error));
       console.warn(error);
     }
   }

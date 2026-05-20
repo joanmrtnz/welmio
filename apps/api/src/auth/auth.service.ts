@@ -183,6 +183,8 @@ export class AuthService {
       await this.mailService.sendEmailVerification({
         to: user.email,
         token: verificationToken,
+        fullName: user.fullName,
+        templateType: 'email_verification',
       });
 
       return {
@@ -201,6 +203,10 @@ export class AuthService {
   }
 
    async verifyEmail(token: string) {
+    if (!token) {
+      throw new BadRequestException('Verification token is required');
+    }
+
     const verificationToken = await this.verificationTokenService.verifyToken(
       token,
       VerificationTokenType.email_verification,
@@ -220,18 +226,73 @@ export class AuthService {
     };
   }
 
+  async verifyEmailChange(token: string) {
+    if (!token) {
+      throw new BadRequestException('Verification token is required');
+    }
+
+    const verificationToken = await this.verificationTokenService.verifyToken(
+      token,
+      VerificationTokenType.email_change,
+    );
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: verificationToken.userId,
+      },
+      select: {
+        id: true,
+        pendingEmail: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found for this verification token');
+    }
+
+    if (!user.pendingEmail) {
+      throw new BadRequestException('There is no pending email change to verify');
+    }
+
+    const pendingEmail = user.pendingEmail.trim().toLowerCase();
+
+    const emailOwner = await this.prisma.user.findUnique({
+      where: {
+        email: pendingEmail,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (emailOwner && emailOwner.id !== user.id) {
+      throw new ConflictException('Email already registered');
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        email: pendingEmail,
+        pendingEmail: null,
+        emailVerifiedAt: new Date(),
+      },
+    });
+
+    return {
+      message: 'Email changed successfully.',
+    };
+  }
+
   async login(dto: LoginDto) {
     try {
       const user = await this.prisma.user.findUnique({
-        where: { email: dto.email },
+        where: { email: dto.email.trim().toLowerCase() },
       });
 
       if (!user) {
         throw new UnauthorizedException('Invalid credentials');
-      }
-
-      if (!user.emailVerifiedAt) {
-        throw new UnauthorizedException('Please verify your email before logging in');
       }
 
       const passwordMatch = await bcrypt.compare(
@@ -241,6 +302,19 @@ export class AuthService {
 
       if (!passwordMatch) {
         throw new UnauthorizedException('Invalid credentials');
+      }
+
+      if (!user.emailVerifiedAt) {
+        const verificationEmailSent =
+          await this.resendVerificationEmailIfLastTokenExpired(user.id, user.email);
+
+        throw new UnauthorizedException({
+          message: verificationEmailSent
+            ? 'Please verify your email before logging in. We sent you a new verification email.'
+            : 'Please verify your email before logging in. Check your inbox for the verification email.',
+          code: 'EMAIL_NOT_VERIFIED',
+          verificationEmailSent,
+        });
       }
 
       return this.generateToken(user.id, user.email);
@@ -260,6 +334,42 @@ export class AuthService {
         'Unexpected error during login',
       );
     }
+  }
+
+  private async resendVerificationEmailIfLastTokenExpired(
+    userId: string,
+    email: string,
+  ) {
+    const activeVerificationToken = await this.prisma.verificationToken.findFirst({
+      where: {
+        userId,
+        type: VerificationTokenType.email_verification,
+        usedAt: null,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (activeVerificationToken) {
+      return false;
+    }
+
+    const verificationToken = await this.verificationTokenService.createToken(
+      userId,
+      VerificationTokenType.email_verification,
+    );
+
+    await this.mailService.sendEmailVerification({
+      to: email,
+      token: verificationToken,
+      templateType: 'email_verification',
+    });
+
+    return true;
   }
 
   async generateToken(userId: string, email: string) {

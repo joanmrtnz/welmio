@@ -19,6 +19,11 @@ export class AuthController {
     return this.authService.verifyEmail(token);
   }
 
+  @Get('verify-email-change')
+  verifyEmailChange(@Query('token') token: string) {
+    return this.authService.verifyEmailChange(token);
+  }
+
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
