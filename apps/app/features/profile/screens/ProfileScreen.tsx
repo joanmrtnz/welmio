@@ -243,6 +243,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
+    overflow: "hidden",
   },
 
   logoBadge: {
@@ -262,8 +263,8 @@ const styles = StyleSheet.create({
   },
 
   logoImage: {
-    width: 85,
-    height: 85,
+    width: "92%",
+    height: "92%",
   },
 
   nameContainer: {

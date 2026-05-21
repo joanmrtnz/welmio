@@ -359,8 +359,8 @@ const styles = StyleSheet.create({
   },
 
   logoImage: {
-    width: 30,
-    height: 29,
+    width: "86%",
+    height: "86%",
   },
 
   brandName: {
@@ -396,6 +396,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
     shadowColor: "rgba(29, 100, 89, 0.16)",
     shadowOpacity: 1,
     shadowRadius: 16,
@@ -410,13 +411,13 @@ const styles = StyleSheet.create({
   },
 
   avatarImage: {
-    width: 100,
-    height: 99,
+    width: "92%",
+    height: "92%",
   },
 
   avatarImageDesktop: {
-    width: 145,
-    height: 144,
+    width: "93%",
+    height: "93%",
   },
 
   desktopCopy: {

@@ -440,6 +440,7 @@ const styles = StyleSheet.create({
     borderColor: PRIMARY_DARK,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
     shadowColor: "rgba(7, 59, 58, 0.22)",
     shadowOpacity: 1,
     shadowRadius: 18,
@@ -448,8 +449,8 @@ const styles = StyleSheet.create({
   },
 
   heroLogo: {
-    width: 99,
-    height: 98,
+    width: "92%",
+    height: "92%",
     resizeMode: "contain",
   },
 
@@ -460,8 +461,8 @@ const styles = StyleSheet.create({
   },
 
   heroLogoDesktop: {
-    width: 121,
-    height: 120,
+    width: "93%",
+    height: "93%",
   },
 
   desktopHeadline: {

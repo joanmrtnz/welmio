@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   avatarOuterRingDesktop: {
     width: 124,
     height: 124,
-    borderRadius: 52,
+    borderRadius: 62,
     backgroundColor: CARD,
     alignItems: "center",
     justifyContent: "center",
@@ -413,10 +413,11 @@ const styles = StyleSheet.create({
   avatarDesktop: {
     width: 112,
     height: 112,
-    borderRadius: 46,
+    borderRadius: 56,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
+    overflow: "hidden",
   },
 
   avatar: {
@@ -426,16 +427,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
+    overflow: "hidden",
   },
 
   logoImage: {
-    width: 85,
-    height: 85,
+    width: "92%",
+    height: "92%",
   },
 
   logoImageDesktop: {
-    width: 115,
-    height: 115,
+    width: "93%",
+    height: "93%",
   },
 
   editAvatarButton: {
