@@ -256,18 +256,6 @@ export default function LoginScreen() {
                 </Link>
               </View>
             </View>
-
-            <View style={[styles.adviceCard, isDesktop && styles.adviceCardDesktop]}>
-              <View style={styles.adviceIcon}>
-                <FontAwesome name="lightbulb-o" size={30} color={PRIMARY} />
-              </View>
-              <View style={styles.adviceTextColumn}>
-                <Text style={styles.adviceTitle}>Smart Finance, Simple Life</Text>
-                <Text style={styles.adviceText}>
-                  Take control of your money with ease.
-                </Text>
-              </View>
-            </View>
           </View>
         </View>
       </ScrollView>
@@ -656,52 +644,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
-  adviceCard: {
-    marginTop: 24,
-    marginBottom: 4,
-    marginHorizontal: 2,
-    paddingVertical: 18,
-    paddingHorizontal: 40,
-    borderRadius: 22,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 13,
-    shadowColor: "rgba(29, 100, 89, 0.08)",
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
-  },
-
-  adviceCardDesktop: {
-    marginHorizontal: 0,
-    paddingHorizontal: 22,
-  },
-
-  adviceIcon: {
-    width: 43,
-    height: 43,
-    borderRadius: 15,
-    backgroundColor: SOFT_GREEN,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  adviceTextColumn: {
-    flex: 1,
-  },
-
-  adviceTitle: {
-    color: DARK,
-    fontSize: 13,
-    fontFamily: fonts.bold,
-  },
-
-  adviceText: {
-    color: MUTED,
-    fontSize: 12,
-    marginTop: 3,
-    fontFamily: fonts.medium,
-  },
 });

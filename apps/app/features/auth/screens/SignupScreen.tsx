@@ -287,20 +287,6 @@ export default function SignupScreen() {
     </View>
   );
 
-  const sloganCard = (
-    <View style={[styles.sloganCard, isDesktop && styles.sloganCardDesktop]}>
-      <View style={styles.sloganIcon}>
-        <FontAwesome name="lightbulb-o" size={23} color={PRIMARY} />
-      </View>
-      <View style={styles.sloganTextWrap}>
-        <Text style={styles.sloganTitle}>Smart Finance, Simple Life</Text>
-        <Text style={styles.sloganText}>
-          Take control of your money with ease.
-        </Text>
-      </View>
-    </View>
-  );
-
   return (
     <KeyboardAvoidingView
       style={styles.screen}
@@ -326,7 +312,6 @@ export default function SignupScreen() {
                 Create your Welmio account and start organizing expenses,
                 savings goals, and financial routines with a clean dashboard.
               </Text>
-              {sloganCard}
             </View>
 
             <View style={styles.desktopFormPane}>{signupCard}</View>
@@ -336,7 +321,6 @@ export default function SignupScreen() {
             {brandHeader}
             {logoHero}
             {signupCard}
-            {sloganCard}
           </>
         )}
       </ScrollView>
@@ -622,7 +606,7 @@ const styles = StyleSheet.create({
   },
 
   primaryButtonDesktop: {
-    alignSelf: "flex-end",
+    alignSelf: "center",
     width: 220,
   },
 
@@ -645,52 +629,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
-  sloganCard: {
-    marginTop: 26,
-    minHeight: 72,
-    borderRadius: 24,
-    backgroundColor: "rgba(255, 255, 255, 0.55)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    paddingHorizontal: 22,
-    paddingVertical: 16,
-    shadowColor: "rgba(7, 59, 58, 0.06)",
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 2,
-  },
-
-  sloganCardDesktop: {
-    maxWidth: 440,
-    marginTop: 34,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-  },
-
-  sloganIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 16,
-    backgroundColor: SOFT_MINT,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  sloganTextWrap: {
-    flex: 1,
-  },
-
-  sloganTitle: {
-    color: TEXT,
-    fontSize: 13,
-    fontFamily: fonts.bold,
-  },
-
-  sloganText: {
-    marginTop: 4,
-    color: MUTED,
-    fontSize: 12,
-    fontFamily: fonts.regular,
-  },
 });
