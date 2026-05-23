@@ -1,4 +1,4 @@
-import { apiFetch } from "@/app/lib/api/client";
+import { apiFetch } from "@/lib/api/client";
 import { createTransaction } from "@/features/transactions/services/transactions.service";
 import { CreateGoalContributionRecordPayload, CreateGoalPayload, CreateTransactionPayload, GoalContributionItem, GoalOverviewItem, GoalsOverviewResponse, TransactionOverviewItem, UpdateGoalPayload } from "@repo/shared-types";
 

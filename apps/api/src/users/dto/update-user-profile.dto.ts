@@ -1,5 +1,6 @@
 import type { IconName } from '@repo/shared-types';
 import {
+  IsEmail,
   IsHexColor,
   IsOptional,
   IsString,
@@ -11,6 +12,11 @@ export class UpdateUserProfileDto {
   @IsString()
   @MaxLength(80)
   fullName?: string;
+
+  @IsOptional()
+  @IsEmail()
+  @MaxLength(255)
+  email?: string;
 
   @IsOptional()
   @IsString()

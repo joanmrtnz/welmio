@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,10 +10,17 @@ import { PrismaService } from 'prisma/prisma.service';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { DeleteAccountDto } from './dto/delete-account.dto';
+import { VerificationTokenType } from '@prisma/client';
+import { VerificationTokenService } from 'src/verification-token/verification-token.service';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly verificationTokenService: VerificationTokenService,
+    private readonly mailService: MailService,
+  ) {}
 
   async getUserProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -40,8 +48,41 @@ export class UsersService {
     return user;
   }
 
-  // TODO: allow change email with new email verification
   async updateUserProfile(userId: string, dto: UpdateUserProfileDto) {
+    const currentUser = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+      },
+    });
+
+    if (!currentUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    const requestedEmail = dto.email?.trim().toLowerCase();
+    const shouldVerifyNewEmail =
+      Boolean(requestedEmail) && requestedEmail !== currentUser.email.toLowerCase();
+
+    if (shouldVerifyNewEmail && requestedEmail) {
+      const existingUser = await this.prisma.user.findUnique({
+        where: {
+          email: requestedEmail,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (existingUser && existingUser.id !== userId) {
+        throw new ConflictException('Email already registered');
+      }
+    }
+
     const user = await this.prisma.user.update({
       where: {
         id: userId,
@@ -51,6 +92,7 @@ export class UsersService {
         mobileNumber: dto.mobileNumber,
         avatarIcon: dto.avatarIcon,
         avatarColor: dto.avatarColor,
+        pendingEmail: shouldVerifyNewEmail ? requestedEmail : undefined,
       },
       select: {
         id: true,
@@ -65,6 +107,21 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    if (shouldVerifyNewEmail && requestedEmail) {
+      // fix: the token its expirated
+      const verificationToken = await this.verificationTokenService.createToken(
+        user.id,
+        VerificationTokenType.email_change,
+      );
+
+      await this.mailService.sendEmailVerification({
+        to: requestedEmail,
+        token: verificationToken,
+        fullName: user.fullName,
+        templateType: 'email_change'
+      });
+    }
 
     return user;
   }

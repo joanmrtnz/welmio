@@ -22,6 +22,7 @@ import {
 } from "@/features/transactions/components/create-transaction-modal/createTransactionModal.styles";
 import { TransactionOverviewItem } from "@repo/shared-types";
 import { useEffect } from "react";
+import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
 
 type CreateTransactionModalProps = {
   visible: boolean;
@@ -36,6 +37,26 @@ type CreateTransactionModalProps = {
   } | null;
   lockType?: boolean;
 };
+
+function formatIsoDateForDatePicker(value: string) {
+  const [year, month, day] = value.split("-");
+
+  if (!year || !month || !day) {
+    return "";
+  }
+
+  return `${day} / ${month} / ${year}`;
+}
+
+function formatDatePickerValueToIso(value: string) {
+  const [day, month, year] = value.split(" / ");
+
+  if (!day || !month || !year) {
+    return value;
+  }
+
+  return `${year}-${month}-${day}`;
+}
 
 export function CreateTransactionModal({
   visible,
@@ -198,14 +219,14 @@ export function CreateTransactionModal({
               </View>
             )}
 
-            <Text style={styles.sectionLabel}>Date</Text>
-
-            <TextInput
-              value={date}
-              onChangeText={setDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="rgba(5, 46, 43, 0.45)"
-              style={styles.input}
+            <DateOfBirthInput
+              label="Date"
+              icon="calendar-o"
+              placeholder="DD / MM / YYYY"
+              value={formatIsoDateForDatePicker(date)}
+              onChangeText={(value) => {
+                setDate(formatDatePickerValueToIso(value));
+              }}
             />
 
             <Text style={styles.sectionLabel}>Amount</Text>
@@ -221,14 +242,24 @@ export function CreateTransactionModal({
               />
 
               <TextInput
+                value={currency || "EUR"}
+                editable={false}
+                pointerEvents="none"
+                style={[styles.input, styles.currencyInput]}
+              />
+
+              {/* TODO: allow diferent concurrency system
+              <TextInput
                 value={currency}
                 onChangeText={setCurrency}
                 maxLength={3}
                 placeholder="EUR"
+                editable={false}
                 placeholderTextColor="rgba(5, 46, 43, 0.45)"
                 autoCapitalize="characters"
                 style={[styles.input, styles.currencyInput]}
-              />
+              /> */}
+
             </View>
 
             <Text style={styles.sectionLabel}>Description</Text>

@@ -9,10 +9,162 @@ import { PrismaService } from 'prisma/prisma.service';
 import { UpdateGoalDto } from './dto/update-goal.dto';
 import { GoalContributionResponseDto } from './dto/goal-contribution-response.dto';
 import { CreateGoalContributionDto } from './dto/create-goal-contribution.dto';
+import {
+  AnalyticsPeriod,
+  GetGoalContributionsAnalyticsQueryDto,
+  SortOrder,
+} from './dto/get-goal-contributions-analytics-query.dto';
+import { GoalContributionsAnalyticsResponseDto } from './dto/goal-contributions-analytics-response.dto';
 
 @Injectable()
 export class GoalsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getGoalContributionsAnalytics(
+    userId: string,
+    query: GetGoalContributionsAnalyticsQueryDto,
+  ): Promise<GoalContributionsAnalyticsResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const period = query.period ?? AnalyticsPeriod.monthly;
+    const order = query.order ?? SortOrder.desc;
+    const { startDate, endDate } = this.getAnalyticsDateRange(period);
+
+    const grouped = await this.prisma.goalContribution.groupBy({
+      by: ['goalId'],
+      where: {
+        userId,
+        date: {
+          gte: startDate,
+          lt: endDate,
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+      _count: {
+        _all: true,
+      },
+    });
+
+    const goalIds = grouped.map((item) => item.goalId);
+
+    const goals = await this.prisma.goal.findMany({
+      where: {
+        id: {
+          in: goalIds,
+        },
+        userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        icon: true,
+        color: true,
+        type: true,
+        status: true,
+        currency: true,
+      },
+    });
+
+    const goalsById = new Map(goals.map((goal) => [goal.id, goal]));
+
+    const total = grouped.reduce((sum, item) => {
+      return sum + Number(item._sum.amount ?? 0);
+    }, 0);
+
+    const items = grouped
+      .map((item) => {
+        const goal = goalsById.get(item.goalId);
+        const amount = Number(item._sum.amount ?? 0);
+
+        if (!goal) {
+          return null;
+        }
+
+        return {
+          goalId: goal.id,
+          name: goal.name,
+          icon: goal.icon,
+          color: goal.color,
+          type: goal.type,
+          status: goal.status,
+          currency: goal.currency,
+          total: amount.toFixed(2),
+          percentage: total > 0 ? Math.round((amount / total) * 100) : 0,
+          contributionsCount: item._count._all,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => Boolean(item))
+      .sort((a, b) => {
+        const amountA = Number(a.total);
+        const amountB = Number(b.total);
+
+        return order === SortOrder.asc ? amountA - amountB : amountB - amountA;
+      });
+
+    return {
+      period,
+      total: total.toFixed(2),
+      items,
+    };
+  }
+
+  private getAnalyticsDateRange(period: AnalyticsPeriod) {
+    const now = new Date();
+    const startDate = new Date(now);
+    const endDate = new Date(now);
+
+    switch (period) {
+      case AnalyticsPeriod.daily:
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setTime(startDate.getTime());
+        endDate.setDate(startDate.getDate() + 1);
+        break;
+
+      case AnalyticsPeriod.weekly: {
+        const day = now.getDay();
+        const diffToMonday = day === 0 ? -6 : 1 - day;
+
+        startDate.setDate(now.getDate() + diffToMonday);
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate.setTime(startDate.getTime());
+        endDate.setDate(startDate.getDate() + 7);
+        break;
+      }
+
+      case AnalyticsPeriod.yearly:
+        startDate.setMonth(0, 1);
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate.setFullYear(startDate.getFullYear() + 1);
+        endDate.setMonth(0, 1);
+        endDate.setHours(0, 0, 0, 0);
+        break;
+
+      case AnalyticsPeriod.monthly:
+      default:
+        startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate.setTime(startDate.getTime());
+        endDate.setMonth(startDate.getMonth() + 1, 1);
+        break;
+    }
+
+    return {
+      startDate,
+      endDate,
+    };
+  }
 
   async getGoalContributions(
     userId: string,

@@ -15,9 +15,8 @@ import {
   TransactionOverviewItem,
 } from "@repo/shared-types";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { apiFetch } from "@/app/lib/api/client";
+import { apiFetch } from "@/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
-import { formatCurrency } from "../utils/formatters";
 import { TransactionsGroupedList } from "../components/transactions-grouped-list/TransactionsGroupedList";
 import { CategoryFilterModal } from "../components/category-filter-modal/CategoryFilterModal";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -27,6 +26,7 @@ import { CalendarFilterModal } from "../components/calendar-filter-modal/Calenda
 import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -37,6 +37,8 @@ const TAB_GREEN = "#a9efdf";
 const MINT = "#00c896";
 const MUTED = "#5e7b78";
 const SHADOW = "rgba(29, 100, 89, 0.12)";
+const BUTTON_GREEN = "#10b992";
+const LIGHT_GRAY = "rgba(0, 0, 0, 0.1)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
@@ -132,7 +134,7 @@ export default function TransactionScreen() {
         <View style={[styles.balanceCard, isDesktop && styles.balanceCardDesktop]}>
           <Text style={styles.balanceCardLabel}>Total Balance</Text>
           <Text style={styles.balanceCardTitle}>
-            {data ? formatCurrency(data.summary.totalBalance) : "$0.00"}
+            {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
           </Text>
         </View>
 
@@ -173,7 +175,7 @@ export default function TransactionScreen() {
                 totalsFilter === "income" && styles.totalLabelActive,
               ]}
             >
-              {data ? formatCurrency(data.summary.totalIncome) : "$0.00"}
+              {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
             </Text>
           </Pressable>
 
@@ -215,7 +217,7 @@ export default function TransactionScreen() {
                 totalsFilter === "expense" && styles.totalLabelActive,
               ]}
             >
-              {data ? formatCurrency(data.summary.totalExpense) : "$0.00"}
+              {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
             </Text>
           </Pressable>
         </View>
@@ -287,17 +289,14 @@ export default function TransactionScreen() {
       </ScrollView>
 
       {!isDesktop && (
-        <View style={styles.floatingAddMoreButton}>
-          <Pressable
-            style={styles.floatingAddButton}
-            onPress={() => {
-              setTransactionToEdit(null);
-              setIsCreateTransactionModalVisible(true);
-            }}
-          >
-            <Icon size={34} strokeWidth={1.2} name="plus" color={BLACK} />
-          </Pressable>
-        </View>
+        <Pressable
+          style={styles.floatingAddButton}
+          onPress={() => {
+            setTransactionToEdit(null);
+            setIsCreateTransactionModalVisible(true);
+          }}>
+          <Icon name="plus" size={30} color={WHITE} strokeWidth={1.8} />
+        </Pressable>
       )}
 
       <CategoryFilterModal
@@ -525,25 +524,24 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
 
-  floatingAddMoreButton: {
-    position: "absolute",
-    right: 24,
-    bottom: 112,
-    zIndex: 10,
-  },
-
   floatingAddButton: {
+    position: "absolute",
+    right: 28,
+    bottom: 116,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: TAB_GREEN,
+    backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: SHADOW,
+    borderColor: LIGHT_GRAY,
+    borderWidth: 1,
+    shadowColor: "rgba(16, 185, 146, 0.32)",
     shadowOpacity: 1,
-    shadowRadius: 14,
+    shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
-    elevation: 5,
+    elevation: 8,
+    zIndex: 2,
   },
 
   bottomFade: {

@@ -17,8 +17,9 @@ import { fonts } from "@/theme/fonts";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import { Icon } from "@/components/icons/Icon";
 import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
-const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";
@@ -29,9 +30,43 @@ const CARD = "#ffffff";
 const SOFT_GREEN = "#e3f8f1";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
+type BackendErrorResponse = {
+  response?: {
+    data?: {
+      message?: string | string[];
+      code?: string;
+    };
+  };
+  data?: {
+    message?: string | string[];
+    code?: string;
+  };
+  message?: string;
+};
+
+function getLoginErrorMessage(error: unknown) {
+  const backendError = error as BackendErrorResponse;
+  const responseMessage =
+    backendError.response?.data?.message ?? backendError.data?.message;
+
+  if (Array.isArray(responseMessage)) {
+    return responseMessage.join("\n");
+  }
+
+  if (typeof responseMessage === "string" && responseMessage.trim()) {
+    return responseMessage;
+  }
+
+  if (typeof backendError.message === "string" && backendError.message.trim()) {
+    return backendError.message;
+  }
+
+  return "Invalid email or password";
+}
+
 export default function LoginScreen() {
   const { width } = useWindowDimensions();
-  const isDesktop = width >= 768;
+  const isDesktop = width >= 1024;
   const { execute, loading } = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,6 +81,7 @@ export default function LoginScreen() {
 
       if (res) router.replace("/(app)/(tabs)/home");
     } catch (error) {
+      feedback.error(getLoginErrorMessage(error));
       console.warn(error);
     }
   }
@@ -53,7 +89,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         contentContainerStyle={[
@@ -180,6 +216,7 @@ export default function LoginScreen() {
                   </Text>
                 </Pressable>
 
+                {/*             
                 <View style={styles.dividerRow}>
                   <View style={styles.dividerLine} />
                   <Text style={styles.dividerText}>or continue with</Text>
@@ -203,31 +240,20 @@ export default function LoginScreen() {
                         size={30}
                         strokeWidth={8}
                         color={PRIMARY}
-                      />{" "}
+                      />
                       <Text style={styles.fingerprintText}>
                         Continue with <Text style={styles.bold}>Touch ID</Text>
                       </Text>
                     </Pressable>
                   </Link>
-                ) : null}
+                ) : null} 
+                */}
 
                 <Link href="/(public)/signup" style={styles.footer}>
                   <Text>
                     Don’t have an account? <Text style={styles.link}>Sign Up</Text>
                   </Text>
                 </Link>
-              </View>
-            </View>
-
-            <View style={[styles.adviceCard, isDesktop && styles.adviceCardDesktop]}>
-              <View style={styles.adviceIcon}>
-                <FontAwesome name="lightbulb-o" size={30} color={PRIMARY} />
-              </View>
-              <View style={styles.adviceTextColumn}>
-                <Text style={styles.adviceTitle}>Smart Finance, Simple Life</Text>
-                <Text style={styles.adviceText}>
-                  Take control of your money with ease.
-                </Text>
               </View>
             </View>
           </View>
@@ -284,6 +310,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flex: 1,
     maxWidth: 460,
+    alignSelf: "center",
     position: "relative",
     zIndex: 1,
   },
@@ -309,11 +336,9 @@ const styles = StyleSheet.create({
     width: 31,
     height: 31,
     borderRadius: 18,
-    backgroundColor: CARD,
+    backgroundColor: GREEN,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: LIGHT_GRAY,
-    borderWidth: 1,
     shadowColor: "rgba(29, 100, 89, 0.18)",
     shadowOpacity: 1,
     shadowRadius: 10,
@@ -322,8 +347,8 @@ const styles = StyleSheet.create({
   },
 
   logoImage: {
-    width: 30,
-    height: 29,
+    width: "86%",
+    height: "86%",
   },
 
   brandName: {
@@ -354,11 +379,12 @@ const styles = StyleSheet.create({
     width: 106,
     height: 106,
     borderRadius: 58,
-    backgroundColor: CARD,
+    backgroundColor: GREEN,
     borderColor: DARK_GREEN,
     borderWidth: 4,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
     shadowColor: "rgba(29, 100, 89, 0.16)",
     shadowOpacity: 1,
     shadowRadius: 16,
@@ -373,13 +399,13 @@ const styles = StyleSheet.create({
   },
 
   avatarImage: {
-    width: 100,
-    height: 99,
+    width: "92%",
+    height: "92%",
   },
 
   avatarImageDesktop: {
-    width: 145,
-    height: 144,
+    width: "93%",
+    height: "93%",
   },
 
   desktopCopy: {
@@ -618,52 +644,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
-  adviceCard: {
-    marginTop: 24,
-    marginBottom: 4,
-    marginHorizontal: 2,
-    paddingVertical: 18,
-    paddingHorizontal: 40,
-    borderRadius: 22,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 13,
-    shadowColor: "rgba(29, 100, 89, 0.08)",
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
-  },
-
-  adviceCardDesktop: {
-    marginHorizontal: 0,
-    paddingHorizontal: 22,
-  },
-
-  adviceIcon: {
-    width: 43,
-    height: 43,
-    borderRadius: 15,
-    backgroundColor: SOFT_GREEN,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  adviceTextColumn: {
-    flex: 1,
-  },
-
-  adviceTitle: {
-    color: DARK,
-    fontSize: 13,
-    fontFamily: fonts.bold,
-  },
-
-  adviceText: {
-    color: MUTED,
-    fontSize: 12,
-    marginTop: 3,
-    fontFamily: fonts.medium,
-  },
 });

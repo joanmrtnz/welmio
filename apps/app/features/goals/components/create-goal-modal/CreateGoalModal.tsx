@@ -46,9 +46,15 @@ const goalTypes = [
 ];
 
 const goalIcons = [
-  { name: "rent", label: "Rent" },
+  { name: "savings", label: "Savings" },
+  { name: "shield", label: "Emergency" },
+  { name: "gift", label: "Purchase" },
+  { name: "income", label: "Investment" },
   { name: "money", label: "Money" },
-  { name: "income", label: "Income" },
+  { name: "rent", label: "Home" },
+  { name: "car", label: "Car" },
+  { name: "plane", label: "Travel" },
+  { name: "book", label: "Education" },
   { name: "calendar", label: "Plan" },
 ];
 
@@ -90,7 +96,7 @@ export function CreateGoalModal({
     setCurrentAmount("");
     setTargetDate("");
     setSelectedType("savings");
-    setSelectedIcon("home");
+    setSelectedIcon("rent");
   }, [visible, isEditMode, goal]);
 
   async function handleSubmitGoal() {
@@ -189,14 +195,14 @@ export function CreateGoalModal({
 
               <View style={styles.previewInfo}>
                 <Text style={styles.previewLabel}>
-                  {isEditMode ? "Editing goal" : "New goal"}
+                  {isEditMode ? "Editing goal" : "New goal pepe"}
                 </Text>
                 <Text style={styles.previewTitle}>
                   {name.trim() || "House Deposit"}
                 </Text>
                 <Text style={styles.previewMeta}>
                   Target ·{" "}
-                  {targetAmount.trim() ? `$${targetAmount}` : "$30,000"}
+                  {targetAmount.trim() ? `€${targetAmount}` : "€30,000"}
                 </Text>
               </View>
             </View>

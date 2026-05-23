@@ -2,6 +2,7 @@ import { IconName } from "../ui";
 
 export type UpdateUserProfilePayload = {
   fullName?: string;
+  email?: string;
   mobileNumber?: string | null;
   avatarIcon?: IconName;
   avatarColor?: string | null;

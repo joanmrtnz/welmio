@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { signup } from "@/app/lib/api/auth";
+import { signup } from "@/lib/api/auth";
 import type { RegisterInput } from "@repo/shared-types";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 
@@ -11,7 +11,10 @@ export function useSignup() {
 
     try {
       const res = await signup(data);
-      feedback.success("Account created successfully");
+      
+      if (res) {
+        feedback.success("Account created. Please verify your email.");
+      }
       return res;
     } catch (error) {
       feedback.error("Server error. Please try again later.");

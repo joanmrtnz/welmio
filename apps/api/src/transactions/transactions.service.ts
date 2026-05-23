@@ -9,6 +9,12 @@ import { FinanceSummaryService } from 'src/finance/finance-summary.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { Prisma } from '@prisma/client';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import {
+  AnalyticsPeriod,
+  GetTransactionsByCategoryQueryDto,
+  SortOrder,
+} from './dto/get-transactions-by-category-query.dto';
+import { TransactionsByCategoryResponseDto } from './dto/transactions-by-category-response.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -53,6 +59,155 @@ export class TransactionsService {
         date: 'desc',
       },
     });
+  }
+
+  async getTransactionsByCategories(
+    userId: string,
+    query: GetTransactionsByCategoryQueryDto,
+  ): Promise<TransactionsByCategoryResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const period = query.period ?? AnalyticsPeriod.monthly;
+    const type = query.type ?? ('expense' as any);
+    const order = query.order ?? SortOrder.desc;
+
+    const { startDate, endDate } = this.getAnalyticsDateRange(period);
+
+    const grouped = await this.prisma.transaction.groupBy({
+      by: ['categoryId'],
+      where: {
+        userId,
+        type,
+        date: {
+          gte: startDate,
+          lt: endDate,
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+      _count: {
+        _all: true,
+      },
+    });
+
+    const categoryIds = grouped.map((item) => item.categoryId);
+
+    const categories = await this.prisma.category.findMany({
+      where: {
+        id: {
+          in: categoryIds,
+        },
+        userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        icon: true,
+        color: true,
+        type: true,
+      },
+    });
+
+    const categoriesById = new Map(
+      categories.map((category) => [category.id, category]),
+    );
+
+    const total = grouped.reduce((sum, item) => {
+      return sum + Number(item._sum.amount ?? 0);
+    }, 0);
+
+    const items = grouped
+      .map((item) => {
+        const category = categoriesById.get(item.categoryId);
+        const amount = Number(item._sum.amount ?? 0);
+
+        if (!category) {
+          return null;
+        }
+
+        return {
+          categoryId: category.id,
+          name: category.name,
+          icon: category.icon,
+          color: category.color,
+          type: category.type,
+          total: amount.toFixed(2),
+          percentage: total > 0 ? Math.round((amount / total) * 100) : 0,
+          transactionsCount: item._count._all,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => {
+        const amountA = Number(a!.total);
+        const amountB = Number(b!.total);
+
+        return order === SortOrder.asc ? amountA - amountB : amountB - amountA;
+      });
+
+    return {
+      period,
+      type,
+      total: total.toFixed(2),
+      items: items as any,
+    };
+  }
+
+  private getAnalyticsDateRange(period: AnalyticsPeriod) {
+    const now = new Date();
+
+    const startDate = new Date(now);
+    const endDate = new Date(now);
+
+    switch (period) {
+      case AnalyticsPeriod.daily:
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setDate(startDate.getDate() + 1);
+        endDate.setHours(0, 0, 0, 0);
+        break;
+
+      case AnalyticsPeriod.weekly: {
+        const day = now.getDay();
+        const diffToMonday = day === 0 ? -6 : 1 - day;
+
+        startDate.setDate(now.getDate() + diffToMonday);
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate.setTime(startDate.getTime());
+        endDate.setDate(startDate.getDate() + 7);
+        break;
+      }
+
+      case AnalyticsPeriod.yearly:
+        startDate.setMonth(0, 1);
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate.setFullYear(startDate.getFullYear() + 1);
+        endDate.setMonth(0, 1);
+        endDate.setHours(0, 0, 0, 0);
+        break;
+
+      case AnalyticsPeriod.monthly:
+      default:
+        startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
+
+        endDate.setMonth(startDate.getMonth() + 1, 1);
+        endDate.setHours(0, 0, 0, 0);
+        break;
+    }
+
+    return {
+      startDate,
+      endDate,
+    };
   }
 
   async getUserTransactionsOverview(

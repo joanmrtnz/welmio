@@ -18,7 +18,7 @@ import { fonts } from "@/theme/fonts";
 import { useValidateResetPasswordCode } from "@/features/auth/hooks/useValidateResetPasswordCode";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
 
-const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";
@@ -83,7 +83,7 @@ export default function VerifyCodeScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         contentContainerStyle={[
@@ -288,11 +288,9 @@ const styles = StyleSheet.create({
     width: 31,
     height: 31,
     borderRadius: 18,
-    backgroundColor: CARD,
+    backgroundColor: GREEN,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: LIGHT_GRAY,
-    borderWidth: 1,
     shadowColor: "rgba(29, 100, 89, 0.18)",
     shadowOpacity: 1,
     shadowRadius: 10,

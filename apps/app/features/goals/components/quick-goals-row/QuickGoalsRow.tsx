@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
 import type { GoalOverviewItem } from "@repo/shared-types";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const CARD = "#ffffff";
 const CARD_SOFT = "#f3fbf8";
@@ -20,15 +21,6 @@ const TEXT = "#063436";
 const MUTED = "#6f8790";
 const BORDER = "rgba(9, 169, 130, 0.12)";
 const DESKTOP_BREAKPOINT = 768;
-
-function formatCurrency(amount: string | number, currency = "USD") {
-  const numericAmount = Number(amount);
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(Number.isFinite(numericAmount) ? numericAmount : 0);
-}
 
 type QuickGoalsRowProps = {
   goals: GoalOverviewItem[];
@@ -61,7 +53,7 @@ function GoalPreviewCard({
     >
       <View style={styles.goalIcon}>
         <Icon
-          name={(goal.icon ?? "target") as never}
+          name={(goal.icon ?? "money") as never}
           size={26}
           color={GREEN_DARK}
           strokeWidth={1.2}
@@ -74,8 +66,8 @@ function GoalPreviewCard({
         </Text>
 
         <Text style={styles.goalMeta} numberOfLines={1} ellipsizeMode="tail">
-          {formatCurrency(goal.saved, goal.currency)} of{" "}
-          {formatCurrency(goal.target, goal.currency)}
+          {formatCurrency(goal.saved)} of{" "}
+          {formatCurrency(goal.target)}
         </Text>
 
         <View style={styles.progressRow}>
@@ -113,7 +105,7 @@ export function QuickGoalsRow({
         onPress={onEmptyPress}
       >
         <View style={styles.goalIcon}>
-          <Icon name="target" size={26} color={GREEN_DARK} strokeWidth={1.2} />
+          <Icon name="money" size={34} color={GREEN_DARK} strokeWidth={0.9} />
         </View>
 
         <View style={styles.goalContent}>

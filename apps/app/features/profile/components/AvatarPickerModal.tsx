@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Image,
+  ImageSourcePropType,
   Modal,
   Pressable,
   ScrollView,
@@ -9,54 +10,79 @@ import {
   View,
 } from "react-native";
 import { fonts } from "@/theme/fonts";
-import { AuthButton } from "@/features/auth/components/AuthButton";
 import { Icon } from "@/components/icons/Icon";
-import { IconName } from "@repo/shared-types";
+const WELMIO_BASE_AVATAR = require("@/assets/images/welmio-logo.png");
+const WELMIO_AVATAR_1 = require("@/assets/images/welmio-avatar-1.png");
+const WELMIO_AVATAR_2 = require("@/assets/images/welmio-avatar-2.png");
+const WELMIO_AVATAR_3 = require("@/assets/images/welmio-avatar-3.png");
+const WELMIO_AVATAR_4 = require("@/assets/images/welmio-avatar-4.png");
+const WELMIO_AVATAR_5 = require("@/assets/images/welmio-avatar-5.png");
+const WELMIO_AVATAR_6 = require("@/assets/images/welmio-avatar-6.png");
+const WELMIO_AVATAR_7 = require("@/assets/images/welmio-avatar-7.png");
+const WELMIO_AVATAR_8 = require("@/assets/images/welmio-avatar-8.png");
+const WELMIO_AVATAR_9 = require("@/assets/images/welmio-avatar-9.png");
+
+export const AVATAR_IMAGES = {
+  "avatar-0": WELMIO_BASE_AVATAR,
+  "avatar-1": WELMIO_AVATAR_1,
+  "avatar-2": WELMIO_AVATAR_2,
+  "avatar-3": WELMIO_AVATAR_3,
+  "avatar-4": WELMIO_AVATAR_4,
+  "avatar-5": WELMIO_AVATAR_5,
+  "avatar-6": WELMIO_AVATAR_6,
+  "avatar-7": WELMIO_AVATAR_7,
+  "avatar-8": WELMIO_AVATAR_8,
+  "avatar-9": WELMIO_AVATAR_9,
+} satisfies Record<string, ImageSourcePropType>;
+
+export type AvatarId = keyof typeof AVATAR_IMAGES;
 
 type AvatarOption = {
-  id: string;
-  icon: IconName;
+  id: AvatarId;
+  image: ImageSourcePropType;
 };
 
 type AvatarPickerModalProps = {
   visible: boolean;
   onClose: () => void;
-  onApply?: (avatar: { icon: IconName; backgroundColor: string }) => void;
+  selectedAvatarId?: AvatarId;
+  onApply?: (avatar: {
+    id: AvatarId;
+    image: ImageSourcePropType;
+    backgroundColor: string;
+  }) => void;
 };
 
-const AVATAR_OPTIONS: AvatarOption[] = [
-  { id: "avatar-1", icon: "user" },
-  { id: "avatar-2", icon: "user" },
-  { id: "avatar-3", icon: "user" },
-  { id: "avatar-4", icon: "user" },
-  { id: "avatar-5", icon: "user" },
-  { id: "avatar-6", icon: "user" },
-  { id: "avatar-7", icon: "user" },
-  { id: "avatar-8", icon: "user" },
-];
+const AVATAR_OPTIONS: AvatarOption[] = Object.entries(AVATAR_IMAGES).map(
+  ([id, image]) => ({ id: id as AvatarId, image }),
+);
 
-const WELMIO_AVATAR = require("@/assets/images/welmio-logo-no-circle.png");
-
-const COLORS = [
-  "#b8eadc",
-  "#dff7ef",
-  "#9ce1cf",
-  "#74d2bd",
-  "#58c5ad",
-  "#0f8f7c",
-  "#e6f8f3",
-  "#c8f1e5",
-];
+// const COLORS = [
+//   "#b8eadc",
+//   "#dff7ef",
+//   "#9ce1cf",
+//   "#74d2bd",
+//   "#58c5ad",
+//   "#0f8f7c",
+//   "#e6f8f3",
+//   "#c8f1e5",
+// ];
 
 export function AvatarPickerModal({
   visible,
   onClose,
+  selectedAvatarId: currentAvatarId = AVATAR_OPTIONS[0].id,
   onApply,
 }: AvatarPickerModalProps) {
-  const [selectedAvatarId, setSelectedAvatarId] = useState(
-    AVATAR_OPTIONS[0].id,
-  );
-  const [selectedColor, setSelectedColor] = useState(COLORS[0]);
+  const [selectedAvatarId, setSelectedAvatarId] =
+    useState<AvatarId>(currentAvatarId);
+  const [selectedColor, setSelectedColor] = useState(WHITE);
+
+  useEffect(() => {
+    if (visible) {
+      setSelectedAvatarId(currentAvatarId);
+    }
+  }, [currentAvatarId, visible]);
 
   const selectedAvatar =
     AVATAR_OPTIONS.find((avatar) => avatar.id === selectedAvatarId) ??
@@ -64,7 +90,8 @@ export function AvatarPickerModal({
 
   function handleApply() {
     onApply?.({
-      icon: selectedAvatar.icon,
+      id: selectedAvatar.id,
+      image: selectedAvatar.image,
       backgroundColor: selectedColor,
     });
 
@@ -96,7 +123,7 @@ export function AvatarPickerModal({
               style={[styles.previewAvatar, { backgroundColor: selectedColor }]}
             >
               <Image
-                source={WELMIO_AVATAR}
+                source={selectedAvatar.image}
                 style={styles.previewAvatarImage}
                 resizeMode="contain"
               />
@@ -131,7 +158,7 @@ export function AvatarPickerModal({
                       ]}
                     >
                       <Image
-                        source={WELMIO_AVATAR}
+                        source={avatar.image}
                         style={styles.avatarOptionImage}
                         resizeMode="contain"
                       />
@@ -141,7 +168,7 @@ export function AvatarPickerModal({
               })}
             </View>
 
-            <Text style={styles.sectionTitle}>Color</Text>
+            {/* <Text style={styles.sectionTitle}>Color</Text>
 
             <View style={styles.colorGrid}>
               {COLORS.map((color) => {
@@ -162,16 +189,16 @@ export function AvatarPickerModal({
                   </Pressable>
                 );
               })}
-            </View>
+            </View> */}
 
             <View style={styles.actions}>
-              <AuthButton title="Apply" onPress={handleApply} />
+              <Pressable style={styles.clearButton} onPress={onClose}>
+                <Text style={styles.clearButtonText}>Cancel</Text>
+              </Pressable>
 
-              <AuthButton
-                title="Cancel"
-                variant="secondary"
-                onPress={onClose}
-              />
+              <Pressable style={styles.applyButton} onPress={handleApply}>
+                <Text style={styles.applyButtonText}>Apply</Text>
+              </Pressable>
             </View>
           </ScrollView>
         </View>
@@ -189,6 +216,7 @@ const MUTED = "#5f7472";
 const BORDER = "rgba(18, 199, 155, 0.14)";
 const CARD_BORDER = "rgba(5, 46, 43, 0.06)";
 const OVERLAY = "rgba(223, 247, 239, 0.92)";
+const BUTTON_GREEN = "#c9f3df";
 
 const styles = StyleSheet.create({
   overlay: {
@@ -222,9 +250,10 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    flexDirection: "row",
+    position: "relative",
+    minHeight: 34,
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
     marginBottom: 20,
   },
 
@@ -233,9 +262,13 @@ const styles = StyleSheet.create({
     color: BLACK,
     fontFamily: fonts.bold,
     letterSpacing: 0.2,
+    textAlign: "center",
   },
 
   closeButton: {
+    position: "absolute",
+    right: 0,
+    top: 0,
     width: 34,
     height: 34,
     borderRadius: 17,
@@ -286,8 +319,9 @@ const styles = StyleSheet.create({
   avatarGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "center",
     rowGap: 12,
+    columnGap: 10,
     marginBottom: 28,
   },
 
@@ -356,7 +390,42 @@ const styles = StyleSheet.create({
   },
 
   actions: {
+    flexDirection: "row",
+    gap: 14,
+    marginTop: 8,
+  },
+
+  clearButton: {
+    flex: 1,
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
-    gap: 12,
+    justifyContent: "center",
+  },
+
+  clearButtonText: {
+    fontSize: 15,
+    fontFamily: fonts.semibold,
+    color: BLACK,
+  },
+
+  applyButton: {
+    flex: 1,
+    height: 54,
+    borderRadius: 16,
+    backgroundColor: BUTTON_GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  applyButtonDisabled: {
+    opacity: 0.5,
+  },
+
+  applyButtonText: {
+    fontSize: 15,
+    fontFamily: fonts.bold,
+    color: BLACK,
   },
 });

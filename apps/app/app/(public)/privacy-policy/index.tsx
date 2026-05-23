@@ -1,9 +1,1 @@
-import { View, Text } from "react-native";
-
-export default function PrivacyPolicy() {
-  return (
-    <View>
-      <Text>Privacy Policy</Text>
-    </View>
-  );
-}
+export { default } from "@/features/auth/screens/PrivacyPolicyScreen";
