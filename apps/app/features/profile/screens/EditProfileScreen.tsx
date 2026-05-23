@@ -161,7 +161,7 @@ export default function EditProfileScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <AppScreenHeader title="Edit My Profile" />
 

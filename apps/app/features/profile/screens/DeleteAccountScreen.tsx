@@ -62,13 +62,14 @@ export default function DeleteAccountScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <AppScreenHeader title="Delete Account" />
 
       <View style={[styles.card, isDesktop && styles.cardDesktop]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={[
             styles.cardContent,
             isDesktop && styles.cardContentDesktop,
