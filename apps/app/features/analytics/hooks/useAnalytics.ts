@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiFetch } from "@/app/lib/api/client";
+import { apiFetch } from "@/lib/api/client";
 import { AnalyticsPeriod, AnalyticsResponse } from "@repo/shared-types";
 
 export function useAnalytics() {

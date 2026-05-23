@@ -94,7 +94,7 @@ export default function ChangePasswordScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <AppScreenHeader title="Change Password" />
 
@@ -135,7 +135,7 @@ export default function ChangePasswordScreen() {
               style={[styles.noticeCard, isDesktop && styles.noticeCardDesktop]}
             >
               <View style={styles.noticeIcon}>
-                <Icon name="shield" size={22} strokeWidth={1.7} color={TEAL} />
+                <Icon name="shield" size={40} strokeWidth={1} color={TEAL} />
               </View>
               <View style={styles.noticeTextWrap}>
                 <Text style={styles.noticeTitle}>Use a strong password</Text>
@@ -199,7 +199,7 @@ export default function ChangePasswordScreen() {
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
 const SOFT_TEAL = "#a9efdf";
-const VERY_SOFT_TEAL = "#eafaf5";
+const VERY_SOFT_TEAL = "#dff7ef";
 const CARD = "#fbfffd";
 const WHITE = "#ffffff";
 const MUTED = "#5e7b78";

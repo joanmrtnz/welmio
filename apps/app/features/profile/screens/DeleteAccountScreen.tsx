@@ -16,7 +16,7 @@ import { Icon } from "@/components/icons/Icon";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { deleteAccount } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { removeAccessToken } from "@/app/lib/auth-storage";
+import { removeAccessToken } from "@/lib/auth-storage";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 export default function DeleteAccountScreen() {
@@ -62,13 +62,14 @@ export default function DeleteAccountScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <AppScreenHeader title="Delete Account" />
 
       <View style={[styles.card, isDesktop && styles.cardDesktop]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={[
             styles.cardContent,
             isDesktop && styles.cardContentDesktop,

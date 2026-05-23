@@ -34,11 +34,13 @@ import { GoalDetailsModal } from "../components/goal-details-modal/GoalDetailsMo
 import { CreateTransactionModal } from "@/features/transactions/components/create-transaction-modal/CreateTransactionModal";
 import { formatGoalTargetDate } from "../utils/formatGoalTargetDate";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 const GREEN = "#dff7ef";
 const DIVIDER_GREEN = "#7adcc8";
 const DARK_GREEN = "#0b8f78";
 const LIGHT_GREEN = "#f8fffc";
+const LIGHT_GRAY = "rgba(0, 0, 0, 0.1)";
 const CARD_GREEN = "#e2f8f0";
 const WHITE = "#ffffff";
 const BLACK = "#082f33";
@@ -48,14 +50,6 @@ const SOFT_SHADOW = "rgba(28, 105, 91, 0.14)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
-function formatCurrency(amount: number | string, currency = "USD") {
-  const numericAmount = typeof amount === "string" ? Number(amount) : amount;
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(Number.isFinite(numericAmount) ? numericAmount : 0);
-}
 
 export default function GoalsScreen() {
   const { width } = useWindowDimensions();
@@ -325,11 +319,11 @@ export default function GoalsScreen() {
 
               <View style={styles.mainGoalInfo}>
                 <Text style={styles.goalAmount} numberOfLines={1}>
-                  {formatCurrency(mainGoal.saved, mainGoal.currency)}
+                  {formatCurrency(mainGoal.saved)}
                 </Text>
 
                 <Text style={styles.goalMeta} numberOfLines={1}>
-                  saved of {formatCurrency(mainGoal.target, mainGoal.currency)}
+                  saved of {formatCurrency(mainGoal.target)}
                 </Text>
 
                 <Text style={styles.goalMeta} numberOfLines={1}>
@@ -449,11 +443,11 @@ export default function GoalsScreen() {
 
               <View style={styles.goalBottomRow}>
                 <Text style={styles.goalSmallText} numberOfLines={1}>
-                  {formatCurrency(goal.saved, goal.currency)} saved
+                  {formatCurrency(goal.saved)} saved
                 </Text>
 
                 <Text style={styles.goalSmallText} numberOfLines={1}>
-                  {formatCurrency(goal.target, goal.currency)}
+                  {formatCurrency(goal.target)}
                 </Text>
               </View>
             </Pressable>
@@ -469,10 +463,8 @@ export default function GoalsScreen() {
             <Text style={styles.tipTitle}>Smart tip</Text>
             <Text style={styles.tipText}>
               {mainGoal
-                ? `You need around ${formatCurrency(
-                    mainGoal.monthlyNeeded,
-                    mainGoal.currency,
-                  )} per month to reach your ${mainGoal.name.toLowerCase()} goal on time.`
+                ? `You need around ${formatCurrency(mainGoal.monthlyNeeded
+                )} per month to reach your ${mainGoal.name.toLowerCase()} goal on time.`
                 : "Create a goal to receive simple progress tips."}
             </Text>
           </View>
@@ -993,6 +985,8 @@ const styles = StyleSheet.create({
     backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
+    borderColor: LIGHT_GRAY,
+    borderWidth: 1,
     shadowColor: "rgba(16, 185, 146, 0.32)",
     shadowOpacity: 1,
     shadowRadius: 16,

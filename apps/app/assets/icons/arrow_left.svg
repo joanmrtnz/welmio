@@ -5,6 +5,7 @@
 >
   <path
     d="M11.5642 4L0.999999 11.9969M0.999999 11.9969L11.5642 20M0.999999 11.9969L20 11.9969"
+    transform="translate(12 12) scale(0.67) translate(-12 -12)"
     stroke-linecap="round"
     stroke-linejoin="round"
   />

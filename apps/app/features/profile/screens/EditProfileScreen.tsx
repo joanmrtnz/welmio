@@ -16,11 +16,18 @@ import { Icon } from "@/components/icons/Icon";
 import { getUserProfile, updateUserProfile } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { router } from "expo-router";
-import { AvatarPickerModal } from "../components/AvatarPickerModal";
+import {
+  AVATAR_IMAGES,
+  AvatarId,
+  AvatarPickerModal,
+} from "../components/AvatarPickerModal";
 import { IconName } from "@repo/shared-types";
 import { Image } from "react-native";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
+function getAvatarId(value?: string | null): AvatarId {
+  return value && value in AVATAR_IMAGES ? (value as AvatarId) : "avatar-0";
+}
 
 export default function EditProfileScreen() {
   const { width } = useWindowDimensions();
@@ -29,37 +36,50 @@ export default function EditProfileScreen() {
   const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [currentEmail, setCurrentEmail] = useState("");
   const [userId, setUserId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
   const [darkTheme, setDarkTheme] = useState(false);
 
   const [showAvatarModal, setShowAvatarModal] = useState(false);
-  const [avatarIcon, setAvatarIcon] = useState<IconName>("user");
+  const [avatarId, setAvatarId] = useState<AvatarId>("avatar-0");
   const [avatarColor, setAvatarColor] = useState(GREEN);
-  const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
 
+  const selectedAvatarImage =
+    AVATAR_IMAGES[avatarId] ?? AVATAR_IMAGES["avatar-0"];
 
   async function handleUpdateProfile() {
     try {
       setIsLoading(true);
 
+      const emailValue = email.trim().toLowerCase();
+      const currentEmailValue = currentEmail.trim().toLowerCase();
+      const hasEmailChanged = Boolean(emailValue) && emailValue !== currentEmailValue;
+
       const updatedUser = await updateUserProfile({
         fullName: username.trim(),
+        email: emailValue,
         mobileNumber: phone.trim() || null,
-        avatarIcon,
+        avatarIcon: avatarId as unknown as IconName,
         avatarColor,
       });
 
       setUsername(updatedUser.fullName ?? "");
       setUsernameLabel(updatedUser.fullName ?? "");
       setPhone(updatedUser.mobileNumber ?? "");
-      setEmail(updatedUser.email ?? "");
+      setEmail(hasEmailChanged ? emailValue : updatedUser.email ?? "");
+      setCurrentEmail(updatedUser.email ?? "");
       setUserId(updatedUser.id);
-      setAvatarIcon(updatedUser.avatarIcon ?? "user");
-      setAvatarColor(updatedUser.avatarColor ?? "#00c896");
+      setAvatarId(getAvatarId(updatedUser.avatarIcon));
+      setAvatarColor(updatedUser.avatarColor ?? WHITE);
 
-      feedback.success("Profile updated successfully");
+      feedback.success(
+        hasEmailChanged
+          ? "Profile updated. Check your new email to verify the change"
+          : "Profile updated successfully"
+      );
+      router.push("/profile");
     } catch (error) {
       console.warn(error);
       feedback.error("Error updating profile");
@@ -79,9 +99,10 @@ export default function EditProfileScreen() {
         setUsernameLabel(user.fullName ?? "");
         setPhone(user.mobileNumber ?? "");
         setEmail(user.email ?? "");
+        setCurrentEmail(user.email ?? "");
         setUserId(user.id);
         setAvatarColor(user.avatarColor ?? GREEN);
-        setAvatarIcon(user.avatarIcon ?? "user");
+        setAvatarId(getAvatarId(user.avatarIcon));
       } catch (error) {
         console.error("Error loading user profile", error);
       } finally {
@@ -140,27 +161,40 @@ export default function EditProfileScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <AppScreenHeader title="Edit My Profile" />
-  
+
       <ScrollView
-        contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
+        contentContainerStyle={[
+          styles.content,
+          isDesktop && styles.contentDesktop,
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={[styles.desktopLayout, !isDesktop && styles.desktopLayoutMobile]}>
-          <View style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}>
-            <View style={styles.avatarOuterRing}>
+        <View
+          style={[
+            styles.desktopLayoutMobile,
+            isDesktop && styles.desktopLayout,
+          ]}
+        >
+          <View
+            style={[styles.profileCard, isDesktop && styles.profileCardDesktop]}
+          >
+            <View style={[styles.avatarOuterRing, isDesktop && styles.avatarOuterRingDesktop]}>
               <View
                 style={[
-                  styles.avatar,
-                  { borderColor: avatarColor || TEAL, backgroundColor: avatarColor || SOFT_TEAL },
+                  styles.avatar, isDesktop && styles.avatarDesktop,
+                  {
+                    borderColor: avatarColor || TEAL,
+                    backgroundColor: avatarColor || SOFT_TEAL,
+                  },
                 ]}
               >
                 <Image
-                  source={WELMIO_LOGO}
-                  style={styles.logoImage}
+                  source={selectedAvatarImage}
+                  style={[styles.logoImage, isDesktop && styles.logoImageDesktop]}
                   resizeMode="contain"
                 />
               </View>
@@ -169,7 +203,12 @@ export default function EditProfileScreen() {
                 style={styles.editAvatarButton}
                 onPress={() => setShowAvatarModal(true)}
               >
-                <Icon name="edit" size={17} strokeWidth={1.9} color={DARK_TEAL} />
+                <Icon
+                  name="edit"
+                  size={17}
+                  strokeWidth={1.9}
+                  color={DARK_TEAL}
+                />
               </Pressable>
             </View>
 
@@ -179,8 +218,18 @@ export default function EditProfileScreen() {
             </View>
           </View>
 
-          <View style={[styles.settingsColumn, isDesktop && styles.settingsColumnDesktop]}>
-            <View style={[styles.settingsCard, isDesktop && styles.settingsCardDesktop]}>
+          <View
+            style={[
+              styles.settingsColumn,
+              isDesktop && styles.settingsColumnDesktop,
+            ]}
+          >
+            <View
+              style={[
+                styles.settingsCard,
+                isDesktop && styles.settingsCardDesktop,
+              ]}
+            >
               <View style={styles.form}>
                 {renderField({
                   label: "Username",
@@ -212,10 +261,24 @@ export default function EditProfileScreen() {
                   autoCorrect: false,
                   value: email,
                   onChangeText: setEmail,
-                  editable: false,
                 })}
 
-                <View style={styles.divider} />
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.updateButton,
+                    isDesktop && styles.updateButtonDesktop,
+                    pressed && styles.updateButtonPressed,
+                    isLoading && styles.updateButtonDisabled,
+                  ]}
+                  onPress={handleUpdateProfile}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.updateButtonText}>
+                    {isLoading ? "Updating..." : "Update Profile"}
+                  </Text>
+                </Pressable>
+
+                {/* <View style={styles.divider} />
 
                 <View style={styles.settingRow}>
                   <Text style={styles.settingLabel}>Push Notifications</Text>
@@ -239,32 +302,18 @@ export default function EditProfileScreen() {
                     trackColor={{ false: SWITCH_OFF, true: TEAL }}
                     thumbColor={WHITE}
                   />
-                </View>
+                </View> */}
               </View>
             </View>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.updateButton,
-                isDesktop && styles.updateButtonDesktop,
-                pressed && styles.updateButtonPressed,
-                isLoading && styles.updateButtonDisabled,
-              ]}
-              onPress={handleUpdateProfile}
-              disabled={isLoading}
-            >
-              <Text style={styles.updateButtonText}>
-                {isLoading ? "Updating..." : "Update Profile"}
-              </Text>
-            </Pressable>
           </View>
         </View>
       </ScrollView>
       <AvatarPickerModal
         visible={showAvatarModal}
         onClose={() => setShowAvatarModal(false)}
-        onApply={({ icon, backgroundColor }) => {
-          setAvatarIcon(icon);
+        selectedAvatarId={avatarId}
+        onApply={({ id, backgroundColor }) => {
+          setAvatarId(id);
           setAvatarColor(backgroundColor);
         }}
       />
@@ -275,7 +324,7 @@ export default function EditProfileScreen() {
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
 const SOFT_TEAL = "#a9efdf";
-const VERY_SOFT_TEAL = "#eafaf5";
+const VERY_SOFT_TEAL = "#dff7ef";
 const CARD = "#fbfffd";
 const WHITE = "#ffffff";
 const MUTED = "#5e7b78";
@@ -334,7 +383,7 @@ const styles = StyleSheet.create({
 
   profileCardDesktop: {
     width: 320,
-    minHeight: 378,
+    minHeight: 400,
     marginBottom: 0,
     paddingTop: 34,
     paddingBottom: 34,
@@ -351,6 +400,26 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
+  avatarOuterRingDesktop: {
+    width: 124,
+    height: 124,
+    borderRadius: 62,
+    backgroundColor: CARD,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+
+  avatarDesktop: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    overflow: "hidden",
+  },
+
   avatar: {
     width: 92,
     height: 92,
@@ -358,11 +427,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
+    overflow: "hidden",
   },
 
   logoImage: {
-    width: 85,
-    height: 85,
+    width: "92%",
+    height: "92%",
+  },
+
+  logoImageDesktop: {
+    width: "93%",
+    height: "93%",
   },
 
   editAvatarButton: {
@@ -426,8 +501,8 @@ const styles = StyleSheet.create({
   settingsCard: {
     backgroundColor: CARD,
     borderRadius: 18,
-    paddingVertical: 18,
-    paddingHorizontal: 14,
+    paddingVertical: 35,
+    paddingHorizontal: 15,
     marginBottom: 22,
     shadowColor: "#000",
     shadowOpacity: 0.04,
@@ -441,6 +516,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     paddingVertical: 24,
     paddingHorizontal: 24,
+    minHeight: 400,
   },
 
   form: {

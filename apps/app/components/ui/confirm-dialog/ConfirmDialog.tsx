@@ -86,8 +86,9 @@ export function ConfirmDialog({
   );
 }
 
-const GREEN = "#00c896";
+const GREEN = "#c9f3df";
 const LIGHT_GREEN = "#dff6e3";
+const SOFT_GREEN = "#e7f8f2";
 const WHITE = "#ffffff";
 const BLACK = "#052e2b";
 const OVERLAY = "rgba(0, 0, 0, 0.72)";
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     width: "82%",
     height: 42,
     borderRadius: 22,
-    backgroundColor: LIGHT_GREEN,
+    backgroundColor: SOFT_GREEN,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from 'src/mail/mail.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { VerificationTokenModule } from 'src/verification-token/verification-token.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { PassportModule } from '@nestjs/passport';
       signOptions: { expiresIn: '7d' },
     }),
     MailModule,
+    VerificationTokenModule,
     PassportModule,
   ],
   providers: [AuthService, JwtStrategy],

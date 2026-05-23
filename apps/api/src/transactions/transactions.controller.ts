@@ -11,9 +11,11 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { GetTransactionsByCategoryQueryDto } from './dto/get-transactions-by-category-query.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('transactions')
@@ -50,6 +52,14 @@ export class TransactionsController {
     @Param('id') transactionId: string,
   ) {
     return this.transactionsService.deleteTransaction(user.sub, transactionId);
+  }
+
+  @Get('analytics/categories')
+  getTransactionsByCategories(
+    @CurrentUser() user: JwtUser,
+    @Query() query: GetTransactionsByCategoryQueryDto,
+  ) {
+    return this.transactionsService.getTransactionsByCategories(user.sub, query);
   }
 
   @Get()

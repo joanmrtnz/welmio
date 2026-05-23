@@ -15,8 +15,10 @@ import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
 import { useSignup } from "@/features/auth/hooks/useSignup";
-import { toIsoDate } from "@/app/lib/date";
-const WELMIO_LOGO = require("@/assets/images/welmio-logo-no-circle.png");
+import { feedback } from "@/components/ui/feedback/feedback.service";
+const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
+import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
+import { toIsoDate } from "@/lib/date";
 
 const BACKGROUND = "#dff7ef";
 const CARD = "#ffffff";
@@ -127,35 +129,35 @@ export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  async function handleSignup() {
-    try {
-      if (password !== confirmPassword) {
-        console.warn("Las contraseñas no coinciden");
-        return;
-      }
-
-      const formattedDateOfBirth = toIsoDate(dateOfBirth);
-
-      if (!formattedDateOfBirth) {
-        console.warn("Invalid date format");
-        return;
-      }
-
-      const res = await execute({
-        fullName,
-        email,
-        mobileNumber,
-        dateOfBirth: formattedDateOfBirth,
-        password,
-      });
-
-      if (res) {
-        router.replace("/(app)/(tabs)/home");
-      }
-    } catch (error) {
-      console.warn(error);
+ async function handleSignup() {
+  try {
+    if (!fullName.trim() || !email.trim() || !password.trim()) {
+      feedback.error("Fill the required form fields before submitting");
+      return;
     }
+
+    if (password !== confirmPassword) {
+      feedback.error("The passwords don't match");
+      return;
+    }
+
+    const formattedDateOfBirth = toIsoDate(dateOfBirth);
+
+    const res = await execute({
+      fullName,
+      email,
+      mobileNumber: mobileNumber.trim() || undefined,
+      dateOfBirth: formattedDateOfBirth || undefined,
+      password,
+    });
+
+    if (res) {
+      router.replace("/(public)/login");
+    }
+  } catch (error) {
+    console.warn(error);
   }
+}
 
   const brandHeader = (
     <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
@@ -188,7 +190,7 @@ export default function SignupScreen() {
 
       <View style={[styles.form, isDesktop && styles.formDesktop]}>
         <SignupInput
-          label="Full Name"
+          label="Full Name *"
           icon="user-o"
           placeholder="John Doe"
           autoCapitalize="words"
@@ -198,7 +200,7 @@ export default function SignupScreen() {
         />
 
         <SignupInput
-          label="Email"
+          label="Email *"
           icon="envelope-o"
           placeholder="example@email.com"
           autoCapitalize="none"
@@ -219,17 +221,16 @@ export default function SignupScreen() {
           onChangeText={setMobileNumber}
         />
 
-        <SignupInput
+        <DateOfBirthInput
           label="Date of Birth"
           icon="calendar-o"
           placeholder="DD / MM / YYYY"
-          keyboardType="numbers-and-punctuation"
           value={dateOfBirth}
           onChangeText={setDateOfBirth}
         />
 
         <SignupInput
-          label="Password"
+          label="Password *"
           icon="lock"
           placeholder=""
           secureTextEntry
@@ -241,7 +242,7 @@ export default function SignupScreen() {
         />
 
         <SignupInput
-          label="Confirm Password"
+          label="Confirm Password *"
           icon="lock"
           placeholder=""
           secureTextEntry
@@ -286,24 +287,10 @@ export default function SignupScreen() {
     </View>
   );
 
-  const sloganCard = (
-    <View style={[styles.sloganCard, isDesktop && styles.sloganCardDesktop]}>
-      <View style={styles.sloganIcon}>
-        <FontAwesome name="lightbulb-o" size={23} color={PRIMARY} />
-      </View>
-      <View style={styles.sloganTextWrap}>
-        <Text style={styles.sloganTitle}>Smart Finance, Simple Life</Text>
-        <Text style={styles.sloganText}>
-          Take control of your money with ease.
-        </Text>
-      </View>
-    </View>
-  );
-
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -325,7 +312,6 @@ export default function SignupScreen() {
                 Create your Welmio account and start organizing expenses,
                 savings goals, and financial routines with a clean dashboard.
               </Text>
-              {sloganCard}
             </View>
 
             <View style={styles.desktopFormPane}>{signupCard}</View>
@@ -335,7 +321,6 @@ export default function SignupScreen() {
             {brandHeader}
             {logoHero}
             {signupCard}
-            {sloganCard}
           </>
         )}
       </ScrollView>
@@ -439,6 +424,7 @@ const styles = StyleSheet.create({
     borderColor: PRIMARY_DARK,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
     shadowColor: "rgba(7, 59, 58, 0.22)",
     shadowOpacity: 1,
     shadowRadius: 18,
@@ -447,8 +433,8 @@ const styles = StyleSheet.create({
   },
 
   heroLogo: {
-    width: 99,
-    height: 98,
+    width: "92%",
+    height: "92%",
     resizeMode: "contain",
   },
 
@@ -459,8 +445,8 @@ const styles = StyleSheet.create({
   },
 
   heroLogoDesktop: {
-    width: 121,
-    height: 120,
+    width: "93%",
+    height: "93%",
   },
 
   desktopHeadline: {
@@ -620,7 +606,7 @@ const styles = StyleSheet.create({
   },
 
   primaryButtonDesktop: {
-    alignSelf: "flex-end",
+    alignSelf: "center",
     width: 220,
   },
 
@@ -643,52 +629,4 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
 
-  sloganCard: {
-    marginTop: 26,
-    minHeight: 72,
-    borderRadius: 24,
-    backgroundColor: "rgba(255, 255, 255, 0.55)",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    paddingHorizontal: 22,
-    paddingVertical: 16,
-    shadowColor: "rgba(7, 59, 58, 0.06)",
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 2,
-  },
-
-  sloganCardDesktop: {
-    maxWidth: 440,
-    marginTop: 34,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-  },
-
-  sloganIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 16,
-    backgroundColor: SOFT_MINT,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  sloganTextWrap: {
-    flex: 1,
-  },
-
-  sloganTitle: {
-    color: TEXT,
-    fontSize: 13,
-    fontFamily: fonts.bold,
-  },
-
-  sloganText: {
-    marginTop: 4,
-    color: MUTED,
-    fontSize: 12,
-    fontFamily: fonts.regular,
-  },
 });

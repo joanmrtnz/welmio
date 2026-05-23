@@ -61,13 +61,37 @@ model User {
   avatarColor String?
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
+  emailVerifiedAt         DateTime?
+  pendingEmail            String?
   resetPasswordCode       String?
   resetPasswordCodeExpiry DateTime?
   transactions            Transaction[]
   accounts                Account[]
-  categories   Category[]
+  categories              Category[]
   goals                   Goal[]
   goalContributions GoalContribution[]
+  verificationTokens VerificationToken[]
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String
+  type      VerificationTokenType
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+enum VerificationTokenType {
+  email_verification
+  email_change
+  password_reset
 }
 
 model Transaction {

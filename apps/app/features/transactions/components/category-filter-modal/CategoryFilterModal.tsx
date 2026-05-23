@@ -12,7 +12,6 @@ import { Icon } from "@/components/icons/Icon";
 
 import { useCategoryFilterModal } from "../../hooks/useCategoryFilterModal";
 import {
-  CATEGORY_COLORS,
   CATEGORY_ICONS,
 } from "../../constants/categoryOptions";
 
@@ -334,9 +333,9 @@ export function CategoryFilterModal({
                   })}
                 </View>
 
-                <Text style={styles.sectionLabel}>Color</Text>
+                {/* <Text style={styles.sectionLabel}>Color</Text>
 
-                <View style={styles.colorSelectorRow}>
+                 <View style={styles.colorSelectorRow}>
                   {CATEGORY_COLORS.map((color) => {
                     const isSelected = selectedColor === color;
 
@@ -352,7 +351,7 @@ export function CategoryFilterModal({
                       />
                     );
                   })}
-                </View>
+                </View> */}
               </ScrollView>
 
               <View style={[styles.actions, isDesktop && styles.actionsDesktop]}>

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - pre
-      - prod
     paths:
       - 'apps/app/**'
       - 'packages/shared-types/**'
@@ -13,11 +12,16 @@ on:
       - 'package.json'
       - 'turbo.json'
       - '.github/workflows/**'
+  release:
+    types:
+      - published
+  workflow_dispatch:
 
 jobs:
-  build-and-push:
-    if: github.ref_name == 'prod'
+  build-and-push-pre:
+    if: github.event_name == 'push' && github.ref_name == 'pre'
     runs-on: ubuntu-latest
+    environment: pre
 
     steps:
       - name: Checkout repository
@@ -29,28 +33,71 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build APP image
+      - name: Build APP pre image
+        run: |
+          docker build \
+            -f apps/app/Dockerfile \
+            --build-arg EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL_PRE }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:pre \
+            .
+
+      - name: Push APP pre image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:pre
+
+  deploy-pre:
+    if: github.event_name == 'push' && github.ref_name == 'pre'
+    needs: build-and-push-pre
+    runs-on: [self-hosted, welmio]
+    environment: pre
+
+    steps:
+      - name: Deploy APP on pre server environment
+        run: |
+          cd /opt/welmio/pre
+          docker compose pull app-web
+          docker compose up -d app-web
+
+  build-and-push-prod:
+    if: github.event_name == 'release' && github.event.action == 'published'
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build APP production image
         run: |
           docker build \
             -f apps/app/Dockerfile \
             --build-arg EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL }} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.event.release.tag_name }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod \
             .
 
-      - name: Push APP image
+      - name: Push APP production image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.event.release.tag_name }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod
 
-  deploy:
-    if: github.ref_name == 'prod'
-    needs: build-and-push
-    runs-on: [self-hosted, welmio, prod]
+  deploy-prod:
+    if: github.event_name == 'release' && github.event.action == 'published'
+    needs: build-and-push-prod
+    runs-on: [self-hosted, welmio]
+    environment: prod
 
     steps:
-      - name: Deploy on server
+      - name: Deploy APP on production server environment
         run: |
-          cd /opt/welmio
+          cd /opt/welmio/prod
           docker compose pull app-web
           docker compose up -d app-web

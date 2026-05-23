@@ -12,8 +12,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-import { apiFetch } from "@/app/lib/api/client";
-import WelmioAvatar from "@/assets/images/welmio-logo-no-circle.png";
+import { apiFetch } from "@/lib/api/client";
 import type {
   GoalsOverviewResponse,
   TransactionsOverviewResponse,
@@ -23,6 +22,10 @@ import { QuickAnalyticsCard } from "@/features/analytics/components/QuickAnalyti
 import { useAnalytics } from "@/features/analytics/hooks/useAnalytics";
 import { getGoalsOverview } from "@/features/goals/services/goals.service";
 import { QuickGoalsRow } from "@/features/goals/components/quick-goals-row/QuickGoalsRow";
+import { formatCurrency } from "@/utils/formatCurrency";
+import { getUserProfile } from "@/features/profile/services/profile-service";
+import { getGreetingLabel } from "./utils/getGreetingLabel";
+import { AVATAR_IMAGES, type AvatarId } from "@/features/profile/components/AvatarPickerModal";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -48,11 +51,9 @@ const EMPTY_ANALYTICS_DATA = [
   { label: "Sun", income: 0, expense: 0 },
 ];
 
-function formatCurrency(amount: string | number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(Number(amount));
+
+function isAvatarId(value: unknown): value is AvatarId {
+  return typeof value === "string" && value in AVATAR_IMAGES;
 }
 
 function formatAnalyticsLabel(label: string) {
@@ -100,11 +101,24 @@ export default function HomeScreen() {
     useState<TransactionsOverviewResponse | null>(null);
   const [goalsOverview, setGoalsOverview] =
     useState<GoalsOverviewResponse | null>(null);
+  const [fullName, setFullName] = useState("");
+  const [avatarId, setAvatarId] = useState<AvatarId>("avatar-0");
   const [goalsErrorMessage, setGoalsErrorMessage] = useState<string | null>(
     null,
   );
 
   const { selected, setSelected, data: analyticsData } = useAnalytics();
+
+  const loadUserProfile = useCallback(async () => {
+    try {
+      const user = await getUserProfile();
+
+      setFullName(user.fullName ?? "");
+      setAvatarId(isAvatarId(user.avatarIcon) ? user.avatarIcon : "avatar-0");
+    } catch (error) {
+      console.warn("[HomeScreen] load user profile error:", error);
+    }
+  }, []);
 
   const recentTransactions = useMemo(
     () =>
@@ -140,6 +154,8 @@ export default function HomeScreen() {
     }));
   }, [analyticsData]);
 
+  const selectedAvatarImage = AVATAR_IMAGES[avatarId];
+
   const totalBalance = transactionsOverview?.summary.totalBalance ?? 0;
   const totalExpense = transactionsOverview?.summary.totalExpense ?? 0;
 
@@ -171,7 +187,8 @@ export default function HomeScreen() {
   useEffect(() => {
     loadTransactionsOverview();
     loadGoalsOverview();
-  }, [loadGoalsOverview, loadTransactionsOverview]);
+    loadUserProfile();
+  }, [loadGoalsOverview, loadTransactionsOverview, loadUserProfile]);
 
   useEffect(() => {
     if (selected !== "weekly") {
@@ -183,7 +200,8 @@ export default function HomeScreen() {
     useCallback(() => {
       loadTransactionsOverview();
       loadGoalsOverview();
-    }, [loadGoalsOverview, loadTransactionsOverview]),
+      loadUserProfile();
+    }, [loadGoalsOverview, loadTransactionsOverview, loadUserProfile]),
   );
 
   return (
@@ -196,20 +214,22 @@ export default function HomeScreen() {
               onPress={() => router.push("/profile")}
             >
               <Image
-                source={WelmioAvatar}
+                source={selectedAvatarImage}
                 style={styles.avatarImage}
                 resizeMode="contain"
               />
             </Pressable>
 
             <View>
-              <Text style={styles.greeting}>Hi, John! 👋</Text>
-              <Text style={styles.greetingSub}>Good Morning</Text>
+             <Text style={styles.greeting}>Hi, {fullName || "User"}</Text>
+              <Text style={styles.greetingSub}>{getGreetingLabel()}</Text>
             </View>
           </View>
+          {/* { !isDesktop ? (
           <Pressable style={styles.notifications}>
             <Icon name="bell" size={24} strokeWidth={1.8} color={TEXT} />
           </Pressable>
+          ):  <View></View>} */}
         </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -356,12 +376,12 @@ const styles = StyleSheet.create({
   },
 
   avatarFrame: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
+    width: 47,
+    height: 47,
+    borderRadius: 25,
     backgroundColor: CARD,
-    borderWidth: 1,
-    borderColor: BORDER,
+    borderWidth: 5,
+    borderColor: CARD,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "rgba(29, 100, 89, 0.12)",
@@ -372,8 +392,8 @@ const styles = StyleSheet.create({
   },
 
   avatarImage: {
-    width: 39,
-    height: 39,
+    width: 45,
+    height: 45,
   },
 
   greeting: {

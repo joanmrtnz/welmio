@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { sendResetPasswordCode } from "@/app/lib/api/auth";
+import { sendResetPasswordCode } from "@/lib/api/auth";
 
 export function useSendResetPasswordCode() {
   const [loading, setLoading] = useState(false);

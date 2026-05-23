@@ -6,12 +6,124 @@ import {
   InternalServerErrorException
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { AccountType, Prisma, TransactionType, VerificationTokenType } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { MailService } from 'src/mail/mail.service';
+import { VerificationTokenService } from 'src/verification-token/verification-token.service';
+
+const DEFAULT_CATEGORIES: Prisma.CategoryCreateWithoutUserInput[] = [
+  {
+    name: 'Food & Dining',
+    type: TransactionType.expense,
+    icon: 'food',
+    color: '#F97316',
+  },
+  {
+    name: 'Groceries',
+    type: TransactionType.expense,
+    icon: 'groceries',
+    color: '#22C55E',
+  },
+  {
+    name: 'Transport',
+    type: TransactionType.expense,
+    icon: 'car',
+    color: '#3B82F6',
+  },
+  {
+    name: 'Housing',
+    type: TransactionType.expense,
+    icon: 'rent',
+    color: '#8B5CF6',
+  },
+  {
+    name: 'Utilities',
+    type: TransactionType.expense,
+    icon: 'document',
+    color: '#EAB308',
+  },
+  {
+    name: 'Health',
+    type: TransactionType.expense,
+    icon: 'medicine',
+    color: '#EF4444',
+  },
+  {
+    name: 'Entertainment',
+    type: TransactionType.expense,
+    icon: 'ticket',
+    color: '#EC4899',
+  },
+  {
+    name: 'Shopping',
+    type: TransactionType.expense,
+    icon: 'gift',
+    color: '#A855F7',
+  },
+  {
+    name: 'Education',
+    type: TransactionType.expense,
+    icon: 'book',
+    color: '#14B8A6',
+  },
+  {
+    name: 'Travel',
+    type: TransactionType.expense,
+    icon: 'plane',
+    color: '#06B6D4',
+  },
+  {
+    name: 'Subscriptions',
+    type: TransactionType.expense,
+    icon: 'ticket',
+    color: '#64748B',
+  },
+  {
+    name: 'Other Expense',
+    type: TransactionType.expense,
+    icon: 'expense',
+    color: '#94A3B8',
+  },
+  {
+    name: 'Salary',
+    type: TransactionType.income,
+    icon: 'income',
+    color: '#16A34A',
+  },
+  {
+    name: 'Freelance',
+    type: TransactionType.income,
+    icon: 'document',
+    color: '#2563EB',
+  },
+  {
+    name: 'Refunds',
+    type: TransactionType.income,
+    icon: 'arrowLeft',
+    color: '#0D9488',
+  },
+  {
+    name: 'Investments',
+    type: TransactionType.income,
+    icon: 'savings',
+    color: '#7C3AED',
+  },
+  {
+    name: 'Gifts',
+    type: TransactionType.income,
+    icon: 'gift',
+    color: '#DB2777',
+  },
+  {
+    name: 'Other Income',
+    type: TransactionType.income,
+    icon: 'plus',
+    color: '#94A3B8',
+  },
+];
 
 @Injectable()
 export class AuthService {
@@ -19,8 +131,8 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private verificationTokenService: VerificationTokenService,
   ) {}
-
 
   async register(dto: RegisterDto) {
     const { fullName, email, mobileNumber, dateOfBirth, password } = dto;
@@ -47,10 +159,37 @@ export class AuthService {
           mobileNumber: mobileNumber ?? null,
           dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
           password: hashedPassword,
+          emailVerifiedAt: null,
+
+          accounts: {
+            create: {
+              name: 'Cash',
+              type: AccountType.cash,
+              currencies: ['EUR'],
+            },
+          },
+
+          categories: {
+            create: DEFAULT_CATEGORIES,
+          },
         },
       });
 
-      return this.generateToken(user.id, user.email);
+      const verificationToken = await this.verificationTokenService.createToken(
+        user.id,
+        VerificationTokenType.email_verification,
+      );
+
+      await this.mailService.sendEmailVerification({
+        to: user.email,
+        token: verificationToken,
+        fullName: user.fullName,
+        templateType: 'email_verification',
+      });
+
+      return {
+        message: 'Account created. Please verify your email.',
+      };
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -63,10 +202,93 @@ export class AuthService {
     }
   }
 
+   async verifyEmail(token: string) {
+    if (!token) {
+      throw new BadRequestException('Verification token is required');
+    }
+
+    const verificationToken = await this.verificationTokenService.verifyToken(
+      token,
+      VerificationTokenType.email_verification,
+    );
+
+    await this.prisma.user.update({
+      where: {
+        id: verificationToken.userId,
+      },
+      data: {
+        emailVerifiedAt: new Date(),
+      },
+    });
+
+    return {
+      message: 'Email verified successfully.',
+    };
+  }
+
+  async verifyEmailChange(token: string) {
+    if (!token) {
+      throw new BadRequestException('Verification token is required');
+    }
+
+    const verificationToken = await this.verificationTokenService.verifyToken(
+      token,
+      VerificationTokenType.email_change,
+    );
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: verificationToken.userId,
+      },
+      select: {
+        id: true,
+        pendingEmail: true,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found for this verification token');
+    }
+
+    if (!user.pendingEmail) {
+      throw new BadRequestException('There is no pending email change to verify');
+    }
+
+    const pendingEmail = user.pendingEmail.trim().toLowerCase();
+
+    const emailOwner = await this.prisma.user.findUnique({
+      where: {
+        email: pendingEmail,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (emailOwner && emailOwner.id !== user.id) {
+      throw new ConflictException('Email already registered');
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        email: pendingEmail,
+        pendingEmail: null,
+        emailVerifiedAt: new Date(),
+      },
+    });
+
+    return {
+      message: 'Email changed successfully.',
+    };
+  }
+
   async login(dto: LoginDto) {
     try {
       const user = await this.prisma.user.findUnique({
-        where: { email: dto.email },
+        where: { email: dto.email.trim().toLowerCase() },
       });
 
       if (!user) {
@@ -80,6 +302,19 @@ export class AuthService {
 
       if (!passwordMatch) {
         throw new UnauthorizedException('Invalid credentials');
+      }
+
+      if (!user.emailVerifiedAt) {
+        const verificationEmailSent =
+          await this.resendVerificationEmailIfLastTokenExpired(user.id, user.email);
+
+        throw new UnauthorizedException({
+          message: verificationEmailSent
+            ? 'Please verify your email before logging in. We sent you a new verification email.'
+            : 'Please verify your email before logging in. Check your inbox for the verification email.',
+          code: 'EMAIL_NOT_VERIFIED',
+          verificationEmailSent,
+        });
       }
 
       return this.generateToken(user.id, user.email);
@@ -99,6 +334,42 @@ export class AuthService {
         'Unexpected error during login',
       );
     }
+  }
+
+  private async resendVerificationEmailIfLastTokenExpired(
+    userId: string,
+    email: string,
+  ) {
+    const activeVerificationToken = await this.prisma.verificationToken.findFirst({
+      where: {
+        userId,
+        type: VerificationTokenType.email_verification,
+        usedAt: null,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (activeVerificationToken) {
+      return false;
+    }
+
+    const verificationToken = await this.verificationTokenService.createToken(
+      userId,
+      VerificationTokenType.email_verification,
+    );
+
+    await this.mailService.sendEmailVerification({
+      to: email,
+      token: verificationToken,
+      templateType: 'email_verification',
+    });
+
+    return true;
   }
 
   async generateToken(userId: string, email: string) {
@@ -219,6 +490,30 @@ async resetPassword(
 
   return {
     message: 'Password updated successfully',
+  };
+}
+
+async checkAccessToken(user: { sub: string; email: string }) {
+  const dbUser = await this.prisma.user.findUnique({
+    where: {
+      id: user.sub,
+    },
+    select: {
+      id: true,
+      email: true,
+      fullName: true,
+      mobileNumber: true,
+      dateOfBirth: true,
+    },
+  });
+
+  if (!dbUser) {
+    throw new UnauthorizedException('Invalid access token');
+  }
+
+  return {
+    valid: true,
+    user: dbUser,
   };
 }
 
