@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { login } from "@/app/lib/api/auth";
+import { login } from "@/lib/api/auth";
 import { LoginInput } from "@repo/shared-types";
-import { setAccessToken } from "@/app/lib/auth-storage";
+import { setAccessToken } from "@/lib/auth-storage";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { ApiError } from "@/app/lib/api/client";
+import { ApiError } from "@/lib/api/client";
 
 export function useLogin() {
   const [loading, setLoading] = useState(false);

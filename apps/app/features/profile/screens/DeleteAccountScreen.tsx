@@ -16,7 +16,7 @@ import { Icon } from "@/components/icons/Icon";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { deleteAccount } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { removeAccessToken } from "@/app/lib/auth-storage";
+import { removeAccessToken } from "@/lib/auth-storage";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 export default function DeleteAccountScreen() {

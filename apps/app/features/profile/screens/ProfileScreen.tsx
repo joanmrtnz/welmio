@@ -12,7 +12,7 @@ import { fonts } from "@/theme/fonts";
 import { ProfileOption } from "../components/ProfileOption";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { removeAccessToken } from "@/app/lib/auth-storage";
+import { removeAccessToken } from "@/lib/auth-storage";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";

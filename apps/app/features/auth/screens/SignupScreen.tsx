@@ -15,10 +15,10 @@ import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
 import { useSignup } from "@/features/auth/hooks/useSignup";
-import { toIsoDate } from "@/app/lib/date";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
+import { toIsoDate } from "@/lib/date";
 
 const BACKGROUND = "#dff7ef";
 const CARD = "#ffffff";

@@ -9,7 +9,7 @@ import { Redirect, Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { checkAccessToken } from "@/features/auth/services/auth.service";
-import { removeAccessToken } from "@/app/lib/auth-storage";
+import { removeAccessToken } from "@/lib/auth-storage";
 
 const GREEN = "#12c79b";
 const LIGHT_GREEN = "#ffffff";

@@ -1,4 +1,4 @@
-import { getAccessToken } from "@/app/lib/auth-storage";
+import { getAccessToken } from "@/lib/auth-storage";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 

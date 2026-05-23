@@ -1,8 +1,6 @@
 export function getGreetingLabel() {
   const hour = new Date().getHours();
-
-  console.log(hour);
-
+  
   if (hour < 12) {
     return "Good morning";
   }

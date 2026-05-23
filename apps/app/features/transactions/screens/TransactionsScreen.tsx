@@ -15,7 +15,7 @@ import {
   TransactionOverviewItem,
 } from "@repo/shared-types";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { apiFetch } from "@/app/lib/api/client";
+import { apiFetch } from "@/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
 import { TransactionsGroupedList } from "../components/transactions-grouped-list/TransactionsGroupedList";
 import { CategoryFilterModal } from "../components/category-filter-modal/CategoryFilterModal";

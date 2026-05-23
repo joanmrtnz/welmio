@@ -12,7 +12,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-import { apiFetch } from "@/app/lib/api/client";
+import { apiFetch } from "@/lib/api/client";
 import type {
   GoalsOverviewResponse,
   TransactionsOverviewResponse,
