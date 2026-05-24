@@ -12,7 +12,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - 'turbo.json'
-      - '.github/workflows/**'
+      - '.github/workflows/deploy-web.yml'
   release:
     types:
       - published
@@ -61,7 +61,7 @@ jobs:
           docker compose up -d welmio
 
   build-and-push-prod:
-    if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published' && startsWith(github.event.release.tag_name, 'web-v')
     runs-on: ubuntu-latest
     environment: prod
 
@@ -89,7 +89,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio:prod
 
   deploy-prod:
-    if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published' && startsWith(github.event.release.tag_name, 'web-v')
     needs: build-and-push-prod
     runs-on: [self-hosted, welmio]
     environment: prod
@@ -98,5 +98,10 @@ jobs:
       - name: Deploy WEB on production server environment
         run: |
           cd /opt/welmio/prod
+          if grep -q '^WEB_IMAGE_TAG=' .env; then
+            sed -i 's/^WEB_IMAGE_TAG=.*/WEB_IMAGE_TAG=${{ github.event.release.tag_name }}/' .env
+          else
+            printf '\nWEB_IMAGE_TAG=${{ github.event.release.tag_name }}\n' >> .env
+          fi
           docker compose pull welmio
           docker compose up -d welmio
