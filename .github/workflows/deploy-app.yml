@@ -11,7 +11,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - 'turbo.json'
-      - '.github/workflows/**'
+      - '.github/workflows/deploy-app.yml'
   release:
     types:
       - published
@@ -33,11 +33,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Validate pre APP environment
+        run: |
+          test -n "${{ vars.EXPO_PUBLIC_API_URL_PRE }}"
+          echo "EXPO_PUBLIC_API_URL_PRE is configured"
+
       - name: Build APP pre image
         run: |
           docker build \
             -f apps/app/Dockerfile \
-            --build-arg EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL_PRE }} \
+            --build-arg "EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL_PRE }}" \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:pre \
             .
@@ -61,7 +66,7 @@ jobs:
           docker compose up -d app-web
 
   build-and-push-prod:
-    if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published' && startsWith(github.event.release.tag_name, 'app-v')
     runs-on: ubuntu-latest
     environment: prod
 
@@ -75,11 +80,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Validate production APP environment
+        run: |
+          test -n "${{ vars.EXPO_PUBLIC_API_URL }}"
+          echo "EXPO_PUBLIC_API_URL is configured"
+
       - name: Build APP production image
         run: |
           docker build \
             -f apps/app/Dockerfile \
-            --build-arg EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL }} \
+            --build-arg "EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL }}" \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.event.release.tag_name }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod \
             .
@@ -90,7 +100,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod
 
   deploy-prod:
-    if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published' && startsWith(github.event.release.tag_name, 'app-v')
     needs: build-and-push-prod
     runs-on: [self-hosted, welmio]
     environment: prod
@@ -99,5 +109,10 @@ jobs:
       - name: Deploy APP on production server environment
         run: |
           cd /opt/welmio/prod
+          if grep -q '^APP_IMAGE_TAG=' .env; then
+            sed -i 's/^APP_IMAGE_TAG=.*/APP_IMAGE_TAG=${{ github.event.release.tag_name }}/' .env
+          else
+            printf '\nAPP_IMAGE_TAG=${{ github.event.release.tag_name }}\n' >> .env
+          fi
           docker compose pull app-web
           docker compose up -d app-web
