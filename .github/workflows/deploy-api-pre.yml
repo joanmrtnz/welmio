@@ -1,0 +1,55 @@
+name: Build, Push & Deploy API Pre
+
+on:
+  push:
+    branches:
+      - pre
+    paths:
+      - 'apps/api/**'
+      - 'packages/shared-types/**'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - 'turbo.json'
+      - '.github/workflows/deploy-api-pre.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-push-pre:
+    runs-on: ubuntu-latest
+    environment: pre
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build API pre image
+        run: |
+          docker build \
+            -f apps/api/Dockerfile \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:pre \
+            .
+
+      - name: Push API pre image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/welmio-api:pre
+
+  deploy-pre:
+    needs: build-and-push-pre
+    runs-on: [self-hosted, welmio]
+    environment: pre
+
+    steps:
+      - name: Deploy API on pre server environment
+        run: |
+          cd /opt/welmio/pre
+          docker compose pull api
+          docker compose up -d api
