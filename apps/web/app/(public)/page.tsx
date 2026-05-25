@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactElement } from "react";
 import styles from "./page.module.css";
-import ScreenshotsSwiper from "../../components/ScreenshotsSwiper/ScreenshotsSwiper";
+import ScreenshotsSwiper from "../../components/screenshotsSwiper/ScreenshotsSwiper";
 import { features, highlights, navLinks, screenshots, steps, techStack } from "./page.data";
 import LandingIcon from "../../components/landingIcon/LandingIcon";
 
