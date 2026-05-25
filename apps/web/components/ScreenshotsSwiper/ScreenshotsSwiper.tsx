@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { ReactElement, useCallback, useMemo, useRef, useState } from "react";
 import styles from "./../../app/(public)/page.module.css";
 
 type Screenshot = {
@@ -14,27 +14,37 @@ type ScreenshotsSwiperProps = {
   screenshots: Screenshot[];
 };
 
-export default function ScreenshotsSwiper({ screenshots }: ScreenshotsSwiperProps) {
+export default function ScreenshotsSwiper({
+  screenshots,
+}: ScreenshotsSwiperProps): ReactElement | null {
   const [activeIndex, setActiveIndex] = useState(0);
   const swipeStartX = useRef<number | null>(null);
   const swipeEndX = useRef<number | null>(null);
+
   const lastIndex = screenshots.length - 1;
 
-  const activeScreenshot = useMemo(() => screenshots[activeIndex], [activeIndex, screenshots]);
+  const activeScreenshot = useMemo(
+    () => screenshots[activeIndex] ?? screenshots[0],
+    [activeIndex, screenshots],
+  );
 
   const goTo = useCallback(
     (index: number) => {
+      if (screenshots.length === 0) return;
+
       if (index < 0) {
         setActiveIndex(lastIndex);
         return;
       }
+
       if (index > lastIndex) {
         setActiveIndex(0);
         return;
       }
+
       setActiveIndex(index);
     },
-    [lastIndex],
+    [lastIndex, screenshots.length],
   );
 
   const handleSwipeStart = (clientX: number) => {
@@ -59,6 +69,8 @@ export default function ScreenshotsSwiper({ screenshots }: ScreenshotsSwiperProp
     swipeEndX.current = null;
   };
 
+  if (!activeScreenshot) return null;
+
   return (
     <div className={styles.screenshotsSwiper} aria-label="Welmio screenshots carousel">
       <div className={styles.swiperHeader}>
@@ -66,16 +78,40 @@ export default function ScreenshotsSwiper({ screenshots }: ScreenshotsSwiperProp
           <h3>{activeScreenshot.title}</h3>
           <p>{activeScreenshot.text}</p>
         </div>
+
         <div className={styles.swiperActions}>
-          <button type="button" onClick={() => goTo(activeIndex - 1)} aria-label="Previous screenshot">‹</button>
-          <button type="button" onClick={() => goTo(activeIndex + 1)} aria-label="Next screenshot">›</button>
+          <button
+            type="button"
+            onClick={() => goTo(activeIndex - 1)}
+            aria-label="Previous screenshot"
+          >
+            ‹
+          </button>
+
+          <button
+            type="button"
+            onClick={() => goTo(activeIndex + 1)}
+            aria-label="Next screenshot"
+          >
+            ›
+          </button>
         </div>
       </div>
 
       <div
         className={styles.swiperViewport}
-        onTouchStart={(event) => handleSwipeStart(event.touches[0].clientX)}
-        onTouchMove={(event) => handleSwipeMove(event.touches[0].clientX)}
+        onTouchStart={(event) => {
+          const touch = event.touches[0];
+          if (!touch) return;
+
+          handleSwipeStart(touch.clientX);
+        }}
+        onTouchMove={(event) => {
+          const touch = event.touches[0];
+          if (!touch) return;
+
+          handleSwipeMove(touch.clientX);
+        }}
         onTouchEnd={handleSwipeEnd}
         onMouseDown={(event) => handleSwipeStart(event.clientX)}
         onMouseMove={(event) => {
@@ -84,9 +120,16 @@ export default function ScreenshotsSwiper({ screenshots }: ScreenshotsSwiperProp
         onMouseUp={handleSwipeEnd}
         onMouseLeave={handleSwipeEnd}
       >
-        <div className={styles.swiperTrack} style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
+        <div
+          className={styles.swiperTrack}
+          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+        >
           {screenshots.map((screen, index) => (
-            <article key={screen.title} className={styles.swiperSlide} aria-hidden={index !== activeIndex}>
+            <article
+              key={screen.title}
+              className={styles.swiperSlide}
+              aria-hidden={index !== activeIndex}
+            >
               <div className={styles.screenshotImageWrap}>
                 <Image
                   src={screen.image}
@@ -111,7 +154,13 @@ export default function ScreenshotsSwiper({ screenshots }: ScreenshotsSwiperProp
             aria-label={`Show ${screen.title} screenshot`}
             aria-current={index === activeIndex ? "true" : undefined}
           >
-            <Image src={screen.image} alt="" width={84} height={175} sizes="54px" />
+            <Image
+              src={screen.image}
+              alt=""
+              width={84}
+              height={175}
+              sizes="54px"
+            />
           </button>
         ))}
       </div>
