@@ -743,13 +743,11 @@
   .primaryButton:hover,
   .secondaryButton:hover,
   .darkSecondaryButton:hover,
-  .githubButton:hover,
-  .featureCard:hover {
+  .githubButton:hover {
     transform: translateY(-2px);
   }
 
-  .secondaryButton:hover,
-  .featureCard:hover {
+  .secondaryButton:hover {
     border-color: rgba(0, 173, 131, 0.32);
     box-shadow: var(--shadow);
   }
