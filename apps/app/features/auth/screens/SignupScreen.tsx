@@ -21,8 +21,6 @@ import { toIsoDate } from "@/lib/date";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
-
-//TODO: añadir el segudno logo de welmio para el avatr
 const WELMIO_APP_URL =
   process.env.EXPO_PUBLIC_WELMIO_APP_URL ?? "https://welmio.dev";
 
