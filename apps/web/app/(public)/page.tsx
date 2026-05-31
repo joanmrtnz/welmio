@@ -149,12 +149,48 @@ export default function Home(): ReactElement {
           </Link>
           <p>© 2026 Welmio. All rights reserved.</p>
         </div>
-        <div className={styles.footerColumns}>
-          <div><h3>Product</h3><a href="#features">Features</a><a href="#screenshots">Screenshots</a><a href="#how-it-works">How It Works</a></div>
-          <div><h3>Resources</h3><a href="https://github.com">GitHub Repository</a><a href="#tech-stack">Tech Stack</a></div>
-          <div><h3>Support</h3><a href="mailto:hello@welmio.app">Help Center</a><a href="mailto:hello@welmio.app">Contact</a><a href="#privacy">Privacy Policy</a></div>
-          <div className={styles.socials}><h3>Connect</h3><span><LandingIcon name="github" /></span><span><LandingIcon name="linkedin" /></span><span><LandingIcon name="twitter" /></span><span><LandingIcon name="mail" /></span></div>
+      <div className={styles.footerColumns}>
+        <div>
+          <h3>Product</h3>
+          <a href="#features">Features</a>
+          <a href="#screenshots">Screenshots</a>
+          <a href="#how-it-works">How It Works</a>
         </div>
+
+        <div>
+          <h3>Resources</h3>
+          <a href="https://github.com">GitHub Repository</a>
+          <a href="#tech-stack">Tech Stack</a>
+        </div>
+
+        <div>
+          <h3>Support</h3>
+          <a href="mailto:hello@welmio.app">Help Center</a>
+          <a href="mailto:hello@welmio.app">Contact</a>
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms of Use</Link>
+        </div>
+
+        <div className={styles.socials}>
+          <h3>Connect</h3>
+
+          <span>
+            <LandingIcon name="github" />
+          </span>
+
+          <span>
+            <LandingIcon name="linkedin" />
+          </span>
+
+          <span>
+            <LandingIcon name="twitter" />
+          </span>
+
+          <span>
+            <LandingIcon name="mail" />
+          </span>
+        </div>
+      </div>
       </footer>
     </main>
   );
