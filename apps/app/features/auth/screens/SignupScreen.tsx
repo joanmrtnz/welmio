@@ -20,6 +20,9 @@ import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirt
 import { toIsoDate } from "@/lib/date";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
+const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
+
+//TODO: añadir el segudno logo de welmio para el avatr
 const WELMIO_APP_URL =
   process.env.EXPO_PUBLIC_WELMIO_APP_URL ?? "https://welmio.dev";
 
@@ -177,7 +180,7 @@ export default function SignupScreen() {
     <View style={[styles.logoWrap, isDesktop && styles.logoWrapDesktop]}>
       <View style={[styles.logoCircle, isDesktop && styles.logoCircleDesktop]}>
         <Image
-          source={WELMIO_LOGO}
+          source={WELMIO_AVATAR_BASE}
           style={[styles.heroLogo, isDesktop && styles.heroLogoDesktop]}
         />
       </View>
