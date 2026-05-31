@@ -104,6 +104,11 @@ export const screenshots: Screenshot[] = [
     text: "A complete account creation flow with the same visual language.",
     image: "/screenshots/welmio-signup.png",
   },
+  {
+    title: "Forgot Password",
+    text: "Recover access with a guided email verification flow for resetting your password.",
+    image: "/screenshots/welmio-forgot-password.png",
+  },
 ];
 
 export const steps: IconCard[] = [
