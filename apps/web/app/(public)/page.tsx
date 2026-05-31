@@ -10,6 +10,16 @@ export default function Home(): ReactElement {
 
   const webAppUrl = process.env.NEXT_PUBLIC_WELMIO_WEB_APP_URL ?? "http://localhost:3000";
   const webAppLoginUrl = `${webAppUrl}/login`;
+  const WELMIO_GITHUB_URL =
+  process.env.NEXT_PUBLIC_WELMIO_GITHUB_URL ?? "https://github.com";
+  const WELMIO_LINKEDIN_URL =
+    process.env.NEXT_PUBLIC_WELMIO_LINKEDIN_URL ?? "https://www.linkedin.com";
+  const WELMIO_TWITTER_URL =
+    process.env.NEXT_PUBLIC_WELMIO_TWITTER_URL ?? "https://x.com";
+  const WELMIO_CONTACT_EMAIL =
+    process.env.NEXT_PUBLIC_WELMIO_CONTACT_EMAIL ?? "hello@welmio.app";
+  const WELMIO_CONTACT_URL = `mailto:${WELMIO_CONTACT_EMAIL}`;
+
   return (
     <main className={styles.page}>
       <header className={styles.navbar}>
@@ -186,21 +196,36 @@ export default function Home(): ReactElement {
         <div className={styles.socials}>
           <h3>Connect</h3>
 
-          <span>
+          <a
+            href={WELMIO_GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Welmio GitHub"
+          >
             <LandingIcon name="github" />
-          </span>
+          </a>
 
-          <span>
+          <a
+            href={WELMIO_LINKEDIN_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Welmio LinkedIn"
+          >
             <LandingIcon name="linkedin" />
-          </span>
+          </a>
 
-          <span>
+          <a
+            href={WELMIO_TWITTER_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Welmio X profile"
+          >
             <LandingIcon name="twitter" />
-          </span>
+          </a>
 
-          <span>
+          <a href={WELMIO_CONTACT_URL} aria-label="Contact Welmio by email">
             <LandingIcon name="mail" />
-          </span>
+          </a>
         </div>
       </div>
       </footer>

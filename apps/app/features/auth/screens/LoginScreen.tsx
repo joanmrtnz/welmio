@@ -20,6 +20,8 @@ import { DARK_GREEN } from "@/features/transactions/components/transaction-detai
 import { feedback } from "@/components/ui/feedback/feedback.service";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
+const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
+
 
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";
@@ -121,7 +123,7 @@ export default function LoginScreen() {
                 style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
               >
                 <Image
-                  source={WELMIO_LOGO}
+                  source={WELMIO_AVATAR_BASE}
                   style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
                   resizeMode="contain"
                 />

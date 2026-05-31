@@ -11,15 +11,23 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { Link, router } from "expo-router";
+import { ExternalPathString, Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
 import { useSignup } from "@/features/auth/hooks/useSignup";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
 import { toIsoDate } from "@/lib/date";
 
+const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
+const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
+
+//TODO: añadir el segudno logo de welmio para el avatr
+const WELMIO_APP_URL =
+  process.env.EXPO_PUBLIC_WELMIO_APP_URL ?? "https://welmio.dev";
+
+const WELMIO_TERMS_URL = `${WELMIO_APP_URL}/terms` as ExternalPathString;
+const WELMIO_PRIVACY_URL = `${WELMIO_APP_URL}/privacy` as ExternalPathString;
 const BACKGROUND = "#dff7ef";
 const CARD = "#ffffff";
 const PRIMARY = "#00b889";
@@ -172,7 +180,7 @@ export default function SignupScreen() {
     <View style={[styles.logoWrap, isDesktop && styles.logoWrapDesktop]}>
       <View style={[styles.logoCircle, isDesktop && styles.logoCircleDesktop]}>
         <Image
-          source={WELMIO_LOGO}
+          source={WELMIO_AVATAR_BASE}
           style={[styles.heroLogo, isDesktop && styles.heroLogoDesktop]}
         />
       </View>
@@ -256,11 +264,11 @@ export default function SignupScreen() {
 
       <Text style={styles.legal}>
         By continuing, you agree to the{" "}
-        <Link href="/(public)/terms-of-use" asChild>
+        <Link href={WELMIO_TERMS_URL} asChild>
           <Text style={styles.legalLink}>Terms of Use</Text>
         </Link>{" "}
         and{" "}
-        <Link href="/(public)/privacy-policy" asChild>
+        <Link href={WELMIO_PRIVACY_URL} asChild>
           <Text style={styles.legalLink}>Privacy Policy</Text>
         </Link>
       </Text>
