@@ -25,11 +25,23 @@ export default function Home(): ReactElement {
         <Link href={webAppLoginUrl} className={styles.navCta}>Use Welmio on Web <LandingIcon name="monitor" /></Link>
 
         <details className={styles.mobileMenu}>
-          <summary aria-label="Open navigation menu"><span /><span /><span /></summary>
-          <div>
-            {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
-            <Link href={webAppLoginUrl}>Use Welmio on Web</Link>
-          </div>
+          <summary aria-label="Open navigation menu">
+            <span />
+            <span />
+            <span />
+          </summary>
+
+          <nav className={styles.mobileMenuPanel} aria-label="Mobile navigation">
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+
+            <Link href={webAppLoginUrl} className={styles.mobileMenuCta}>
+              Use Welmio on Web <LandingIcon name="monitor" />
+            </Link>
+          </nav>
         </details>
       </header>
 

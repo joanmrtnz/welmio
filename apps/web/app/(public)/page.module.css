@@ -89,15 +89,15 @@
 }
 
 .mobileMenu {
-  position: relative;
   display: block;
 }
 
 .mobileMenu summary {
-  width: 44px;
-  height: 32px;
+  width: 46px;
+  height: 26px;
   display: grid;
   place-items: center;
+  padding: 0;
   list-style: none;
   cursor: pointer;
 }
@@ -108,26 +108,77 @@
 
 .mobileMenu summary span {
   display: block;
-  width: 28px;
-  height: 3px;
-  margin: 3px 0;
+  width: 22px;
+  height: 2.5px;
   border-radius: 99px;
   background: var(--ink);
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.mobileMenu div {
-  position: absolute;
+.mobileMenu summary span + span {
+  margin-top: 5px;
+}
+
+.mobileMenu[open] summary span:nth-child(1) {
+  transform: translateY(12.5px) rotate(45deg);
+}
+
+.mobileMenu[open] summary span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobileMenu[open] summary span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+.mobileMenuPanel {
+  position: fixed;
+  top: 72px;
+  left: 0;
   right: 0;
-  top: calc(100% + 10px);
+  z-index: 30;
   display: grid;
-  gap: 20px;
-  min-width: min(86vw, 440px);
+  gap: 10px;
   padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 20px;
-  background: var(--card-solid);
-  box-shadow: var(--shadow);
-  font-weight: 850;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(0, 173, 131, 0.12), #fff6 12rem),
+    rgba(255, 255, 255, 0.96);
+  box-shadow: 0 22px 60px rgba(6, 45, 58, 0.16);
+}
+
+.mobileMenuPanel a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  color: var(--ink);
+  /* background: rgba(248, 255, 253, 0.78); */
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+
+.mobileMenuPanel a:hover {
+  border-color: rgba(0, 173, 131, 0.22);
+  background: var(--teal-soft);
+}
+
+.mobileMenuCta {
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #05be92, #009e78) !important;
+  box-shadow: 0 14px 30px rgba(0, 173, 131, 0.24);
+}
+
+.mobileMenuCta svg {
+  width: 20px;
+  height: 20px;
 }
 
 .hero {
@@ -1027,8 +1078,13 @@
   .screenshotThumbs button {
     flex-basis: 50px;
   }
-}
 
+  .badge {
+    margin: 0 0 18px;
+    padding: 10px 14px;
+    font-size: 0.80rem;
+  }
+}
 
 
 /* Legal pages */
