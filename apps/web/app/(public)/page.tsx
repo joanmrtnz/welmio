@@ -32,7 +32,7 @@ export default function Home(): ReactElement {
           {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
         </nav>
 
-        <Link href={webAppLoginUrl} className={styles.navCta}>Use Welmio on Web <LandingIcon name="monitor" /></Link>
+        <Link href={webAppLoginUrl} className={styles.navCta}><LandingIcon name="monitor" /> Use Welmio on Web</Link>
 
         <details className={styles.mobileMenu}>
           <summary aria-label="Open navigation menu">

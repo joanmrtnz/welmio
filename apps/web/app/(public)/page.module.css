@@ -250,7 +250,11 @@
   display: grid;
   gap: 14px;
   margin-top: 30px;
+  .primaryButton {
+    color: #ffffff;
+  }
 }
+
 
 .navCta,
 .primaryButton,
@@ -279,10 +283,11 @@
   box-shadow: 0 16px 36px rgba(0, 173, 131, 0.28);
 }
 
-.navCta {
+.page .navCta {
   min-height: 48px;
   padding: 0 24px;
   font-size: 0.9rem;
+  color: #ffffff;
 }
 
 .primaryButton,
