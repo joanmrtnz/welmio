@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-const WELMIO_BASE_AVATAR = require("@/assets/images/welmio-logo.png");
+const WELMIO_BASE_AVATAR = require("@/assets/images/welmio-avatar-base.png");
 const WELMIO_AVATAR_1 = require("@/assets/images/welmio-avatar-1.png");
 const WELMIO_AVATAR_2 = require("@/assets/images/welmio-avatar-2.png");
 const WELMIO_AVATAR_3 = require("@/assets/images/welmio-avatar-3.png");

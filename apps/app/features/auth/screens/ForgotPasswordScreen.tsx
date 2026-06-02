@@ -22,6 +22,7 @@ const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";
 const PRIMARY_DARK = "#079374";
+const DARK_GREEN = "#0a8f72";
 const DARK = "#052e2b";
 const MUTED = "#6f8586";
 const CARD = "#ffffff";
@@ -268,7 +269,9 @@ const styles = StyleSheet.create({
     width: 106,
     height: 106,
     borderRadius: 58,
-    backgroundColor: CARD,
+    backgroundColor: SOFT_GREEN,
+    borderColor: DARK_GREEN,
+    borderWidth: 4,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "rgba(29, 100, 89, 0.16)",

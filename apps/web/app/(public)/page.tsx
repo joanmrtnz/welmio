@@ -10,6 +10,16 @@ export default function Home(): ReactElement {
 
   const webAppUrl = process.env.NEXT_PUBLIC_WELMIO_WEB_APP_URL ?? "http://localhost:3000";
   const webAppLoginUrl = `${webAppUrl}/login`;
+  const WELMIO_GITHUB_URL =
+  process.env.NEXT_PUBLIC_WELMIO_GITHUB_URL ?? "https://github.com";
+  const WELMIO_LINKEDIN_URL =
+    process.env.NEXT_PUBLIC_WELMIO_LINKEDIN_URL ?? "https://www.linkedin.com";
+  const WELMIO_TWITTER_URL =
+    process.env.NEXT_PUBLIC_WELMIO_TWITTER_URL ?? "https://x.com";
+  const WELMIO_CONTACT_EMAIL =
+    process.env.NEXT_PUBLIC_WELMIO_CONTACT_EMAIL ?? "hello@welmio.app";
+  const WELMIO_CONTACT_URL = `mailto:${WELMIO_CONTACT_EMAIL}`;
+
   return (
     <main className={styles.page}>
       <header className={styles.navbar}>
@@ -22,14 +32,26 @@ export default function Home(): ReactElement {
           {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
         </nav>
 
-        <Link href={webAppLoginUrl} className={styles.navCta}>Use Welmio on Web <LandingIcon name="monitor" /></Link>
+        <Link href={webAppLoginUrl} className={styles.navCta}><LandingIcon name="monitor" /> Use Welmio on Web</Link>
 
         <details className={styles.mobileMenu}>
-          <summary aria-label="Open navigation menu"><span /><span /><span /></summary>
-          <div>
-            {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
-            <Link href={webAppLoginUrl}>Use Welmio on Web</Link>
-          </div>
+          <summary aria-label="Open navigation menu">
+            <span />
+            <span />
+            <span />
+          </summary>
+
+          <nav className={styles.mobileMenuPanel} aria-label="Mobile navigation">
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href}>
+                {link.label}
+              </a>
+            ))}
+
+            <Link href={webAppLoginUrl} className={styles.mobileMenuCta}>
+              Use Welmio on Web <LandingIcon name="monitor" />
+            </Link>
+          </nav>
         </details>
       </header>
 
@@ -149,12 +171,63 @@ export default function Home(): ReactElement {
           </Link>
           <p>© 2026 Welmio. All rights reserved.</p>
         </div>
-        <div className={styles.footerColumns}>
-          <div><h3>Product</h3><a href="#features">Features</a><a href="#screenshots">Screenshots</a><a href="#how-it-works">How It Works</a></div>
-          <div><h3>Resources</h3><a href="https://github.com">GitHub Repository</a><a href="#tech-stack">Tech Stack</a></div>
-          <div><h3>Support</h3><a href="mailto:hello@welmio.app">Help Center</a><a href="mailto:hello@welmio.app">Contact</a><a href="#privacy">Privacy Policy</a></div>
-          <div className={styles.socials}><h3>Connect</h3><span><LandingIcon name="github" /></span><span><LandingIcon name="linkedin" /></span><span><LandingIcon name="twitter" /></span><span><LandingIcon name="mail" /></span></div>
+      <div className={styles.footerColumns}>
+        <div>
+          <h3>Product</h3>
+          <a href="#features">Features</a>
+          <a href="#screenshots">Screenshots</a>
+          <a href="#how-it-works">How It Works</a>
         </div>
+
+        <div>
+          <h3>Resources</h3>
+          <a href="https://github.com">GitHub Repository</a>
+          <a href="#tech-stack">Tech Stack</a>
+        </div>
+
+        <div>
+          <h3>Support</h3>
+          <a href="mailto:hello@welmio.app">Help Center</a>
+          <a href="mailto:hello@welmio.app">Contact</a>
+          <Link href="/privacy">Privacy Policy</Link>
+          <Link href="/terms">Terms of Use</Link>
+        </div>
+
+        <div className={styles.socials}>
+          <h3>Connect</h3>
+
+          <a
+            href={WELMIO_GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Welmio GitHub"
+          >
+            <LandingIcon name="github" />
+          </a>
+
+          <a
+            href={WELMIO_LINKEDIN_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Welmio LinkedIn"
+          >
+            <LandingIcon name="linkedin" />
+          </a>
+
+          <a
+            href={WELMIO_TWITTER_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Welmio X profile"
+          >
+            <LandingIcon name="twitter" />
+          </a>
+
+          <a href={WELMIO_CONTACT_URL} aria-label="Contact Welmio by email">
+            <LandingIcon name="mail" />
+          </a>
+        </div>
+      </div>
       </footer>
     </main>
   );
