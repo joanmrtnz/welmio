@@ -32,13 +32,15 @@ jobs:
       - name: Validate pre APP environment
         run: |
           test -n "${{ vars.EXPO_PUBLIC_API_URL_PRE }}"
-          echo "EXPO_PUBLIC_API_URL_PRE is configured"
+          test -n "${{ vars.EXPO_PUBLIC_WELMIO_APP_URL_PRE }}"
+          echo "APP pre public environment is configured"
 
       - name: Build APP pre image
         run: |
           docker build \
             -f apps/app/Dockerfile \
             --build-arg "EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL_PRE }}" \
+            --build-arg "EXPO_PUBLIC_WELMIO_APP_URL=${{ vars.EXPO_PUBLIC_WELMIO_APP_URL_PRE }}" \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:pre \
             .
