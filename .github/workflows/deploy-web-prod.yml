@@ -36,10 +36,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Validate production WEB environment
+        run: |
+          test -n "${{ vars.NEXT_PUBLIC_WELMIO_WEB_APP_URL }}"
+          test -n "${{ vars.NEXT_PUBLIC_WELMIO_GITHUB_URL }}"
+          test -n "${{ vars.NEXT_PUBLIC_WELMIO_CONTACT_EMAIL }}"
+          echo "WEB production public environment is configured"
+
       - name: Build WEB production image
         run: |
           docker build \
             -f apps/web/Dockerfile \
+            --build-arg "NEXT_PUBLIC_WELMIO_WEB_APP_URL=${{ vars.NEXT_PUBLIC_WELMIO_WEB_APP_URL }}" \
+            --build-arg "NEXT_PUBLIC_WELMIO_GITHUB_URL=${{ vars.NEXT_PUBLIC_WELMIO_GITHUB_URL }}" \
+            --build-arg "NEXT_PUBLIC_WELMIO_LINKEDIN_URL=${{ vars.NEXT_PUBLIC_WELMIO_LINKEDIN_URL }}" \
+            --build-arg "NEXT_PUBLIC_WELMIO_TWITTER_URL=${{ vars.NEXT_PUBLIC_WELMIO_TWITTER_URL }}" \
+            --build-arg "NEXT_PUBLIC_WELMIO_CONTACT_EMAIL=${{ vars.NEXT_PUBLIC_WELMIO_CONTACT_EMAIL }}" \
             -t "${{ secrets.DOCKERHUB_USERNAME }}/welmio:${IMAGE_TAG}" \
             -t "${{ secrets.DOCKERHUB_USERNAME }}/welmio:prod" \
             .
