@@ -31,7 +31,10 @@ RUN pnpm install --frozen-lockfile
 COPY --from=pruner /app/out/full/ .
 
 ARG EXPO_PUBLIC_API_URL
+ARG EXPO_PUBLIC_WELMIO_APP_URL
+
 ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
+ENV EXPO_PUBLIC_WELMIO_APP_URL=$EXPO_PUBLIC_WELMIO_APP_URL
 
 RUN pnpm --filter app run build-web
 
