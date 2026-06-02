@@ -30,10 +30,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Validate pre WEB environment
+        run: |
+          test -n "${{ vars.NEXT_PUBLIC_WELMIO_WEB_APP_URL_PRE }}"
+          test -n "${{ vars.NEXT_PUBLIC_WELMIO_GITHUB_URL_PRE }}"
+          test -n "${{ vars.NEXT_PUBLIC_WELMIO_CONTACT_EMAIL_PRE }}"
+          echo "WEB pre public environment is configured"
+
       - name: Build WEB pre image
         run: |
           docker build \
             -f apps/web/Dockerfile \
+            --build-arg "NEXT_PUBLIC_WELMIO_WEB_APP_URL=${{ vars.NEXT_PUBLIC_WELMIO_WEB_APP_URL_PRE }}" \
+            --build-arg "NEXT_PUBLIC_WELMIO_GITHUB_URL=${{ vars.NEXT_PUBLIC_WELMIO_GITHUB_URL_PRE }}" \
+            --build-arg "NEXT_PUBLIC_WELMIO_LINKEDIN_URL=${{ vars.NEXT_PUBLIC_WELMIO_LINKEDIN_URL_PRE }}" \
+            --build-arg "NEXT_PUBLIC_WELMIO_TWITTER_URL=${{ vars.NEXT_PUBLIC_WELMIO_TWITTER_URL_PRE }}" \
+            --build-arg "NEXT_PUBLIC_WELMIO_CONTACT_EMAIL=${{ vars.NEXT_PUBLIC_WELMIO_CONTACT_EMAIL_PRE }}" \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio:${{ github.sha }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio:pre \
             .
