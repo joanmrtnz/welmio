@@ -39,13 +39,15 @@ jobs:
       - name: Validate production APP environment
         run: |
           test -n "${{ vars.EXPO_PUBLIC_API_URL }}"
-          echo "EXPO_PUBLIC_API_URL is configured"
+          test -n "${{ vars.EXPO_PUBLIC_WELMIO_APP_URL }}"
+          echo "APP production public environment is configured"
 
       - name: Build APP production image
         run: |
           docker build \
             -f apps/app/Dockerfile \
             --build-arg "EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL }}" \
+            --build-arg "EXPO_PUBLIC_WELMIO_APP_URL=${{ vars.EXPO_PUBLIC_WELMIO_APP_URL }}" \
             -t "${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${IMAGE_TAG}" \
             -t "${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:prod" \
             .
