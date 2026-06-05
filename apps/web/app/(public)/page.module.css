@@ -167,6 +167,10 @@
   background: var(--teal-soft);
 }
 
+.navLabel{
+  border-bottom: 2.5px dotted gray;
+} 
+
 .mobileMenuCta {
   justify-content: center;
   gap: 10px;
