@@ -131,7 +131,13 @@ export default function Home(): ReactElement {
           <p className={styles.eyebrow}>Built as a portfolio project</p>
           <h2>Built with modern technologies and best practices</h2>
           <p>Welmio is a full-stack personal finance app built to demonstrate real-world development skills, clean code and great UX.</p>
-          <a href="https://github.com" className={styles.githubButton} target="_blank" rel="noreferrer">View on GitHub <LandingIcon name="github" /></a>
+          <a href={WELMIO_GITHUB_URL}
+             target="_blank"
+             rel="noreferrer"
+             aria-label="Open Welmio GitHub"
+             className={styles.githubButton} 
+          >
+            View on GitHub <LandingIcon name="github" /></a>
         </div>
        <div className={styles.techGrid}>
         {techStack.map((tech) => (
@@ -181,7 +187,12 @@ export default function Home(): ReactElement {
 
         <div>
           <h3>Resources</h3>
-          <a href="https://github.com">GitHub Repository</a>
+          <a href={WELMIO_GITHUB_URL}
+             target="_blank"
+             rel="noreferrer"
+             aria-label="Open Welmio GitHub Repository"
+          >
+              GitHub Repository</a>
           <a href="#tech-stack">Tech Stack</a>
         </div>
 
