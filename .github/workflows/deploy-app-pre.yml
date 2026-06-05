@@ -60,4 +60,4 @@ jobs:
         run: |
           cd /opt/welmio/pre
           docker compose pull app-web
-          docker compose up -d app-web
+          docker compose up -d --force-recreate app-web
