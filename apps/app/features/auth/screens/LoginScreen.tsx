@@ -120,12 +120,17 @@ export default function LoginScreen() {
               <View
                 style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
               >
-               <AppImage
-                  source={WELMIO_AVATAR_BASE}
-                  style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
-                />
+                <View 
+                  style={[styles.avatar, isDesktop && styles.avatarDesktop]}
+                >
+                  <AppImage
+                      source={WELMIO_AVATAR_BASE}
+                      style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
+                    />
+                </View>
               </View>
             </View>
+
 
             {isDesktop ? (
               <View style={styles.desktopCopy}>
@@ -373,38 +378,45 @@ const styles = StyleSheet.create({
   },
 
   avatarCircle: {
-    position: "relative",
-    zIndex: 20,
-    width: 106,
-    height: 106,
-    borderRadius: 58,
-    backgroundColor: GREEN,
+    width: 102,
+    height: 102,
+    borderRadius: 51,
+    backgroundColor: DARK_GREEN,
     borderColor: DARK_GREEN,
-    borderWidth: 4,
-    alignItems: "center",
-    justifyContent: "center",
+    padding: 4,
+  },
+
+  avatar: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 47,
+    backgroundColor: GREEN,
     overflow: "hidden",
-    shadowColor: "rgba(29, 100, 89, 0.16)",
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 8,
+  },
+
+  avatarDesktop: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 78,
+    backgroundColor: GREEN,
+    overflow: "hidden",
   },
 
   avatarCircleDesktop: {
     width: 156,
     height: 156,
-    borderRadius: 82,
+    borderRadius: 78,
+    padding: 6,
   },
 
   avatarImage: {
-    width: "92%",
-    height: "92%",
+    width: "100%",
+    height: "100%",
   },
 
   avatarImageDesktop: {
-    width: "93%",
-    height: "93%",
+    width: "100%",
+    height: "100%",
   },
 
   desktopCopy: {

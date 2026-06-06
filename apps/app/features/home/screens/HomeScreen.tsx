@@ -377,12 +377,9 @@ const styles = StyleSheet.create({
   avatarFrame: {
     width: 47,
     height: 47,
-    borderRadius: 25,
+    borderRadius: 24,
     backgroundColor: CARD,
-    borderWidth: 5,
-    borderColor: CARD,
-    alignItems: "center",
-    justifyContent: "center",
+    overflow: "hidden",
     shadowColor: "rgba(29, 100, 89, 0.12)",
     shadowOpacity: 1,
     shadowRadius: 12,
@@ -391,8 +388,8 @@ const styles = StyleSheet.create({
   },
 
   avatarImage: {
-    width: 45,
-    height: 45,
+    width: "100%",
+    height: "100%",
   },
 
   greeting: {

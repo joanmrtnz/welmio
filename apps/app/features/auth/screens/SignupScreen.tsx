@@ -26,10 +26,10 @@ const WELMIO_APP_URL =
 
 const WELMIO_TERMS_URL = `${WELMIO_APP_URL}/terms` as ExternalPathString;
 const WELMIO_PRIVACY_URL = `${WELMIO_APP_URL}/privacy` as ExternalPathString;
-const BACKGROUND = "#dff7ef";
+const GREEN = "#dff7ef";
 const CARD = "#ffffff";
 const PRIMARY = "#00b889";
-const PRIMARY_DARK = "#008f73";
+const DARK_GREEN = "#008f73";
 const TEXT = "#073b3a";
 const MUTED = "#6f8185";
 const INPUT_BG = "#ffffff";
@@ -176,11 +176,17 @@ export default function SignupScreen() {
 
   const logoHero = (
     <View style={[styles.logoWrap, isDesktop && styles.logoWrapDesktop]}>
-      <View style={[styles.logoCircle, isDesktop && styles.logoCircleDesktop]}>
-        <AppImage
-          source={WELMIO_AVATAR_BASE}
-          style={[styles.heroLogo, isDesktop && styles.heroLogoDesktop]}
-        />
+      <View
+        style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
+      >
+        <View 
+          style={[styles.avatar, isDesktop && styles.avatarDesktop]}
+        >
+          <AppImage
+              source={WELMIO_AVATAR_BASE}
+              style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
+            />
+        </View>
       </View>
     </View>
   );
@@ -336,7 +342,7 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: BACKGROUND,
+    backgroundColor: GREEN,
   },
 
   scrollContent: {
@@ -421,39 +427,49 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
 
-  logoCircle: {
-    width: 104,
-    height: 104,
-    borderRadius: 52,
-    backgroundColor: SOFT_MINT,
-    borderWidth: 4,
-    borderColor: PRIMARY_DARK,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-    shadowColor: "rgba(7, 59, 58, 0.22)",
-    shadowOpacity: 1,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 8,
-  },
-
-  heroLogo: {
-    width: "92%",
-    height: "92%",
-    resizeMode: "contain",
-  },
-
-  logoCircleDesktop: {
-    width: 128,
-    height: 128,
-    borderRadius: 64,
-  },
-
-  heroLogoDesktop: {
-    width: "93%",
-    height: "93%",
-  },
+  
+    avatarCircle: {
+      width: 102,
+      height: 102,
+      borderRadius: 51,
+      backgroundColor: DARK_GREEN,
+      borderColor: DARK_GREEN,
+      padding: 4,
+    },
+  
+    avatar: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 47,
+      backgroundColor: GREEN,
+      overflow: "hidden",
+    },
+  
+    avatarDesktop: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 78,
+      backgroundColor: GREEN,
+      overflow: "hidden",
+    },
+  
+    avatarCircleDesktop: {
+      width: 156,
+      height: 156,
+      borderRadius: 78,
+      padding: 6,
+    },
+  
+    avatarImage: {
+      width: "100%",
+      height: "100%",
+    },
+  
+    avatarImageDesktop: {
+      width: "100%",
+      height: "100%",
+    },
+  
 
   desktopHeadline: {
     maxWidth: 420,
@@ -588,7 +604,7 @@ const styles = StyleSheet.create({
   },
 
   legalLink: {
-    color: PRIMARY_DARK,
+    color: DARK_GREEN,
     fontFamily: fonts.semibold,
   },
 
@@ -631,7 +647,7 @@ const styles = StyleSheet.create({
   },
 
   link: {
-    color: PRIMARY_DARK,
+    color: DARK_GREEN,
     fontFamily: fonts.bold,
   },
 

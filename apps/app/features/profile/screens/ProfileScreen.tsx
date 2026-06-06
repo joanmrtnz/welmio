@@ -112,7 +112,7 @@ export default function ProfileScreen() {
           >
             <View style={styles.avatarOuterRing}>
               <View
-                style={[styles.avatar, { borderColor: avatarColor || TEAL }]}
+                style={styles.avatar}
               >
                 <AppImage
                   source={selectedAvatarImage}
@@ -229,19 +229,15 @@ const styles = StyleSheet.create({
     height: 102,
     borderRadius: 51,
     backgroundColor: SOFT_TEAL,
-    alignItems: "center",
-    justifyContent: "center",
+    padding: 5,
     marginBottom: 16,
   },
 
   avatar: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+    width: "100%",
+    height: "100%",
+    borderRadius: 47,
     backgroundColor: WHITE,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
     overflow: "hidden",
   },
 
@@ -262,8 +258,8 @@ const styles = StyleSheet.create({
   },
 
   logoImage: {
-    width: "92%",
-    height: "92%",
+    width: "100%",
+    height: "100%",
   },
 
   nameContainer: {
