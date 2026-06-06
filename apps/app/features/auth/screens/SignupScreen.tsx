@@ -180,6 +180,7 @@ export default function SignupScreen() {
         <AppImage
           source={WELMIO_AVATAR_BASE}
           style={[styles.heroLogo, isDesktop && styles.heroLogoDesktop]}
+          contentFit="cover"
         />
       </View>
     </View>
@@ -439,9 +440,8 @@ const styles = StyleSheet.create({
   },
 
   heroLogo: {
-    width: "92%",
-    height: "92%",
-    resizeMode: "contain",
+    width: "100%",
+    height: "100%",
   },
 
   logoCircleDesktop: {
@@ -451,8 +451,8 @@ const styles = StyleSheet.create({
   },
 
   heroLogoDesktop: {
-    width: "93%",
-    height: "93%",
+    width: "100%",
+    height: "100%",
   },
 
   desktopHeadline: {
