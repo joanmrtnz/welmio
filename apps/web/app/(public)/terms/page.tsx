@@ -92,11 +92,17 @@ export default function TermsOfUsePage(): ReactElement {
             <span />
             <span />
           </summary>
-          <div>
-            <Link href="/">Home</Link>
-            <Link href="/privacy">Privacy Policy</Link>
-            <Link href="/terms">Terms of Use</Link>
-          </div>
+          <nav className={styles.mobileMenuPanel} aria-label="Mobile navigation">
+            <Link href="/">
+              <p className={styles.navLabel}>Home</p>
+            </Link>
+            <Link href="/privacy">
+              <p className={styles.navLabel}>Privacy Policy</p>
+            </Link>
+            <Link href="/terms">
+              <p className={styles.navLabel}>Terms of Use</p>
+            </Link>
+          </nav>
         </details>
       </header>
 
