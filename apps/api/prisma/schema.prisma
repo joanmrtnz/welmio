@@ -71,6 +71,7 @@ model User {
   goals                   Goal[]
   goalContributions GoalContribution[]
   verificationTokens VerificationToken[]
+  refreshTokens RefreshToken[]
 }
 
 model VerificationToken {
@@ -92,6 +93,23 @@ enum VerificationTokenType {
   email_verification
   email_change
   password_reset
+}
+
+model RefreshToken {
+  id                  String    @id @default(uuid())
+  userId              String
+  tokenHash           String    @unique
+  replacedByTokenHash String?
+  expiresAt           DateTime
+  revokedAt           DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
 }
 
 model Transaction {
