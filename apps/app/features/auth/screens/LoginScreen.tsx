@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,9 +14,9 @@ import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
 import { useLogin } from "@/features/auth/hooks/useLogin";
-import { Icon } from "@/components/icons/Icon";
 import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
 import { feedback } from "@/components/ui/feedback/feedback.service";
+import { AppImage } from "@/components/images/AppImage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
@@ -106,11 +105,10 @@ export default function LoginScreen() {
             <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
               <View style={styles.brandRow}>
                 <View style={styles.logoBadge}>
-                  <Image
-                    source={WELMIO_LOGO}
-                    style={styles.logoImage}
-                    resizeMode="contain"
-                  />
+                <AppImage
+                  source={WELMIO_LOGO}
+                  style={styles.logoImage}
+                />
                 </View>
                 <Text style={[styles.brandName, isDesktop && styles.brandNameDesktop]}>
                   Welmio
@@ -122,10 +120,9 @@ export default function LoginScreen() {
               <View
                 style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
               >
-                <Image
+               <AppImage
                   source={WELMIO_AVATAR_BASE}
                   style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
-                  resizeMode="contain"
                 />
               </View>
             </View>

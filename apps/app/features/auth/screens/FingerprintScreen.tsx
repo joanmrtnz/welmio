@@ -1,5 +1,4 @@
 import {
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,6 +11,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
+import { AppImage } from "@/components/images/AppImage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -47,10 +47,9 @@ export default function FingerprintScreen() {
             >
               <View style={styles.brandRow}>
                 <View style={styles.logoBadge}>
-                  <Image
+                  <AppImage
                     source={WELMIO_LOGO}
                     style={styles.logoImage}
-                    resizeMode="contain"
                   />
                 </View>
                 <Text
