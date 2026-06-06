@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { login } from "@/lib/api/auth";
 import { LoginInput } from "@repo/shared-types";
-import { setAccessToken } from "@/lib/auth-storage";
+import { setAuthTokens } from "@/lib/auth-storage";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ApiError } from "@/lib/api/client";
 
@@ -14,29 +14,30 @@ export function useLogin() {
     try {
       const res = await login(data);
 
-      if (res?.accessToken) {
-        await setAccessToken(res.accessToken);
+      if (res?.accessToken && res?.refreshToken) {
+        await setAuthTokens({
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        });
+
         feedback.success("Login successful");
       }
 
-      
       return res;
-
-     } catch (error) {
-        if (error instanceof ApiError) {
-          if (error.status === 401) {
-            feedback.error("Invalid email or password");
-          } else if (error.status >= 500) {
-            feedback.error("Server error. Please try again later.");
-          } else {
-            feedback.error(error.message);
-          }
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.status === 401) {
+          feedback.error("Invalid email or password");
+        } else if (error.status >= 500) {
+          feedback.error("Server error. Please try again later.");
         } else {
-          feedback.error("Network error. Check your connection.");
+          feedback.error(error.message);
         }
+      } else {
+        feedback.error("Network error. Check your connection.");
+      }
 
-        throw error;
-
+      throw error;
     } finally {
       setLoading(false);
     }

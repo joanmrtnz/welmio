@@ -21,3 +21,19 @@ export interface AuthResponse {
   accessToken: string;
   user: AuthResponseUser;
 }
+
+export type AuthMeResponse = {
+  valid: boolean;
+  user: {
+    id: string;
+    email: string;
+    fullName?: string | null;
+    mobileNumber?: string | null;
+    dateOfBirth?: string | null;
+  }
+}
+
+export type AuthTokensResponse = {
+  accessToken: string;
+  refreshToken: string;
+}
