@@ -120,8 +120,9 @@ export default function LoginScreen() {
               <View
                 style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
               >
-                <View
-                  style={styles.avatar}>
+                <View 
+                  style={[styles.avatar, isDesktop && styles.avatarDesktop]}
+                >
                   <AppImage
                       source={WELMIO_AVATAR_BASE}
                       style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
@@ -388,8 +389,16 @@ const styles = StyleSheet.create({
   avatar: {
     width: "100%",
     height: "100%",
-    borderRadius: 60,
-    backgroundColor: CARD,
+    borderRadius: 47,
+    backgroundColor: GREEN,
+    overflow: "hidden",
+  },
+
+  avatarDesktop: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 78,
+    backgroundColor: GREEN,
     overflow: "hidden",
   },
 
@@ -397,6 +406,7 @@ const styles = StyleSheet.create({
     width: 156,
     height: 156,
     borderRadius: 78,
+    padding: 6,
   },
 
   avatarImage: {
