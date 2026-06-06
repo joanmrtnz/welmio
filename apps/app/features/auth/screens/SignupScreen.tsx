@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -18,6 +17,7 @@ import { useSignup } from "@/features/auth/hooks/useSignup";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
 import { toIsoDate } from "@/lib/date";
+import { AppImage } from "@/components/images/AppImage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
@@ -168,7 +168,7 @@ export default function SignupScreen() {
   const brandHeader = (
     <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
       <View style={styles.brandRow}>
-        <Image source={WELMIO_LOGO} style={styles.brandLogo} />
+        <AppImage source={WELMIO_LOGO} style={styles.brandLogo} />
         <Text style={styles.brandName}>Welmio</Text>
       </View>
     </View>
@@ -177,7 +177,7 @@ export default function SignupScreen() {
   const logoHero = (
     <View style={[styles.logoWrap, isDesktop && styles.logoWrapDesktop]}>
       <View style={[styles.logoCircle, isDesktop && styles.logoCircleDesktop]}>
-        <Image
+        <AppImage
           source={WELMIO_AVATAR_BASE}
           style={[styles.heroLogo, isDesktop && styles.heroLogoDesktop]}
         />

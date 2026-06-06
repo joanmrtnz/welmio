@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   useWindowDimensions,
 } from "react-native";
 
@@ -17,6 +16,7 @@ import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { AVATAR_IMAGES, type AvatarId } from "../components/AvatarPickerModal";
+import { AppImage } from "@/components/images/AppImage";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -114,10 +114,9 @@ export default function ProfileScreen() {
               <View
                 style={[styles.avatar, { borderColor: avatarColor || TEAL }]}
               >
-                <Image
+                <AppImage
                   source={selectedAvatarImage}
                   style={styles.logoImage}
-                  resizeMode="contain"
                 />
               </View>
             </View>
