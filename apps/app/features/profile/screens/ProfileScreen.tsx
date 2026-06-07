@@ -11,7 +11,8 @@ import { fonts } from "@/theme/fonts";
 import { ProfileOption } from "../components/ProfileOption";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { removeAccessToken } from "@/lib/auth-storage";
+import { clearAuthTokens, getRefreshToken } from "@/lib/auth-storage";
+import { logout } from "@/lib/api/auth";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
@@ -83,7 +84,15 @@ export default function ProfileScreen() {
     try {
       setIsLoggingOut(true);
 
-      await removeAccessToken();
+      const refreshToken = await getRefreshToken();
+
+      try {
+        await logout(refreshToken);
+      } catch (error) {
+        console.warn("Error revoking refresh token", error);
+      }
+
+      await clearAuthTokens();
 
       setShowLogoutDialog(false);
       router.replace("/login");

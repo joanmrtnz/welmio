@@ -9,7 +9,7 @@ import { Redirect, Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { checkAccessToken } from "@/features/auth/services/auth.service";
-import { removeAccessToken } from "@/lib/auth-storage";
+import { clearAuthTokens } from "@/lib/auth-storage";
 
 const GREEN = "#12c79b";
 const LIGHT_GREEN = "#ffffff";
@@ -28,7 +28,7 @@ export default function TabLayout() {
         await checkAccessToken();
         setIsAuthenticated(true);
       } catch {
-        await removeAccessToken();
+        await clearAuthTokens();
         setIsAuthenticated(false);
       } finally {
         setIsCheckingAuth(false);

@@ -16,7 +16,7 @@ import { Icon } from "@/components/icons/Icon";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { deleteAccount } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { removeAccessToken } from "@/lib/auth-storage";
+import { clearAuthTokens } from "@/lib/auth-storage";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 
 export default function DeleteAccountScreen() {
@@ -45,7 +45,7 @@ export default function DeleteAccountScreen() {
         confirmationText,
       });
 
-      await removeAccessToken();
+      await clearAuthTokens();
 
       feedback.success("Account deleted successfully");
       setShowConfirmDialog(false);
