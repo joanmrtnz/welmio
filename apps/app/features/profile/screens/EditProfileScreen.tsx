@@ -21,7 +21,6 @@ import {
   AvatarPickerModal,
 } from "../components/AvatarPickerModal";
 import { IconName } from "@repo/shared-types";
-import { Image } from "react-native";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { AppImage } from "@/components/images/AppImage";
 

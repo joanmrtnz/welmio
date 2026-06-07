@@ -9,8 +9,8 @@ import {
 import { getUserProfile } from "@/features/profile/services/profile-service";
 import { fonts } from "@/theme/fonts";
 import { ProfileOption } from "../components/ProfileOption";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { clearAuthTokens, getRefreshToken } from "@/lib/auth-storage";
 import { logout } from "@/lib/api/auth";
 import { feedback } from "@/components/ui/feedback/feedback.service";
@@ -50,23 +50,25 @@ export default function ProfileScreen() {
   const selectedAvatarImage =
     AVATAR_IMAGES[avatarIcon] ?? AVATAR_IMAGES["avatar-0"];
 
-  useEffect(() => {
-    async function loadUserProfile() {
-      try {
-        const user = await getUserProfile();
+ const loadUserProfile = useCallback(async () => {
+    try {
+      const user = await getUserProfile();
 
-        setFullName(user.fullName ?? "");
-        setEmail(user.email ?? "");
-        setAvatarIcon(getAvatarId(user.avatarIcon));
-        setAvatarColor(user.avatarColor ?? "#00c896");
-      } catch (error) {
-        console.warn("Error loading profile", error);
-      }
+      setFullName(user.fullName ?? "");
+      setEmail(user.email ?? "");
+      setAvatarIcon(getAvatarId(user.avatarIcon));
+      setAvatarColor(user.avatarColor ?? "#00c896");
+    } catch (error) {
+      console.warn("Error loading profile", error);
     }
-
-    loadUserProfile();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadUserProfile();
+    }, [loadUserProfile])
+  );
+  
   function handleOpenLogoutDialog() {
     setShowLogoutDialog(true);
   }
