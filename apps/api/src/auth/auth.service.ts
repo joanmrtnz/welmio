@@ -518,7 +518,8 @@ export class AuthService {
 
   private getAccessTokenExpiresIn(): StringValue {
     return (
-      process.env.JWT_ACCESS_TOKEN_EXPIRES_IN ?? DEFAULT_ACCESS_TOKEN_EXPIRES_IN
+      process.env.JWT_ACCESS_TOKEN_EXPIRES_IN?.trim() ||
+      DEFAULT_ACCESS_TOKEN_EXPIRES_IN
     ) as StringValue;
-  }
+ }
 }
