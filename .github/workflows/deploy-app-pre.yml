@@ -41,7 +41,6 @@ jobs:
             -f apps/app/Dockerfile \
             --build-arg "EXPO_PUBLIC_API_URL=${{ vars.EXPO_PUBLIC_API_URL_PRE }}" \
             --build-arg "EXPO_PUBLIC_WELMIO_APP_URL=${{ vars.EXPO_PUBLIC_WELMIO_APP_URL_PRE }}" \
-            --build-arg "APP_IMAGE_TAG=${{ github.sha }}" \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:${{ github.sha }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/welmio-app:pre \
             .
