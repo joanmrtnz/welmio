@@ -14,7 +14,7 @@ import { clearAuthTokens } from "@/lib/auth-storage";
 import { AppImage } from "@/components/images/AppImage";
 import { fonts } from "@/theme/fonts";
 
-const APP_VERSION = process.env.EXPO_PUBLIC_APP_VERSION ?? "pre";
+const APP_VERSION = process.env.EXPO_PUBLIC_APP_VERSION?.trim() || "pre";
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
 const GREEN = "#12c79b";
