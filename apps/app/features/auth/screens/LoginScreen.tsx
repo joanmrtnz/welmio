@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,9 +14,9 @@ import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
 import { useLogin } from "@/features/auth/hooks/useLogin";
-import { Icon } from "@/components/icons/Icon";
 import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
 import { feedback } from "@/components/ui/feedback/feedback.service";
+import { AppImage } from "@/components/images/AppImage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
@@ -106,11 +105,10 @@ export default function LoginScreen() {
             <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
               <View style={styles.brandRow}>
                 <View style={styles.logoBadge}>
-                  <Image
-                    source={WELMIO_LOGO}
-                    style={styles.logoImage}
-                    resizeMode="contain"
-                  />
+                <AppImage
+                  source={WELMIO_LOGO}
+                  style={styles.logoImage}
+                />
                 </View>
                 <Text style={[styles.brandName, isDesktop && styles.brandNameDesktop]}>
                   Welmio
@@ -122,13 +120,17 @@ export default function LoginScreen() {
               <View
                 style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
               >
-                <Image
-                  source={WELMIO_AVATAR_BASE}
-                  style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
-                  resizeMode="contain"
-                />
+                <View 
+                  style={[styles.avatar, isDesktop && styles.avatarDesktop]}
+                >
+                  <AppImage
+                      source={WELMIO_AVATAR_BASE}
+                      style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
+                    />
+                </View>
               </View>
             </View>
+
 
             {isDesktop ? (
               <View style={styles.desktopCopy}>
@@ -376,38 +378,45 @@ const styles = StyleSheet.create({
   },
 
   avatarCircle: {
-    position: "relative",
-    zIndex: 20,
-    width: 106,
-    height: 106,
-    borderRadius: 58,
-    backgroundColor: GREEN,
+    width: 102,
+    height: 102,
+    borderRadius: 51,
+    backgroundColor: DARK_GREEN,
     borderColor: DARK_GREEN,
-    borderWidth: 4,
-    alignItems: "center",
-    justifyContent: "center",
+    padding: 4,
+  },
+
+  avatar: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 47,
+    backgroundColor: GREEN,
     overflow: "hidden",
-    shadowColor: "rgba(29, 100, 89, 0.16)",
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 8,
+  },
+
+  avatarDesktop: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 78,
+    backgroundColor: GREEN,
+    overflow: "hidden",
   },
 
   avatarCircleDesktop: {
     width: 156,
     height: 156,
-    borderRadius: 82,
+    borderRadius: 78,
+    padding: 6,
   },
 
   avatarImage: {
-    width: "92%",
-    height: "92%",
+    width: "100%",
+    height: "100%",
   },
 
   avatarImageDesktop: {
-    width: "93%",
-    height: "93%",
+    width: "100%",
+    height: "100%",
   },
 
   desktopCopy: {

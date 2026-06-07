@@ -1,5 +1,4 @@
 import {
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -26,6 +25,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { getUserProfile } from "@/features/profile/services/profile-service";
 import { getGreetingLabel } from "./utils/getGreetingLabel";
 import { AVATAR_IMAGES, type AvatarId } from "@/features/profile/components/AvatarPickerModal";
+import { AppImage } from "@/components/images/AppImage";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -213,10 +213,9 @@ export default function HomeScreen() {
               hitSlop={10}
               onPress={() => router.push("/profile")}
             >
-              <Image
+              <AppImage
                 source={selectedAvatarImage}
                 style={styles.avatarImage}
-                resizeMode="contain"
               />
             </Pressable>
 
@@ -378,12 +377,9 @@ const styles = StyleSheet.create({
   avatarFrame: {
     width: 47,
     height: 47,
-    borderRadius: 25,
+    borderRadius: 24,
     backgroundColor: CARD,
-    borderWidth: 5,
-    borderColor: CARD,
-    alignItems: "center",
-    justifyContent: "center",
+    overflow: "hidden",
     shadowColor: "rgba(29, 100, 89, 0.12)",
     shadowOpacity: 1,
     shadowRadius: 12,
@@ -392,8 +388,8 @@ const styles = StyleSheet.create({
   },
 
   avatarImage: {
-    width: 45,
-    height: 45,
+    width: "100%",
+    height: "100%",
   },
 
   greeting: {

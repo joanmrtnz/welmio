@@ -3,20 +3,21 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   useWindowDimensions,
 } from "react-native";
 
 import { getUserProfile } from "@/features/profile/services/profile-service";
 import { fonts } from "@/theme/fonts";
 import { ProfileOption } from "../components/ProfileOption";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { removeAccessToken } from "@/lib/auth-storage";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { clearAuthTokens, getRefreshToken } from "@/lib/auth-storage";
+import { logout } from "@/lib/api/auth";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { AVATAR_IMAGES, type AvatarId } from "../components/AvatarPickerModal";
+import { AppImage } from "@/components/images/AppImage";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -49,23 +50,25 @@ export default function ProfileScreen() {
   const selectedAvatarImage =
     AVATAR_IMAGES[avatarIcon] ?? AVATAR_IMAGES["avatar-0"];
 
-  useEffect(() => {
-    async function loadUserProfile() {
-      try {
-        const user = await getUserProfile();
+ const loadUserProfile = useCallback(async () => {
+    try {
+      const user = await getUserProfile();
 
-        setFullName(user.fullName ?? "");
-        setEmail(user.email ?? "");
-        setAvatarIcon(getAvatarId(user.avatarIcon));
-        setAvatarColor(user.avatarColor ?? "#00c896");
-      } catch (error) {
-        console.warn("Error loading profile", error);
-      }
+      setFullName(user.fullName ?? "");
+      setEmail(user.email ?? "");
+      setAvatarIcon(getAvatarId(user.avatarIcon));
+      setAvatarColor(user.avatarColor ?? "#00c896");
+    } catch (error) {
+      console.warn("Error loading profile", error);
     }
-
-    loadUserProfile();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadUserProfile();
+    }, [loadUserProfile])
+  );
+  
   function handleOpenLogoutDialog() {
     setShowLogoutDialog(true);
   }
@@ -83,7 +86,15 @@ export default function ProfileScreen() {
     try {
       setIsLoggingOut(true);
 
-      await removeAccessToken();
+      const refreshToken = await getRefreshToken();
+
+      try {
+        await logout(refreshToken);
+      } catch (error) {
+        console.warn("Error revoking refresh token", error);
+      }
+
+      await clearAuthTokens();
 
       setShowLogoutDialog(false);
       router.replace("/login");
@@ -112,12 +123,11 @@ export default function ProfileScreen() {
           >
             <View style={styles.avatarOuterRing}>
               <View
-                style={[styles.avatar, { borderColor: avatarColor || TEAL }]}
+                style={styles.avatar}
               >
-                <Image
+                <AppImage
                   source={selectedAvatarImage}
                   style={styles.logoImage}
-                  resizeMode="contain"
                 />
               </View>
             </View>
@@ -230,19 +240,15 @@ const styles = StyleSheet.create({
     height: 102,
     borderRadius: 51,
     backgroundColor: SOFT_TEAL,
-    alignItems: "center",
-    justifyContent: "center",
+    padding: 5,
     marginBottom: 16,
   },
 
   avatar: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+    width: "100%",
+    height: "100%",
+    borderRadius: 47,
     backgroundColor: WHITE,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
     overflow: "hidden",
   },
 
@@ -263,8 +269,8 @@ const styles = StyleSheet.create({
   },
 
   logoImage: {
-    width: "92%",
-    height: "92%",
+    width: "100%",
+    height: "100%",
   },
 
   nameContainer: {

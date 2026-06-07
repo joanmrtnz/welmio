@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Image,
   ImageSourcePropType,
   Modal,
   Pressable,
@@ -11,6 +10,7 @@ import {
 } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import { AppImage } from "@/components/images/AppImage";
 const WELMIO_BASE_AVATAR = require("@/assets/images/welmio-avatar-base.png");
 const WELMIO_AVATAR_1 = require("@/assets/images/welmio-avatar-1.png");
 const WELMIO_AVATAR_2 = require("@/assets/images/welmio-avatar-2.png");
@@ -122,10 +122,9 @@ export function AvatarPickerModal({
             <View
               style={[styles.previewAvatar, { backgroundColor: selectedColor }]}
             >
-              <Image
+              <AppImage
                 source={selectedAvatar.image}
                 style={styles.previewAvatarImage}
-                resizeMode="contain"
               />
             </View>
 
@@ -157,10 +156,9 @@ export function AvatarPickerModal({
                         { backgroundColor: selectedColor },
                       ]}
                     >
-                      <Image
+                      <AppImage
                         source={avatar.image}
                         style={styles.avatarOptionImage}
-                        resizeMode="contain"
                       />
                     </View>
                   </Pressable>

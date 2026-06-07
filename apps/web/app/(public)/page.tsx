@@ -44,7 +44,7 @@ export default function Home(): ReactElement {
           <nav className={styles.mobileMenuPanel} aria-label="Mobile navigation">
             {navLinks.map((link) => (
               <a key={link.href} href={link.href}>
-                {link.label}
+                <p className={styles.navLabel}>{link.label}</p>
               </a>
             ))}
 
