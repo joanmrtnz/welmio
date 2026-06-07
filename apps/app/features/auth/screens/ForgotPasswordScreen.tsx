@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,6 +15,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
+import { AppImage } from "@/components/images/AppImage";
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
 
@@ -72,10 +72,9 @@ export default function ForgotPasswordScreen() {
           <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
             <View style={styles.brandRow}>
               <View style={styles.logoBadge}>
-                <Image
+                <AppImage
                   source={WELMIO_LOGO}
                   style={styles.logoImage}
-                  resizeMode="contain"
                 />
               </View>
               <Text style={styles.brandName}>Welmio</Text>

@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  Switch,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -22,8 +21,8 @@ import {
   AvatarPickerModal,
 } from "../components/AvatarPickerModal";
 import { IconName } from "@repo/shared-types";
-import { Image } from "react-native";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { AppImage } from "@/components/images/AppImage";
 
 function getAvatarId(value?: string | null): AvatarId {
   return value && value in AVATAR_IMAGES ? (value as AvatarId) : "avatar-0";
@@ -192,10 +191,9 @@ export default function EditProfileScreen() {
                   },
                 ]}
               >
-                <Image
+                <AppImage
                   source={selectedAvatarImage}
                   style={[styles.logoImage, isDesktop && styles.logoImageDesktop]}
-                  resizeMode="contain"
                 />
               </View>
 

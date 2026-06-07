@@ -3,14 +3,8 @@ import type {
   LoginInput,
   RegisterInput,
   AuthResponse,
+  AuthTokensResponse,
 } from "@repo/shared-types";
-
-export function login(payload: LoginInput) {
-  return apiFetch<AuthResponse>("/auth/login", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-}
 
 export function signup(payload: RegisterInput) {
   return apiFetch<AuthResponse>("/auth/register", {
@@ -41,5 +35,35 @@ export function resetPassword(
   return apiFetch<{ message: string }>("/auth/reset-password", {
     method: "POST",
     body: JSON.stringify({ email, code, newPassword }),
+  });
+}
+
+export async function login(data: LoginInput) {
+  return apiFetch<AuthTokensResponse>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(data),
+    skipAuthRefresh: true,
+  });
+}
+
+export async function refreshAccessToken(refreshToken: string) {
+  return apiFetch<AuthTokensResponse>("/auth/refresh", {
+    method: "POST",
+    body: JSON.stringify({ refreshToken }),
+    skipAuthRefresh: true,
+  });
+}
+
+export async function logout(refreshToken?: string | null) {
+  return apiFetch<void>("/auth/logout", {
+    method: "POST",
+    body: JSON.stringify({ refreshToken }),
+    skipAuthRefresh: true,
+  });
+}
+
+export async function logoutAll() {
+  return apiFetch<void>("/auth/logout-all", {
+    method: "POST",
   });
 }

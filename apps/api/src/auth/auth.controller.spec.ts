@@ -2,10 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
-
 const mockAuthService = {
   register: jest.fn(),
   login: jest.fn(),
+  refresh: jest.fn(),
+  logout: jest.fn(),
+  logoutAll: jest.fn(),
+  verifyEmail: jest.fn(),
+  verifyEmailChange: jest.fn(),
+  checkAccessToken: jest.fn(),
   sendResetPasswordCode: jest.fn(),
   validateResetPasswordCode: jest.fn(),
   resetPassword: jest.fn(),

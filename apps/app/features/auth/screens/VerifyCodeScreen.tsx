@@ -17,6 +17,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 import { useValidateResetPasswordCode } from "@/features/auth/hooks/useValidateResetPasswordCode";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
+import { AppImage } from "@/components/images/AppImage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -101,10 +102,9 @@ export default function VerifyCodeScreen() {
           >
             <View style={styles.brandRow}>
               <View style={styles.logoBadge}>
-                <Image
+                <AppImage
                   source={WELMIO_LOGO}
                   style={styles.logoImage}
-                  resizeMode="contain"
                 />
               </View>
               <Text style={styles.brandName}>Welmio</Text>

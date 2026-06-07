@@ -1,81 +1,154 @@
-import { getAccessToken } from "@/lib/auth-storage";
+import {
+  clearAuthTokens,
+  getAccessToken,
+  getRefreshToken,
+  setAuthTokens,
+} from "@/lib/auth-storage";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-if (!API_URL) {
-  throw new Error("EXPO_PUBLIC_API_URL is not defined");
-}
-
 type ApiFetchOptions = RequestInit & {
-  token?: string | null;
+  skipAuthRefresh?: boolean;
 };
 
 export class ApiError extends Error {
-  status: number;
-  body: unknown;
-
-  constructor(status: number, message: string, body?: unknown) {
+  constructor(
+    public status: number,
+    message: string,
+    public data?: unknown,
+  ) {
     super(message);
     this.name = "ApiError";
-    this.status = status;
-    this.body = body;
   }
 }
 
-function getErrorMessage(data: unknown) {
-  if (
-    typeof data === "object" &&
-    data !== null &&
-    "message" in data
-  ) {
-    const message = (data as { message: unknown }).message;
+let refreshPromise: Promise<string | null> | null = null;
 
-    if (typeof message === "string") {
-      return message;
-    }
+async function parseResponse(response: Response) {
+  const text = await response.text();
 
-    if (Array.isArray(message)) {
-      return message.join(", ");
-    }
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
   }
-
-  if (typeof data === "string" && data.trim()) {
-    return data;
-  }
-
-  return "Request failed";
 }
 
-export async function apiFetch<T>(
-  path: string,
-  options: ApiFetchOptions = {},
-): Promise<T> {
-  const { token, headers, ...rest } = options;
+async function refreshAccessTokenOnce() {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessToken().finally(() => {
+      refreshPromise = null;
+    });
+  }
 
-  const resolvedToken = token ?? (await getAccessToken());
+  return refreshPromise;
+}
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...rest,
+async function refreshAccessToken() {
+  const refreshToken = await getRefreshToken();
+
+  if (!refreshToken) {
+    await clearAuthTokens();
+    return null;
+  }
+
+  const response = await fetch(`${API_URL}/auth/refresh`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(resolvedToken ? { Authorization: `Bearer ${resolvedToken}` } : {}),
-      ...(headers ?? {}),
     },
+    body: JSON.stringify({ refreshToken }),
   });
 
-  const contentType = response.headers.get("content-type");
+  if (!response.ok) {
+    await clearAuthTokens();
+    return null;
+  }
 
-  let data: unknown = null;
+  const tokens = (await parseResponse(response)) as {
+    accessToken?: string;
+    refreshToken?: string;
+  } | null;
 
-  if (contentType?.includes("application/json")) {
-    data = await response.json();
-  } else {
-    data = await response.text();
+  if (!tokens?.accessToken || !tokens?.refreshToken) {
+    await clearAuthTokens();
+    return null;
+  }
+
+  await setAuthTokens({
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+  });
+
+  return tokens.accessToken;
+}
+
+async function request<T>(path: string, options: ApiFetchOptions = {}) {
+  const accessToken = await getAccessToken();
+
+  const headers = new Headers(options.headers);
+
+  if (!headers.has("Content-Type") && options.body) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  if (accessToken) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
+  }
+
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers,
+  });
+
+  return response;
+}
+
+export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}) {
+  const response = await request<T>(path, options);
+
+  if (response.status === 401 && !options.skipAuthRefresh) {
+    const newAccessToken = await refreshAccessTokenOnce();
+
+    if (newAccessToken) {
+      const retryResponse = await request<T>(path, options);
+
+      if (retryResponse.ok) {
+        return parseResponse(retryResponse) as Promise<T>;
+      }
+
+      const retryErrorData = await parseResponse(retryResponse);
+      throw new ApiError(
+        retryResponse.status,
+        getApiErrorMessage(retryErrorData, retryResponse.statusText),
+        retryErrorData,
+      );
+    }
   }
 
   if (!response.ok) {
-    throw new ApiError(response.status, getErrorMessage(data), data);
+    const errorData = await parseResponse(response);
+    throw new ApiError(
+      response.status,
+      getApiErrorMessage(errorData, response.statusText),
+      errorData,
+    );
   }
 
-  return data as T;
+  return parseResponse(response) as Promise<T>;
+}
+
+function getApiErrorMessage(data: unknown, fallback: string) {
+  if (
+    data &&
+    typeof data === "object" &&
+    "message" in data &&
+    typeof data.message === "string"
+  ) {
+    return data.message;
+  }
+
+  return fallback || "Request failed";
 }
