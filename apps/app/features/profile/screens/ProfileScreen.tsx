@@ -31,6 +31,8 @@ const GRID = "rgba(6, 59, 58, 0.09)";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
+const APP_VERSION = process.env.EXPO_PUBLIC_APP_VERSION?.trim() || "pre";
+
 
 function getAvatarId(value?: string | null): AvatarId {
   return value && value in AVATAR_IMAGES ? (value as AvatarId) : "avatar-0";
@@ -164,6 +166,10 @@ export default function ProfileScreen() {
               label="Logout"
               onPress={handleOpenLogoutDialog}
             />
+             <View style={styles.divider} />
+              <View style={styles.versionContainer}>
+                <Text style={styles.versionText}>{APP_VERSION}</Text>
+              </View>
           </View>
         </View>
       </ScrollView>
@@ -326,5 +332,19 @@ const styles = StyleSheet.create({
     height: 1,
     marginLeft: 60,
     backgroundColor: GRID,
+  },
+
+ versionContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 14,
+  },
+
+  versionText: {
+    color: MUTED,
+    fontSize: 12,
+    fontWeight: "500",
+    letterSpacing: 0.2,
   },
 });
