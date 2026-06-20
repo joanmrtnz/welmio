@@ -898,16 +898,16 @@
   }
 
   .laptopFrame {
-    left: 0;
-    bottom: 20px;
-    width: 86%;
+    left: clamp(-55px, -5vw, -24px);
+    top: clamp(130px, 18vw, 170px);
+    width: min(86%, 920px);
     transform: none;
   }
 
   .phoneFrame {
-    right: 4%;
-    top: 35px;
-    width: min(37%, 255px);
+    right: clamp(16px, 4vw, 48px);
+    top: clamp(24px, 5vw, 40px);
+    width: clamp(190px, 24vw, 255px);
   }
 
   .highlights,
