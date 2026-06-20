@@ -70,6 +70,28 @@ export default function ForgotPasswordScreen() {
       >
         <View style={[styles.desktopShell, isDesktop && styles.desktopShellWide]}>
           <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
+             
+
+            {isDesktop ? (
+              <View style={styles.desktopIntroCard}>
+                <View style={[styles.brandRow, isDesktop && styles.brandRowDesktop]}>
+                  <View style={[styles.logoBadge]}>
+                    <AppImage
+                      source={WELMIO_LOGO}
+                      style={styles.logoImage}
+                    />
+                  </View>
+                  <Text style={[styles.brandName, isDesktop && styles.brandNameDesktop]}>Welmio</Text>
+                </View>
+                <View style={styles.desktopIntroIcon}>
+                  <FontAwesome name="key" size={50} color={PRIMARY} />
+                </View>
+                <Text style={styles.desktopIntroTitle}>Reset your password safely</Text>
+                <Text style={styles.desktopIntroText}>
+                  We’ll send a secure verification code to your email so you can create a new password.
+                </Text>
+              </View>
+            ) : 
             <View style={styles.brandRow}>
               <View style={styles.logoBadge}>
                 <AppImage
@@ -78,26 +100,14 @@ export default function ForgotPasswordScreen() {
                 />
               </View>
               <Text style={styles.brandName}>Welmio</Text>
-            </View>
-
-            {isDesktop ? (
-              <View style={styles.desktopIntroCard}>
-                <View style={styles.desktopIntroIcon}>
-                  <FontAwesome name="key" size={30} color={PRIMARY} />
-                </View>
-                <Text style={styles.desktopIntroTitle}>Reset your password safely</Text>
-                <Text style={styles.desktopIntroText}>
-                  We’ll send a secure verification code to your email so you can create a new password.
-                </Text>
-              </View>
-            ) : null}
+            </View>}
           </View>
 
           <View style={[styles.formColumn, isDesktop && styles.formColumnDesktop]}>
             {!isDesktop ? (
               <View style={styles.avatarWrap}>
                 <View style={styles.avatarCircle}>
-                  <FontAwesome name="key" size={44} color={PRIMARY} />
+                  <FontAwesome name="key" size={40} color={PRIMARY} />
                 </View>
               </View>
             ) : null}
@@ -220,7 +230,7 @@ const styles = StyleSheet.create({
 
   brandAreaDesktop: {
     flex: 1,
-    alignItems: "flex-start",
+    alignItems: "center",
     marginTop: 0,
     marginBottom: 0,
   },
@@ -229,6 +239,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 9,
+  },
+
+  brandRowDesktop: {
+    marginBottom: 24,
   },
 
   logoBadge: {
@@ -246,14 +260,18 @@ const styles = StyleSheet.create({
   },
 
   logoImage: {
-    width: 30,
-    height: 29,
+    width: "86%",
+    height: "86%",
   },
 
   brandName: {
     fontSize: 24,
     color: DARK,
     fontFamily: fonts.bold,
+  },
+
+  brandNameDesktop: {
+    fontSize: 30,
   },
 
   avatarWrap: {
@@ -314,25 +332,18 @@ const styles = StyleSheet.create({
   },
 
   desktopIntroCard: {
-    marginTop: 42,
     maxWidth: 420,
-    backgroundColor: "rgba(255, 255, 255, 0.68)",
-    borderWidth: 1,
-    borderColor: "rgba(5, 46, 43, 0.08)",
-    borderRadius: 32,
     padding: 28,
-    shadowColor: "rgba(29, 100, 89, 0.10)",
-    shadowOpacity: 1,
-    shadowRadius: 22,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 5,
+    alignItems: "center"
   },
 
   desktopIntroIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 22,
-    backgroundColor: CARD,
+    width: 156,
+    height: 156,
+    borderRadius: 78,
+    padding: 6,
+    borderColor: DARK_GREEN,
+    borderWidth: 4,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 22,
@@ -344,6 +355,7 @@ const styles = StyleSheet.create({
     lineHeight: 38,
     fontFamily: fonts.bold,
     marginBottom: 12,
+    textAlign:"center"
   },
 
   desktopIntroText: {
@@ -351,6 +363,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 25,
     fontFamily: fonts.medium,
+    textAlign: "center"
   },
 
   title: {

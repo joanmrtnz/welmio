@@ -168,8 +168,15 @@ export default function SignupScreen() {
   const brandHeader = (
     <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
       <View style={styles.brandRow}>
-        <AppImage source={WELMIO_LOGO} style={styles.brandLogo} />
-        <Text style={styles.brandName}>Welmio</Text>
+        <View style={styles.logoBadge}>
+        <AppImage
+          source={WELMIO_LOGO}
+          style={styles.logoImage}
+        />
+        </View>
+        <Text style={[styles.brandName, isDesktop && styles.brandNameDesktop]}>
+          Welmio
+        </Text>
       </View>
     </View>
   );
@@ -317,13 +324,15 @@ export default function SignupScreen() {
             <View style={styles.desktopHeroPane}>
               {brandHeader}
               <View style={styles.desktopLogoBlock}>{logoHero}</View>
-              <Text style={styles.desktopHeadline}>
-                Build better money habits from day one.
-              </Text>
-              <Text style={styles.desktopCopy}>
-                Create your Welmio account and start organizing expenses,
-                savings goals, and financial routines with a clean dashboard.
-              </Text>
+              <View style={styles.desktopDescriptionBlock}>
+                <Text style={styles.desktopHeadline}>
+                  Build better money habits from day one.
+                </Text>
+                <Text style={styles.desktopCopy}>
+                  Create your Welmio account and start organizing expenses,
+                  savings goals, and financial routines with a clean dashboard.
+                </Text>
+              </View>
             </View>
 
             <View style={styles.desktopFormPane}>{signupCard}</View>
@@ -381,35 +390,50 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
 
-  brandArea: {
+ brandArea: {
     alignItems: "center",
     marginTop: 4,
-    marginBottom: 26,
+    marginBottom: 34,
   },
 
   brandAreaDesktop: {
-    alignItems: "flex-start",
     marginTop: 0,
-    marginBottom: 30,
+    marginBottom: 24,
   },
 
   brandRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 9,
   },
 
-  brandLogo: {
-    width: 34,
-    height: 34,
-    resizeMode: "contain",
+  logoBadge: {
+    width: 31,
+    height: 31,
+    borderRadius: 18,
+    backgroundColor: GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "rgba(29, 100, 89, 0.18)",
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 5,
+  },
+
+  logoImage: {
+    width: "86%",
+    height: "86%",
   },
 
   brandName: {
+    fontSize: 24,
     color: TEXT,
-    fontSize: 25,
-    letterSpacing: 1,
     fontFamily: fonts.bold,
+  },
+
+  brandNameDesktop: {
+    fontSize: 30,
   },
 
   logoWrap: {
@@ -419,7 +443,7 @@ const styles = StyleSheet.create({
   },
 
   logoWrapDesktop: {
-    alignItems: "flex-start",
+    alignItems: "center",
     marginBottom: 0,
   },
 
@@ -427,49 +451,52 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
 
+  avatarCircle: {
+    width: 102,
+    height: 102,
+    borderRadius: 51,
+    backgroundColor: DARK_GREEN,
+    borderColor: DARK_GREEN,
+    padding: 4,
+  },
   
-    avatarCircle: {
-      width: 102,
-      height: 102,
-      borderRadius: 51,
-      backgroundColor: DARK_GREEN,
-      borderColor: DARK_GREEN,
-      padding: 4,
-    },
+  avatar: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 47,
+    backgroundColor: GREEN,
+    overflow: "hidden",
+  },
   
-    avatar: {
-      width: "100%",
-      height: "100%",
-      borderRadius: 47,
-      backgroundColor: GREEN,
-      overflow: "hidden",
-    },
+  avatarDesktop: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 78,
+    backgroundColor: GREEN,
+    overflow: "hidden",
+  },
   
-    avatarDesktop: {
-      width: "100%",
-      height: "100%",
-      borderRadius: 78,
-      backgroundColor: GREEN,
-      overflow: "hidden",
-    },
+  avatarCircleDesktop: {
+    width: 156,
+    height: 156,
+    borderRadius: 78,
+    padding: 6,
+  },
   
-    avatarCircleDesktop: {
-      width: 156,
-      height: 156,
-      borderRadius: 78,
-      padding: 6,
-    },
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+  },
   
-    avatarImage: {
-      width: "100%",
-      height: "100%",
-    },
+  avatarImageDesktop: {
+    width: "100%",
+    height: "100%",
+  },
   
-    avatarImageDesktop: {
-      width: "100%",
-      height: "100%",
-    },
-  
+
+  desktopDescriptionBlock: {
+    alignItems: "center",
+  },
 
   desktopHeadline: {
     maxWidth: 420,
@@ -477,6 +504,7 @@ const styles = StyleSheet.create({
     fontSize: 38,
     lineHeight: 44,
     letterSpacing: -1,
+    textAlign: "center",
     fontFamily: fonts.bold,
   },
 
@@ -487,6 +515,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 25,
     fontFamily: fonts.regular,
+    textAlign: "center",
   },
 
   card: {

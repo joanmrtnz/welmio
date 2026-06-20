@@ -123,8 +123,6 @@ export default function GoalsScreen() {
 
   async function handleDeleteGoal(goal: GoalOverviewItem) {
     try {
-      console.log("Delete goal later", goal.id);
-
       await deleteGoal(goal.id);
       await loadGoalsOverview();
 
