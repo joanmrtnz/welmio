@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { login } from "@/lib/api/auth";
 import { LoginInput } from "@repo/shared-types";
-import { setAuthTokens } from "@/lib/auth-storage";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ApiError } from "@/lib/api/client";
+import { useAuth } from "@/lib/auth-context";
 
 export function useLogin() {
   const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
   async function execute(data: LoginInput) {
     setLoading(true);
@@ -15,7 +16,7 @@ export function useLogin() {
       const res = await login(data);
 
       if (res?.accessToken && res?.refreshToken) {
-        await setAuthTokens({
+        await signIn({
           accessToken: res.accessToken,
           refreshToken: res.refreshToken,
         });
