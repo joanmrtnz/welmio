@@ -5,6 +5,7 @@ import styles from "./page.module.css";
 import ScreenshotsSwiper from "../../components/screenshotsSwiper/ScreenshotsSwiper";
 import { features, highlights, navLinks, screenshots,screenshotsDesktop, steps, techStack } from "./page.data";
 import LandingIcon from "../../components/landingIcon/LandingIcon";
+import ScrollToTopButton from "../../components/scrollToTopButton/ScrollToTopButton";
 
 export default function Home(): ReactElement {
 
@@ -243,6 +244,8 @@ export default function Home(): ReactElement {
         </div>
       </div>
       </footer>
+
+      <ScrollToTopButton/>
     </main>
   );
 }
