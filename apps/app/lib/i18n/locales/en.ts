@@ -7,6 +7,15 @@ const en = {
     save: "Save",
     delete: "Delete",
     edit: "Edit",
+    weekDays: {
+        mon: "Mo",
+        tue: "Tu",
+        wed: "We",
+        thu: "Th",
+        fri: "Fr",
+        sat: "Sa",
+        sun: "Su",
+      },
   },
 
   auth: {
@@ -193,16 +202,6 @@ const en = {
       empty: "No recent transactions yet.",
     },
 
-    weekdays: {
-      mon: "Mon",
-      tue: "Tue",
-      wed: "Wed",
-      thu: "Thu",
-      fri: "Fri",
-      sat: "Sat",
-      sun: "Sun",
-    },
-
     errors: {
       loadGoals: "Could not load goals.",
     },
@@ -224,6 +223,148 @@ const en = {
     title: "Transactions",
     income: "Income",
     expense: "Expense",
+    totalBalance: "Total Balance",
+
+    feedback: {
+      deleteSuccess: "Transaction deleted successfully",
+      deleteError: "Error deleting transaction",
+    },
+
+    types: {
+      income: "Income",
+      expense: "Expense",
+    },
+
+    details: {
+      title: "Transaction details",
+      category: "Category",
+      account: "Account",
+      currency: "Currency",
+      nature: "Nature",
+      frequency: "Frequency",
+      date: "Date",
+      notes: "Notes",
+      notSet: "Not set",
+      noNotesAdded: "No notes added.",
+      edit: "Edit",
+      delete: "Delete",
+
+      deleteDialog: {
+        title: "Delete Transaction",
+        message:
+          "Are you sure you want to delete this transaction?\nThis action cannot be undone.",
+        confirmLabel: "Yes, Delete",
+        cancelLabel: "Cancel",
+        loadingLabel: "Deleting...",
+      },
+    },
+
+    form: {
+      newTitle: "New Transaction",
+      editTitle: "Edit Transaction",
+      type: "Type",
+      incomeContribution: "Income contribution",
+      date: "Date",
+      datePlaceholder: "DD / MM / YYYY",
+      amount: "Amount",
+      amountPlaceholder: "30.00",
+      description: "Description",
+      descriptionPlaceholder: "Cinema",
+      category: "Category",
+      account: "Account",
+      nature: "Nature",
+      frequency: "Frequency",
+      notes: "Notes",
+      notesPlaceholder: "Enter message",
+      cancel: "Cancel",
+      save: "Save",
+      saving: "Saving...",
+      update: "Update",
+      updating: "Updating...",
+
+      natureOptions: {
+        fixed: "Fixed",
+        variable: "Variable",
+        essential: "Essential",
+        non_essential: "Non-essential",
+        need: "Need",
+        want: "Want",
+        saving: "Saving",
+        investment: "Investment",
+      },
+
+      frequencyOptions: {
+        one_time: "One-time",
+        recurring: "Recurring",
+        daily: "Daily",
+        weekly: "Weekly",
+        monthly: "Monthly",
+        yearly: "Yearly",
+      },
+
+      accountTypes: {
+        cash: "Cash",
+        bank: "Bank",
+        debit: "Debit",
+        credit: "Credit",
+        savings: "Savings",
+        investment: "Investment",
+        wallet: "Wallet",
+      },
+    },
+
+    categoryFilter: {
+      title: "Filter by category",
+      addMoreCategories: "Add more categories",
+      clear: "Clear",
+      applyFilter: "Apply filter",
+      editCategory: "Edit Category",
+      newCategory: "New Category",
+      categoryNamePlaceholder: "Category name",
+      type: "Type",
+      icon: "Icon",
+      cancel: "Cancel",
+      save: "Save",
+      saving: "Saving...",
+      saveChanges: "Save changes",
+
+      deleteDialog: {
+        title: "Delete Category",
+        singleMessage:
+          "Are you sure you want to delete this category?\nThis action cannot be undone.",
+        multipleMessage:
+          "Are you sure you want to delete these categories?\nThis action cannot be undone.",
+        singleConfirmLabel: "Yes, Delete",
+        multipleConfirmLabel: "Yes, Delete All",
+        cancelLabel: "Cancel",
+        loadingLabel: "Deleting...",
+      },
+    },
+
+    calendarFilter: {
+      title: "Filter by date",
+      clear: "Clear",
+      applyFilter: "Apply filter",
+    },
+
+    groupedList: {
+      emptyMessage: "No transactions found.",
+
+      months: {
+        january: "January",
+        february: "February",
+        march: "March",
+        april: "April",
+        may: "May",
+        june: "June",
+        july: "July",
+        august: "August",
+        september: "September",
+        october: "October",
+        november: "November",
+        december: "December",
+      },
+    },
   },
 };
 

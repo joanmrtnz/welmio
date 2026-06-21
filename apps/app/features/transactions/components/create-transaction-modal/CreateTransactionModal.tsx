@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Modal,
   Pressable,
@@ -9,6 +10,8 @@ import {
 } from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
+import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
+import { t } from "@/lib/i18n";
 
 import { useCreateTransactionForm } from "@/features/transactions/hooks/useCreateTransactionForm";
 import {
@@ -21,8 +24,6 @@ import {
   styles,
 } from "@/features/transactions/components/create-transaction-modal/createTransactionModal.styles";
 import { TransactionOverviewItem } from "@repo/shared-types";
-import { useEffect } from "react";
-import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
 
 type CreateTransactionModalProps = {
   visible: boolean;
@@ -56,6 +57,26 @@ function formatDatePickerValueToIso(value: string) {
   }
 
   return `${year}-${month}-${day}`;
+}
+
+function normalizeTranslationKey(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function translateOptionLabel(
+  group: "natureOptions" | "frequencyOptions" | "accountTypes",
+  value: string,
+  fallback: string,
+) {
+  const key = normalizeTranslationKey(value || fallback);
+
+  return t(`transactions.form.${group}.${key}`, {
+    defaultValue: fallback,
+  });
 }
 
 export function CreateTransactionModal({
@@ -152,10 +173,14 @@ export function CreateTransactionModal({
       onRequestClose={handleClose}
     >
       <Pressable style={styles.backdrop} onPress={handleClose}>
-        <Pressable style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
+        <Pressable
+          style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}
+        >
           <View style={styles.header}>
             <Text style={styles.title}>
-              {transactionToEdit ? "Edit Transaction" : "New Transaction"}
+              {transactionToEdit
+                ? t("transactions.form.editTitle")
+                : t("transactions.form.newTitle")}
             </Text>
 
             <Pressable onPress={handleClose} style={styles.closeButton}>
@@ -165,280 +190,330 @@ export function CreateTransactionModal({
 
           <ScrollView
             style={styles.scrollView}
-            contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
+            contentContainerStyle={[
+              styles.content,
+              isDesktop && styles.contentDesktop,
+            ]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
             <View style={[isDesktop && styles.desktopColumns]}>
               <View style={[isDesktop && styles.desktopColumn]}>
-            <Text style={styles.sectionLabel}>Type</Text>
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.form.type")}
+                </Text>
 
-            {!lockType ? (
-              <View style={[styles.typeRow, isDesktop && styles.typeRowDesktop]}>
-                <Pressable
-                  style={[
-                    styles.typeButton,
-                    type === "income" && styles.typeButtonSelected,
-                  ]}
-                  onPress={() => setType("income")}
-                >
-                  <Text
-                    style={[
-                      styles.typeButtonText,
-                      type === "income" && styles.typeButtonTextSelected,
-                    ]}
+                {!lockType ? (
+                  <View
+                    style={[styles.typeRow, isDesktop && styles.typeRowDesktop]}
                   >
-                    Income
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  style={[
-                    styles.typeButton,
-                    type === "expense" && styles.typeButtonSelected,
-                  ]}
-                  onPress={() => setType("expense")}
-                >
-                  <Text
-                    style={[
-                      styles.typeButtonText,
-                      type === "expense" && styles.typeButtonTextSelected,
-                    ]}
-                  >
-                    Expense
-                  </Text>
-                </Pressable>
-              </View>
-            ) : (
-              <View style={[styles.typeRow, isDesktop && styles.typeRowDesktop]}>
-                <View style={[styles.typeButton, styles.typeButtonSelected]}>
-                  <Text style={styles.typeButtonTextSelected}>
-                    Income contribution
-                  </Text>
-                </View>
-              </View>
-            )}
-
-            <DateOfBirthInput
-              label="Date"
-              icon="calendar-o"
-              placeholder="DD / MM / YYYY"
-              value={formatIsoDateForDatePicker(date)}
-              onChangeText={(value) => {
-                setDate(formatDatePickerValueToIso(value));
-              }}
-            />
-
-            <Text style={styles.sectionLabel}>Amount</Text>
-
-            <View style={styles.amountRow}>
-              <TextInput
-                value={amount}
-                onChangeText={setAmount}
-                placeholder="30.00"
-                placeholderTextColor="rgba(5, 46, 43, 0.45)"
-                keyboardType="decimal-pad"
-                style={[styles.input, styles.amountInput]}
-              />
-
-              <TextInput
-                value={currency || "EUR"}
-                editable={false}
-                pointerEvents="none"
-                style={[styles.input, styles.currencyInput]}
-              />
-
-              {/* TODO: allow diferent concurrency system
-              <TextInput
-                value={currency}
-                onChangeText={setCurrency}
-                maxLength={3}
-                placeholder="EUR"
-                editable={false}
-                placeholderTextColor="rgba(5, 46, 43, 0.45)"
-                autoCapitalize="characters"
-                style={[styles.input, styles.currencyInput]}
-              /> */}
-
-            </View>
-
-            <Text style={styles.sectionLabel}>Description</Text>
-
-            <TextInput
-              value={description}
-              onChangeText={setDescription}
-              placeholder="Cinema"
-              placeholderTextColor="rgba(5, 46, 43, 0.45)"
-              style={styles.input}
-            />
-
-            <Text style={styles.sectionLabel}>Category</Text>
-
-            <View style={[styles.selectorGrid, isDesktop && styles.selectorGridDesktop]}>
-              {filteredCategories.map((category) => {
-                const isSelected = selectedCategoryId === category.id;
-
-                return (
-                  <Pressable
-                    key={category.id}
-                    style={[
-                      styles.selectorOption,
-                      isDesktop && styles.selectorOptionDesktop,
-                      isSelected && styles.selectorOptionSelected,
-                    ]}
-                    onPress={() => setSelectedCategoryId(category.id)}
-                  >
-                    <Icon
-                      name={(category.icon ?? "plus") as any}
-                      size={40}
-                      strokeWidth={1}
-                      color={TAB_GREEN}
-                    />
-
-                    <Text
-                      numberOfLines={1}
+                    <Pressable
                       style={[
-                        styles.selectorOptionText,
-                        isSelected && styles.selectorOptionTextSelected,
+                        styles.typeButton,
+                        type === "income" && styles.typeButtonSelected,
                       ]}
+                      onPress={() => setType("income")}
                     >
-                      {category.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+                      <Text
+                        style={[
+                          styles.typeButtonText,
+                          type === "income" && styles.typeButtonTextSelected,
+                        ]}
+                      >
+                        {t("transactions.types.income")}
+                      </Text>
+                    </Pressable>
+
+                    <Pressable
+                      style={[
+                        styles.typeButton,
+                        type === "expense" && styles.typeButtonSelected,
+                      ]}
+                      onPress={() => setType("expense")}
+                    >
+                      <Text
+                        style={[
+                          styles.typeButtonText,
+                          type === "expense" && styles.typeButtonTextSelected,
+                        ]}
+                      >
+                        {t("transactions.types.expense")}
+                      </Text>
+                    </Pressable>
+                  </View>
+                ) : (
+                  <View
+                    style={[styles.typeRow, isDesktop && styles.typeRowDesktop]}
+                  >
+                    <View style={[styles.typeButton, styles.typeButtonSelected]}>
+                      <Text style={styles.typeButtonTextSelected}>
+                        {t("transactions.form.incomeContribution")}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+
+                <DateOfBirthInput
+                  label={t("transactions.form.date")}
+                  icon="calendar-o"
+                  placeholder={t("transactions.form.datePlaceholder")}
+                  value={formatIsoDateForDatePicker(date)}
+                  onChangeText={(value) => {
+                    setDate(formatDatePickerValueToIso(value));
+                  }}
+                />
+
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.form.amount")}
+                </Text>
+
+                <View style={styles.amountRow}>
+                  <TextInput
+                    value={amount}
+                    onChangeText={setAmount}
+                    placeholder={t("transactions.form.amountPlaceholder")}
+                    placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                    keyboardType="decimal-pad"
+                    style={[styles.input, styles.amountInput]}
+                  />
+
+                  <TextInput
+                    value={currency || "EUR"}
+                    editable={false}
+                    pointerEvents="none"
+                    style={[styles.input, styles.currencyInput]}
+                  />
+
+                  {/* TODO: allow diferent concurrency system
+                  <TextInput
+                    value={currency}
+                    onChangeText={setCurrency}
+                    maxLength={3}
+                    placeholder="EUR"
+                    editable={false}
+                    placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                    autoCapitalize="characters"
+                    style={[styles.input, styles.currencyInput]}
+                  /> */}
+                </View>
+
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.form.description")}
+                </Text>
+
+                <TextInput
+                  value={description}
+                  onChangeText={setDescription}
+                  placeholder={t("transactions.form.descriptionPlaceholder")}
+                  placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                  style={styles.input}
+                />
+
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.form.category")}
+                </Text>
+
+                <View
+                  style={[
+                    styles.selectorGrid,
+                    isDesktop && styles.selectorGridDesktop,
+                  ]}
+                >
+                  {filteredCategories.map((category) => {
+                    const isSelected = selectedCategoryId === category.id;
+
+                    return (
+                      <Pressable
+                        key={category.id}
+                        style={[
+                          styles.selectorOption,
+                          isDesktop && styles.selectorOptionDesktop,
+                          isSelected && styles.selectorOptionSelected,
+                        ]}
+                        onPress={() => setSelectedCategoryId(category.id)}
+                      >
+                        <Icon
+                          name={(category.icon ?? "plus") as any}
+                          size={40}
+                          strokeWidth={1}
+                          color={TAB_GREEN}
+                        />
+
+                        <Text
+                          numberOfLines={1}
+                          style={[
+                            styles.selectorOptionText,
+                            isSelected && styles.selectorOptionTextSelected,
+                          ]}
+                        >
+                          {category.name}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
               </View>
 
               <View style={[isDesktop && styles.desktopColumn]}>
-            <Text style={styles.sectionLabel}>Account</Text>
-
-            <View style={[styles.optionColumn, isDesktop && styles.optionColumnDesktop]}>
-              {accounts.map((account) => {
-                const isSelected = selectedAccountId === account.id;
-
-                return (
-                  <Pressable
-                    key={account.id}
-                    style={[
-                      styles.accountOption,
-                      isSelected && styles.accountOptionSelected,
-                    ]}
-                    onPress={() => handleSelectAccount(account)}
-                  >
-                    <View>
-                      <Text
-                        style={[
-                          styles.accountName,
-                          isSelected && styles.accountNameSelected,
-                        ]}
-                      >
-                        {account.name}
-                      </Text>
-
-                      <Text
-                        style={[
-                          styles.accountMeta,
-                          isSelected && styles.accountMetaSelected,
-                        ]}
-                      >
-                        {account.type}
-                      </Text>
-                    </View>
-
-                    {isSelected ? (
-                      <Icon name="check" size={20} color={TAB_GREEN} />
-                    ) : null}
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            <Text style={styles.sectionLabel}>Nature</Text>
-
-            <View style={[styles.chipsRow, isDesktop && styles.chipsRowDesktop]}>
-              {NATURE_OPTIONS.map((item) => {
-                const isSelected = transactionNature === item.value;
-
-                return (
-                  <Pressable
-                    key={item.value}
-                    style={[styles.chip, isSelected && styles.chipSelected]}
-                    onPress={() => setTransactionNature(item.value)}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        isSelected && styles.chipTextSelected,
-                      ]}
-                    >
-                      {item.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            <Text style={styles.sectionLabel}>Frequency</Text>
-
-            <View style={[styles.chipsRow, isDesktop && styles.chipsRowDesktop]}>
-              {FREQUENCY_OPTIONS.map((item) => {
-                const isSelected = frequencyType === item.value;
-
-                return (
-                  <Pressable
-                    key={item.value}
-                    style={[styles.chip, isSelected && styles.chipSelected]}
-                    onPress={() => setFrequencyType(item.value)}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        isSelected && styles.chipTextSelected,
-                      ]}
-                    >
-                      {item.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            <Text style={styles.sectionLabel}>Notes</Text>
-
-            <TextInput
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="Enter message"
-              placeholderTextColor="rgba(5, 46, 43, 0.45)"
-              multiline
-              textAlignVertical="top"
-              style={styles.textArea}
-            />
-
-            <View style={styles.actions}>
-              <Pressable style={styles.clearButton} onPress={handleClose}>
-                <Text style={styles.clearButtonText}>Cancel</Text>
-              </Pressable>
-
-              <Pressable
-                style={[
-                  styles.applyButton,
-                  !canSave && styles.applyButtonDisabled,
-                ]}
-                onPress={handleSubmitTransaction}
-              >
-                <Text style={styles.applyButtonText}>
-                  {isSaving
-                    ? transactionToEdit
-                      ? "Updating..."
-                      : "Saving..."
-                    : transactionToEdit
-                      ? "Update"
-                      : "Save"}
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.form.account")}
                 </Text>
-              </Pressable>
-            </View>
+
+                <View
+                  style={[
+                    styles.optionColumn,
+                    isDesktop && styles.optionColumnDesktop,
+                  ]}
+                >
+                  {accounts.map((account) => {
+                    const isSelected = selectedAccountId === account.id;
+
+                    return (
+                      <Pressable
+                        key={account.id}
+                        style={[
+                          styles.accountOption,
+                          isSelected && styles.accountOptionSelected,
+                        ]}
+                        onPress={() => handleSelectAccount(account)}
+                      >
+                        <View>
+                          <Text
+                            style={[
+                              styles.accountName,
+                              isSelected && styles.accountNameSelected,
+                            ]}
+                          >
+                            {account.name}
+                          </Text>
+
+                          <Text
+                            style={[
+                              styles.accountMeta,
+                              isSelected && styles.accountMetaSelected,
+                            ]}
+                          >
+                            {translateOptionLabel(
+                              "accountTypes",
+                              account.type,
+                              account.type,
+                            )}
+                          </Text>
+                        </View>
+
+                        {isSelected ? (
+                          <Icon name="check" size={20} color={TAB_GREEN} />
+                        ) : null}
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.form.nature")}
+                </Text>
+
+                <View
+                  style={[styles.chipsRow, isDesktop && styles.chipsRowDesktop]}
+                >
+                  {NATURE_OPTIONS.map((item) => {
+                    const isSelected = transactionNature === item.value;
+
+                    return (
+                      <Pressable
+                        key={item.value}
+                        style={[styles.chip, isSelected && styles.chipSelected]}
+                        onPress={() => setTransactionNature(item.value)}
+                      >
+                        <Text
+                          style={[
+                            styles.chipText,
+                            isSelected && styles.chipTextSelected,
+                          ]}
+                        >
+                          {translateOptionLabel(
+                            "natureOptions",
+                            item.value,
+                            item.label,
+                          )}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.form.frequency")}
+                </Text>
+
+                <View
+                  style={[styles.chipsRow, isDesktop && styles.chipsRowDesktop]}
+                >
+                  {FREQUENCY_OPTIONS.map((item) => {
+                    const isSelected = frequencyType === item.value;
+
+                    return (
+                      <Pressable
+                        key={item.value}
+                        style={[styles.chip, isSelected && styles.chipSelected]}
+                        onPress={() => setFrequencyType(item.value)}
+                      >
+                        <Text
+                          style={[
+                            styles.chipText,
+                            isSelected && styles.chipTextSelected,
+                          ]}
+                        >
+                          {translateOptionLabel(
+                            "frequencyOptions",
+                            item.value,
+                            item.label,
+                          )}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.form.notes")}
+                </Text>
+
+                <TextInput
+                  value={notes}
+                  onChangeText={setNotes}
+                  placeholder={t("transactions.form.notesPlaceholder")}
+                  placeholderTextColor="rgba(5, 46, 43, 0.45)"
+                  multiline
+                  textAlignVertical="top"
+                  style={styles.textArea}
+                />
+
+                <View style={styles.actions}>
+                  <Pressable style={styles.clearButton} onPress={handleClose}>
+                    <Text style={styles.clearButtonText}>
+                      {t("transactions.form.cancel")}
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={[
+                      styles.applyButton,
+                      !canSave && styles.applyButtonDisabled,
+                    ]}
+                    onPress={handleSubmitTransaction}
+                  >
+                    <Text style={styles.applyButtonText}>
+                      {isSaving
+                        ? transactionToEdit
+                          ? t("transactions.form.updating")
+                          : t("transactions.form.saving")
+                        : transactionToEdit
+                          ? t("transactions.form.update")
+                          : t("transactions.form.save")}
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
           </ScrollView>

@@ -7,6 +7,15 @@ const ca = {
     save: "Desar",
     delete: "Eliminar",
     edit: "Editar",
+    weekDays: {
+      mon: "Dl",
+      tue: "Dt",
+      wed: "Dc",
+      thu: "Dj",
+      fri: "Dv",
+      sat: "Ds",
+      sun: "Dg",
+    },
   },
 
   auth: {
@@ -193,16 +202,6 @@ const ca = {
       empty: "Encara no hi ha transaccions recents.",
     },
 
-    weekdays: {
-      mon: "Dl",
-      tue: "Dt",
-      wed: "Dc",
-      thu: "Dj",
-      fri: "Dv",
-      sat: "Ds",
-      sun: "Dg",
-    },
-
     errors: {
       loadGoals: "No s’han pogut carregar els objectius.",
     },
@@ -222,8 +221,150 @@ const ca = {
 
   transactions: {
     title: "Transaccions",
-    income: "Ingrés",
-    expense: "Despesa",
+    income: "Ingressos",
+    expense: "Despeses",
+    totalBalance: "Saldo total",
+
+    feedback: {
+      deleteSuccess: "Transacció eliminada correctament",
+      deleteError: "Error en eliminar la transacció",
+    },
+
+    types: {
+      income: "Ingressos",
+      expense: "Despeses",
+    },
+
+    details: {
+      title: "Detalls de la transacció",
+      category: "Categoria",
+      account: "Compte",
+      currency: "Divisa",
+      nature: "Naturalesa",
+      frequency: "Freqüència",
+      date: "Data",
+      notes: "Notes",
+      notSet: "Sense assignar",
+      noNotesAdded: "No s’han afegit notes.",
+      edit: "Editar",
+      delete: "Eliminar",
+
+      deleteDialog: {
+        title: "Eliminar transacció",
+        message:
+          "Segur que vols eliminar aquesta transacció?\nAquesta acció no es pot desfer.",
+        confirmLabel: "Sí, eliminar",
+        cancelLabel: "Cancel·lar",
+        loadingLabel: "Eliminant...",
+      },
+    },
+
+    form: {
+      newTitle: "Nova transacció",
+      editTitle: "Editar transacció",
+      type: "Tipus",
+      incomeContribution: "Aportació d’ingrés",
+      date: "Data",
+      datePlaceholder: "DD / MM / AAAA",
+      amount: "Quantitat",
+      amountPlaceholder: "30,00",
+      description: "Descripció",
+      descriptionPlaceholder: "Cinema",
+      category: "Categoria",
+      account: "Compte",
+      nature: "Naturalesa",
+      frequency: "Freqüència",
+      notes: "Notes",
+      notesPlaceholder: "Escriu una nota",
+      cancel: "Cancel·lar",
+      save: "Desar",
+      saving: "Desant...",
+      update: "Actualitzar",
+      updating: "Actualitzant...",
+
+      natureOptions: {
+        fixed: "Fixa",
+        variable: "Variable",
+        essential: "Essencial",
+        non_essential: "No essencial",
+        need: "Necessitat",
+        want: "Desig",
+        saving: "Estalvi",
+        investment: "Inversió",
+      },
+
+      frequencyOptions: {
+        one_time: "Única",
+        recurring: "Recurrent",
+        daily: "Diària",
+        weekly: "Setmanal",
+        monthly: "Mensual",
+        yearly: "Anual",
+      },
+
+      accountTypes: {
+        cash: "Efectiu",
+        bank: "Banc",
+        debit: "Dèbit",
+        credit: "Crèdit",
+        savings: "Estalvis",
+        investment: "Inversió",
+        wallet: "Cartera",
+      },
+    },
+
+    categoryFilter: {
+      title: "Filtrar per categoria",
+      addMoreCategories: "Afegir més categories",
+      clear: "Netejar",
+      applyFilter: "Aplicar filtre",
+      editCategory: "Editar categoria",
+      newCategory: "Nova categoria",
+      categoryNamePlaceholder: "Nom de la categoria",
+      type: "Tipus",
+      icon: "Icona",
+      cancel: "Cancel·lar",
+      save: "Desar",
+      saving: "Desant...",
+      saveChanges: "Desar canvis",
+
+      deleteDialog: {
+        title: "Eliminar categoria",
+        singleMessage:
+          "Segur que vols eliminar aquesta categoria?\nAquesta acció no es pot desfer.",
+        multipleMessage:
+          "Segur que vols eliminar aquestes categories?\nAquesta acció no es pot desfer.",
+        singleConfirmLabel: "Sí, eliminar",
+        multipleConfirmLabel: "Sí, eliminar-les totes",
+        cancelLabel: "Cancel·lar",
+        loadingLabel: "Eliminant...",
+      },
+    },
+
+    calendarFilter: {
+      title: "Filtrar per data",
+      clear: "Netejar",
+      applyFilter: "Aplicar filtre",
+    },
+  },
+
+  groupedList: {
+    emptyMessage: "No s’han trobat transaccions.",
+
+    months: {
+      january: "Gener",
+      february: "Febrer",
+      march: "Març",
+      april: "Abril",
+      may: "Maig",
+      june: "Juny",
+      july: "Juliol",
+      august: "Agost",
+      september: "Setembre",
+      october: "Octubre",
+      november: "Novembre",
+      december: "Desembre",
+    },
   },
 };
 

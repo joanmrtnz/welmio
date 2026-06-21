@@ -7,6 +7,15 @@ const es = {
     save: "Guardar",
     delete: "Eliminar",
     edit: "Editar",
+    weekDays: {
+      mon: "Lu",
+      tue: "Ma",
+      wed: "Mi",
+      thu: "Ju",
+      fri: "Vi",
+      sat: "Sá",
+      sun: "Do",
+    },
   },
 
   auth: {
@@ -193,16 +202,6 @@ const es = {
       empty: "Todavía no hay transacciones recientes.",
     },
 
-    weekdays: {
-      mon: "Lun",
-      tue: "Mar",
-      wed: "Mié",
-      thu: "Jue",
-      fri: "Vie",
-      sat: "Sáb",
-      sun: "Dom",
-    },
-
     errors: {
       loadGoals: "No se pudieron cargar los objetivos.",
     },
@@ -222,8 +221,150 @@ const es = {
 
   transactions: {
     title: "Transacciones",
-    income: "Ingreso",
-    expense: "Gasto",
+    income: "Ingresos",
+    expense: "Gastos",
+    totalBalance: "Saldo total",
+
+    feedback: {
+      deleteSuccess: "Transacción eliminada correctamente",
+      deleteError: "Error al eliminar la transacción",
+    },
+
+    types: {
+      income: "Ingresos",
+      expense: "Gastos",
+    },
+
+    details: {
+      title: "Detalles de la transacción",
+      category: "Categoría",
+      account: "Cuenta",
+      currency: "Divisa",
+      nature: "Naturaleza",
+      frequency: "Frecuencia",
+      date: "Fecha",
+      notes: "Notas",
+      notSet: "Sin asignar",
+      noNotesAdded: "No se han añadido notas.",
+      edit: "Editar",
+      delete: "Eliminar",
+
+      deleteDialog: {
+        title: "Eliminar transacción",
+        message:
+          "¿Seguro que quieres eliminar esta transacción?\nEsta acción no se puede deshacer.",
+        confirmLabel: "Sí, eliminar",
+        cancelLabel: "Cancelar",
+        loadingLabel: "Eliminando...",
+      },
+    },
+
+    form: {
+      newTitle: "Nueva transacción",
+      editTitle: "Editar transacción",
+      type: "Tipo",
+      incomeContribution: "Aportación de ingreso",
+      date: "Fecha",
+      datePlaceholder: "DD / MM / AAAA",
+      amount: "Cantidad",
+      amountPlaceholder: "30,00",
+      description: "Descripción",
+      descriptionPlaceholder: "Cine",
+      category: "Categoría",
+      account: "Cuenta",
+      nature: "Naturaleza",
+      frequency: "Frecuencia",
+      notes: "Notas",
+      notesPlaceholder: "Escribe una nota",
+      cancel: "Cancelar",
+      save: "Guardar",
+      saving: "Guardando...",
+      update: "Actualizar",
+      updating: "Actualizando...",
+
+      natureOptions: {
+        fixed: "Fija",
+        variable: "Variable",
+        essential: "Esencial",
+        non_essential: "No esencial",
+        need: "Necesidad",
+        want: "Deseo",
+        saving: "Ahorro",
+        investment: "Inversión",
+      },
+
+      frequencyOptions: {
+        one_time: "Única",
+        recurring: "Recurrente",
+        daily: "Diaria",
+        weekly: "Semanal",
+        monthly: "Mensual",
+        yearly: "Anual",
+      },
+
+      accountTypes: {
+        cash: "Efectivo",
+        bank: "Banco",
+        debit: "Débito",
+        credit: "Crédito",
+        savings: "Ahorros",
+        investment: "Inversión",
+        wallet: "Cartera",
+      },
+    },
+
+    categoryFilter: {
+      title: "Filtrar por categoría",
+      addMoreCategories: "Añadir más categorías",
+      clear: "Limpiar",
+      applyFilter: "Aplicar filtro",
+      editCategory: "Editar categoría",
+      newCategory: "Nueva categoría",
+      categoryNamePlaceholder: "Nombre de la categoría",
+      type: "Tipo",
+      icon: "Icono",
+      cancel: "Cancelar",
+      save: "Guardar",
+      saving: "Guardando...",
+      saveChanges: "Guardar cambios",
+
+      deleteDialog: {
+        title: "Eliminar categoría",
+        singleMessage:
+          "¿Seguro que quieres eliminar esta categoría?\nEsta acción no se puede deshacer.",
+        multipleMessage:
+          "¿Seguro que quieres eliminar estas categorías?\nEsta acción no se puede deshacer.",
+        singleConfirmLabel: "Sí, eliminar",
+        multipleConfirmLabel: "Sí, eliminar todas",
+        cancelLabel: "Cancelar",
+        loadingLabel: "Eliminando...",
+      },
+    },
+
+    calendarFilter: {
+      title: "Filtrar por fecha",
+      clear: "Limpiar",
+      applyFilter: "Aplicar filtro",
+    },
+
+    groupedList: {
+      emptyMessage: "No se encontraron transacciones.",
+
+      months: {
+        january: "Enero",
+        february: "Febrero",
+        march: "Marzo",
+        april: "Abril",
+        may: "Mayo",
+        june: "Junio",
+        july: "Julio",
+        august: "Agosto",
+        september: "Septiembre",
+        october: "Octubre",
+        november: "Noviembre",
+        december: "Diciembre",
+      },
+    },
   },
 };
 
