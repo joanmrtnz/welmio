@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { ExternalPathString, Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { useSignup } from "@/features/auth/hooks/useSignup";
 import { feedback } from "@/components/ui/feedback/feedback.service";
@@ -34,7 +35,6 @@ const TEXT = "#073b3a";
 const MUTED = "#6f8185";
 const INPUT_BG = "#ffffff";
 const INPUT_BORDER = "rgba(7, 59, 58, 0.12)";
-const SOFT_MINT = "#dff7ef";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
@@ -108,6 +108,11 @@ function SignupInput({
             hitSlop={10}
             onPress={onTogglePassword}
             style={styles.eyeButton}
+            accessibilityLabel={
+              showPassword
+                ? t("auth.signup.hidePassword")
+                : t("auth.signup.showPassword")
+            }
           >
             <FontAwesome
               name={showPassword ? "eye-slash" : "eye"}
@@ -135,47 +140,45 @@ export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
- async function handleSignup() {
-  try {
-    if (!fullName.trim() || !email.trim() || !password.trim()) {
-      feedback.error("Fill the required form fields before submitting");
-      return;
+  async function handleSignup() {
+    try {
+      if (!fullName.trim() || !email.trim() || !password.trim()) {
+        feedback.error(t("auth.signup.errors.requiredFields"));
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        feedback.error(t("auth.signup.errors.passwordsDontMatch"));
+        return;
+      }
+
+      const formattedDateOfBirth = toIsoDate(dateOfBirth);
+
+      const res = await execute({
+        fullName,
+        email,
+        mobileNumber: mobileNumber.trim() || undefined,
+        dateOfBirth: formattedDateOfBirth || undefined,
+        password,
+      });
+
+      if (res) {
+        router.replace("/(public)/login");
+      }
+    } catch (error) {
+      console.warn(error);
     }
-
-    if (password !== confirmPassword) {
-      feedback.error("The passwords don't match");
-      return;
-    }
-
-    const formattedDateOfBirth = toIsoDate(dateOfBirth);
-
-    const res = await execute({
-      fullName,
-      email,
-      mobileNumber: mobileNumber.trim() || undefined,
-      dateOfBirth: formattedDateOfBirth || undefined,
-      password,
-    });
-
-    if (res) {
-      router.replace("/(public)/login");
-    }
-  } catch (error) {
-    console.warn(error);
   }
-}
 
   const brandHeader = (
     <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
       <View style={styles.brandRow}>
         <View style={styles.logoBadge}>
-        <AppImage
-          source={WELMIO_LOGO}
-          style={styles.logoImage}
-        />
+          <AppImage source={WELMIO_LOGO} style={styles.logoImage} />
         </View>
+
         <Text style={[styles.brandName, isDesktop && styles.brandNameDesktop]}>
-          Welmio
+          {t("common.appName")}
         </Text>
       </View>
     </View>
@@ -186,13 +189,11 @@ export default function SignupScreen() {
       <View
         style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
       >
-        <View 
-          style={[styles.avatar, isDesktop && styles.avatarDesktop]}
-        >
+        <View style={[styles.avatar, isDesktop && styles.avatarDesktop]}>
           <AppImage
-              source={WELMIO_AVATAR_BASE}
-              style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
-            />
+            source={WELMIO_AVATAR_BASE}
+            style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
+          />
         </View>
       </View>
     </View>
@@ -201,17 +202,18 @@ export default function SignupScreen() {
   const signupCard = (
     <View style={[styles.card, isDesktop && styles.cardDesktop]}>
       <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
-        Create account
+        {t("auth.signup.title")}
       </Text>
+
       <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
-        Start tracking your money, goals and habits in one place.
+        {t("auth.signup.subtitle")}
       </Text>
 
       <View style={[styles.form, isDesktop && styles.formDesktop]}>
         <SignupInput
-          label="Full Name *"
+          label={t("auth.signup.fullNameRequired")}
           icon="user-o"
-          placeholder="John Doe"
+          placeholder={t("auth.signup.fullNamePlaceholder")}
           autoCapitalize="words"
           textContentType="name"
           value={fullName}
@@ -219,9 +221,9 @@ export default function SignupScreen() {
         />
 
         <SignupInput
-          label="Email *"
+          label={t("auth.signup.emailRequired")}
           icon="envelope-o"
-          placeholder="example@email.com"
+          placeholder={t("auth.signup.emailPlaceholder")}
           autoCapitalize="none"
           keyboardType="email-address"
           textContentType="emailAddress"
@@ -231,9 +233,9 @@ export default function SignupScreen() {
         />
 
         <SignupInput
-          label="Mobile Number"
+          label={t("auth.signup.mobileNumber")}
           icon="phone"
-          placeholder="+123 456 789"
+          placeholder={t("auth.signup.mobileNumberPlaceholder")}
           keyboardType="phone-pad"
           textContentType="telephoneNumber"
           value={mobileNumber}
@@ -241,17 +243,17 @@ export default function SignupScreen() {
         />
 
         <DateOfBirthInput
-          label="Date of Birth"
+          label={t("auth.signup.dateOfBirth")}
           icon="calendar-o"
-          placeholder="DD / MM / YYYY"
+          placeholder={t("auth.signup.dateOfBirthPlaceholder")}
           value={dateOfBirth}
           onChangeText={setDateOfBirth}
         />
 
         <SignupInput
-          label="Password *"
+          label={t("auth.signup.passwordRequired")}
           icon="lock"
-          placeholder=""
+          placeholder={t("auth.signup.passwordPlaceholder")}
           secureTextEntry
           showPassword={showPassword}
           onTogglePassword={() => setShowPassword((current) => !current)}
@@ -261,9 +263,9 @@ export default function SignupScreen() {
         />
 
         <SignupInput
-          label="Confirm Password *"
+          label={t("auth.signup.confirmPasswordRequired")}
           icon="lock"
-          placeholder=""
+          placeholder={t("auth.signup.confirmPasswordPlaceholder")}
           secureTextEntry
           showPassword={showConfirmPassword}
           onTogglePassword={() => setShowConfirmPassword((current) => !current)}
@@ -274,13 +276,17 @@ export default function SignupScreen() {
       </View>
 
       <Text style={styles.legal}>
-        By continuing, you agree to the{" "}
+        {t("auth.signup.legal.prefix")}{" "}
         <Link href={WELMIO_TERMS_URL} asChild>
-          <Text style={styles.legalLink}>Terms of Use</Text>
+          <Text style={styles.legalLink}>
+            {t("auth.signup.legal.terms")}
+          </Text>
         </Link>{" "}
-        and{" "}
+        {t("auth.signup.legal.and")}{" "}
         <Link href={WELMIO_PRIVACY_URL} asChild>
-          <Text style={styles.legalLink}>Privacy Policy</Text>
+          <Text style={styles.legalLink}>
+            {t("auth.signup.legal.privacy")}
+          </Text>
         </Link>
       </Text>
 
@@ -294,13 +300,14 @@ export default function SignupScreen() {
         disabled={loading}
       >
         <Text style={styles.primaryButtonText}>
-          {loading ? "Creating account..." : "Sign Up"}
+          {loading ? t("auth.signup.creatingAccount") : t("auth.signup.submit")}
         </Text>
       </Pressable>
 
       <Link href="/(public)/login" style={styles.footer}>
         <Text>
-          Already have an account? <Text style={styles.link}>Log in</Text>
+          {t("auth.signup.alreadyHaveAccount")}{" "}
+          <Text style={styles.link}>{t("auth.signup.logIn")}</Text>
         </Text>
       </Link>
     </View>
@@ -326,11 +333,11 @@ export default function SignupScreen() {
               <View style={styles.desktopLogoBlock}>{logoHero}</View>
               <View style={styles.desktopDescriptionBlock}>
                 <Text style={styles.desktopHeadline}>
-                  Build better money habits from day one.
+                  {t("auth.signup.desktopHeadline")}
                 </Text>
+
                 <Text style={styles.desktopCopy}>
-                  Create your Welmio account and start organizing expenses,
-                  savings goals, and financial routines with a clean dashboard.
+                  {t("auth.signup.desktopCopy")}
                 </Text>
               </View>
             </View>
@@ -348,6 +355,7 @@ export default function SignupScreen() {
     </KeyboardAvoidingView>
   );
 }
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -390,7 +398,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
 
- brandArea: {
+  brandArea: {
     alignItems: "center",
     marginTop: 4,
     marginBottom: 34,
@@ -459,7 +467,7 @@ const styles = StyleSheet.create({
     borderColor: DARK_GREEN,
     padding: 4,
   },
-  
+
   avatar: {
     width: "100%",
     height: "100%",
@@ -467,7 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
     overflow: "hidden",
   },
-  
+
   avatarDesktop: {
     width: "100%",
     height: "100%",
@@ -475,24 +483,23 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
     overflow: "hidden",
   },
-  
+
   avatarCircleDesktop: {
     width: 156,
     height: 156,
     borderRadius: 78,
     padding: 6,
   },
-  
+
   avatarImage: {
     width: "100%",
     height: "100%",
   },
-  
+
   avatarImageDesktop: {
     width: "100%",
     height: "100%",
   },
-  
 
   desktopDescriptionBlock: {
     alignItems: "center",
@@ -679,5 +686,4 @@ const styles = StyleSheet.create({
     color: DARK_GREEN,
     fontFamily: fonts.bold,
   },
-
 });
