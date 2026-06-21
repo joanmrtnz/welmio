@@ -1,14 +1,15 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
-import i18n from "./index";
-import { getDeviceLocale } from "./locale";
+import { hydrateStoredLocale } from "./index";
 
 export const useSyncLocale = (): void => {
   useEffect(() => {
+    void hydrateStoredLocale();
+
     const subscription = AppState.addEventListener("change", (state) => {
       if (state !== "active") return;
 
-      i18n.locale = getDeviceLocale();
+      void hydrateStoredLocale();
     });
 
     return () => {

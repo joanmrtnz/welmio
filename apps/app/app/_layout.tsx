@@ -14,6 +14,7 @@ import { View } from 'react-native';
 import { FeedbackProvider } from '@/components/ui/feedback/feedbackProvider';
 import "@/lib/i18n";
 import { useSyncLocale } from '@/lib/i18n/useSyncLocale';
+import { LocaleProvider } from '@/lib/i18n/LocaleProvider';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -31,14 +32,17 @@ export default function RootLayout() {
   }
 
   return (
+    
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <FeedbackProvider>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
-        />
-      </FeedbackProvider>
+       <LocaleProvider>
+        <FeedbackProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          />
+        </FeedbackProvider>
+      </LocaleProvider>
     </ThemeProvider>
   );
 }

@@ -168,6 +168,7 @@ const ca = {
   },
 
   home: {
+    title: "Inici",
     greeting: "Hola, %{name}",
     defaultUser: "Usuari",
 
@@ -246,6 +247,7 @@ const ca = {
     options: {
       editProfile: "Editar perfil",
       settings: "Configuració",
+      language: "Idioma",
       logout: "Tancar sessió",
     },
 
@@ -387,6 +389,52 @@ const ca = {
       avatar: "Avatar",
       cancel: "Cancel·lar",
       apply: "Aplicar",
+    },
+
+    language: {
+      title: "Idioma de l’app",
+
+      hero: {
+        title: "Preferències d’idioma",
+        description:
+          "Tria l’idioma que s’utilitzarà a Welmio. Aquesta preferència es desarà en aquest dispositiu.",
+      },
+
+      notice: {
+        title: "Idioma específic de l’app",
+        description:
+          "Aquest ajust només canvia Welmio i no modifica l’idioma del teu dispositiu.",
+      },
+
+      form: {
+        title: "Triar idioma",
+        currentLanguage: "Idioma actual: %{language}",
+
+        actions: {
+          saveLanguage: "Desar idioma",
+          saving: "Desant...",
+        },
+      },
+
+      options: {
+        en: {
+          label: "Anglès",
+          description: "Utilitzar Welmio en anglès.",
+        },
+        es: {
+          label: "Espanyol",
+          description: "Utilitzar Welmio en espanyol.",
+        },
+        ca: {
+          label: "Català",
+          description: "Utilitzar Welmio en català.",
+        },
+      },
+
+      feedback: {
+        updateSuccess: "Idioma actualitzat correctament",
+        updateError: "No s’ha pogut actualitzar l’idioma",
+      },
     },
   },
 

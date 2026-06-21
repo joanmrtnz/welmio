@@ -165,6 +165,12 @@ export default function ProfileScreen() {
             />
             <View style={styles.divider} />
             <ProfileOption
+              icon="language"
+              label={t("profile.options.language")}
+              onPress={() => router.push("/profile/language")}
+            />
+            <View style={styles.divider} />
+            <ProfileOption
               icon="logout"
               label={t("profile.options.logout")}
               onPress={handleOpenLogoutDialog}

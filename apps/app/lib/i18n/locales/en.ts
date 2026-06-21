@@ -168,6 +168,7 @@ const en = {
   },
 
   home: {
+    title: "Home",
     greeting: "Hi, %{name}",
     defaultUser: "User",
 
@@ -246,6 +247,7 @@ const en = {
     options: {
       editProfile: "Edit Profile",
       settings: "Settings",
+      language: "Language",
       logout: "Logout",
     },
 
@@ -387,6 +389,52 @@ const en = {
       avatar: "Avatar",
       cancel: "Cancel",
       apply: "Apply",
+    },
+
+    language: {
+      title: "App Language",
+
+      hero: {
+        title: "Language Preferences",
+        description:
+          "Choose the language used across Welmio. This preference will be saved on this device.",
+      },
+
+      notice: {
+        title: "App-specific language",
+        description:
+          "This setting only changes Welmio and does not change your device language.",
+      },
+
+      form: {
+        title: "Choose language",
+        currentLanguage: "Current language: %{language}",
+
+        actions: {
+          saveLanguage: "Save language",
+          saving: "Saving...",
+        },
+      },
+
+      options: {
+        en: {
+          label: "English",
+          description: "Use Welmio in English.",
+        },
+        es: {
+          label: "Spanish",
+          description: "Use Welmio in Spanish.",
+        },
+        ca: {
+          label: "Catalan",
+          description: "Use Welmio in Catalan.",
+        },
+      },
+
+      feedback: {
+        updateSuccess: "Language updated successfully",
+        updateError: "Could not update language",
+      },
     },
   },
 
