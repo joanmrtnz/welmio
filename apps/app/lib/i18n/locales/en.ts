@@ -158,6 +158,56 @@ const en = {
     },
   },
 
+  home: {
+    greeting: "Hi, %{name}",
+    defaultUser: "User",
+
+    greetings: {
+      morning: "Good morning",
+      afternoon: "Good afternoon",
+      evening: "Good evening",
+    },
+
+    sections: {
+      overview: "Overview",
+      goals: "Goals",
+      analytics: "Analytics",
+      recentTransactions: "Recent Transactions",
+    },
+
+    actions: {
+      viewAll: "View All",
+    },
+
+    overview: {
+      totalBalance: "Total Balance",
+      totalExpense: "Total Expense",
+    },
+
+    analytics: {
+      thisWeekChart: "This week chart",
+      weekly: "Weekly",
+    },
+
+    transactions: {
+      empty: "No recent transactions yet.",
+    },
+
+    weekdays: {
+      mon: "Mon",
+      tue: "Tue",
+      wed: "Wed",
+      thu: "Thu",
+      fri: "Fri",
+      sat: "Sat",
+      sun: "Sun",
+    },
+
+    errors: {
+      loadGoals: "Could not load goals.",
+    },
+  },
+
   profile: {
     title: "Profile",
     appVersion: "App version",

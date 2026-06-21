@@ -158,6 +158,56 @@ const ca = {
     },
   },
 
+  home: {
+    greeting: "Hola, %{name}",
+    defaultUser: "Usuari",
+
+    greetings: {
+      morning: "Bon dia",
+      afternoon: "Bona tarda",
+      evening: "Bona nit",
+    },
+
+    sections: {
+      overview: "Resum",
+      goals: "Objectius",
+      analytics: "Analítiques",
+      recentTransactions: "Transaccions recents",
+    },
+
+    actions: {
+      viewAll: "Veure-ho tot",
+    },
+
+    overview: {
+      totalBalance: "Balanç total",
+      totalExpense: "Despesa total",
+    },
+
+    analytics: {
+      thisWeekChart: "Gràfic d’aquesta setmana",
+      weekly: "Setmanal",
+    },
+
+    transactions: {
+      empty: "Encara no hi ha transaccions recents.",
+    },
+
+    weekdays: {
+      mon: "Dl",
+      tue: "Dt",
+      wed: "Dc",
+      thu: "Dj",
+      fri: "Dv",
+      sat: "Ds",
+      sun: "Dg",
+    },
+
+    errors: {
+      loadGoals: "No s’han pogut carregar els objectius.",
+    },
+  },
+
   profile: {
     title: "Perfil",
     appVersion: "Versió de l’app",
