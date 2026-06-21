@@ -43,13 +43,13 @@ const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
 const getEmptyAnalyticsData = () => [
-  { label: t("home.weekdays.mon"), income: 0, expense: 0 },
-  { label: t("home.weekdays.tue"), income: 0, expense: 0 },
-  { label: t("home.weekdays.wed"), income: 0, expense: 0 },
-  { label: t("home.weekdays.thu"), income: 0, expense: 0 },
-  { label: t("home.weekdays.fri"), income: 0, expense: 0 },
-  { label: t("home.weekdays.sat"), income: 0, expense: 0 },
-  { label: t("home.weekdays.sun"), income: 0, expense: 0 },
+  { label: t("common.weekdays.mon"), income: 0, expense: 0 },
+  { label: t("common.weekdays.tue"), income: 0, expense: 0 },
+  { label: t("common.weekdays.wed"), income: 0, expense: 0 },
+  { label: t("common.weekdays.thu"), income: 0, expense: 0 },
+  { label: t("common.weekdays.fri"), income: 0, expense: 0 },
+  { label: t("common.weekdays.sat"), income: 0, expense: 0 },
+  { label: t("common.weekdays.sun"), income: 0, expense: 0 },
 ];
 
 function isAvatarId(value: unknown): value is AvatarId {
