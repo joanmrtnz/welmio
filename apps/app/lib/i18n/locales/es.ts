@@ -217,6 +217,188 @@ const es = {
     title: "Objetivos",
     createGoal: "Crear objetivo",
     targetAmount: "Cantidad objetivo",
+
+    summary: {
+      totalSaved: "Total ahorrado",
+      targetAmount: "Cantidad objetivo",
+    },
+
+    progress: {
+      loading: "Cargando objetivos...",
+      empty: "Todavía no hay objetivos.",
+      saved: "Has ahorrado el %{percent}% de tu objetivo total.",
+    },
+
+    mainGoal: {
+      eyebrow: "Objetivo principal",
+      savedOf: "ahorrado de %{amount}",
+      targetDate: "Fecha objetivo · %{date}",
+    },
+
+    empty: {
+      title: "Todavía no hay objetivos",
+      description: "Crea tu primer objetivo para empezar a seguir tu progreso.",
+    },
+
+    pace: {
+      monthlyNeeded: "Necesario al mes",
+      activeGoals: "Objetivos activos",
+    },
+
+    list: {
+      title: "Mis objetivos",
+      savedAmount: "%{amount} ahorrados",
+    },
+
+    filters: {
+      active: "Activo",
+    },
+
+    actions: {
+      newGoal: "Nuevo objetivo",
+    },
+
+    smartTip: {
+      title: "Consejo inteligente",
+      withMainGoal:
+        "Necesitas alrededor de %{amount} al mes para alcanzar tu objetivo de %{goalName} a tiempo.",
+      empty: "Crea un objetivo para recibir consejos simples de progreso.",
+    },
+
+    statusLabels: {
+      active: "Activo",
+      completed: "Completado",
+      paused: "Pausado",
+      archived: "Archivado",
+      overdue: "Atrasado",
+      in_progress: "En progreso",
+    },
+
+    contributions: {
+      defaultDescription: "Aportación a %{goalName}",
+      defaultNotes: "Aportación a objetivo · %{goalName}",
+    },
+
+    feedback: {
+      createSuccess: "Objetivo creado correctamente.",
+      createError: "No se pudo crear el objetivo.",
+      updateSuccess: "Objetivo actualizado correctamente.",
+      updateError: "No se pudo actualizar el objetivo.",
+      deleteSuccess: "Objetivo eliminado correctamente.",
+      deleteError: "No se pudo eliminar el objetivo.",
+      loadError: "No se pudieron cargar los objetivos.",
+      contributionDeleteSuccess: "Aportación eliminada correctamente.",
+      contributionDeleteError: "No se pudo eliminar la aportación.",
+    },
+
+    details: {
+      title: "Detalles del objetivo",
+      noDeadline: "Sin fecha límite",
+      completed: "completado",
+      saved: "Ahorrado",
+      target: "Objetivo",
+      remaining: "Restante",
+      monthlyNeeded: "Necesario al mes",
+      progressInsight: "Análisis del progreso",
+      progressInsightText:
+        "Has ahorrado %{saved} de %{target}. Para alcanzar este objetivo a tiempo, necesitas alrededor de %{monthlyNeeded} al mes.",
+      contributionSingular: "aportación",
+      contributionPlural: "aportaciones",
+      editGoal: "Editar objetivo",
+      delete: "Eliminar",
+
+      goalTypes: {
+        emergency_fund: "Fondo de emergencia",
+        savings: "Ahorro",
+        purchase: "Compra",
+        trip: "Viaje",
+        investment: "Inversión",
+        debt_payment: "Pago de deuda",
+        education: "Educación",
+        home: "Vivienda",
+        car: "Coche",
+        other: "Otro",
+      },
+
+      contributions: {
+        title: "Aportaciones recientes",
+        subtitle: "Último dinero añadido a este objetivo",
+        loading: "Cargando aportaciones...",
+        loadError: "No se pudieron cargar las aportaciones.",
+        empty:
+          "Todavía no hay aportaciones. Añade la primera para empezar a seguir este objetivo.",
+        defaultTitle: "Aportación al objetivo",
+      },
+
+      deleteDialog: {
+        title: "Eliminar objetivo",
+        message:
+          "¿Seguro que quieres eliminar este objetivo?\nEsta acción no se puede deshacer.",
+        messageWithContributions:
+          "¿Seguro que quieres eliminar este objetivo?\nEsto también eliminará %{count} %{contributionLabel} vinculadas a este objetivo.\nEsta acción no se puede deshacer.",
+        confirmLabel: "Sí, eliminar",
+        cancelLabel: "Cancelar",
+        loadingLabel: "Eliminando...",
+      },
+
+      deleteContributionDialog: {
+        title: "Eliminar aportación",
+        message:
+          "¿Seguro que quieres eliminar esta aportación?\nSe eliminará del progreso del objetivo, pero no se eliminará la transacción vinculada.",
+        confirmLabel: "Sí, eliminar",
+        cancelLabel: "Cancelar",
+        loadingLabel: "Eliminando...",
+      },
+    },
+
+    createModal: {
+      createTitle: "Crear objetivo",
+      editTitle: "Editar objetivo",
+
+      preview: {
+        new: "Nuevo objetivo",
+        editing: "Editando objetivo",
+        target: "Objetivo · %{amount}",
+        defaultTargetAmount: "30.000 €",
+      },
+
+      fields: {
+        goalName: "Nombre del objetivo",
+        targetAmount: "Cantidad objetivo",
+        currentSaved: "Ahorro actual",
+        targetDate: "Fecha objetivo",
+        goalType: "Tipo de objetivo",
+        icon: "Icono",
+      },
+
+      placeholders: {
+        name: "Entrada de una casa",
+        targetAmount: "30000",
+        currentSaved: "9000",
+        targetDate: "2027-12-31",
+      },
+
+      actions: {
+        createGoal: "Crear objetivo",
+        creating: "Creando...",
+        saveChanges: "Guardar cambios",
+        saving: "Guardando...",
+      },
+
+      errors: {
+        nameRequired: "El nombre del objetivo es obligatorio.",
+        targetAmountInvalid: "La cantidad objetivo debe ser mayor que 0.",
+        currentAmountInvalid: "El ahorro actual debe ser 0 o mayor.",
+        currentGreaterThanTarget:
+          "El ahorro actual no puede ser mayor que la cantidad objetivo.",
+      },
+    },
+
+    quickGoals: {
+      savedOf: "%{saved} de %{target}",
+      emptyTitle: "Todavía no hay objetivos",
+      emptyDescription: "Crea tu primer objetivo para empezar a seguir el progreso.",
+    },
   },
 
   transactions: {

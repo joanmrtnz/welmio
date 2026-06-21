@@ -217,6 +217,188 @@ const ca = {
     title: "Objectius",
     createGoal: "Crear objectiu",
     targetAmount: "Quantitat objectiu",
+
+    summary: {
+      totalSaved: "Total estalviat",
+      targetAmount: "Quantitat objectiu",
+    },
+
+    progress: {
+      loading: "Carregant objectius...",
+      empty: "Encara no hi ha objectius.",
+      saved: "Has estalviat el %{percent}% del teu objectiu total.",
+    },
+
+    mainGoal: {
+      eyebrow: "Objectiu principal",
+      savedOf: "estalviat de %{amount}",
+      targetDate: "Data objectiu · %{date}",
+    },
+
+    empty: {
+      title: "Encara no hi ha objectius",
+      description: "Crea el teu primer objectiu per començar a seguir el teu progrés.",
+    },
+
+    pace: {
+      monthlyNeeded: "Necessari al mes",
+      activeGoals: "Objectius actius",
+    },
+
+    list: {
+      title: "Els meus objectius",
+      savedAmount: "%{amount} estalviats",
+    },
+
+    filters: {
+      active: "Actiu",
+    },
+
+    actions: {
+      newGoal: "Nou objectiu",
+    },
+
+    smartTip: {
+      title: "Consell intel·ligent",
+      withMainGoal:
+        "Necessites aproximadament %{amount} al mes per assolir el teu objectiu de %{goalName} a temps.",
+      empty: "Crea un objectiu per rebre consells simples de progrés.",
+    },
+
+    statusLabels: {
+      active: "Actiu",
+      completed: "Completat",
+      paused: "Pausat",
+      archived: "Arxivat",
+      overdue: "Endarrerit",
+      in_progress: "En progrés",
+    },
+
+    contributions: {
+      defaultDescription: "Aportació a %{goalName}",
+      defaultNotes: "Aportació a objectiu · %{goalName}",
+    },
+
+    feedback: {
+      createSuccess: "Objectiu creat correctament.",
+      createError: "No s’ha pogut crear l’objectiu.",
+      updateSuccess: "Objectiu actualitzat correctament.",
+      updateError: "No s’ha pogut actualitzar l’objectiu.",
+      deleteSuccess: "Objectiu eliminat correctament.",
+      deleteError: "No s’ha pogut eliminar l’objectiu.",
+      loadError: "No s’han pogut carregar els objectius.",
+      contributionDeleteSuccess: "Aportació eliminada correctament.",
+      contributionDeleteError: "No s’ha pogut eliminar l’aportació.",
+    },
+
+    details: {
+      title: "Detalls de l’objectiu",
+      noDeadline: "Sense data límit",
+      completed: "completat",
+      saved: "Estalviat",
+      target: "Objectiu",
+      remaining: "Restant",
+      monthlyNeeded: "Necessari al mes",
+      progressInsight: "Anàlisi del progrés",
+      progressInsightText:
+        "Has estalviat %{saved} de %{target}. Per assolir aquest objectiu a temps, necessites aproximadament %{monthlyNeeded} al mes.",
+      contributionSingular: "aportació",
+      contributionPlural: "aportacions",
+      editGoal: "Editar objectiu",
+      delete: "Eliminar",
+
+      goalTypes: {
+        emergency_fund: "Fons d’emergència",
+        savings: "Estalvi",
+        purchase: "Compra",
+        trip: "Viatge",
+        investment: "Inversió",
+        debt_payment: "Pagament de deute",
+        education: "Educació",
+        home: "Habitatge",
+        car: "Cotxe",
+        other: "Altres",
+      },
+
+      contributions: {
+        title: "Aportacions recents",
+        subtitle: "Últims diners afegits a aquest objectiu",
+        loading: "Carregant aportacions...",
+        loadError: "No s’han pogut carregar les aportacions.",
+        empty:
+          "Encara no hi ha aportacions. Afegeix-ne la primera per començar a seguir aquest objectiu.",
+        defaultTitle: "Aportació a l’objectiu",
+      },
+
+      deleteDialog: {
+        title: "Eliminar objectiu",
+        message:
+          "Segur que vols eliminar aquest objectiu?\nAquesta acció no es pot desfer.",
+        messageWithContributions:
+          "Segur que vols eliminar aquest objectiu?\nAixò també eliminarà %{count} %{contributionLabel} vinculades a aquest objectiu.\nAquesta acció no es pot desfer.",
+        confirmLabel: "Sí, eliminar",
+        cancelLabel: "Cancel·lar",
+        loadingLabel: "Eliminant...",
+      },
+
+      deleteContributionDialog: {
+        title: "Eliminar aportació",
+        message:
+          "Segur que vols eliminar aquesta aportació?\nS’eliminarà del progrés de l’objectiu, però no s’eliminarà la transacció vinculada.",
+        confirmLabel: "Sí, eliminar",
+        cancelLabel: "Cancel·lar",
+        loadingLabel: "Eliminant...",
+      },
+    },
+
+    createModal: {
+      createTitle: "Crear objectiu",
+      editTitle: "Editar objectiu",
+
+      preview: {
+        new: "Nou objectiu",
+        editing: "Editant objectiu",
+        target: "Objectiu · %{amount}",
+        defaultTargetAmount: "30.000 €",
+      },
+
+      fields: {
+        goalName: "Nom de l’objectiu",
+        targetAmount: "Quantitat objectiu",
+        currentSaved: "Estalvi actual",
+        targetDate: "Data objectiu",
+        goalType: "Tipus d’objectiu",
+        icon: "Icona",
+      },
+
+      placeholders: {
+        name: "Entrada d’una casa",
+        targetAmount: "30000",
+        currentSaved: "9000",
+        targetDate: "2027-12-31",
+      },
+
+      actions: {
+        createGoal: "Crear objectiu",
+        creating: "Creant...",
+        saveChanges: "Desar canvis",
+        saving: "Desant...",
+      },
+
+      errors: {
+        nameRequired: "El nom de l’objectiu és obligatori.",
+        targetAmountInvalid: "La quantitat objectiu ha de ser superior a 0.",
+        currentAmountInvalid: "L’estalvi actual ha de ser 0 o superior.",
+        currentGreaterThanTarget:
+          "L’estalvi actual no pot ser superior a la quantitat objectiu.",
+      },
+    },
+
+    quickGoals: {
+      savedOf: "%{saved} de %{target}",
+      emptyTitle: "Encara no hi ha objectius",
+      emptyDescription: "Crea el teu primer objectiu per començar a seguir el progrés.",
+    },
   },
 
   transactions: {

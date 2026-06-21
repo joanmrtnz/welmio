@@ -217,6 +217,188 @@ const en = {
     title: "Goals",
     createGoal: "Create goal",
     targetAmount: "Target amount",
+
+    summary: {
+      totalSaved: "Total Saved",
+      targetAmount: "Target Amount",
+    },
+
+    progress: {
+      loading: "Loading goals...",
+      empty: "No goals yet.",
+      saved: "You have saved %{percent}% of your total target.",
+    },
+
+    mainGoal: {
+      eyebrow: "Main Goal",
+      savedOf: "saved of %{amount}",
+      targetDate: "Target date · %{date}",
+    },
+
+    empty: {
+      title: "No goals yet",
+      description: "Create your first goal to start tracking your progress.",
+    },
+
+    pace: {
+      monthlyNeeded: "Monthly Needed",
+      activeGoals: "Active Goals",
+    },
+
+    list: {
+      title: "My Goals",
+      savedAmount: "%{amount} saved",
+    },
+
+    filters: {
+      active: "Active",
+    },
+
+    actions: {
+      newGoal: "New goal",
+    },
+
+    smartTip: {
+      title: "Smart tip",
+      withMainGoal:
+        "You need around %{amount} per month to reach your %{goalName} goal on time.",
+      empty: "Create a goal to receive simple progress tips.",
+    },
+
+    statusLabels: {
+      active: "Active",
+      completed: "Completed",
+      paused: "Paused",
+      archived: "Archived",
+      overdue: "Overdue",
+      in_progress: "In progress",
+    },
+
+    contributions: {
+      defaultDescription: "Contribution to %{goalName}",
+      defaultNotes: "Goal contribution · %{goalName}",
+    },
+
+    feedback: {
+      createSuccess: "Goal created successfully.",
+      createError: "Could not create goal.",
+      updateSuccess: "Goal updated successfully.",
+      updateError: "Could not update goal.",
+      deleteSuccess: "Goal deleted successfully.",
+      deleteError: "Could not delete goal.",
+      loadError: "Could not load goals.",
+      contributionDeleteSuccess: "Contribution removed successfully.",
+      contributionDeleteError: "Could not remove contribution.",
+    },
+
+    details: {
+      title: "Goal Details",
+      noDeadline: "No deadline",
+      completed: "completed",
+      saved: "Saved",
+      target: "Target",
+      remaining: "Remaining",
+      monthlyNeeded: "Monthly needed",
+      progressInsight: "Progress insight",
+      progressInsightText:
+        "You have saved %{saved} of %{target}. To reach this goal on time, you need around %{monthlyNeeded} per month.",
+      contributionSingular: "contribution",
+      contributionPlural: "contributions",
+      editGoal: "Edit goal",
+      delete: "Delete",
+
+      goalTypes: {
+        emergency_fund: "Emergency fund",
+        savings: "Savings",
+        purchase: "Purchase",
+        trip: "Trip",
+        investment: "Investment",
+        debt_payment: "Debt payment",
+        education: "Education",
+        home: "Home",
+        car: "Car",
+        other: "Other",
+      },
+
+      contributions: {
+        title: "Recent contributions",
+        subtitle: "Latest money added to this goal",
+        loading: "Loading contributions...",
+        loadError: "Could not load contributions.",
+        empty:
+          "No contributions yet. Add your first one to start tracking this goal.",
+        defaultTitle: "Goal contribution",
+      },
+
+      deleteDialog: {
+        title: "Delete Goal",
+        message:
+          "Are you sure you want to delete this goal?\nThis action cannot be undone.",
+        messageWithContributions:
+          "Are you sure you want to delete this goal?\nThis will also delete %{count} %{contributionLabel} linked to this goal.\nThis action cannot be undone.",
+        confirmLabel: "Yes, Delete",
+        cancelLabel: "Cancel",
+        loadingLabel: "Deleting...",
+      },
+
+      deleteContributionDialog: {
+        title: "Delete Contribution",
+        message:
+          "Are you sure you want to delete this contribution?\nThis will remove it from the goal progress, but the linked transaction will not be deleted.",
+        confirmLabel: "Yes, Delete",
+        cancelLabel: "Cancel",
+        loadingLabel: "Deleting...",
+      },
+    },
+
+    createModal: {
+      createTitle: "Create Goal",
+      editTitle: "Edit Goal",
+
+      preview: {
+        new: "New goal",
+        editing: "Editing goal",
+        target: "Target · %{amount}",
+        defaultTargetAmount: "€30,000",
+      },
+
+      fields: {
+        goalName: "Goal name",
+        targetAmount: "Target amount",
+        currentSaved: "Current saved",
+        targetDate: "Target date",
+        goalType: "Goal type",
+        icon: "Icon",
+      },
+
+      placeholders: {
+        name: "House Deposit",
+        targetAmount: "30000",
+        currentSaved: "9000",
+        targetDate: "2027-12-31",
+      },
+
+      actions: {
+        createGoal: "Create goal",
+        creating: "Creating...",
+        saveChanges: "Save changes",
+        saving: "Saving...",
+      },
+
+      errors: {
+        nameRequired: "Goal name is required.",
+        targetAmountInvalid: "Target amount must be greater than 0.",
+        currentAmountInvalid: "Current amount must be 0 or greater.",
+        currentGreaterThanTarget:
+          "Current amount cannot be greater than target amount.",
+      },
+    },
+
+    quickGoals: {
+      savedOf: "%{saved} of %{target}",
+      emptyTitle: "No goals yet",
+      emptyDescription: "Create your first goal to start tracking progress.",
+    },
   },
 
   transactions: {
