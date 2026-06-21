@@ -92,7 +92,7 @@ export default function ChangeLanguageScreen() {
 
   return (
     <View style={styles.screen}>
-      <AppScreenHeader title={t("profile.language.title")} />
+      <AppScreenHeader title={t("profile.language.title")} backHref="/profile" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
