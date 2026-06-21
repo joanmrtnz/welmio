@@ -211,6 +211,183 @@ const ca = {
     title: "Perfil",
     appVersion: "Versió de l’app",
     logout: "Tancar sessió",
+    defaultUser: "Usuari",
+
+    edit: {
+      title: "Editar el meu perfil",
+      defaultUser: "Usuari",
+
+      fields: {
+        username: "Nom d’usuari",
+        phone: "Telèfon",
+        email: "Email",
+      },
+
+      placeholders: {
+        username: "Joan Pérez",
+        phone: "+34 600 123 456",
+        email: "exemple@email.com",
+      },
+
+      actions: {
+        updateProfile: "Actualitzar perfil",
+        updating: "Actualitzant...",
+      },
+
+      feedback: {
+        updateSuccess: "Perfil actualitzat correctament",
+        updateSuccessEmailChanged:
+          "Perfil actualitzat. Revisa el teu nou email per verificar el canvi",
+        updateError: "Error en actualitzar el perfil",
+        loadError: "Error en carregar el perfil d’usuari",
+      },
+    },
+
+    options: {
+      editProfile: "Editar perfil",
+      settings: "Configuració",
+      logout: "Tancar sessió",
+    },
+
+    logoutDialog: {
+      title: "Tancar sessió",
+      message: "Segur que vols tancar la sessió?",
+      confirmLabel: "Sí, tancar sessió",
+      cancelLabel: "Cancel·lar",
+      loadingLabel: "Tancant...",
+    },
+
+    feedback: {
+      logoutError: "Error en tancar la sessió",
+    },
+
+    settings: {
+      title: "Configuració",
+      sectionTitle: "Configuració del compte",
+      sectionDescription:
+        "Gestiona l’accés, la seguretat i el cicle de vida del teu perfil.",
+
+      options: {
+        changePassword: {
+          label: "Canviar contrasenya",
+          description: "Actualitza la contrasenya del teu compte",
+        },
+        deleteAccount: {
+          label: "Eliminar compte",
+          description: "Elimina el teu perfil permanentment",
+        },
+      },
+    },
+
+    deleteAccount: {
+      title: "Eliminar compte",
+      confirmTitle: "Segur que vols eliminar%{breakLine}el teu compte?",
+      warningText:
+        "Aquesta acció eliminarà permanentment totes les teves dades i no les podràs recuperar. Tingues en compte el següent abans de continuar:",
+
+      bullets: {
+        transactions:
+          "Totes les teves despeses, ingressos i transaccions associades seran eliminats.",
+        access:
+          "No podràs accedir al teu compte ni a cap informació relacionada.",
+        irreversible: "Aquesta acció no es pot desfer.",
+      },
+
+      typeDeleteTitle:
+        "Escriu \"%{keyword}\" per confirmar%{breakLine}l’eliminació del teu compte.",
+      confirmPlaceholder: "Escriu \"%{keyword}\"",
+
+      actions: {
+        deleteAccount: "Sí, eliminar compte",
+      },
+
+      deleteDialog: {
+        title: "Eliminar compte",
+        message:
+          "Segur que vols eliminar el teu compte?\n\nEn eliminar el teu compte, acceptes que entens les conseqüències d’aquesta acció i que totes les dades associades s’eliminaran permanentment.",
+        confirmLabel: "Sí, eliminar compte",
+        cancelLabel: "Cancel·lar",
+        loadingLabel: "Eliminant...",
+      },
+
+      feedback: {
+        deleteSuccess: "Compte eliminat correctament",
+        deleteError: "Error en eliminar el compte",
+      },
+    },
+
+    changePassword: {
+      title: "Canviar contrasenya",
+
+      hero: {
+        title: "Configuració de la contrasenya",
+        description:
+          "Actualitza la teva contrasenya regularment per mantenir protegit el teu compte de Welmio.",
+      },
+
+      notice: {
+        title: "Utilitza una contrasenya segura",
+        description: "Combina lletres, números i símbols per millorar la seguretat.",
+      },
+
+      form: {
+        title: "Actualitzar contrasenya",
+
+        fields: {
+          currentPassword: "Contrasenya actual",
+          newPassword: "Nova contrasenya",
+          confirmPassword: "Confirmar contrasenya",
+        },
+
+        placeholders: {
+          currentPassword: "Introdueix la contrasenya actual",
+          newPassword: "Introdueix la nova contrasenya",
+          confirmPassword: "Repeteix la nova contrasenya",
+        },
+
+        actions: {
+          updatePassword: "Actualitzar contrasenya",
+          updating: "Actualitzant...",
+        },
+      },
+
+      feedback: {
+        requiredFields: "Completa tots els camps",
+        passwordsDontMatch: "Les contrasenyes no coincideixen",
+        updateSuccess: "Contrasenya actualitzada correctament",
+        updateError: "Error en actualitzar la contrasenya",
+      },
+    },
+
+    security: {
+      title: "Seguretat",
+      sectionTitle: "Configuració de seguretat",
+      sectionDescription:
+        "Gestiona la protecció del compte, l’accés biomètric i les polítiques de seguretat.",
+
+      options: {
+        changePin: {
+          label: "Canviar PIN",
+          description: "Actualitza el teu PIN d’accés segur",
+        },
+        fingerprint: {
+          label: "Empremta digital",
+          description: "Gestiona l’autenticació biomètrica",
+        },
+        termsAndConditions: {
+          label: "Termes i condicions",
+          description: "Revisa els termes de seguretat i ús de l’app",
+        },
+      },
+    },
+
+    avatarPicker: {
+      title: "Editar avatar",
+      previewText: "Tria el teu avatar de perfil",
+      avatar: "Avatar",
+      cancel: "Cancel·lar",
+      apply: "Aplicar",
+    },
   },
 
   goals: {

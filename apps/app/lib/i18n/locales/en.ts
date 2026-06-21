@@ -211,6 +211,183 @@ const en = {
     title: "Profile",
     appVersion: "App version",
     logout: "Log out",
+    defaultUser: "User",
+
+    edit: {
+      title: "Edit My Profile",
+      defaultUser: "User",
+
+      fields: {
+        username: "Username",
+        phone: "Phone",
+        email: "Email Address",
+      },
+
+      placeholders: {
+        username: "John Smith",
+        phone: "+44 555 5555",
+        email: "example@example.com",
+      },
+
+      actions: {
+        updateProfile: "Update Profile",
+        updating: "Updating...",
+      },
+
+      feedback: {
+        updateSuccess: "Profile updated successfully",
+        updateSuccessEmailChanged:
+          "Profile updated. Check your new email to verify the change",
+        updateError: "Error updating profile",
+        loadError: "Error loading user profile",
+      },
+    },
+
+    options: {
+      editProfile: "Edit Profile",
+      settings: "Settings",
+      logout: "Logout",
+    },
+
+    logoutDialog: {
+      title: "End Session",
+      message: "Are you sure you want to log out?",
+      confirmLabel: "Yes, End Session",
+      cancelLabel: "Cancel",
+      loadingLabel: "Ending...",
+    },
+
+    feedback: {
+      logoutError: "Error ending session",
+    },
+
+    settings: {
+      title: "Settings",
+      sectionTitle: "Account Settings",
+      sectionDescription:
+        "Manage your account access, security, and profile lifecycle.",
+
+      options: {
+        changePassword: {
+          label: "Change Password",
+          description: "Update your account password",
+        },
+        deleteAccount: {
+          label: "Delete Account",
+          description: "Permanently remove your profile",
+        },
+      },
+    },
+
+    deleteAccount: {
+      title: "Delete Account",
+      confirmTitle: "Are You Sure You Want To Delete%{breakLine}Your Account?",
+      warningText:
+        "This action will permanently delete all of your data, and you will not be able to recover it. Please keep the following in mind before proceeding:",
+
+      bullets: {
+        transactions:
+          "All your expenses, income and associated transactions will be eliminated.",
+        access:
+          "You will not be able to access your account or any related information.",
+        irreversible: "This action cannot be undone.",
+      },
+
+      typeDeleteTitle:
+        "Please Type \"%{keyword}\" To Confirm%{breakLine}Deletion Of Your Account.",
+      confirmPlaceholder: "Type \"%{keyword}\"",
+
+      actions: {
+        deleteAccount: "Yes, Delete Account",
+      },
+
+      deleteDialog: {
+        title: "Delete Account",
+        message:
+          "Are you sure you want to delete your account?\n\nBy deleting your account, you agree that you understand the consequences of this action and that all associated data will be permanently deleted.",
+        confirmLabel: "Yes, Delete Account",
+        cancelLabel: "Cancel",
+        loadingLabel: "Deleting...",
+      },
+
+      feedback: {
+        deleteSuccess: "Account deleted successfully",
+        deleteError: "Error deleting account",
+      },
+    },
+
+    changePassword: {
+      title: "Change Password",
+
+      hero: {
+        title: "Password Settings",
+        description:
+          "Update your password regularly to keep your Welmio account protected.",
+      },
+
+      notice: {
+        title: "Use a strong password",
+        description: "Mix letters, numbers and symbols for better security.",
+      },
+
+      form: {
+        title: "Update password",
+
+        fields: {
+          currentPassword: "Current Password",
+          newPassword: "New Password",
+          confirmPassword: "Confirm Password",
+        },
+
+        placeholders: {
+          currentPassword: "Enter current password",
+          newPassword: "Enter new password",
+          confirmPassword: "Repeat new password",
+        },
+
+        actions: {
+          updatePassword: "Update Password",
+          updating: "Updating...",
+        },
+      },
+
+      feedback: {
+        requiredFields: "Please fill in all fields",
+        passwordsDontMatch: "Passwords do not match",
+        updateSuccess: "Password updated successfully",
+        updateError: "Error updating password",
+      },
+    },
+
+    security: {
+      title: "Security",
+      sectionTitle: "Security Settings",
+      sectionDescription:
+        "Manage account protection, biometric access, and security policies.",
+
+      options: {
+        changePin: {
+          label: "Change PIN",
+          description: "Update your secure access PIN",
+        },
+        fingerprint: {
+          label: "Fingerprint",
+          description: "Manage biometric authentication",
+        },
+        termsAndConditions: {
+          label: "Terms and Conditions",
+          description: "Review app security and usage terms",
+        },
+      },
+    },
+
+    avatarPicker: {
+      title: "Edit Avatar",
+      previewText: "Choose your profile avatar",
+      avatar: "Avatar",
+      cancel: "Cancel",
+      apply: "Apply",
+    },
   },
 
   goals: {

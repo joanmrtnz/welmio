@@ -211,6 +211,183 @@ const es = {
     title: "Perfil",
     appVersion: "Versión de la app",
     logout: "Cerrar sesión",
+    defaultUser: "Usuario",
+
+    edit: {
+      title: "Editar mi perfil",
+      defaultUser: "Usuario",
+
+      fields: {
+        username: "Nombre de usuario",
+        phone: "Teléfono",
+        email: "Email",
+      },
+
+      placeholders: {
+        username: "Juan Pérez",
+        phone: "+34 600 123 456",
+        email: "ejemplo@email.com",
+      },
+
+      actions: {
+        updateProfile: "Actualizar perfil",
+        updating: "Actualizando...",
+      },
+
+      feedback: {
+        updateSuccess: "Perfil actualizado correctamente",
+        updateSuccessEmailChanged:
+          "Perfil actualizado. Revisa tu nuevo email para verificar el cambio",
+        updateError: "Error al actualizar el perfil",
+        loadError: "Error al cargar el perfil de usuario",
+      },
+    },
+
+    options: {
+      editProfile: "Editar perfil",
+      settings: "Ajustes",
+      logout: "Cerrar sesión",
+    },
+
+    logoutDialog: {
+      title: "Cerrar sesión",
+      message: "¿Seguro que quieres cerrar sesión?",
+      confirmLabel: "Sí, cerrar sesión",
+      cancelLabel: "Cancelar",
+      loadingLabel: "Cerrando...",
+    },
+
+    feedback: {
+      logoutError: "Error al cerrar sesión",
+    },
+
+    settings: {
+      title: "Ajustes",
+      sectionTitle: "Ajustes de la cuenta",
+      sectionDescription:
+        "Gestiona el acceso, la seguridad y el ciclo de vida de tu perfil.",
+
+      options: {
+        changePassword: {
+          label: "Cambiar contraseña",
+          description: "Actualiza la contraseña de tu cuenta",
+        },
+        deleteAccount: {
+          label: "Eliminar cuenta",
+          description: "Elimina tu perfil permanentemente",
+        },
+      },
+    },
+
+    deleteAccount: {
+      title: "Eliminar cuenta",
+      confirmTitle: "¿Seguro que quieres eliminar%{breakLine}tu cuenta?",
+      warningText:
+        "Esta acción eliminará permanentemente todos tus datos y no podrás recuperarlos. Ten en cuenta lo siguiente antes de continuar:",
+
+      bullets: {
+        transactions:
+          "Todos tus gastos, ingresos y transacciones asociadas serán eliminados.",
+        access:
+          "No podrás acceder a tu cuenta ni a ninguna información relacionada.",
+        irreversible: "Esta acción no se puede deshacer.",
+      },
+
+      typeDeleteTitle:
+        "Escribe \"%{keyword}\" para confirmar%{breakLine}la eliminación de tu cuenta.",
+      confirmPlaceholder: "Escribe \"%{keyword}\"",
+
+      actions: {
+        deleteAccount: "Sí, eliminar cuenta",
+      },
+
+      deleteDialog: {
+        title: "Eliminar cuenta",
+        message:
+          "¿Seguro que quieres eliminar tu cuenta?\n\nAl eliminar tu cuenta, aceptas que entiendes las consecuencias de esta acción y que todos los datos asociados se eliminarán permanentemente.",
+        confirmLabel: "Sí, eliminar cuenta",
+        cancelLabel: "Cancelar",
+        loadingLabel: "Eliminando...",
+      },
+
+      feedback: {
+        deleteSuccess: "Cuenta eliminada correctamente",
+        deleteError: "Error al eliminar la cuenta",
+      },
+    },
+
+    changePassword: {
+      title: "Cambiar contraseña",
+
+      hero: {
+        title: "Ajustes de contraseña",
+        description:
+          "Actualiza tu contraseña con regularidad para mantener protegida tu cuenta de Welmio.",
+      },
+
+      notice: {
+        title: "Usa una contraseña segura",
+        description: "Combina letras, números y símbolos para mejorar la seguridad.",
+      },
+
+      form: {
+        title: "Actualizar contraseña",
+
+        fields: {
+          currentPassword: "Contraseña actual",
+          newPassword: "Nueva contraseña",
+          confirmPassword: "Confirmar contraseña",
+        },
+
+        placeholders: {
+          currentPassword: "Introduce tu contraseña actual",
+          newPassword: "Introduce la nueva contraseña",
+          confirmPassword: "Repite la nueva contraseña",
+        },
+
+        actions: {
+          updatePassword: "Actualizar contraseña",
+          updating: "Actualizando...",
+        },
+      },
+
+      feedback: {
+        requiredFields: "Completa todos los campos",
+        passwordsDontMatch: "Las contraseñas no coinciden",
+        updateSuccess: "Contraseña actualizada correctamente",
+        updateError: "Error al actualizar la contraseña",
+      },
+    },
+
+    security: {
+      title: "Seguridad",
+      sectionTitle: "Ajustes de seguridad",
+      sectionDescription:
+        "Gestiona la protección de la cuenta, el acceso biométrico y las políticas de seguridad.",
+
+      options: {
+        changePin: {
+          label: "Cambiar PIN",
+          description: "Actualiza tu PIN de acceso seguro",
+        },
+        fingerprint: {
+          label: "Huella digital",
+          description: "Gestiona la autenticación biométrica",
+        },
+        termsAndConditions: {
+          label: "Términos y condiciones",
+          description: "Revisa los términos de seguridad y uso de la app",
+        },
+      },
+    },
+
+    avatarPicker: {
+      title: "Editar avatar",
+      previewText: "Elige tu avatar de perfil",
+      avatar: "Avatar",
+      cancel: "Cancelar",
+      apply: "Aplicar",
+    },
   },
 
   goals: {
