@@ -366,6 +366,95 @@ const es = {
       },
     },
   },
+
+  analytics: {
+    title: "Analíticas",
+
+    periods: {
+      daily: "Diario",
+      weekly: "Semanal",
+      monthly: "Mensual",
+      yearly: "Anual",
+    },
+
+    summary: {
+      totalBalance: "Saldo total",
+      totalExpense: "Gasto total",
+    },
+
+    progress: {
+      spent: "Has gastado el %{percent}% de tus ingresos.",
+    },
+
+    labels: {
+      income: "Ingresos",
+      expense: "Gastos",
+      transactionSingular: "transacción",
+      transactionPlural: "transacciones",
+      contributionSingular: "aportación",
+      contributionPlural: "aportaciones",
+    },
+
+    incomeExpenseChart: {
+      title: "Ingresos y gastos",
+      subtitle: "Ingresos frente a gastos",
+    },
+
+    expensesByCategory: {
+      title: "Gastos por categoría",
+      subtitle: "Distribución por categoría",
+      loadingTitle: "Cargando gastos...",
+      loadingText: "Obteniendo los totales por categoría para este periodo.",
+      errorTitle: "No se pudieron cargar las categorías",
+      errorText: "Prueba a cambiar el periodo o refrescar la pantalla.",
+      emptyTitle: "Todavía no hay gastos",
+      emptyText: "Añade transacciones de gasto para ver este gráfico.",
+      meta: "%{percent}% de los gastos · %{count} %{transactionLabel}",
+    },
+
+    goalContributions: {
+      title: "Aportaciones a objetivos",
+      subtitle: "Aportaciones recibidas por objetivo",
+      loadingTitle: "Cargando aportaciones...",
+      loadingText: "Obteniendo los totales de aportaciones para este periodo.",
+      errorTitle: "No se pudieron cargar los objetivos",
+      errorText: "Prueba a cambiar el periodo o refrescar la pantalla.",
+      emptyTitle: "Todavía no hay aportaciones",
+      emptyText: "Añade aportaciones a objetivos para ver este gráfico.",
+      amountContributed: "%{amount} aportados",
+      meta: "%{percent}% de las aportaciones a objetivos · %{count} %{contributionLabel}",
+    },
+
+    months: {
+      jan: "Enero",
+      feb: "Febrero",
+      mar: "Marzo",
+      apr: "Abril",
+      may: "Mayo",
+      jun: "Junio",
+      jul: "Julio",
+      aug: "Agosto",
+      sep: "Septiembre",
+      oct: "Octubre",
+      nov: "Noviembre",
+      dec: "Diciembre",
+    },
+
+    monthsShort: {
+      jan: "Ene",
+      feb: "Feb",
+      mar: "Mar",
+      apr: "Abr",
+      may: "May",
+      jun: "Jun",
+      jul: "Jul",
+      aug: "Ago",
+      sep: "Sep",
+      oct: "Oct",
+      nov: "Nov",
+      dec: "Dic",
+    },
+  },
 };
 
 export default es;

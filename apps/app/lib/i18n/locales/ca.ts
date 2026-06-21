@@ -366,6 +366,95 @@ const ca = {
       december: "Desembre",
     },
   },
+
+  analytics: {
+    title: "Analítiques",
+
+    periods: {
+      daily: "Diari",
+      weekly: "Setmanal",
+      monthly: "Mensual",
+      yearly: "Anual",
+    },
+
+    summary: {
+      totalBalance: "Saldo total",
+      totalExpense: "Despesa total",
+    },
+
+    progress: {
+      spent: "Has gastat el %{percent}% dels teus ingressos.",
+    },
+
+    labels: {
+      income: "Ingressos",
+      expense: "Despeses",
+      transactionSingular: "transacció",
+      transactionPlural: "transaccions",
+      contributionSingular: "aportació",
+      contributionPlural: "aportacions",
+    },
+
+    incomeExpenseChart: {
+      title: "Ingressos i despeses",
+      subtitle: "Ingressos davant despeses",
+    },
+
+    expensesByCategory: {
+      title: "Despeses per categoria",
+      subtitle: "Distribució per categoria",
+      loadingTitle: "Carregant despeses...",
+      loadingText: "Obtenint els totals per categoria per a aquest període.",
+      errorTitle: "No s’han pogut carregar les categories",
+      errorText: "Prova de canviar el període o refrescar la pantalla.",
+      emptyTitle: "Encara no hi ha despeses",
+      emptyText: "Afegeix transaccions de despesa per veure aquest gràfic.",
+      meta: "%{percent}% de les despeses · %{count} %{transactionLabel}",
+    },
+
+    goalContributions: {
+      title: "Aportacions a objectius",
+      subtitle: "Aportacions rebudes per objectiu",
+      loadingTitle: "Carregant aportacions...",
+      loadingText: "Obtenint els totals d’aportacions per a aquest període.",
+      errorTitle: "No s’han pogut carregar els objectius",
+      errorText: "Prova de canviar el període o refrescar la pantalla.",
+      emptyTitle: "Encara no hi ha aportacions",
+      emptyText: "Afegeix aportacions a objectius per veure aquest gràfic.",
+      amountContributed: "%{amount} aportats",
+      meta: "%{percent}% de les aportacions a objectius · %{count} %{contributionLabel}",
+    },
+
+    months: {
+      jan: "Gener",
+      feb: "Febrer",
+      mar: "Març",
+      apr: "Abril",
+      may: "Maig",
+      jun: "Juny",
+      jul: "Juliol",
+      aug: "Agost",
+      sep: "Setembre",
+      oct: "Octubre",
+      nov: "Novembre",
+      dec: "Desembre",
+    },
+
+    monthsShort: {
+      jan: "Gen",
+      feb: "Feb",
+      mar: "Març",
+      apr: "Abr",
+      may: "Maig",
+      jun: "Juny",
+      jul: "Jul",
+      aug: "Ago",
+      sep: "Set",
+      oct: "Oct",
+      nov: "Nov",
+      dec: "Des",
+    },
+  },
 };
 
 export default ca;

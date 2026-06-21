@@ -366,6 +366,95 @@ const en = {
       },
     },
   },
+
+  analytics: {
+    title: "Analytics",
+
+    periods: {
+      daily: "Daily",
+      weekly: "Weekly",
+      monthly: "Monthly",
+      yearly: "Yearly",
+    },
+
+    summary: {
+      totalBalance: "Total Balance",
+      totalExpense: "Total Expense",
+    },
+
+    progress: {
+      spent: "%{percent}% of your income has been spent.",
+    },
+
+    labels: {
+      income: "Income",
+      expense: "Expense",
+      transactionSingular: "transaction",
+      transactionPlural: "transactions",
+      contributionSingular: "contribution",
+      contributionPlural: "contributions",
+    },
+
+    incomeExpenseChart: {
+      title: "Income & Expenses",
+      subtitle: "Income vs expenses",
+    },
+
+    expensesByCategory: {
+      title: "Expenses by Category",
+      subtitle: "Distribution by category",
+      loadingTitle: "Loading expenses...",
+      loadingText: "Getting your category totals for this period.",
+      errorTitle: "Could not load categories",
+      errorText: "Try changing the period or refreshing the screen.",
+      emptyTitle: "No expenses yet",
+      emptyText: "Add expense transactions to see this chart.",
+      meta: "%{percent}% of expenses · %{count} %{transactionLabel}",
+    },
+
+    goalContributions: {
+      title: "Goal Contributions",
+      subtitle: "Contributions received by goal",
+      loadingTitle: "Loading contributions...",
+      loadingText: "Getting your goal contribution totals for this period.",
+      errorTitle: "Could not load goals",
+      errorText: "Try changing the period or refreshing the screen.",
+      emptyTitle: "No contributions yet",
+      emptyText: "Add goal contributions to see this chart.",
+      amountContributed: "%{amount} contributed",
+      meta: "%{percent}% of goal contributions · %{count} %{contributionLabel}",
+    },
+
+    months: {
+      jan: "January",
+      feb: "February",
+      mar: "March",
+      apr: "April",
+      may: "May",
+      jun: "June",
+      jul: "July",
+      aug: "August",
+      sep: "September",
+      oct: "October",
+      nov: "November",
+      dec: "December",
+    },
+
+    monthsShort: {
+      jan: "Jan",
+      feb: "Feb",
+      mar: "Mar",
+      apr: "Apr",
+      may: "May",
+      jun: "Jun",
+      jul: "Jul",
+      aug: "Aug",
+      sep: "Sep",
+      oct: "Oct",
+      nov: "Nov",
+      dec: "Dec",
+    },
+  },
 };
 
 export default en;
