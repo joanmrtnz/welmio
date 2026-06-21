@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { t } from "@/lib/i18n";
 import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
@@ -21,14 +22,12 @@ import { AppImage } from "@/components/images/AppImage";
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
 
-
 const GREEN = "#dff7ef";
 const PRIMARY = "#00b889";
 const PRIMARY_DARK = "#079374";
 const DARK = "#052e2b";
 const MUTED = "#6f8586";
 const CARD = "#ffffff";
-const SOFT_GREEN = "#e3f8f1";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 type BackendErrorResponse = {
@@ -62,7 +61,7 @@ function getLoginErrorMessage(error: unknown) {
     return backendError.message;
   }
 
-  return "Invalid email or password";
+  return t("auth.login.errors.invalidCredentials");
 }
 
 export default function LoginScreen() {
@@ -105,13 +104,11 @@ export default function LoginScreen() {
             <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
               <View style={styles.brandRow}>
                 <View style={styles.logoBadge}>
-                <AppImage
-                  source={WELMIO_LOGO}
-                  style={styles.logoImage}
-                />
+                  <AppImage source={WELMIO_LOGO} style={styles.logoImage} />
                 </View>
+
                 <Text style={[styles.brandName, isDesktop && styles.brandNameDesktop]}>
-                  Welmio
+                  {t("common.appName")}
                 </Text>
               </View>
             </View>
@@ -120,24 +117,23 @@ export default function LoginScreen() {
               <View
                 style={[styles.avatarCircle, isDesktop && styles.avatarCircleDesktop]}
               >
-                <View 
-                  style={[styles.avatar, isDesktop && styles.avatarDesktop]}
-                >
+                <View style={[styles.avatar, isDesktop && styles.avatarDesktop]}>
                   <AppImage
-                      source={WELMIO_AVATAR_BASE}
-                      style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
-                    />
+                    source={WELMIO_AVATAR_BASE}
+                    style={[styles.avatarImage, isDesktop && styles.avatarImageDesktop]}
+                  />
                 </View>
               </View>
             </View>
 
-
             {isDesktop ? (
               <View style={styles.desktopCopy}>
-                <Text style={styles.desktopTitle}>Smart Finance, Simple Life</Text>
+                <Text style={styles.desktopTitle}>
+                  {t("auth.login.desktopTitle")}
+                </Text>
+
                 <Text style={styles.desktopSubtitle}>
-                  Track your money, organize your transactions, and keep your goals
-                  moving from one clean dashboard.
+                  {t("auth.login.desktopSubtitle")}
                 </Text>
               </View>
             ) : null}
@@ -145,14 +141,14 @@ export default function LoginScreen() {
 
           <View style={styles.desktopFormColumn}>
             <View style={[styles.card, isDesktop && styles.cardDesktop]}>
-              <Text style={styles.title}>Welcome back</Text>
-              <Text style={styles.subtitle}>
-                Track your money, goals and habits in one place.
-              </Text>
+              <Text style={styles.title}>{t("auth.login.title")}</Text>
+
+              <Text style={styles.subtitle}>{t("auth.login.subtitle")}</Text>
 
               <View style={styles.form}>
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Email</Text>
+                  <Text style={styles.inputLabel}>{t("auth.login.email")}</Text>
+
                   <View style={styles.inputShell}>
                     <FontAwesome
                       name="user-o"
@@ -160,9 +156,10 @@ export default function LoginScreen() {
                       color="rgba(5, 46, 43, 0.5)"
                       style={styles.inputIcon}
                     />
+
                     <TextInput
                       style={styles.textInput}
-                      placeholder="example@email.com"
+                      placeholder={t("auth.login.emailPlaceholder")}
                       placeholderTextColor="rgba(5, 46, 43, 0.42)"
                       autoCapitalize="none"
                       keyboardType="email-address"
@@ -173,7 +170,8 @@ export default function LoginScreen() {
                 </View>
 
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Password</Text>
+                  <Text style={styles.inputLabel}>{t("auth.login.password")}</Text>
+
                   <View style={styles.inputShell}>
                     <FontAwesome
                       name="lock"
@@ -181,17 +179,25 @@ export default function LoginScreen() {
                       color="rgba(5, 46, 43, 0.5)"
                       style={styles.inputIcon}
                     />
+
                     <TextInput
                       style={styles.textInput}
+                      placeholder={t("auth.login.passwordPlaceholder")}
                       placeholderTextColor="rgba(5, 46, 43, 0.42)"
                       secureTextEntry={!showPassword}
                       value={password}
                       onChangeText={setPassword}
                     />
+
                     <Pressable
                       hitSlop={8}
                       onPress={() => setShowPassword((visible) => !visible)}
                       style={styles.eyeButton}
+                      accessibilityLabel={
+                        showPassword
+                          ? t("auth.login.hidePassword")
+                          : t("auth.login.showPassword")
+                      }
                     >
                       <FontAwesome
                         name={showPassword ? "eye-slash" : "eye"}
@@ -203,7 +209,7 @@ export default function LoginScreen() {
                 </View>
 
                 <Link href="/(public)/forgot-password" style={styles.forgotLink}>
-                  <Text>Forgot Password?</Text>
+                  <Text>{t("auth.login.forgotPassword")}</Text>
                 </Link>
 
                 <Pressable
@@ -216,10 +222,9 @@ export default function LoginScreen() {
                   ]}
                 >
                   <Text style={styles.primaryButtonText}>
-                    {loading ? "Logging in..." : "Log In"}
+                    {loading ? t("auth.login.loggingIn") : t("auth.login.submit")}
                   </Text>
                 </Pressable>
-
                 {/*             
                 <View style={styles.dividerRow}>
                   <View style={styles.dividerLine} />
@@ -255,7 +260,8 @@ export default function LoginScreen() {
 
                 <Link href="/(public)/signup" style={styles.footer}>
                   <Text>
-                    Don’t have an account? <Text style={styles.link}>Sign Up</Text>
+                    {t("auth.login.noAccount")}{" "}
+                    <Text style={styles.link}>{t("auth.login.signUp")}</Text>
                   </Text>
                 </Link>
               </View>
@@ -654,5 +660,4 @@ const styles = StyleSheet.create({
     color: PRIMARY_DARK,
     fontFamily: fonts.bold,
   },
-
 });

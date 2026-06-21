@@ -12,9 +12,12 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { View } from 'react-native';
 import { FeedbackProvider } from '@/components/ui/feedback/feedbackProvider';
+import "@/lib/i18n";
+import { useSyncLocale } from '@/lib/i18n/useSyncLocale';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  useSyncLocale();
 
   const [loaded] = useFonts({
     Montserrat_400Regular,
