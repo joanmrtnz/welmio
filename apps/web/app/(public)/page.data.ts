@@ -67,47 +67,95 @@ export const screenshots: Screenshot[] = [
   {
     title: "Overview",
     text: "Balance, expenses, goals and weekly chart in one clean dashboard.",
-    image: "/screenshots/welmio-overview.png",
+    image: "/screenshots/mobile/welmio-overview.png",
   },
   {
     title: "Analytics",
     text: "Income, expenses and category insights with a focused mobile layout.",
-    image: "/screenshots/welmio-analytics.png",
+    image: "/screenshots/mobile/welmio-analytics.png",
   },
   {
     title: "Transactions",
     text: "Browse, filter and review all income and expenses clearly.",
-    image: "/screenshots/welmio-transactions.png",
+    image: "/screenshots/mobile/welmio-transactions.png",
   },
   {
     title: "Goals",
     text: "Track saved amounts, targets and goal progress in real time.",
-    image: "/screenshots/welmio-goals.png",
+    image: "/screenshots/mobile/welmio-goals.png",
   },
   {
     title: "Profile",
     text: "Manage profile, settings and account actions from a simple screen.",
-    image: "/screenshots/welmio-profile.png",
+    image: "/screenshots/mobile/welmio-profile.png",
   },
   {
     title: "Edit Avatar",
     text: "Customize your profile picture with a simple avatar selection screen.",
-    image: "/screenshots/welmio-edit-avatar.png",
+    image: "/screenshots/mobile/welmio-edit-avatar.png",
   },
   {
     title: "Login",
     text: "A soft emerald authentication screen designed for quick access.",
-    image: "/screenshots/welmio-login.png",
+    image: "/screenshots/mobile/welmio-login.png",
   },
   {
     title: "Signup",
     text: "A complete account creation flow with the same visual language.",
-    image: "/screenshots/welmio-signup.png",
+    image: "/screenshots/mobile/welmio-signup.png",
   },
   {
     title: "Forgot Password",
     text: "Recover access with a guided email verification flow for resetting your password.",
-    image: "/screenshots/welmio-forgot-password.png",
+    image: "/screenshots/mobile/welmio-forgot-password.png",
+  },
+];
+
+export const screenshotsDesktop: Screenshot[] = [
+  {
+    title: "Overview",
+    text: "Balance, expenses, goals and weekly chart in one clean dashboard.",
+    image: "/screenshots/desktop/welmio-overview.png",
+  },
+  {
+    title: "Analytics",
+    text: "Income, expenses and category insights with a focused mobile layout.",
+    image: "/screenshots/desktop/welmio-analytics.png",
+  },
+  {
+    title: "Transactions",
+    text: "Browse, filter and review all income and expenses clearly.",
+    image: "/screenshots/desktop/welmio-transactions.png",
+  },
+  {
+    title: "Goals",
+    text: "Track saved amounts, targets and goal progress in real time.",
+    image: "/screenshots/desktop/welmio-goals.png",
+  },
+  {
+    title: "Profile",
+    text: "Manage profile, settings and account actions from a simple screen.",
+    image: "/screenshots/desktop/welmio-profile.png",
+  },
+  {
+    title: "Edit Avatar",
+    text: "Customize your profile picture with a simple avatar selection screen.",
+    image: "/screenshots/desktop/welmio-edit-avatar.png",
+  },
+  {
+    title: "Login",
+    text: "A soft emerald authentication screen designed for quick access.",
+    image: "/screenshots/desktop/welmio-login.png",
+  },
+  {
+    title: "Signup",
+    text: "A complete account creation flow with the same visual language.",
+    image: "/screenshots/desktop/welmio-signup.png",
+  },
+  {
+    title: "Forgot Password",
+    text: "Recover access with a guided email verification flow for resetting your password.",
+    image: "/screenshots/desktop/welmio-forgot-password.png",
   },
 ];
 
