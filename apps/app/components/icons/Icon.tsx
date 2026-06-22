@@ -32,7 +32,7 @@ import FingerPrint from "../../assets/icons/fingerprint.svg";
 import Phone from "../../assets/icons/phone.svg";
 import Mail from "../../assets/icons/mail.svg";
 import Document from "../../assets/icons/document.svg";
-
+import Language from "../../assets/icons/language.svg";
 
 import { IconName } from "@repo/shared-types";
 import { SvgProps } from "react-native-svg";
@@ -75,6 +75,7 @@ const icons = {
   phone: Phone,
   mail: Mail,
   document: Document,
+  language: Language,
 } satisfies Record<IconName, ComponentType<SvgProps>>;
 
 type IconProps = {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import i18n, { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import type {
   TransactionOverviewGroup,
@@ -10,6 +11,21 @@ import { TransactionRow } from "../transaction-row/TransactionRow";
 import type { TransactionDetailsItem } from "../../types/transactionDetails.types";
 
 const BLACK = "#0b3437";
+
+const MONTH_KEY_BY_ENGLISH_NAME: Record<string, string> = {
+  january: "january",
+  february: "february",
+  march: "march",
+  april: "april",
+  may: "may",
+  june: "june",
+  july: "july",
+  august: "august",
+  september: "september",
+  october: "october",
+  november: "november",
+  december: "december",
+};
 
 type TransactionsGroupedListProps = {
   groups: TransactionOverviewGroup[];
@@ -57,8 +73,10 @@ export function TransactionsGroupedList({
 
   if (groups.length === 0) {
     return (
-      <Text style={[styles.emptyMessage, isDesktop && styles.emptyMessageDesktop]}>
-        No transactions found.
+      <Text
+        style={[styles.emptyMessage, isDesktop && styles.emptyMessageDesktop]}
+      >
+        {t("transactions.groupedList.emptyMessage")}
       </Text>
     );
   }
@@ -70,8 +88,10 @@ export function TransactionsGroupedList({
           key={group.month}
           style={[styles.groupBlock, isDesktop && styles.groupBlockDesktop]}
         >
-          <Text style={[styles.monthLabel, isDesktop && styles.monthLabelDesktop]}>
-            {group.month}
+          <Text
+            style={[styles.monthLabel, isDesktop && styles.monthLabelDesktop]}
+          >
+            {formatGroupMonthLabel(group.month)}
           </Text>
 
           {group.items.map((item, index) => (
@@ -95,6 +115,50 @@ export function TransactionsGroupedList({
       />
     </>
   );
+}
+
+function formatGroupMonthLabel(monthLabel: string) {
+  const trimmedMonthLabel = monthLabel.trim();
+
+  const isoMonthDate = getDateFromIsoMonthLabel(trimmedMonthLabel);
+
+  if (isoMonthDate) {
+    return new Intl.DateTimeFormat(i18n.locale || "en", {
+      month: "long",
+      year: "numeric",
+    }).format(isoMonthDate);
+  }
+
+  const englishMonthMatch = trimmedMonthLabel.match(
+    /^([a-zA-Z]+)(?:\s+(\d{4}))?$/,
+  );
+
+  if (!englishMonthMatch) {
+    return monthLabel;
+  }
+
+  const [, monthName, year] = englishMonthMatch;
+  const monthKey = MONTH_KEY_BY_ENGLISH_NAME[monthName.toLowerCase()];
+
+  if (!monthKey) {
+    return monthLabel;
+  }
+
+  const translatedMonth = t(`transactions.groupedList.months.${monthKey}`);
+
+  return year ? `${translatedMonth} ${year}` : translatedMonth;
+}
+
+function getDateFromIsoMonthLabel(monthLabel: string) {
+  const isoMonthMatch = monthLabel.match(/^(\d{4})-(\d{2})(?:-\d{2})?$/);
+
+  if (!isoMonthMatch) {
+    return null;
+  }
+
+  const [, year, month] = isoMonthMatch;
+
+  return new Date(Number(year), Number(month) - 1, 1);
 }
 
 const styles = StyleSheet.create({

@@ -164,7 +164,6 @@ export function useCategoryFilterModal({
       };
 
       if (editingCategoryId) {
-        console.log("modifing: ", editingCategoryId,",  with payload: ", payload);
         await updateCategory(editingCategoryId, payload);
         feedback.success("Category updated successfully");
       } else {

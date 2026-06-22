@@ -3,8 +3,6 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AccountsModule } from './accounts/accounts.module';
 import { AnalyticsModule } from './analytics/analytics.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { GoalsModule } from './goals/goals.module';
@@ -46,9 +44,7 @@ import * as Joi from 'joi';
     GoalsModule,
     VerificationTokenModule,
   ],
-  controllers: [AppController],
   providers: [
-    AppService,
     GoalsService,
     {
       provide: APP_GUARD,

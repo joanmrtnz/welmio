@@ -16,8 +16,11 @@ import { Icon } from "@/components/icons/Icon";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { deleteAccount } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { clearAuthTokens } from "@/lib/auth-storage";
+import { clearAuthTokens } from "@/lib/auth/auth-storage";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { t } from "@/lib/i18n";
+
+const DELETE_CONFIRMATION_TEXT = "delete";
 
 export default function DeleteAccountScreen() {
   const { width } = useWindowDimensions();
@@ -25,7 +28,7 @@ export default function DeleteAccountScreen() {
 
   const [confirmationText, setConfirmationText] = useState("");
   const isDeleteButtonDisabled =
-    confirmationText.trim().toLowerCase() !== "delete";
+    confirmationText.trim().toLowerCase() !== DELETE_CONFIRMATION_TEXT;
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -47,13 +50,13 @@ export default function DeleteAccountScreen() {
 
       await clearAuthTokens();
 
-      feedback.success("Account deleted successfully");
+      feedback.success(t("profile.deleteAccount.feedback.deleteSuccess"));
       setShowConfirmDialog(false);
 
       router.replace("/login");
     } catch (error) {
       console.warn(error);
-      feedback.error("Error deleting account");
+      feedback.error(t("profile.deleteAccount.feedback.deleteError"));
     } finally {
       setIsDeleting(false);
     }
@@ -64,7 +67,7 @@ export default function DeleteAccountScreen() {
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <AppScreenHeader title="Delete Account" />
+      <AppScreenHeader title={t("profile.deleteAccount.title")} />
 
       <View style={[styles.card, isDesktop && styles.cardDesktop]}>
         <ScrollView
@@ -76,30 +79,28 @@ export default function DeleteAccountScreen() {
           ]}
         >
           <Text style={[styles.confirmTitle, isDesktop && styles.confirmTitleDesktop]}>
-            Are You Sure You Want To Delete{isDesktop ? " " : "\n"}Your Account?
+            {t("profile.deleteAccount.confirmTitle", {
+              breakLine: isDesktop ? " " : "\n",
+            })}
           </Text>
 
           <View style={[styles.desktopGrid, !isDesktop && styles.mobileGrid]}>
             <View style={[styles.warningBox, isDesktop && styles.warningBoxDesktop]}>
 
               <Text style={[styles.warningText, isDesktop && styles.warningTextDesktop]}>
-                This action will permanently delete all of your data, and you will
-                not be able to recover it. Please keep the following in mind
-                before proceeding:
+                {t("profile.deleteAccount.warningText")}
               </Text>
 
               <Text style={styles.bulletText}>
-                All your expenses, income and associated transactions will be
-                eliminated.
+                {t("profile.deleteAccount.bullets.transactions")}
               </Text>
 
               <Text style={styles.bulletText}>
-                You will not be able to access your account or any related
-                information.
+                {t("profile.deleteAccount.bullets.access")}
               </Text>
 
               <Text style={[styles.bulletText, styles.lastBulletText]}>
-                This action cannot be undone.
+                {t("profile.deleteAccount.bullets.irreversible")}
               </Text>
             </View>
 
@@ -107,15 +108,19 @@ export default function DeleteAccountScreen() {
               <Text
                 style={[styles.passwordTitle, isDesktop && styles.passwordTitleDesktop]}
               >
-                Please Type "delete" To Confirm{isDesktop ? " " : "\n"}
-                Deletion Of Your Account.
+                {t("profile.deleteAccount.typeDeleteTitle", {
+                  breakLine: isDesktop ? " " : "\n",
+                  keyword: DELETE_CONFIRMATION_TEXT,
+                })}
               </Text>
 
               <View style={[styles.form, isDesktop && styles.formDesktop]}>
                 <View style={styles.inputShell}>
                   <TextInput
                     style={styles.confirmInput}
-                    placeholder='Type "delete"'
+                    placeholder={t("profile.deleteAccount.confirmPlaceholder", {
+                      keyword: DELETE_CONFIRMATION_TEXT,
+                    })}
                     placeholderTextColor={MUTED}
                     value={confirmationText}
                     onChangeText={setConfirmationText}
@@ -139,7 +144,7 @@ export default function DeleteAccountScreen() {
                       isDeleteButtonDisabled && styles.deleteButtonTextDisabled,
                     ]}
                   >
-                    Yes, Delete Account
+                    {t("profile.deleteAccount.actions.deleteAccount")}
                   </Text>
                 </Pressable>
               </View>
@@ -150,13 +155,11 @@ export default function DeleteAccountScreen() {
 
       <ConfirmDialog
         visible={showConfirmDialog}
-        title="Delete Account"
-        message={`Are you sure you want to delete your account?
-
-      By deleting your account, you agree that you understand the consequences of this action and that all associated data will be permanently deleted.`}
-        confirmLabel="Yes, Delete Account"
-        cancelLabel="Cancel"
-        loadingLabel="Deleting..."
+        title={t("profile.deleteAccount.deleteDialog.title")}
+        message={t("profile.deleteAccount.deleteDialog.message")}
+        confirmLabel={t("profile.deleteAccount.deleteDialog.confirmLabel")}
+        cancelLabel={t("profile.deleteAccount.deleteDialog.cancelLabel")}
+        loadingLabel={t("profile.deleteAccount.deleteDialog.loadingLabel")}
         destructive
         isLoading={isDeleting}
         onConfirm={handleConfirmDeleteAccount}

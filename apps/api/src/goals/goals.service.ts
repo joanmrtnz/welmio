@@ -119,51 +119,95 @@ export class GoalsService {
 
   private getAnalyticsDateRange(period: AnalyticsPeriod) {
     const now = new Date();
-    const startDate = new Date(now);
-    const endDate = new Date(now);
 
     switch (period) {
       case AnalyticsPeriod.daily:
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setTime(startDate.getTime());
-        endDate.setDate(startDate.getDate() + 1);
-        break;
+        return {
+          startDate: new Date(
+            Date.UTC(
+              now.getUTCFullYear(),
+              now.getUTCMonth(),
+              now.getUTCDate(),
+              0,
+              0,
+              0,
+              0,
+            ),
+          ),
+          endDate: new Date(
+            Date.UTC(
+              now.getUTCFullYear(),
+              now.getUTCMonth(),
+              now.getUTCDate() + 1,
+              0,
+              0,
+              0,
+              0,
+            ),
+          ),
+        };
 
       case AnalyticsPeriod.weekly: {
-        const day = now.getDay();
+        const day = now.getUTCDay();
         const diffToMonday = day === 0 ? -6 : 1 - day;
 
-        startDate.setDate(now.getDate() + diffToMonday);
-        startDate.setHours(0, 0, 0, 0);
+        const startDate = new Date(
+          Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate() + diffToMonday,
+            0,
+            0,
+            0,
+            0,
+          ),
+        );
 
-        endDate.setTime(startDate.getTime());
-        endDate.setDate(startDate.getDate() + 7);
-        break;
+        const endDate = new Date(
+          Date.UTC(
+            startDate.getUTCFullYear(),
+            startDate.getUTCMonth(),
+            startDate.getUTCDate() + 7,
+            0,
+            0,
+            0,
+            0,
+          ),
+        );
+
+        return {
+          startDate,
+          endDate,
+        };
       }
 
       case AnalyticsPeriod.yearly:
-        startDate.setMonth(0, 1);
-        startDate.setHours(0, 0, 0, 0);
-
-        endDate.setFullYear(startDate.getFullYear() + 1);
-        endDate.setMonth(0, 1);
-        endDate.setHours(0, 0, 0, 0);
-        break;
+        return {
+          startDate: new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0)),
+          endDate: new Date(
+            Date.UTC(now.getUTCFullYear() + 1, 0, 1, 0, 0, 0, 0),
+          ),
+        };
 
       case AnalyticsPeriod.monthly:
       default:
-        startDate.setDate(1);
-        startDate.setHours(0, 0, 0, 0);
-
-        endDate.setTime(startDate.getTime());
-        endDate.setMonth(startDate.getMonth() + 1, 1);
-        break;
+        return {
+          startDate: new Date(
+            Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0),
+          ),
+          endDate: new Date(
+            Date.UTC(
+              now.getUTCFullYear(),
+              now.getUTCMonth() + 1,
+              1,
+              0,
+              0,
+              0,
+              0,
+            ),
+          ),
+        };
     }
-
-    return {
-      startDate,
-      endDate,
-    };
   }
 
   async getGoalContributions(

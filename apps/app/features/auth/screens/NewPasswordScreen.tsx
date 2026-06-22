@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,12 +11,19 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { useResetPassword } from "@/features/auth/hooks/useResetPassword";
 import { AppImage } from "@/components/images/AppImage";
+import {
+  canAccessNewPassword,
+  getResetPasswordFlow,
+  setResetPasswordChanged,
+  type ResetPasswordFlowState,
+} from "@/lib/auth/reset-password-flow-storage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -37,39 +45,72 @@ export default function NewPasswordScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const { email, code } = useLocalSearchParams<{
-    email?: string;
-    code?: string;
-  }>();
+  const [resetFlow, setResetFlow] = useState<ResetPasswordFlowState | null>(null);
+  const [isCheckingFlow, setIsCheckingFlow] = useState(true);
 
   const { execute, loading } = useResetPassword();
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function hydrateResetFlow() {
+      const flow = await getResetPasswordFlow();
+
+      if (!canAccessNewPassword(flow)) {
+        router.replace("/(public)/forgot-password");
+        return;
+      }
+
+      if (isMounted) {
+        setResetFlow(flow);
+        setIsCheckingFlow(false);
+      }
+    }
+
+    void hydrateResetFlow();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   async function handleChangePassword() {
     try {
-      if (!email || !code) {
-        console.warn("Missing email or code");
+      const resetCredential = resetFlow?.resetToken ?? resetFlow?.verificationCode;
+
+      if (!resetFlow?.email || !resetCredential) {
+        console.warn(t("auth.newPasswordScreen.errors.missingEmailOrCode"));
+        router.replace("/(public)/forgot-password");
         return;
       }
 
       if (!newPassword || newPassword.length < 6) {
-        console.warn("Password must be at least 6 characters");
+        console.warn(t("auth.newPasswordScreen.errors.passwordTooShort"));
         return;
       }
 
       if (newPassword !== confirmPassword) {
-        console.warn("Passwords do not match");
+        console.warn(t("auth.newPasswordScreen.errors.passwordsDontMatch"));
         return;
       }
 
-      const res = await execute(email, code, newPassword);
+      const res = await execute(resetFlow.email, resetCredential, newPassword);
 
       if (res) {
+        await setResetPasswordChanged();
         router.replace("/(public)/forgot-password/success");
       }
     } catch (error) {
       console.warn(error);
     }
+  }
+
+  if (isCheckingFlow) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator color={PRIMARY} />
+      </View>
+    );
   }
 
   return (
@@ -90,12 +131,10 @@ export default function NewPasswordScreen() {
             <View style={[styles.brandArea, isDesktop && styles.brandAreaDesktop]}>
               <View style={styles.brandRow}>
                 <View style={styles.logoBadge}>
-                  <AppImage
-                    source={WELMIO_LOGO}
-                    style={styles.logoImage}
-                  />
+                  <AppImage source={WELMIO_LOGO} style={styles.logoImage} />
                 </View>
-                <Text style={styles.brandName}>Welmio</Text>
+
+                <Text style={styles.brandName}>{t("common.appName")}</Text>
               </View>
             </View>
 
@@ -104,10 +143,13 @@ export default function NewPasswordScreen() {
                 <View style={styles.desktopIntroIcon}>
                   <FontAwesome name="shield" size={30} color={PRIMARY} />
                 </View>
-                <Text style={styles.desktopIntroTitle}>Set a new password</Text>
+
+                <Text style={styles.desktopIntroTitle}>
+                  {t("auth.newPasswordScreen.desktopTitle")}
+                </Text>
+
                 <Text style={styles.desktopIntroText}>
-                  Choose a strong password to protect your account and keep your
-                  financial workspace secure.
+                  {t("auth.newPasswordScreen.desktopText")}
                 </Text>
               </View>
             ) : null}
@@ -122,114 +164,146 @@ export default function NewPasswordScreen() {
 
             <View style={[styles.card, isDesktop && styles.cardDesktop]}>
               <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
-                New password
+                {t("auth.newPasswordScreen.title")}
               </Text>
+
               <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
-                Create a secure new password to recover access to your account.
+                {t("auth.newPasswordScreen.subtitle")}
               </Text>
 
               <View style={styles.form}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>New password</Text>
-              <View style={styles.inputShell}>
-                <FontAwesome
-                  name="lock"
-                  size={17}
-                  color="rgba(5, 46, 43, 0.5)"
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.textInput}
-                  placeholderTextColor="rgba(5, 46, 43, 0.42)"
-                  secureTextEntry={!showNewPassword}
-                  textContentType="newPassword"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  value={newPassword}
-                  onChangeText={setNewPassword}
-                />
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>
+                    {t("auth.newPasswordScreen.newPassword")}
+                  </Text>
+
+                  <View style={styles.inputShell}>
+                    <FontAwesome
+                      name="lock"
+                      size={17}
+                      color="rgba(5, 46, 43, 0.5)"
+                      style={styles.inputIcon}
+                    />
+
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder={t("auth.newPasswordScreen.newPasswordPlaceholder")}
+                      placeholderTextColor="rgba(5, 46, 43, 0.42)"
+                      secureTextEntry={!showNewPassword}
+                      textContentType="newPassword"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      value={newPassword}
+                      onChangeText={setNewPassword}
+                    />
+
+                    <Pressable
+                      onPress={() => setShowNewPassword((value) => !value)}
+                      hitSlop={8}
+                      style={styles.eyeButton}
+                      accessibilityLabel={
+                        showNewPassword
+                          ? t("auth.newPasswordScreen.hidePassword")
+                          : t("auth.newPasswordScreen.showPassword")
+                      }
+                    >
+                      <FontAwesome
+                        name={showNewPassword ? "eye-slash" : "eye"}
+                        size={17}
+                        color="rgba(5, 46, 43, 0.45)"
+                      />
+                    </Pressable>
+                  </View>
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>
+                    {t("auth.newPasswordScreen.confirmNewPassword")}
+                  </Text>
+
+                  <View style={styles.inputShell}>
+                    <FontAwesome
+                      name="lock"
+                      size={17}
+                      color="rgba(5, 46, 43, 0.5)"
+                      style={styles.inputIcon}
+                    />
+
+                    <TextInput
+                      style={styles.textInput}
+                      placeholder={t(
+                        "auth.newPasswordScreen.confirmNewPasswordPlaceholder",
+                      )}
+                      placeholderTextColor="rgba(5, 46, 43, 0.42)"
+                      secureTextEntry={!showConfirmPassword}
+                      textContentType="newPassword"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                    />
+
+                    <Pressable
+                      onPress={() => setShowConfirmPassword((value) => !value)}
+                      hitSlop={8}
+                      style={styles.eyeButton}
+                      accessibilityLabel={
+                        showConfirmPassword
+                          ? t("auth.newPasswordScreen.hidePassword")
+                          : t("auth.newPasswordScreen.showPassword")
+                      }
+                    >
+                      <FontAwesome
+                        name={showConfirmPassword ? "eye-slash" : "eye"}
+                        size={17}
+                        color="rgba(5, 46, 43, 0.45)"
+                      />
+                    </Pressable>
+                  </View>
+                </View>
+
+                <View style={styles.actionButtons}>
+                  <Pressable
+                    onPress={handleChangePassword}
+                    disabled={loading}
+                    style={({ pressed }) => [
+                      styles.primaryButton,
+                      pressed && !loading ? styles.buttonPressed : null,
+                      loading ? styles.buttonDisabled : null,
+                    ]}
+                  >
+                    <Text style={styles.primaryButtonText}>
+                      {loading
+                        ? t("auth.newPasswordScreen.updating")
+                        : t("auth.newPasswordScreen.changePassword")}
+                    </Text>
+                  </Pressable>
+                </View>
+
                 <Pressable
-                  onPress={() => setShowNewPassword((value) => !value)}
-                  hitSlop={8}
-                  style={styles.eyeButton}
+                  onPress={() => router.push("/(public)/login")}
+                  style={({ pressed }) => [
+                    styles.ghostButton,
+                    pressed ? styles.buttonPressed : null,
+                  ]}
                 >
-                  <FontAwesome
-                    name={showNewPassword ? "eye-slash" : "eye"}
-                    size={17}
-                    color="rgba(5, 46, 43, 0.45)"
-                  />
+                  <Text style={styles.ghostButtonText}>
+                    {t("auth.newPasswordScreen.backToLogin")}
+                  </Text>
                 </Pressable>
+
+                <Link href="/(public)/signup" style={styles.footer}>
+                  <Text>
+                    {t("auth.newPasswordScreen.noAccount")}{" "}
+                    <Text style={styles.link}>
+                      {t("auth.newPasswordScreen.signUp")}
+                    </Text>
+                  </Text>
+                </Link>
               </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Confirm new password</Text>
-              <View style={styles.inputShell}>
-                <FontAwesome
-                  name="lock"
-                  size={17}
-                  color="rgba(5, 46, 43, 0.5)"
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.textInput}
-                  placeholderTextColor="rgba(5, 46, 43, 0.42)"
-                  secureTextEntry={!showConfirmPassword}
-                  textContentType="newPassword"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                />
-                <Pressable
-                  onPress={() => setShowConfirmPassword((value) => !value)}
-                  hitSlop={8}
-                  style={styles.eyeButton}
-                >
-                  <FontAwesome
-                    name={showConfirmPassword ? "eye-slash" : "eye"}
-                    size={17}
-                    color="rgba(5, 46, 43, 0.45)"
-                  />
-                </Pressable>
-              </View>
-            </View>
-
-            <View style={styles.actionButtons}>
-              <Pressable
-                onPress={handleChangePassword}
-                disabled={loading}
-                style={({ pressed }) => [
-                  styles.primaryButton,
-                  pressed && !loading ? styles.buttonPressed : null,
-                  loading ? styles.buttonDisabled : null,
-                ]}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {loading ? "Updating..." : "Change password"}
-                </Text>
-              </Pressable>
-            </View>
-
-            <Pressable
-              onPress={() => router.push("/(public)/login")}
-              style={({ pressed }) => [
-                styles.ghostButton,
-                pressed ? styles.buttonPressed : null,
-              ]}
-            >
-              <Text style={styles.ghostButtonText}>Back to Log In</Text>
-            </Pressable>
-
-              <Link href="/(public)/signup" style={styles.footer}>
-                <Text>
-                  Don’t have an account? <Text style={styles.link}>Sign Up</Text>
-                </Text>
-              </Link>
             </View>
           </View>
         </View>
-      </View>
       </ScrollView>
 
       {!isDesktop ? (
@@ -244,6 +318,13 @@ export default function NewPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: GREEN,
+  },
+
   screen: {
     flex: 1,
     backgroundColor: GREEN,

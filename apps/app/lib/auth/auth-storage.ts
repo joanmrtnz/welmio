@@ -9,7 +9,7 @@ type AuthTokens = {
   refreshToken: string;
 };
 
-async function setItem(key: string, value: string) {
+export async function setStorageItem(key: string, value: string) {
   if (Platform.OS === "web") {
     localStorage.setItem(key, value);
     return;
@@ -18,7 +18,7 @@ async function setItem(key: string, value: string) {
   await SecureStore.setItemAsync(key, value);
 }
 
-async function getItem(key: string) {
+export async function getStorageItem(key: string) {
   if (Platform.OS === "web") {
     return localStorage.getItem(key);
   }
@@ -26,7 +26,7 @@ async function getItem(key: string) {
   return SecureStore.getItemAsync(key);
 }
 
-async function deleteItem(key: string) {
+export async function deleteStorageItem(key: string) {
   if (Platform.OS === "web") {
     localStorage.removeItem(key);
     return;
@@ -36,19 +36,19 @@ async function deleteItem(key: string) {
 }
 
 export async function setAccessToken(accessToken: string) {
-  await setItem(ACCESS_TOKEN_KEY, accessToken);
+  await setStorageItem(ACCESS_TOKEN_KEY, accessToken);
 }
 
 export async function getAccessToken() {
-  return getItem(ACCESS_TOKEN_KEY);
+  return getStorageItem(ACCESS_TOKEN_KEY);
 }
 
 export async function setRefreshToken(refreshToken: string) {
-  await setItem(REFRESH_TOKEN_KEY, refreshToken);
+  await setStorageItem(REFRESH_TOKEN_KEY, refreshToken);
 }
 
 export async function getRefreshToken() {
-  return getItem(REFRESH_TOKEN_KEY);
+  return getStorageItem(REFRESH_TOKEN_KEY);
 }
 
 export async function setAuthTokens(tokens: AuthTokens) {
@@ -60,7 +60,7 @@ export async function setAuthTokens(tokens: AuthTokens) {
 
 export async function clearAuthTokens() {
   await Promise.all([
-    deleteItem(ACCESS_TOKEN_KEY),
-    deleteItem(REFRESH_TOKEN_KEY),
+    deleteStorageItem(ACCESS_TOKEN_KEY),
+    deleteStorageItem(REFRESH_TOKEN_KEY),
   ]);
 }

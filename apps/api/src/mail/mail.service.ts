@@ -66,16 +66,17 @@ export class MailService {
     token: string,
     templateType: VerificationEmailTemplateType,
   ) {
-    const appUrl = process.env.APP_URL + "/auth";
+    const appUrl = process.env.APP_URL;
 
     if (!appUrl) {
       throw new Error('APP_URL is not configured');
     }
 
+    const authUrl = `${appUrl}/auth`;
     const verificationPath =
       templateType === 'email_change' ? 'verify-email-change' : 'verify-email';
 
-    return `${appUrl}/${verificationPath}?token=${token}`;
+    return `${authUrl}/${verificationPath}?token=${token}`;
   }
 
   private getVerificationEmailTemplate({

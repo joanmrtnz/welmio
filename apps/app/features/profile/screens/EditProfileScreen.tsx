@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
+import { t } from "@/lib/i18n";
 import { getUserProfile, updateUserProfile } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { router } from "expo-router";
@@ -75,13 +76,13 @@ export default function EditProfileScreen() {
 
       feedback.success(
         hasEmailChanged
-          ? "Profile updated. Check your new email to verify the change"
-          : "Profile updated successfully"
+          ? t("profile.edit.feedback.updateSuccessEmailChanged")
+          : t("profile.edit.feedback.updateSuccess")
       );
       router.push("/profile");
     } catch (error) {
       console.warn(error);
-      feedback.error("Error updating profile");
+      feedback.error(t("profile.edit.feedback.updateError"));
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +104,7 @@ export default function EditProfileScreen() {
         setAvatarColor(user.avatarColor ?? GREEN);
         setAvatarId(getAvatarId(user.avatarIcon));
       } catch (error) {
-        console.error("Error loading user profile", error);
+        console.error(t("profile.edit.feedback.loadError"), error);
       } finally {
         setIsLoading(false);
       }
@@ -162,7 +163,7 @@ export default function EditProfileScreen() {
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <AppScreenHeader title="Edit My Profile" />
+      <AppScreenHeader title={t("profile.edit.title")} />
 
       <ScrollView
         contentContainerStyle={[
@@ -211,7 +212,7 @@ export default function EditProfileScreen() {
             </View>
 
             <View style={styles.nameContainer}>
-              <Text style={styles.name}>{usernameLabel || "User"}</Text>
+              <Text style={styles.name}>{usernameLabel || t("profile.edit.defaultUser")}</Text>
               <Text style={styles.userId}>{email ? email : "-"}</Text>
             </View>
           </View>
@@ -230,9 +231,9 @@ export default function EditProfileScreen() {
             >
               <View style={styles.form}>
                 {renderField({
-                  label: "Username",
+                  label: t("profile.edit.fields.username"),
                   icon: "user",
-                  placeholder: "John Smith",
+                  placeholder: t("profile.edit.placeholders.username"),
                   autoCapitalize: "words",
                   textContentType: "name",
                   value: username,
@@ -240,9 +241,9 @@ export default function EditProfileScreen() {
                 })}
 
                 {renderField({
-                  label: "Phone",
+                  label: t("profile.edit.fields.phone"),
                   icon: "phone",
-                  placeholder: "+44 555 5555",
+                  placeholder: t("profile.edit.placeholders.phone"),
                   keyboardType: "phone-pad",
                   textContentType: "telephoneNumber",
                   value: phone,
@@ -250,9 +251,9 @@ export default function EditProfileScreen() {
                 })}
 
                 {renderField({
-                  label: "Email Address",
+                  label: t("profile.edit.fields.email"),
                   icon: "mail",
-                  placeholder: "example@example.com",
+                  placeholder: t("profile.edit.placeholders.email"),
                   autoCapitalize: "none",
                   keyboardType: "email-address",
                   textContentType: "emailAddress",
@@ -272,7 +273,7 @@ export default function EditProfileScreen() {
                   disabled={isLoading}
                 >
                   <Text style={styles.updateButtonText}>
-                    {isLoading ? "Updating..." : "Update Profile"}
+                    {isLoading ? t("profile.edit.actions.updating") : t("profile.edit.actions.updateProfile")}
                   </Text>
                 </Pressable>
 

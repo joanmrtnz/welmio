@@ -11,13 +11,14 @@ import { fonts } from "@/theme/fonts";
 import { ProfileOption } from "../components/ProfileOption";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { clearAuthTokens, getRefreshToken } from "@/lib/auth-storage";
+import { clearAuthTokens, getRefreshToken } from "@/lib/auth/auth-storage";
 import { logout } from "@/lib/api/auth";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { AVATAR_IMAGES, type AvatarId } from "../components/AvatarPickerModal";
 import { AppImage } from "@/components/images/AppImage";
+import { t } from "@/lib/i18n";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -31,6 +32,8 @@ const GRID = "rgba(6, 59, 58, 0.09)";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
+const APP_VERSION = process.env.EXPO_PUBLIC_APP_VERSION?.trim() || "pre";
+
 
 function getAvatarId(value?: string | null): AvatarId {
   return value && value in AVATAR_IMAGES ? (value as AvatarId) : "avatar-0";
@@ -68,7 +71,7 @@ export default function ProfileScreen() {
       loadUserProfile();
     }, [loadUserProfile])
   );
-  
+
   function handleOpenLogoutDialog() {
     setShowLogoutDialog(true);
   }
@@ -100,7 +103,7 @@ export default function ProfileScreen() {
       router.replace("/login");
     } catch (error) {
       console.warn(error);
-      feedback.error("Error ending session");
+      feedback.error(t("profile.feedback.logoutError"));
     } finally {
       setIsLoggingOut(false);
     }
@@ -108,7 +111,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.screen}>
-      <AppScreenHeader title="Profile" />
+      <AppScreenHeader title={t("profile.title")} />
 
       <ScrollView
         contentContainerStyle={[
@@ -133,7 +136,9 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.nameContainer}>
-              <Text style={styles.name}>{fullName || "User"}</Text>
+              <Text style={styles.name}>
+                {fullName || t("profile.defaultUser")}
+              </Text>
               <Text style={styles.userId}>{email ? email : "-"}</Text>
             </View>
           </View>
@@ -143,7 +148,7 @@ export default function ProfileScreen() {
           >
             <ProfileOption
               icon="user"
-              label="Edit Profile"
+              label={t("profile.options.editProfile")}
               onPress={() => router.push("/profile/edit")}
             />
             {/* <View style={styles.divider} />
@@ -155,26 +160,36 @@ export default function ProfileScreen() {
             <View style={styles.divider} />
             <ProfileOption
               icon="settings"
-              label="Settings"
+              label={t("profile.options.settings")}
               onPress={() => router.push("/profile/settings")}
             />
             <View style={styles.divider} />
             <ProfileOption
+              icon="language"
+              label={t("profile.options.language")}
+              onPress={() => router.push("/profile/language")}
+            />
+            <View style={styles.divider} />
+            <ProfileOption
               icon="logout"
-              label="Logout"
+              label={t("profile.options.logout")}
               onPress={handleOpenLogoutDialog}
             />
+             <View style={styles.divider} />
+              <View style={styles.versionContainer}>
+                <Text style={styles.versionText}>{APP_VERSION}</Text>
+              </View>
           </View>
         </View>
       </ScrollView>
 
       <ConfirmDialog
         visible={showLogoutDialog}
-        title="End Session"
-        message="Are you sure you want to log out?"
-        confirmLabel="Yes, End Session"
-        cancelLabel="Cancel"
-        loadingLabel="Ending..."
+        title={t("profile.logoutDialog.title")}
+        message={t("profile.logoutDialog.message")}
+        confirmLabel={t("profile.logoutDialog.confirmLabel")}
+        cancelLabel={t("profile.logoutDialog.cancelLabel")}
+        loadingLabel={t("profile.logoutDialog.loadingLabel")}
         destructive={true}
         isLoading={isLoggingOut}
         onConfirm={handleConfirmLogout}
@@ -326,5 +341,19 @@ const styles = StyleSheet.create({
     height: 1,
     marginLeft: 60,
     backgroundColor: GRID,
+  },
+
+ versionContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 14,
+  },
+
+  versionText: {
+    color: MUTED,
+    fontSize: 12,
+    fontWeight: "500",
+    letterSpacing: 0.2,
   },
 });

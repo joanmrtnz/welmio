@@ -1,6 +1,14 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
@@ -22,7 +30,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.screen}>
-      <AppScreenHeader title="Settings" />
+      <AppScreenHeader title={t("profile.settings.title")} />
 
       <View style={[styles.card, isDesktop && styles.cardDesktop]}>
         <ScrollView
@@ -33,29 +41,44 @@ export default function SettingsScreen() {
           ]}
         >
           <View style={isDesktop && styles.desktopHeaderBlock}>
-            <Text style={[styles.sectionTitle, isDesktop && styles.sectionTitleDesktop]}>
-              Account Settings
+            <Text
+              style={[
+                styles.sectionTitle,
+                isDesktop && styles.sectionTitleDesktop,
+              ]}
+            >
+              {t("profile.settings.sectionTitle")}
             </Text>
+
             {isDesktop ? (
               <Text style={styles.sectionDescriptionDesktop}>
-                Manage your account access, security, and profile lifecycle.
+                {t("profile.settings.sectionDescription")}
               </Text>
             ) : null}
           </View>
 
-          <View style={[styles.optionsContainer, isDesktop && styles.optionsContainerDesktop]}>
+          <View
+            style={[
+              styles.optionsContainer,
+              isDesktop && styles.optionsContainerDesktop,
+            ]}
+          >
             <SettingsOption
               icon="key"
-              label="Change Password"
-              description="Update your account password"
+              label={t("profile.settings.options.changePassword.label")}
+              description={t(
+                "profile.settings.options.changePassword.description",
+              )}
               onPress={() => router.push("/profile/change-password")}
               isDesktop={isDesktop}
             />
 
             <SettingsOption
               icon="user"
-              label="Delete Account"
-              description="Permanently remove your profile"
+              label={t("profile.settings.options.deleteAccount.label")}
+              description={t(
+                "profile.settings.options.deleteAccount.description",
+              )}
               danger
               onPress={() => router.push("/profile/delete-account")}
               isDesktop={isDesktop}
@@ -93,16 +116,33 @@ function SettingsOption({
   isDesktop,
 }: SettingsOptionProps) {
   return (
-    <Pressable style={[styles.optionRow, isDesktop && styles.optionRowDesktop]} onPress={onPress}>
+    <Pressable
+      style={[styles.optionRow, isDesktop && styles.optionRowDesktop]}
+      onPress={onPress}
+    >
       <View style={styles.optionLeft}>
         <View style={[styles.optionIcon, danger && styles.optionIconDanger]}>
-          <Icon name={icon} size={21} color={danger ? "#d64b42" : MINT_STRONG} />
+          <Icon
+            name={icon}
+            size={21}
+            color={danger ? "#d64b42" : MINT_STRONG}
+          />
         </View>
 
         <View style={styles.optionTextWrap}>
-          <Text style={[styles.optionLabel, isDesktop && styles.optionLabelDesktop]}>{label}</Text>
+          <Text
+            style={[styles.optionLabel, isDesktop && styles.optionLabelDesktop]}
+          >
+            {label}
+          </Text>
+
           {description ? (
-            <Text style={[styles.optionDescription, isDesktop && styles.optionDescriptionDesktop]}>
+            <Text
+              style={[
+                styles.optionDescription,
+                isDesktop && styles.optionDescriptionDesktop,
+              ]}
+            >
               {description}
             </Text>
           ) : null}
@@ -195,7 +235,7 @@ const styles = StyleSheet.create({
 
   optionsContainerDesktop: {
     marginTop: 20,
-    gap:20,
+    gap: 20,
   },
 
   optionRow: {

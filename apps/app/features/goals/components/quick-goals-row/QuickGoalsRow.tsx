@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 import { Icon } from "@/components/icons/Icon";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import type { GoalOverviewItem } from "@repo/shared-types";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -41,6 +42,8 @@ function GoalPreviewCard({
   desktopCardWidth?: number;
 }) {
   const progress = Math.min(Number(goal.progress) || 0, 100);
+  const savedAmount = formatCurrency(goal.saved);
+  const targetAmount = formatCurrency(goal.target);
 
   return (
     <Pressable
@@ -66,8 +69,10 @@ function GoalPreviewCard({
         </Text>
 
         <Text style={styles.goalMeta} numberOfLines={1} ellipsizeMode="tail">
-          {formatCurrency(goal.saved)} of{" "}
-          {formatCurrency(goal.target)}
+          {t("goals.quickGoals.savedOf", {
+            saved: savedAmount,
+            target: targetAmount,
+          })}
         </Text>
 
         <View style={styles.progressRow}>
@@ -96,7 +101,8 @@ export function QuickGoalsRow({
   const isDesktop = width >= DESKTOP_BREAKPOINT;
   const [desktopRowWidth, setDesktopRowWidth] = useState(0);
   const desktopGoals = goals.slice(0, 4);
-  const desktopCardWidth = desktopRowWidth > 0 ? (desktopRowWidth - 12) / 2 : undefined;
+  const desktopCardWidth =
+    desktopRowWidth > 0 ? (desktopRowWidth - 12) / 2 : undefined;
 
   if (goals.length === 0) {
     return (
@@ -109,10 +115,12 @@ export function QuickGoalsRow({
         </View>
 
         <View style={styles.goalContent}>
-          <Text style={styles.goalTitle}>No goals yet</Text>
+          <Text style={styles.goalTitle}>
+            {t("goals.quickGoals.emptyTitle")}
+          </Text>
+
           <Text style={styles.goalMeta} numberOfLines={2}>
-            {errorMessage ??
-              "Create your first goal to start tracking progress."}
+            {errorMessage ?? t("goals.quickGoals.emptyDescription")}
           </Text>
         </View>
       </Pressable>

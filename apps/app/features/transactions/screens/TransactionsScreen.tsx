@@ -27,6 +27,7 @@ import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { t } from "@/lib/i18n";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -62,10 +63,10 @@ export default function TransactionScreen() {
   async function handleDeleteTransaction(transactionId: string) {
     try {
       await deleteTransaction(transactionId);
-      feedback.success("Transaction deleted successfully");
+      feedback.success(t("transactions.feedback.deleteSuccess"));
     } catch (error) {
       console.warn(error);
-      feedback.error("Error deleting transaction");
+      feedback.error(t("transactions.feedback.deleteError"));
     }
   }
 
@@ -122,7 +123,7 @@ export default function TransactionScreen() {
 
   return (
     <View style={styles.screen}>
-      <AppScreenHeader title="Transactions" />
+      <AppScreenHeader title={t("transactions.title")} />
 
       <ScrollView
         contentContainerStyle={[
@@ -132,7 +133,7 @@ export default function TransactionScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={[styles.balanceCard, isDesktop && styles.balanceCardDesktop]}>
-          <Text style={styles.balanceCardLabel}>Total Balance</Text>
+          <Text style={styles.balanceCardLabel}>{t("transactions.totalBalance")}</Text>
           <Text style={styles.balanceCardTitle}>
             {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
           </Text>
@@ -167,7 +168,7 @@ export default function TransactionScreen() {
                 totalsFilter === "income" && styles.labelActive,
               ]}
             >
-              Income
+              {t("transactions.income")}
             </Text>
             <Text
               style={[
@@ -209,7 +210,7 @@ export default function TransactionScreen() {
                 totalsFilter === "expense" && styles.labelActive,
               ]}
             >
-              Expense
+              {t("transactions.expense")}
             </Text>
             <Text
               style={[
@@ -224,7 +225,7 @@ export default function TransactionScreen() {
 
         <View style={[styles.cardWrapper, isDesktop && styles.cardWrapperDesktop]}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardHeaderTitle}>Transactions</Text>
+            <Text style={styles.cardHeaderTitle}>{t("transactions.title")}</Text>
 
             <View style={styles.listHeaderActions}>
               <Pressable
