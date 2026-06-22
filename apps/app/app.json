@@ -43,7 +43,16 @@
           "backgroundColor": "#c9f3df"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": ["en", "es", "ca"],
+            "android": ["en", "es", "ca"]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

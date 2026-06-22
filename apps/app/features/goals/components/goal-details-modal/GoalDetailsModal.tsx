@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Icon } from "@/components/icons/Icon";
+import i18n, { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { GoalContributionItem, GoalOverviewItem } from "@repo/shared-types";
 import { useCallback, useEffect, useState } from "react";
@@ -39,13 +40,41 @@ type GoalDetailsModalProps = {
 };
 
 function formatDate(date?: string | null) {
-  if (!date) return "No deadline";
+  if (!date) return t("goals.details.noDeadline");
 
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat(i18n.locale || "en", {
     month: "short",
     day: "2-digit",
     year: "numeric",
   }).format(new Date(date));
+}
+
+function translateGoalStatusLabel(statusLabel?: string | null) {
+  if (!statusLabel) return t("goals.statusLabels.active");
+
+  const statusKey = statusLabel.trim().toLowerCase().replace(/\s+/g, "_");
+  const translationKey = `goals.statusLabels.${statusKey}`;
+  const translated = t(translationKey);
+
+  if (typeof translated === "string" && !translated.startsWith("[missing")) {
+    return translated;
+  }
+
+  return statusLabel;
+}
+
+function translateGoalType(type?: string | null) {
+  if (!type) return t("goals.details.goalTypes.other");
+
+  const typeKey = type.trim().toLowerCase();
+  const translationKey = `goals.details.goalTypes.${typeKey}`;
+  const translated = t(translationKey);
+
+  if (typeof translated === "string" && !translated.startsWith("[missing")) {
+    return translated;
+  }
+
+  return type.replace(/_/g, " ");
 }
 
 export function GoalDetailsModal({
@@ -176,7 +205,7 @@ export function GoalDetailsModal({
       setContributions(response);
     } catch (error) {
       console.warn("[GoalDetailsModal] load contributions error:", error);
-      setContributionsError("Could not load contributions.");
+      setContributionsError(t("goals.details.contributions.loadError"));
     } finally {
       setIsLoadingContributions(false);
     }
@@ -199,13 +228,14 @@ export function GoalDetailsModal({
   const contributionsCount = goal.contributionsCount ?? 0;
   const deleteMessage =
     contributionsCount > 0
-      ? `Are you sure you want to delete this goal?
-  This will also delete ${contributionsCount} contribution${
-    contributionsCount === 1 ? "" : "s"
-  } linked to this goal.
-  This action cannot be undone.`
-      : `Are you sure you want to delete this goal?
-  This action cannot be undone.`;
+      ? t("goals.details.deleteDialog.messageWithContributions", {
+          count: contributionsCount,
+          contributionLabel:
+            contributionsCount === 1
+              ? t("goals.details.contributionSingular")
+              : t("goals.details.contributionPlural"),
+        })
+      : t("goals.details.deleteDialog.message");
 
   return (
     <Modal
@@ -221,7 +251,7 @@ export function GoalDetailsModal({
           <View style={styles.handle} />
 
           <View style={styles.header}>
-            <Text style={styles.title}>Goal Details</Text>
+            <Text style={styles.title}>{t("goals.details.title")}</Text>
 
             <View style={styles.headerActions}>
               <Pressable style={styles.iconButton} onPress={handleEditGoal}>
@@ -273,18 +303,17 @@ export function GoalDetailsModal({
                 </View>
 
                 <View style={styles.heroInfo}>
-                  <Text style={styles.heroLabel}>{goal.statusLabel}</Text>
+                  <Text style={styles.heroLabel}>{translateGoalStatusLabel(goal.statusLabel)}</Text>
                   <Text style={styles.heroTitle}>{goal.name}</Text>
                   <Text style={styles.heroMeta}>
-                    {goal.type.replace("_", " ")} ·{" "}
-                    {formatDate(goal.targetDate)}
+                    {translateGoalType(goal.type)} · {formatDate(goal.targetDate)}
                   </Text>
                 </View>
               </View>
 
               <View style={styles.progressCircle}>
                 <Text style={styles.progressValue}>{progress}%</Text>
-                <Text style={styles.progressLabel}>completed</Text>
+                <Text style={styles.progressLabel}>{t("goals.details.completed")}</Text>
               </View>
 
               <View style={styles.mainProgressBar}>
@@ -301,7 +330,7 @@ export function GoalDetailsModal({
 
             <View style={styles.amountsCard}>
               <View style={styles.amountItem}>
-                <Text style={styles.amountLabel}>Saved</Text>
+                <Text style={styles.amountLabel}>{t("goals.details.saved")}</Text>
                 <Text style={styles.amountValue}>
                   {formatCurrency(goal.saved)}
                 </Text>
@@ -310,7 +339,7 @@ export function GoalDetailsModal({
               <View style={styles.amountSeparator} />
 
               <View style={styles.amountItem}>
-                <Text style={styles.amountLabel}>Target</Text>
+                <Text style={styles.amountLabel}>{t("goals.details.target")}</Text>
                 <Text style={styles.amountValue}>
                   {formatCurrency(goal.target)}
                 </Text>
@@ -328,7 +357,7 @@ export function GoalDetailsModal({
                   />
                 </View>
 
-                <Text style={styles.statLabel}>Remaining</Text>
+                <Text style={styles.statLabel}>{t("goals.details.remaining")}</Text>
                 <Text style={styles.statValue}>
                   {formatCurrency(remainingAmount)}
                 </Text>
@@ -344,7 +373,7 @@ export function GoalDetailsModal({
                   />
                 </View>
 
-                <Text style={styles.statLabel}>Monthly needed</Text>
+                <Text style={styles.statLabel}>{t("goals.details.monthlyNeeded")}</Text>
                 <Text style={styles.statValue}>
                   {formatCurrency(goal.monthlyNeeded)}
                 </Text>
@@ -360,22 +389,19 @@ export function GoalDetailsModal({
                 ]}
               >
                 <View style={styles.infoCard}>
-              <Text style={styles.sectionTitle}>Progress insight</Text>
+              <Text style={styles.sectionTitle}>{t("goals.details.progressInsight")}</Text>
 
               <Text style={styles.infoText}>
-                You have saved {formatCurrency(goal.saved)} of{" "}
-                {formatCurrency(goal.target)}. To reach this goal
-                on time, you need around{" "}
-                {formatCurrency(goal.monthlyNeeded)} per month.
+                {t("goals.details.progressInsightText", { saved: formatCurrency(goal.saved), target: formatCurrency(goal.target), monthlyNeeded: formatCurrency(goal.monthlyNeeded) })}
               </Text>
             </View>
 
                 <View style={styles.mockHistoryCard}>
               <View style={styles.sectionHeader}>
                 <View>
-                  <Text style={styles.sectionTitle}>Recent contributions</Text>
+                  <Text style={styles.sectionTitle}>{t("goals.details.contributions.title")}</Text>
                   <Text style={styles.sectionSubtitle}>
-                    Latest money added to this goal
+                    {t("goals.details.contributions.subtitle")}
                   </Text>
                 </View>
 
@@ -389,7 +415,7 @@ export function GoalDetailsModal({
 
               {isLoadingContributions ? (
                 <Text style={styles.emptyContributionsText}>
-                  Loading contributions...
+                  {t("goals.details.contributions.loading")}
                 </Text>
               ) : contributionsError ? (
                 <Text style={styles.errorContributionsText}>
@@ -397,8 +423,7 @@ export function GoalDetailsModal({
                 </Text>
               ) : contributions.length === 0 ? (
                 <Text style={styles.emptyContributionsText}>
-                  No contributions yet. Add your first one to start tracking
-                  this goal.
+                  {t("goals.details.contributions.empty")}
                 </Text>
               ) : (
                 contributions.map((contribution) => (
@@ -416,7 +441,7 @@ export function GoalDetailsModal({
                       <Text style={styles.historyTitle} numberOfLines={1}>
                         {contribution.description ||
                           contribution.notes ||
-                          "Goal contribution"}
+                          t("goals.details.contributions.defaultTitle")}
                       </Text>
 
                       <Text style={styles.historyDate}>
@@ -462,7 +487,7 @@ export function GoalDetailsModal({
                 onEdit?.(goal);
               }}
             >
-              <Text style={styles.secondaryButtonText}>Edit goal</Text>
+              <Text style={styles.secondaryButtonText}>{t("goals.details.editGoal")}</Text>
             </Pressable>
 
              <Pressable
@@ -476,18 +501,18 @@ export function GoalDetailsModal({
                 strokeWidth={2}
                 color={RED}
               />
-              <Text style={styles.deleteButtonText}>Delete</Text>
+              <Text style={styles.deleteButtonText}>{t("goals.details.delete")}</Text>
             </Pressable>
           </View>
         </View>
       </View>
       <ConfirmDialog
         visible={showDeleteDialog}
-        title="Delete Goal"
+        title={t("goals.details.deleteDialog.title")}
         message={deleteMessage}
-        confirmLabel="Yes, Delete"
-        cancelLabel="Cancel"
-        loadingLabel="Deleting..."
+        confirmLabel={t("goals.details.deleteDialog.confirmLabel")}
+        cancelLabel={t("goals.details.deleteDialog.cancelLabel")}
+        loadingLabel={t("goals.details.deleteDialog.loadingLabel")}
         destructive
         isLoading={isDeleting}
         onConfirm={handleConfirmDeleteGoal}
@@ -496,12 +521,11 @@ export function GoalDetailsModal({
 
       <ConfirmDialog
         visible={showDeleteContributionDialog}
-        title="Delete Contribution"
-        message={`Are you sure you want to delete this contribution?
-      This will remove it from the goal progress, but the linked transaction will not be deleted.`}
-        confirmLabel="Yes, Delete"
-        cancelLabel="Cancel"
-        loadingLabel="Deleting..."
+        title={t("goals.details.deleteContributionDialog.title")}
+        message={t("goals.details.deleteContributionDialog.message")}
+        confirmLabel={t("goals.details.deleteContributionDialog.confirmLabel")}
+        cancelLabel={t("goals.details.deleteContributionDialog.cancelLabel")}
+        loadingLabel={t("goals.details.deleteContributionDialog.loadingLabel")}
         destructive
         isLoading={isDeletingContribution}
         onConfirm={handleConfirmDeleteContribution}

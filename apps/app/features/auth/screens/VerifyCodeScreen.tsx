@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -14,6 +13,7 @@ import {
 import { Link, router, useLocalSearchParams } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { useValidateResetPasswordCode } from "@/features/auth/hooks/useValidateResetPasswordCode";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
@@ -28,7 +28,6 @@ const DARK = "#052e2b";
 const MUTED = "#6f8586";
 const CARD = "#ffffff";
 const SOFT_GREEN = "#e3f8f1";
-const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 export default function VerifyCodeScreen() {
   const { width } = useWindowDimensions();
@@ -43,12 +42,12 @@ export default function VerifyCodeScreen() {
   async function handleAccept() {
     try {
       if (!email) {
-        console.warn("Email is missing");
+        console.warn(t("auth.verifyCodeScreen.errors.emailMissing"));
         return;
       }
 
       if (!code.trim()) {
-        console.warn("Recovery code is required");
+        console.warn(t("auth.verifyCodeScreen.errors.codeRequired"));
         return;
       }
 
@@ -71,7 +70,7 @@ export default function VerifyCodeScreen() {
   async function handleSendAgain() {
     try {
       if (!email) {
-        console.warn("Email is missing");
+        console.warn(t("auth.verifyCodeScreen.errors.emailMissing"));
         return;
       }
 
@@ -102,12 +101,10 @@ export default function VerifyCodeScreen() {
           >
             <View style={styles.brandRow}>
               <View style={styles.logoBadge}>
-                <AppImage
-                  source={WELMIO_LOGO}
-                  style={styles.logoImage}
-                />
+                <AppImage source={WELMIO_LOGO} style={styles.logoImage} />
               </View>
-              <Text style={styles.brandName}>Welmio</Text>
+
+              <Text style={styles.brandName}>{t("common.appName")}</Text>
             </View>
 
             {isDesktop ? (
@@ -115,12 +112,13 @@ export default function VerifyCodeScreen() {
                 <View style={styles.desktopIntroIcon}>
                   <FontAwesome name="lock" size={30} color={PRIMARY} />
                 </View>
+
                 <Text style={styles.desktopIntroTitle}>
-                  Confirm your recovery code
+                  {t("auth.verifyCodeScreen.desktopTitle")}
                 </Text>
+
                 <Text style={styles.desktopIntroText}>
-                  Enter the verification code from your email to keep your
-                  password reset secure.
+                  {t("auth.verifyCodeScreen.desktopText")}
                 </Text>
               </View>
             ) : null}
@@ -139,17 +137,21 @@ export default function VerifyCodeScreen() {
 
             <View style={[styles.card, isDesktop && styles.cardDesktop]}>
               <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
-                Verify code
+                {t("auth.verifyCodeScreen.title")}
               </Text>
+
               <Text
                 style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}
               >
-                Enter the recovery code we sent to your email to continue.
+                {t("auth.verifyCodeScreen.subtitle")}
               </Text>
 
               <View style={styles.form}>
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Recovery code</Text>
+                  <Text style={styles.inputLabel}>
+                    {t("auth.verifyCodeScreen.recoveryCode")}
+                  </Text>
+
                   <View style={styles.inputShell}>
                     <FontAwesome
                       name="key"
@@ -157,9 +159,10 @@ export default function VerifyCodeScreen() {
                       color="rgba(5, 46, 43, 0.5)"
                       style={styles.inputIcon}
                     />
+
                     <TextInput
                       style={styles.textInput}
-                      placeholder="Enter your code"
+                      placeholder={t("auth.verifyCodeScreen.codePlaceholder")}
                       placeholderTextColor="rgba(5, 46, 43, 0.42)"
                       keyboardType="number-pad"
                       textContentType="oneTimeCode"
@@ -182,7 +185,9 @@ export default function VerifyCodeScreen() {
                     ]}
                   >
                     <Text style={styles.primaryButtonText}>
-                      {loading ? "Checking..." : "Accept"}
+                      {loading
+                        ? t("auth.verifyCodeScreen.checking")
+                        : t("auth.verifyCodeScreen.accept")}
                     </Text>
                   </Pressable>
 
@@ -196,7 +201,9 @@ export default function VerifyCodeScreen() {
                     ]}
                   >
                     <Text style={styles.secondaryButtonText}>
-                      {resendLoading ? "Sending..." : "Send again"}
+                      {resendLoading
+                        ? t("auth.verifyCodeScreen.sending")
+                        : t("auth.verifyCodeScreen.sendAgain")}
                     </Text>
                   </Pressable>
                 </View>
@@ -208,13 +215,17 @@ export default function VerifyCodeScreen() {
                     pressed ? styles.buttonPressed : null,
                   ]}
                 >
-                  <Text style={styles.ghostButtonText}>Back to Log In</Text>
+                  <Text style={styles.ghostButtonText}>
+                    {t("auth.verifyCodeScreen.backToLogin")}
+                  </Text>
                 </Pressable>
 
                 <Link href="/(public)/signup" style={styles.footer}>
                   <Text>
-                    Don’t have an account?{" "}
-                    <Text style={styles.link}>Sign Up</Text>
+                    {t("auth.verifyCodeScreen.noAccount")}{" "}
+                    <Text style={styles.link}>
+                      {t("auth.verifyCodeScreen.signUp")}
+                    </Text>
                   </Text>
                 </Link>
               </View>
@@ -233,6 +244,7 @@ export default function VerifyCodeScreen() {
     </KeyboardAvoidingView>
   );
 }
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,

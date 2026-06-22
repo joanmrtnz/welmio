@@ -1,10 +1,17 @@
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
-import { router } from "expo-router";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { router, type Href } from "expo-router";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 
 type AppScreenHeaderProps = {
   title: string;
+  backHref?: Href;
 };
 
 const BLACK = "#082f33";
@@ -12,15 +19,29 @@ const LIGHT_GREEN = "#f8fffc";
 const DESKTOP_CONTENT_WIDTH = 1040;
 const DESKTOP_BREAKPOINT = 768;
 
-export function AppScreenHeader({ title }: AppScreenHeaderProps) {
+export function AppScreenHeader({ title, backHref }: AppScreenHeaderProps) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
+
+  function handleBackPress() {
+    if (backHref) {
+      router.replace(backHref);
+      return;
+    }
+
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace("/");
+  }
 
   return (
     <View style={[styles.headerArea, isDesktop && styles.headerAreaDesktop]}>
       <Pressable
         hitSlop={12}
-        onPress={() => router.back()}
+        onPress={handleBackPress}
         style={[styles.backButton, isDesktop && styles.backButtonDesktop]}
       >
         <Icon name="arrowLeft" size={28} strokeWidth={1.5} color={BLACK} />

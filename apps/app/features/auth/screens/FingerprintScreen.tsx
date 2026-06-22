@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { AppImage } from "@/components/images/AppImage";
 
@@ -47,18 +48,16 @@ export default function FingerprintScreen() {
             >
               <View style={styles.brandRow}>
                 <View style={styles.logoBadge}>
-                  <AppImage
-                    source={WELMIO_LOGO}
-                    style={styles.logoImage}
-                  />
+                  <AppImage source={WELMIO_LOGO} style={styles.logoImage} />
                 </View>
+
                 <Text
                   style={[
                     styles.brandName,
                     isDesktop && styles.brandNameDesktop,
                   ]}
                 >
-                  Welmio
+                  {t("common.appName")}
                 </Text>
               </View>
             </View>
@@ -83,11 +82,11 @@ export default function FingerprintScreen() {
             {isDesktop ? (
               <View style={styles.desktopCopy}>
                 <Text style={styles.desktopTitle}>
-                  Secure access in one touch
+                  {t("auth.fingerprintScreen.desktopTitle")}
                 </Text>
+
                 <Text style={styles.desktopSubtitle}>
-                  Keep your financial dashboard protected while making sign in
-                  fast and effortless on trusted devices.
+                  {t("auth.fingerprintScreen.desktopSubtitle")}
                 </Text>
               </View>
             ) : null}
@@ -96,14 +95,13 @@ export default function FingerprintScreen() {
           <View style={styles.desktopFormColumn}>
             <View style={[styles.card, isDesktop && styles.cardDesktop]}>
               <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
-                Use Touch ID
+                {t("auth.fingerprintScreen.title")}
               </Text>
 
               <Text
                 style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}
               >
-                Unlock Welmio faster and keep your account protected with
-                biometric access.
+                {t("auth.fingerprintScreen.subtitle")}
               </Text>
 
               <View
@@ -112,11 +110,14 @@ export default function FingerprintScreen() {
                 <View style={styles.infoIcon}>
                   <FontAwesome name="lock" size={19} color={PRIMARY} />
                 </View>
+
                 <View style={styles.infoTextWrap}>
-                  <Text style={styles.infoTitle}>Secure access</Text>
+                  <Text style={styles.infoTitle}>
+                    {t("auth.fingerprintScreen.infoTitle")}
+                  </Text>
+
                   <Text style={styles.infoText}>
-                    Your fingerprint stays on this device and is never shared
-                    with Welmio.
+                    {t("auth.fingerprintScreen.infoText")}
                   </Text>
                 </View>
               </View>
@@ -143,7 +144,10 @@ export default function FingerprintScreen() {
                     size={22}
                     color="#ffffff"
                   />
-                  <Text style={styles.primaryButtonText}>Use Touch ID</Text>
+
+                  <Text style={styles.primaryButtonText}>
+                    {t("auth.fingerprintScreen.useTouchId")}
+                  </Text>
                 </Pressable>
 
                 <Pressable
@@ -157,7 +161,7 @@ export default function FingerprintScreen() {
                   ]}
                 >
                   <Text style={styles.secondaryButtonText}>
-                    Use pin code instead
+                    {t("auth.fingerprintScreen.usePinInstead")}
                   </Text>
                 </Pressable>
               </View>

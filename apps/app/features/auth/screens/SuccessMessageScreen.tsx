@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Animated, useWindowDimensions } from "react-nat
 import { useEffect, useRef } from "react";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 
 const SCREEN_BG = "#dff7ef";
@@ -32,7 +33,7 @@ export default function SuccessMessageScreen() {
     ]).start();
 
     const timeout = setTimeout(() => {
-     router.replace("/(public)/login");
+      router.replace("/(public)/login");
     }, 5000);
 
     return () => clearTimeout(timeout);
@@ -42,7 +43,11 @@ export default function SuccessMessageScreen() {
     <View style={styles.screen}>
       <LinearGradient
         pointerEvents="none"
-        colors={["rgba(255,255,255,0.82)", "rgba(223,247,239,0.96)", "rgba(255,255,255,0.72)"]}
+        colors={[
+          "rgba(255,255,255,0.82)",
+          "rgba(223,247,239,0.96)",
+          "rgba(255,255,255,0.72)",
+        ]}
         locations={[0, 0.58, 1]}
         style={StyleSheet.absoluteFill}
       />
@@ -50,10 +55,12 @@ export default function SuccessMessageScreen() {
       <View style={[styles.content, isDesktop && styles.contentDesktop]}>
         {isDesktop ? (
           <View style={styles.desktopIntro}>
-            <Text style={styles.desktopHeadline}>Your account is secure</Text>
+            <Text style={styles.desktopHeadline}>
+              {t("auth.successMessageScreen.desktopHeadline")}
+            </Text>
+
             <Text style={styles.desktopText}>
-              Your password was changed successfully. You will be redirected to
-              sign in again with your new credentials.
+              {t("auth.successMessageScreen.desktopText")}
             </Text>
           </View>
         ) : null}
@@ -73,10 +80,11 @@ export default function SuccessMessageScreen() {
           </View>
 
           <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
-            Password Changed
+            {t("auth.successMessageScreen.title")}
           </Text>
+
           <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
-            Your password has been updated successfully
+            {t("auth.successMessageScreen.subtitle")}
           </Text>
         </Animated.View>
       </View>

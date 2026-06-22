@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Icon } from "@/components/icons/Icon";
+import { t } from "@/lib/i18n";
 import type { TransactionDetailsModalProps } from "../../types/transactionDetails.types";
 import { BLACK, RED, TAB_GREEN, styles } from "./transactionDetails.styles";
 import {
@@ -82,7 +83,10 @@ export function TransactionDetailsModal({
         <View style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>Transaction details</Text>
+              <Text style={styles.title}>
+                {t("transactions.details.title")}
+              </Text>
+
               <Text style={styles.subtitle}>
                 {formatDate(transaction.date)}
               </Text>
@@ -150,7 +154,9 @@ export function TransactionDetailsModal({
 
                 <View style={styles.typeBadge}>
                   <Text style={styles.typeBadgeText}>
-                    {transaction.type.toUpperCase()}
+                    {isExpense
+                      ? t("transactions.types.expense").toUpperCase()
+                      : t("transactions.types.income").toUpperCase()}
                   </Text>
                 </View>
               </View>
@@ -168,42 +174,62 @@ export function TransactionDetailsModal({
                   ]}
                 >
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Category</Text>
+                    <Text style={styles.detailLabel}>
+                      {t("transactions.details.category")}
+                    </Text>
+
                     <Text style={styles.detailValue}>
-                      {transaction.category?.name ?? "Not set"}
+                      {transaction.category?.name ??
+                        t("transactions.details.notSet")}
                     </Text>
                   </View>
 
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Account</Text>
+                    <Text style={styles.detailLabel}>
+                      {t("transactions.details.account")}
+                    </Text>
+
                     <Text style={styles.detailValue}>
-                      {transaction.account?.name ?? "Not set"}
+                      {transaction.account?.name ??
+                        t("transactions.details.notSet")}
                     </Text>
                   </View>
 
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Currency</Text>
+                    <Text style={styles.detailLabel}>
+                      {t("transactions.details.currency")}
+                    </Text>
+
                     <Text style={styles.detailValue}>
                       {transaction.currency}
                     </Text>
                   </View>
 
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Nature</Text>
+                    <Text style={styles.detailLabel}>
+                      {t("transactions.details.nature")}
+                    </Text>
+
                     <Text style={styles.detailValue}>
                       {formatValue(transaction.transactionNature)}
                     </Text>
                   </View>
 
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Frequency</Text>
+                    <Text style={styles.detailLabel}>
+                      {t("transactions.details.frequency")}
+                    </Text>
+
                     <Text style={styles.detailValue}>
                       {formatValue(transaction.frequencyType)}
                     </Text>
                   </View>
 
                   <View style={[styles.detailRow, styles.detailRowLast]}>
-                    <Text style={styles.detailLabel}>Date</Text>
+                    <Text style={styles.detailLabel}>
+                      {t("transactions.details.date")}
+                    </Text>
+
                     <Text style={styles.detailValue}>
                       {formatDate(transaction.date)}
                     </Text>
@@ -216,9 +242,13 @@ export function TransactionDetailsModal({
                     isDesktop && styles.notesCardDesktop,
                   ]}
                 >
-                  <Text style={styles.notesLabel}>Notes</Text>
+                  <Text style={styles.notesLabel}>
+                    {t("transactions.details.notes")}
+                  </Text>
+
                   <Text style={styles.notesText}>
-                    {transaction.notes?.trim() || "No notes added."}
+                    {transaction.notes?.trim() ||
+                      t("transactions.details.noNotesAdded")}
                   </Text>
                 </View>
 
@@ -233,7 +263,10 @@ export function TransactionDetailsModal({
                       strokeWidth={1.8}
                       color={BLACK}
                     />
-                    <Text style={styles.editButtonText}>Edit</Text>
+
+                    <Text style={styles.editButtonText}>
+                      {t("transactions.details.edit")}
+                    </Text>
                   </Pressable>
 
                   <Pressable
@@ -242,7 +275,10 @@ export function TransactionDetailsModal({
                     disabled={isDeleting}
                   >
                     <Icon name="bin" size={23} strokeWidth={2} color={RED} />
-                    <Text style={styles.deleteButtonText}>Delete</Text>
+
+                    <Text style={styles.deleteButtonText}>
+                      {t("transactions.details.delete")}
+                    </Text>
                   </Pressable>
                 </View>
               </View>
@@ -251,12 +287,11 @@ export function TransactionDetailsModal({
 
           <ConfirmDialog
             visible={showDeleteDialog}
-            title="Delete Transaction"
-            message={`Are you sure you want to delete this transaction?
-            This action cannot be undone.`}
-            confirmLabel="Yes, Delete"
-            cancelLabel="Cancel"
-            loadingLabel="Deleting..."
+            title={t("transactions.details.deleteDialog.title")}
+            message={t("transactions.details.deleteDialog.message")}
+            confirmLabel={t("transactions.details.deleteDialog.confirmLabel")}
+            cancelLabel={t("transactions.details.deleteDialog.cancelLabel")}
+            loadingLabel={t("transactions.details.deleteDialog.loadingLabel")}
             destructive
             isLoading={isDeleting}
             onConfirm={handleConfirmDeleteTransaction}

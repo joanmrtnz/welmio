@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Icon } from "@/components/icons/Icon";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import {
   CreateGoalPayload,
@@ -39,24 +40,24 @@ type CreateGoalModalProps = {
 };
 
 const goalTypes = [
-  { label: "Savings", value: "savings" },
-  { label: "Emergency", value: "emergency_fund" },
-  { label: "Purchase", value: "purchase" },
-  { label: "Investment", value: "investment" },
-];
+  { value: "savings" },
+  { value: "emergency_fund" },
+  { value: "purchase" },
+  { value: "investment" },
+] as const;
 
 const goalIcons = [
-  { name: "savings", label: "Savings" },
-  { name: "shield", label: "Emergency" },
-  { name: "gift", label: "Purchase" },
-  { name: "income", label: "Investment" },
-  { name: "money", label: "Money" },
-  { name: "rent", label: "Home" },
-  { name: "car", label: "Car" },
-  { name: "plane", label: "Travel" },
-  { name: "book", label: "Education" },
-  { name: "calendar", label: "Plan" },
-];
+  { name: "savings" },
+  { name: "shield" },
+  { name: "gift" },
+  { name: "income" },
+  { name: "money" },
+  { name: "rent" },
+  { name: "car" },
+  { name: "plane" },
+  { name: "book" },
+  { name: "calendar" },
+] as const;
 
 export function CreateGoalModal({
   visible,
@@ -109,19 +110,19 @@ export function CreateGoalModal({
         : 0;
 
       if (!name.trim()) {
-        throw new Error("Goal name is required.");
+        throw new Error(t("goals.createModal.errors.nameRequired"));
       }
 
       if (!Number.isFinite(parsedTargetAmount) || parsedTargetAmount <= 0) {
-        throw new Error("Target amount must be greater than 0.");
+        throw new Error(t("goals.createModal.errors.targetAmountInvalid"));
       }
 
       if (!Number.isFinite(parsedCurrentAmount) || parsedCurrentAmount < 0) {
-        throw new Error("Current amount must be 0 or greater.");
+        throw new Error(t("goals.createModal.errors.currentAmountInvalid"));
       }
 
       if (parsedCurrentAmount > parsedTargetAmount) {
-        throw new Error("Current amount cannot be greater than target amount.");
+        throw new Error(t("goals.createModal.errors.currentGreaterThanTarget"));
       }
 
       const payload: CreateGoalPayload = {
@@ -163,7 +164,9 @@ export function CreateGoalModal({
 
           <View style={styles.header}>
             <Text style={styles.title}>
-              {isEditMode ? "Edit Goal" : "Create Goal"}
+              {isEditMode
+                ? t("goals.createModal.editTitle")
+                : t("goals.createModal.createTitle")}
             </Text>
 
             <Pressable style={styles.closeButton} onPress={onClose}>
@@ -195,14 +198,21 @@ export function CreateGoalModal({
 
               <View style={styles.previewInfo}>
                 <Text style={styles.previewLabel}>
-                  {isEditMode ? "Editing goal" : "New goal pepe"}
+                  {isEditMode
+                    ? t("goals.createModal.preview.editing")
+                    : t("goals.createModal.preview.new")}
                 </Text>
+
                 <Text style={styles.previewTitle}>
-                  {name.trim() || "House Deposit"}
+                  {name.trim() || t("goals.createModal.placeholders.name")}
                 </Text>
+
                 <Text style={styles.previewMeta}>
-                  Target ·{" "}
-                  {targetAmount.trim() ? `€${targetAmount}` : "€30,000"}
+                  {t("goals.createModal.preview.target", {
+                    amount: targetAmount.trim()
+                      ? `€${targetAmount}`
+                      : t("goals.createModal.preview.defaultTargetAmount"),
+                  })}
                 </Text>
               </View>
             </View>
@@ -210,11 +220,14 @@ export function CreateGoalModal({
             <View style={isDesktop ? styles.desktopColumns : undefined}>
               <View style={isDesktop ? styles.desktopColumn : undefined}>
                 <View style={styles.fieldGroup}>
-                  <Text style={styles.label}>Goal name</Text>
+                  <Text style={styles.label}>
+                    {t("goals.createModal.fields.goalName")}
+                  </Text>
+
                   <TextInput
                     value={name}
                     onChangeText={setName}
-                    placeholder="House Deposit"
+                    placeholder={t("goals.createModal.placeholders.name")}
                     placeholderTextColor="rgba(5, 46, 43, 0.45)"
                     style={styles.input}
                   />
@@ -222,11 +235,16 @@ export function CreateGoalModal({
 
                 <View style={styles.row}>
                   <View style={styles.halfField}>
-                    <Text style={styles.label}>Target amount</Text>
+                    <Text style={styles.label}>
+                      {t("goals.createModal.fields.targetAmount")}
+                    </Text>
+
                     <TextInput
                       value={targetAmount}
                       onChangeText={setTargetAmount}
-                      placeholder="30000"
+                      placeholder={t(
+                        "goals.createModal.placeholders.targetAmount",
+                      )}
                       keyboardType="numeric"
                       placeholderTextColor="rgba(5, 46, 43, 0.45)"
                       style={styles.input}
@@ -234,11 +252,16 @@ export function CreateGoalModal({
                   </View>
 
                   <View style={styles.halfField}>
-                    <Text style={styles.label}>Current saved</Text>
+                    <Text style={styles.label}>
+                      {t("goals.createModal.fields.currentSaved")}
+                    </Text>
+
                     <TextInput
                       value={currentAmount}
                       onChangeText={setCurrentAmount}
-                      placeholder="9000"
+                      placeholder={t(
+                        "goals.createModal.placeholders.currentSaved",
+                      )}
                       keyboardType="numeric"
                       placeholderTextColor="rgba(5, 46, 43, 0.45)"
                       style={styles.input}
@@ -247,11 +270,14 @@ export function CreateGoalModal({
                 </View>
 
                 <View style={styles.fieldGroup}>
-                  <Text style={styles.label}>Target date</Text>
+                  <Text style={styles.label}>
+                    {t("goals.createModal.fields.targetDate")}
+                  </Text>
+
                   <TextInput
                     value={targetDate}
                     onChangeText={setTargetDate}
-                    placeholder="2027-12-31"
+                    placeholder={t("goals.createModal.placeholders.targetDate")}
                     placeholderTextColor="rgba(5, 46, 43, 0.45)"
                     style={styles.input}
                   />
@@ -260,7 +286,9 @@ export function CreateGoalModal({
 
               <View style={isDesktop ? styles.desktopColumn : undefined}>
                 <View style={styles.fieldGroup}>
-                  <Text style={styles.label}>Goal type</Text>
+                  <Text style={styles.label}>
+                    {t("goals.createModal.fields.goalType")}
+                  </Text>
 
                   <View style={styles.chipsGrid}>
                     {goalTypes.map((type) => {
@@ -283,7 +311,7 @@ export function CreateGoalModal({
                               isSelected && styles.chipTextSelected,
                             ]}
                           >
-                            {type.label}
+                            {t(`goals.details.goalTypes.${type.value}`)}
                           </Text>
                         </Pressable>
                       );
@@ -292,7 +320,9 @@ export function CreateGoalModal({
                 </View>
 
                 <View style={styles.fieldGroup}>
-                  <Text style={styles.label}>Icon</Text>
+                  <Text style={styles.label}>
+                    {t("goals.createModal.fields.icon")}
+                  </Text>
 
                   <View style={styles.iconsRow}>
                     {goalIcons.map((icon) => {
@@ -333,11 +363,11 @@ export function CreateGoalModal({
               <Text style={styles.createButtonText}>
                 {isSubmitting
                   ? isEditMode
-                    ? "Saving..."
-                    : "Creating..."
+                    ? t("goals.createModal.actions.saving")
+                    : t("goals.createModal.actions.creating")
                   : isEditMode
-                    ? "Save changes"
-                    : "Create goal"}
+                    ? t("goals.createModal.actions.saveChanges")
+                    : t("goals.createModal.actions.createGoal")}
               </Text>
             </Pressable>
           </ScrollView>
