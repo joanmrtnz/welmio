@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { Redirect, Stack } from "expo-router";
 
 import { checkAccessToken } from "@/features/auth/services/auth.service";
-import { clearAuthTokens } from "@/lib/auth-storage";
+import { clearAuthTokens } from "@/lib/auth/auth-storage";
 
 export default function ProtectedAppLayout() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);

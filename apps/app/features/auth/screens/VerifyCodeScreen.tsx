@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,7 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { t } from "@/lib/i18n";
@@ -18,6 +19,12 @@ import { fonts } from "@/theme/fonts";
 import { useValidateResetPasswordCode } from "@/features/auth/hooks/useValidateResetPasswordCode";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
 import { AppImage } from "@/components/images/AppImage";
+import {
+  canAccessVerifyCode,
+  getResetPasswordFlow,
+  setResetPasswordCodeSent,
+  setResetPasswordCodeVerified,
+} from "@/lib/auth/reset-password-flow-storage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -29,15 +36,57 @@ const MUTED = "#6f8586";
 const CARD = "#ffffff";
 const SOFT_GREEN = "#e3f8f1";
 
+type ValidateResetPasswordCodeResponse = {
+  valid?: boolean;
+  resetToken?: string;
+  token?: string;
+};
+
+function getResetTokenFromResponse(response: unknown) {
+  if (!response || typeof response !== "object") {
+    return undefined;
+  }
+
+  const result = response as ValidateResetPasswordCodeResponse;
+  const token = result.resetToken ?? result.token;
+
+  return typeof token === "string" && token.trim() ? token.trim() : undefined;
+}
+
 export default function VerifyCodeScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const [code, setCode] = useState("");
-  const { email } = useLocalSearchParams<{ email?: string }>();
+  const [email, setEmail] = useState("");
+  const [isCheckingFlow, setIsCheckingFlow] = useState(true);
 
   const { execute, loading } = useValidateResetPasswordCode();
   const { execute: resendCode, loading: resendLoading } =
     useSendResetPasswordCode();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function hydrateResetFlow() {
+      const flow = await getResetPasswordFlow();
+
+      if (!canAccessVerifyCode(flow)) {
+        router.replace("/(public)/forgot-password");
+        return;
+      }
+
+      if (isMounted && flow) {
+        setEmail(flow.email);
+        setIsCheckingFlow(false);
+      }
+    }
+
+    void hydrateResetFlow();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   async function handleAccept() {
     try {
@@ -46,21 +95,23 @@ export default function VerifyCodeScreen() {
         return;
       }
 
-      if (!code.trim()) {
+      const normalizedCode = code.trim();
+
+      if (!normalizedCode) {
         console.warn(t("auth.verifyCodeScreen.errors.codeRequired"));
         return;
       }
 
-      const res = await execute(email, code.trim());
+      const res = await execute(email, normalizedCode);
 
       if (res?.valid) {
-        router.push({
-          pathname: "/(public)/forgot-password/new-password",
-          params: {
-            email,
-            code: code.trim(),
-          },
+        await setResetPasswordCodeVerified({
+          email,
+          verificationCode: normalizedCode,
+          resetToken: getResetTokenFromResponse(res),
         });
+
+        router.push("/(public)/forgot-password/new-password");
       }
     } catch (error) {
       console.warn(error);
@@ -74,10 +125,22 @@ export default function VerifyCodeScreen() {
         return;
       }
 
-      await resendCode(email);
+      const res = await resendCode(email);
+
+      if (res) {
+        await setResetPasswordCodeSent(email);
+      }
     } catch (error) {
       console.warn(error);
     }
+  }
+
+  if (isCheckingFlow) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator color={PRIMARY} />
+      </View>
+    );
   }
 
   return (
@@ -246,6 +309,13 @@ export default function VerifyCodeScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: GREEN,
+  },
+
   screen: {
     flex: 1,
     backgroundColor: GREEN,

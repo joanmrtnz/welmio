@@ -3,7 +3,7 @@ import {
   getAccessToken,
   getRefreshToken,
   setAuthTokens,
-} from "@/lib/auth-storage";
+} from "@/lib/auth/auth-storage";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 

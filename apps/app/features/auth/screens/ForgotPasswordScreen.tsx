@@ -17,6 +17,7 @@ import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
 import { AppImage } from "@/components/images/AppImage";
+import { setResetPasswordCodeSent } from "@/lib/auth/reset-password-flow-storage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -37,18 +38,18 @@ export default function ForgotPasswordScreen() {
 
   async function handleNextStep() {
     try {
-      if (!email.trim()) {
+      const normalizedEmail = email.trim();
+
+      if (!normalizedEmail) {
         console.warn(t("auth.forgotPasswordScreen.errors.emailRequired"));
         return;
       }
 
-      const res = await execute(email.trim());
+      const res = await execute(normalizedEmail);
 
       if (res) {
-        router.push({
-          pathname: "/(public)/forgot-password/verify-code",
-          params: { email: email.trim() },
-        });
+        await setResetPasswordCodeSent(normalizedEmail);
+        router.push("/(public)/forgot-password/verify-code");
       }
     } catch (error) {
       console.warn(error);

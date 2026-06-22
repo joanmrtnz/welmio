@@ -1,5 +1,5 @@
 
-import { deleteStorageItem, getStorageItem, setStorageItem } from "../auth-storage";
+import { deleteStorageItem, getStorageItem, setStorageItem } from "../auth/auth-storage";
 import type { SupportedLocale } from "./translations";
 
 const LANGUAGE_STORAGE_KEY = "welmio.language";

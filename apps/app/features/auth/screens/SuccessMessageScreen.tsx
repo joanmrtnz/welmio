@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
+import { clearResetPasswordFlow } from "@/lib/auth/reset-password-flow-storage";
 
 const SCREEN_BG = "#dff7ef";
 const CARD_BG = "rgba(255, 255, 255, 0.88)";
@@ -33,7 +34,9 @@ export default function SuccessMessageScreen() {
     ]).start();
 
     const timeout = setTimeout(() => {
-      router.replace("/(public)/login");
+      void clearResetPasswordFlow().finally(() => {
+        router.replace("/(public)/login");
+      });
     }, 5000);
 
     return () => clearTimeout(timeout);

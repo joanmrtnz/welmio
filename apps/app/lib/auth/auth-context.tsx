@@ -6,8 +6,8 @@ import {
   useState,
 } from "react";
 
-import { clearAuthTokens, setAuthTokens } from "@/lib/auth-storage";
-import { restoreAuthSession } from "@/lib/auth-session";
+import { clearAuthTokens, setAuthTokens } from "@/lib/auth/auth-storage";
+import { restoreAuthSession } from "@/lib/auth/auth-session";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 

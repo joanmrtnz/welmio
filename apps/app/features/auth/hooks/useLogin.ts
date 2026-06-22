@@ -3,7 +3,7 @@ import { login } from "@/lib/api/auth";
 import { LoginInput } from "@repo/shared-types";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ApiError } from "@/lib/api/client";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/lib/auth/auth-context";
 
 export function useLogin() {
   const [loading, setLoading] = useState(false);

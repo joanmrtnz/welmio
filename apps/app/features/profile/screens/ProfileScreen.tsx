@@ -11,7 +11,7 @@ import { fonts } from "@/theme/fonts";
 import { ProfileOption } from "../components/ProfileOption";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { clearAuthTokens, getRefreshToken } from "@/lib/auth-storage";
+import { clearAuthTokens, getRefreshToken } from "@/lib/auth/auth-storage";
 import { logout } from "@/lib/api/auth";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";

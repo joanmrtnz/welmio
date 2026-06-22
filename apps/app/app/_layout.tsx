@@ -9,7 +9,7 @@ import {
 } from "@expo-google-fonts/montserrat";
 import "react-native-reanimated";
 
-import { AuthProvider } from "@/lib/auth-context";
+import { AuthProvider } from "@/lib/auth/auth-context";
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { View } from 'react-native';
 import { FeedbackProvider } from '@/components/ui/feedback/feedbackProvider';

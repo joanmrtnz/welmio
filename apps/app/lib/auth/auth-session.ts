@@ -3,7 +3,7 @@ import {
   clearAuthTokens,
   getRefreshToken,
   setAuthTokens,
-} from "@/lib/auth-storage";
+} from "@/lib/auth/auth-storage";
 
 export async function restoreAuthSession() {
   const refreshToken = await getRefreshToken();

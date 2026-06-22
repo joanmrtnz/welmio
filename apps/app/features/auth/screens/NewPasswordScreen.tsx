@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,13 +11,19 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { useResetPassword } from "@/features/auth/hooks/useResetPassword";
 import { AppImage } from "@/components/images/AppImage";
+import {
+  canAccessNewPassword,
+  getResetPasswordFlow,
+  setResetPasswordChanged,
+  type ResetPasswordFlowState,
+} from "@/lib/auth/reset-password-flow-storage";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -38,18 +45,42 @@ export default function NewPasswordScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const { email, code } = useLocalSearchParams<{
-    email?: string;
-    code?: string;
-  }>();
+  const [resetFlow, setResetFlow] = useState<ResetPasswordFlowState | null>(null);
+  const [isCheckingFlow, setIsCheckingFlow] = useState(true);
 
   const { execute, loading } = useResetPassword();
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function hydrateResetFlow() {
+      const flow = await getResetPasswordFlow();
+
+      if (!canAccessNewPassword(flow)) {
+        router.replace("/(public)/forgot-password");
+        return;
+      }
+
+      if (isMounted) {
+        setResetFlow(flow);
+        setIsCheckingFlow(false);
+      }
+    }
+
+    void hydrateResetFlow();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   async function handleChangePassword() {
     try {
-      if (!email || !code) {
+      const resetCredential = resetFlow?.resetToken ?? resetFlow?.verificationCode;
+
+      if (!resetFlow?.email || !resetCredential) {
         console.warn(t("auth.newPasswordScreen.errors.missingEmailOrCode"));
+        router.replace("/(public)/forgot-password");
         return;
       }
 
@@ -63,14 +94,23 @@ export default function NewPasswordScreen() {
         return;
       }
 
-      const res = await execute(email, code, newPassword);
+      const res = await execute(resetFlow.email, resetCredential, newPassword);
 
       if (res) {
+        await setResetPasswordChanged();
         router.replace("/(public)/forgot-password/success");
       }
     } catch (error) {
       console.warn(error);
     }
+  }
+
+  if (isCheckingFlow) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator color={PRIMARY} />
+      </View>
+    );
   }
 
   return (
@@ -278,6 +318,13 @@ export default function NewPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: GREEN,
+  },
+
   screen: {
     flex: 1,
     backgroundColor: GREEN,

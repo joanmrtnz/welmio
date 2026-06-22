@@ -16,7 +16,7 @@ import { Icon } from "@/components/icons/Icon";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { deleteAccount } from "../services/profile-service";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { clearAuthTokens } from "@/lib/auth-storage";
+import { clearAuthTokens } from "@/lib/auth/auth-storage";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { t } from "@/lib/i18n";
 
