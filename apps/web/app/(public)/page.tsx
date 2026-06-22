@@ -3,8 +3,9 @@ import Link from "next/link";
 import type { ReactElement } from "react";
 import styles from "./page.module.css";
 import ScreenshotsSwiper from "../../components/screenshotsSwiper/ScreenshotsSwiper";
-import { features, highlights, navLinks, screenshots, steps, techStack } from "./page.data";
+import { features, highlights, navLinks, screenshots,screenshotsDesktop, steps, techStack } from "./page.data";
 import LandingIcon from "../../components/landingIcon/LandingIcon";
+import ScrollToTopButton from "../../components/scrollToTopButton/ScrollToTopButton";
 
 export default function Home(): ReactElement {
 
@@ -107,7 +108,10 @@ export default function Home(): ReactElement {
           <p className={styles.eyebrow}>Screenshots</p>
           <h2>Beautiful, clean and intuitive interface</h2>
         </div>
-        <ScreenshotsSwiper screenshots={screenshots} />
+        <ScreenshotsSwiper 
+          screenshots={screenshots}
+          screenshotsDesktop={screenshotsDesktop}
+         />
       </section>
 
       <section id="how-it-works" className={styles.stepsSection}>
@@ -240,6 +244,8 @@ export default function Home(): ReactElement {
         </div>
       </div>
       </footer>
+
+      <ScrollToTopButton/>
     </main>
   );
 }
