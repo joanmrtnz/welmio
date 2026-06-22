@@ -1,10 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { FinanceSummaryService } from '../finance/finance-summary.service';
-import { AnalyticsPeriod } from "@repo/shared-types";
-import { AnalyticsResponse } from "@repo/shared-types";
-
-
+import { AnalyticsPeriod } from '@repo/shared-types';
+import { AnalyticsResponse } from '@repo/shared-types';
 
 @Injectable()
 export class AnalyticsService {
@@ -50,7 +48,7 @@ export class AnalyticsService {
 
     const chart = this.buildChart(period, labels, transactions);
 
-     // todo: make this value programmatic
+    // todo: make this value programmatic
     const budgetLimit = 20000;
     const spentPercentage =
       budgetLimit > 0
@@ -100,11 +98,29 @@ export class AnalyticsService {
     endDate: Date;
     labels: string[];
   } {
-    const startDate = new Date(now);
-    startDate.setHours(0, 0, 0, 0);
+    const startDate = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
 
-    const endDate = new Date(now);
-    endDate.setHours(23, 59, 59, 999);
+    const endDate = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        23,
+        59,
+        59,
+        999,
+      ),
+    );
 
     const labels = ['00', '04', '08', '12', '16', '20'];
 
@@ -116,17 +132,32 @@ export class AnalyticsService {
     endDate: Date;
     labels: string[];
   } {
-    const current = new Date(now);
-    const day = current.getDay();
+    const day = now.getUTCDay();
     const mondayOffset = day === 0 ? -6 : 1 - day;
 
-    const startDate = new Date(current);
-    startDate.setDate(current.getDate() + mondayOffset);
-    startDate.setHours(0, 0, 0, 0);
+    const startDate = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() + mondayOffset,
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
 
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 6);
-    endDate.setHours(23, 59, 59, 999);
+    const endDate = new Date(
+      Date.UTC(
+        startDate.getUTCFullYear(),
+        startDate.getUTCMonth(),
+        startDate.getUTCDate() + 6,
+        23,
+        59,
+        59,
+        999,
+      ),
+    );
 
     const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -138,11 +169,21 @@ export class AnalyticsService {
     endDate: Date;
     labels: string[];
   } {
-    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    startDate.setHours(0, 0, 0, 0);
+    const startDate = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0, 0),
+    );
 
-    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    endDate.setHours(23, 59, 59, 999);
+    const endDate = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999,
+      ),
+    );
 
     const labels = ['W1', 'W2', 'W3', 'W4', 'W5'];
 
@@ -154,15 +195,27 @@ export class AnalyticsService {
     endDate: Date;
     labels: string[];
   } {
-    const startDate = new Date(now.getFullYear(), 0, 1);
-    startDate.setHours(0, 0, 0, 0);
+    const startDate = new Date(
+      Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0),
+    );
 
-    const endDate = new Date(now.getFullYear(), 11, 31);
-    endDate.setHours(23, 59, 59, 999);
+    const endDate = new Date(
+      Date.UTC(now.getUTCFullYear(), 11, 31, 23, 59, 59, 999),
+    );
 
     const labels = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     return { startDate, endDate, labels };
@@ -218,7 +271,7 @@ export class AnalyticsService {
     const transactionDate = new Date(date);
 
     if (period === 'daily') {
-      const hour = transactionDate.getHours();
+      const hour = transactionDate.getUTCHours();
 
       if (hour < 4) return '00';
       if (hour < 8) return '04';
@@ -229,7 +282,7 @@ export class AnalyticsService {
     }
 
     if (period === 'weekly') {
-      const day = transactionDate.getDay();
+      const day = transactionDate.getUTCDay();
       const weekMap: Record<number, string> = {
         1: 'Mon',
         2: 'Tue',
@@ -244,7 +297,7 @@ export class AnalyticsService {
     }
 
     if (period === 'monthly') {
-      const dayOfMonth = transactionDate.getDate();
+      const dayOfMonth = transactionDate.getUTCDate();
 
       if (dayOfMonth <= 7) return 'W1';
       if (dayOfMonth <= 14) return 'W2';
@@ -254,7 +307,8 @@ export class AnalyticsService {
     }
 
     if (period === 'yearly') {
-      const month = transactionDate.getMonth();
+      const month = transactionDate.getUTCMonth();
+
       return labels[month] ?? null;
     }
 
