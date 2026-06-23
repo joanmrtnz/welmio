@@ -12,6 +12,7 @@ import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { feedback } from "@/components/ui/feedback/feedback.service";
 
 const BACKGROUND = "#dff7ef";
 const CARD = "#fbfffd";
@@ -24,6 +25,15 @@ const WHITE = "#ffffff";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
+const APP_URL = process.env.WELMIO_APP_URL?.trim();
+export const TERMS_URL = APP_URL
+  ? `${APP_URL.replace(/\/$/, "")}/terms`
+  : "";
+
+export const PRIVACY_URL = APP_URL
+  ? `${APP_URL.replace(/\/$/, "")}/privacy`
+  : "";
+
 export default function LegalScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
@@ -31,10 +41,10 @@ export default function LegalScreen() {
   const handleOpenLink = async (url: string) => {
     try {
       const supported = await Linking.canOpenURL(url);
-      if (supported) {
+      if (supported && APP_URL) {
         await Linking.openURL(url);
       } else {
-        console.warn(`Don't know how to open this URL: ${url}`);
+        feedback.error("Invalid URL");
       }
     } catch (error) {
       console.error("An error occurred opening the link", error);
@@ -74,7 +84,7 @@ export default function LegalScreen() {
               icon="document"
               label={t("profile.legal.terms") || "Terms of Use"}
               description={t("profile.legal.termsDescription") || "Read our terms and conditions"}
-              onPress={() => handleOpenLink("https://welmio.dev/legal/tems-of-use")}
+              onPress={() => handleOpenLink(TERMS_URL)}
               isDesktop={isDesktop}
             />
 
@@ -82,7 +92,7 @@ export default function LegalScreen() {
               icon="shield"
               label={t("profile.legal.privacy") || "Privacy Policy"}
               description={t("profile.legal.privacyDescription") || "Read our privacy guidelines"}
-              onPress={() => handleOpenLink("https://welmio.dev/legal/privacy-policy")}
+              onPress={() => handleOpenLink(PRIVACY_URL)}
               isDesktop={isDesktop}
             />
           </View>
