@@ -9,9 +9,12 @@ import {
   View,
 } from "react-native";
 import { useState, useEffect } from "react";
+
 import { Icon } from "@/components/icons/Icon";
+import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
 import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
+
 import {
   CreateGoalPayload,
   GoalOverviewItem,
@@ -58,6 +61,26 @@ const goalIcons = [
   { name: "book" },
   { name: "calendar" },
 ] as const;
+
+function formatIsoDateForDatePicker(value: string) {
+  const [year, month, day] = value.split("-");
+
+  if (!year || !month || !day) {
+    return "";
+  }
+
+  return `${day} / ${month} / ${year}`;
+}
+
+function formatDatePickerValueToIso(value: string) {
+  const [day, month, year] = value.split(" / ");
+
+  if (!day || !month || !year) {
+    return value;
+  }
+
+  return `${year}-${month}-${day}`;
+}
 
 export function CreateGoalModal({
   visible,
@@ -176,6 +199,7 @@ export function CreateGoalModal({
 
           <ScrollView
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
             contentContainerStyle={[
               styles.content,
               isDesktop && styles.contentDesktop,
@@ -270,16 +294,14 @@ export function CreateGoalModal({
                 </View>
 
                 <View style={styles.fieldGroup}>
-                  <Text style={styles.label}>
-                    {t("goals.createModal.fields.targetDate")}
-                  </Text>
-
-                  <TextInput
-                    value={targetDate}
-                    onChangeText={setTargetDate}
+                  <DateOfBirthInput
+                    label={t("goals.createModal.fields.targetDate")}
+                    icon="calendar-o"
                     placeholder={t("goals.createModal.placeholders.targetDate")}
-                    placeholderTextColor="rgba(5, 46, 43, 0.45)"
-                    style={styles.input}
+                    value={formatIsoDateForDatePicker(targetDate)}
+                    onChangeText={(value) => {
+                      setTargetDate(formatDatePickerValueToIso(value));
+                    }}
                   />
                 </View>
               </View>

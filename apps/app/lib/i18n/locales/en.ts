@@ -247,8 +247,18 @@ const en = {
     options: {
       editProfile: "Edit Profile",
       settings: "Settings",
+      legal: "Legal",
       language: "Language",
       logout: "Logout",
+    },
+
+    legal: {
+      title: "Legal",
+      sectionTitle: "Legal Documents",
+      terms: "Terms of Use",
+      termsDescription: "Read our terms and conditions",
+      privacy: "Privacy Policy",
+      privacyDescription: "Read our privacy guidelines",
     },
 
     logoutDialog: {

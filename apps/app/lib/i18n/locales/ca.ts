@@ -247,8 +247,18 @@ const ca = {
     options: {
       editProfile: "Editar perfil",
       settings: "Configuració",
+      legal: "Legal",
       language: "Idioma",
       logout: "Tancar sessió",
+    },
+
+    legal: {
+      title: "Legal",
+      sectionTitle: "Documents legals",
+      terms: "Termes d’ús",
+      termsDescription: "Consulta els nostres termes i condicions",
+      privacy: "Política de privacitat",
+      privacyDescription: "Consulta les nostres directrius de privacitat",
     },
 
     logoutDialog: {
