@@ -19,6 +19,7 @@ import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPass
 import { AppImage } from "@/components/images/AppImage";
 import { setResetPasswordCodeSent } from "@/lib/auth/reset-password-flow-storage";
 import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -36,6 +37,7 @@ export default function ForgotPasswordScreen() {
   const isDesktop = width >= 768;
   const [email, setEmail] = useState("");
   const { execute, loading } = useSendResetPasswordCode();
+  const { t } = useTranslation();
 
   async function handleNextStep() {
     try {

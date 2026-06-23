@@ -15,10 +15,9 @@ import SpainFlag from "@/assets/icons/flags/spain_flag.svg";
 import EnglishFlag from "@/assets/icons/flags/english_flag.svg";
 import CataloniaFlag from "@/assets/icons/flags/catalonia_flag.svg";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { t } from "@/lib/i18n";
-import { useLocale } from "@/lib/i18n/LocaleProvider";
 import type { SupportedLocale } from "@/lib/i18n/translations";
 import { fonts } from "@/theme/fonts";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const GREEN = "#dff7ef";
 const PRIMARY_DARK = "#079374";
@@ -58,7 +57,7 @@ const LANGUAGE_OPTIONS: PublicAuthLanguageOption[] = [
 export function PublicAuthLanguageSelector({
   style,
 }: PublicAuthLanguageSelectorProps) {
-  const { locale, changeLocale } = useLocale();
+  const { locale, changeLocale, t } = useTranslation();
 
   const [selectedLocale, setSelectedLocale] =
     useState<SupportedLocale>(locale);

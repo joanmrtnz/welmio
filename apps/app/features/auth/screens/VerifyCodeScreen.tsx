@@ -26,6 +26,7 @@ import {
   setResetPasswordCodeVerified,
 } from "@/lib/auth/reset-password-flow-storage";
 import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -60,6 +61,7 @@ export default function VerifyCodeScreen() {
   const [code, setCode] = useState("");
   const [email, setEmail] = useState("");
   const [isCheckingFlow, setIsCheckingFlow] = useState(true);
+  const { t } = useTranslation();
 
   const { execute, loading } = useValidateResetPasswordCode();
   const { execute: resendCode, loading: resendLoading } =

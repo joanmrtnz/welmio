@@ -19,6 +19,7 @@ import { DARK_GREEN } from "@/features/transactions/components/transaction-detai
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { AppImage } from "@/components/images/AppImage";
 import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
@@ -71,6 +72,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useTranslation();
 
   async function handleLogin() {
     try {

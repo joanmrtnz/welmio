@@ -48,4 +48,15 @@ export async function setAppLocale(locale: SupportedLocale): Promise<void> {
   await setStoredLocale(nextLocale);
 }
 
+export function translateWithLocale(
+  locale: SupportedLocale,
+  key: string,
+  options?: Record<string, unknown>,
+) {
+  return i18n.t(key, {
+    ...options,
+    locale,
+  });
+}
+
 export default i18n;
