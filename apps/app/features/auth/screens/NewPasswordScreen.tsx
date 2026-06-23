@@ -24,6 +24,7 @@ import {
   setResetPasswordChanged,
   type ResetPasswordFlowState,
 } from "@/lib/auth/reset-password-flow-storage";
+import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -300,6 +301,8 @@ export default function NewPasswordScreen() {
                     </Text>
                   </Text>
                 </Link>
+
+                <PublicAuthLanguageSelector />
               </View>
             </View>
           </View>

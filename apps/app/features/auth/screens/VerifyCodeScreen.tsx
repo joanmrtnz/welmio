@@ -25,6 +25,7 @@ import {
   setResetPasswordCodeSent,
   setResetPasswordCodeVerified,
 } from "@/lib/auth/reset-password-flow-storage";
+import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -291,6 +292,8 @@ export default function VerifyCodeScreen() {
                     </Text>
                   </Text>
                 </Link>
+
+                <PublicAuthLanguageSelector />
               </View>
             </View>
           </View>

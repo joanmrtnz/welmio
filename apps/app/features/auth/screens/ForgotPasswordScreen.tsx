@@ -18,6 +18,7 @@ import { fonts } from "@/theme/fonts";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
 import { AppImage } from "@/components/images/AppImage";
 import { setResetPasswordCodeSent } from "@/lib/auth/reset-password-flow-storage";
+import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -190,6 +191,8 @@ export default function ForgotPasswordScreen() {
                     </Text>
                   </Text>
                 </Link>
+
+                <PublicAuthLanguageSelector />
               </View>
             </View>
           </View>
