@@ -248,7 +248,17 @@ const es = {
       editProfile: "Editar perfil",
       settings: "Ajustes",
       language: "Idioma",
+      legal: "Legal",
       logout: "Cerrar sesión",
+    },
+
+    legal: {
+      title: "Legal",
+      sectionTitle: "Documentos legales",
+      terms: "Términos de uso",
+      termsDescription: "Consulta nuestros términos y condiciones",
+      privacy: "Política de privacidad",
+      privacyDescription: "Consulta nuestras directrices de privacidad",
     },
 
     logoutDialog: {
