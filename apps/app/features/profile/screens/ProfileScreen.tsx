@@ -164,6 +164,16 @@ export default function ProfileScreen() {
               onPress={() => router.push("/profile/settings")}
             />
             <View style={styles.divider} />
+            
+            <ProfileOption
+              icon="shield"
+              size={31}
+              label={t("profile.options.legal")}
+              onPress={() => router.push("/profile/legal")}
+            />
+
+           <View style={styles.divider} />
+
             <ProfileOption
               icon="language"
               label={t("profile.options.language")}

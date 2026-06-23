@@ -19,6 +19,8 @@ import { feedback } from "@/components/ui/feedback/feedback.service";
 import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
 import { toIsoDate } from "@/lib/date";
 import { AppImage } from "@/components/images/AppImage";
+import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
@@ -77,6 +79,7 @@ function SignupInput({
   autoCorrect = true,
 }: SignupInputProps) {
   const isPassword = Boolean(onTogglePassword);
+  const { t } = useTranslation();
 
   return (
     <View style={styles.inputGroup}>
@@ -310,6 +313,8 @@ export default function SignupScreen() {
           <Text style={styles.link}>{t("auth.signup.logIn")}</Text>
         </Text>
       </Link>
+
+      <PublicAuthLanguageSelector />
     </View>
   );
 

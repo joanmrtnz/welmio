@@ -18,6 +18,8 @@ import { useLogin } from "@/features/auth/hooks/useLogin";
 import { DARK_GREEN } from "@/features/transactions/components/transaction-details-modal/transactionDetails.styles";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { AppImage } from "@/components/images/AppImage";
+import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
@@ -28,7 +30,6 @@ const PRIMARY_DARK = "#079374";
 const DARK = "#052e2b";
 const MUTED = "#6f8586";
 const CARD = "#ffffff";
-const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 
 type BackendErrorResponse = {
   response?: {
@@ -71,6 +72,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { t } = useTranslation();
 
   async function handleLogin() {
     try {
@@ -264,6 +266,8 @@ export default function LoginScreen() {
                     <Text style={styles.link}>{t("auth.login.signUp")}</Text>
                   </Text>
                 </Link>
+
+                <PublicAuthLanguageSelector />
               </View>
             </View>
           </View>
