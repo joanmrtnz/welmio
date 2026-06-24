@@ -65,6 +65,11 @@ export const features: IconCard[] = [
 
 export const screenshots: Screenshot[] = [
   {
+    title: "Login",
+    text: "A soft emerald authentication screen designed for quick access.",
+    image: "/screenshots/mobile/welmio-login.png",
+  },
+  {
     title: "Overview",
     text: "Balance, expenses, goals and weekly chart in one clean dashboard.",
     image: "/screenshots/mobile/welmio-overview.png",
@@ -80,6 +85,11 @@ export const screenshots: Screenshot[] = [
     image: "/screenshots/mobile/welmio-transactions.png",
   },
   {
+    title: "Filter by Category",
+    text: "Filter transactions by category.",
+    image: "/screenshots/mobile/welmio-categories.png",
+  },
+  {
     title: "Goals",
     text: "Track saved amounts, targets and goal progress in real time.",
     image: "/screenshots/mobile/welmio-goals.png",
@@ -93,25 +103,15 @@ export const screenshots: Screenshot[] = [
     title: "Edit Avatar",
     text: "Customize your profile picture with a simple avatar selection screen.",
     image: "/screenshots/mobile/welmio-edit-avatar.png",
-  },
-  {
-    title: "Login",
-    text: "A soft emerald authentication screen designed for quick access.",
-    image: "/screenshots/mobile/welmio-login.png",
-  },
-  {
-    title: "Signup",
-    text: "A complete account creation flow with the same visual language.",
-    image: "/screenshots/mobile/welmio-signup.png",
-  },
-  {
-    title: "Forgot Password",
-    text: "Recover access with a guided email verification flow for resetting your password.",
-    image: "/screenshots/mobile/welmio-forgot-password.png",
-  },
+  }
 ];
 
 export const screenshotsDesktop: Screenshot[] = [
+  {
+    title: "Login",
+    text: "A soft emerald authentication screen designed for quick access.",
+    image: "/screenshots/desktop/welmio-login.png",
+  },
   {
     title: "Overview",
     text: "Balance, expenses, goals and weekly chart in one clean dashboard.",
@@ -141,21 +141,6 @@ export const screenshotsDesktop: Screenshot[] = [
     title: "Edit Avatar",
     text: "Customize your profile picture with a simple avatar selection screen.",
     image: "/screenshots/desktop/welmio-edit-avatar.png",
-  },
-  {
-    title: "Login",
-    text: "A soft emerald authentication screen designed for quick access.",
-    image: "/screenshots/desktop/welmio-login.png",
-  },
-  {
-    title: "Signup",
-    text: "A complete account creation flow with the same visual language.",
-    image: "/screenshots/desktop/welmio-signup.png",
-  },
-  {
-    title: "Forgot Password",
-    text: "Recover access with a guided email verification flow for resetting your password.",
-    image: "/screenshots/desktop/welmio-forgot-password.png",
   },
 ];
 

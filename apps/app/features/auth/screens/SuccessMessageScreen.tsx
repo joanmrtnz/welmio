@@ -12,15 +12,17 @@ const MINT_SOFT = "#d6f6ec";
 const MINT_STRONG = "#08b692";
 const TEXT = "#062f33";
 const MUTED = "#6f858a";
+const REDIRECT_DELAY_MS = 5000;
 
 export default function SuccessMessageScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const scale = useRef(new Animated.Value(0.6)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const progress = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.parallel([
+    const animation = Animated.parallel([
       Animated.spring(scale, {
         toValue: 1,
         friction: 6,
@@ -31,16 +33,26 @@ export default function SuccessMessageScreen() {
         duration: 400,
         useNativeDriver: true,
       }),
-    ]).start();
+      Animated.timing(progress, {
+        toValue: 0,
+        duration: REDIRECT_DELAY_MS,
+        useNativeDriver: false,
+      }),
+    ]);
+
+    animation.start();
 
     const timeout = setTimeout(() => {
       void clearResetPasswordFlow().finally(() => {
         router.replace("/(public)/login");
       });
-    }, 5000);
+    }, REDIRECT_DELAY_MS);
 
-    return () => clearTimeout(timeout);
-  }, []);
+    return () => {
+      clearTimeout(timeout);
+      animation.stop();
+    };
+  }, [opacity, progress, scale]);
 
   return (
     <View style={styles.screen}>
@@ -89,6 +101,20 @@ export default function SuccessMessageScreen() {
           <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
             {t("auth.successMessageScreen.subtitle")}
           </Text>
+
+          <View style={styles.progressTrack}>
+            <Animated.View
+              style={[
+                styles.progressFill,
+                {
+                  width: progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ["0%", "100%"],
+                  }),
+                },
+              ]}
+            />
+          </View>
         </Animated.View>
       </View>
     </View>
@@ -176,6 +202,7 @@ const styles = StyleSheet.create({
     shadowRadius: 26,
     shadowOffset: { width: 0, height: 14 },
     elevation: 12,
+    overflow: "hidden",
   },
 
   cardDesktop: {
@@ -244,5 +271,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     maxWidth: 300,
+  },
+
+  progressTrack: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 4,
+    backgroundColor: "rgba(8, 182, 146, 0.12)",
+  },
+
+  progressFill: {
+    height: "100%",
+    backgroundColor: MINT_STRONG,
   },
 });
