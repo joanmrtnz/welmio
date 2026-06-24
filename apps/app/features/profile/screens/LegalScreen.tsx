@@ -25,14 +25,13 @@ const WHITE = "#ffffff";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
-const APP_URL = process.env.WELMIO_APP_URL?.trim();
-export const TERMS_URL = APP_URL
-  ? `${APP_URL.replace(/\/$/, "")}/terms`
-  : "";
+const rawWelmioAppUrl = process.env.EXPO_PUBLIC_WELMIO_APP_URL?.trim();
+const WELMIO_APP_URL = rawWelmioAppUrl
+  ? rawWelmioAppUrl.replace(/\/+$/, "")
+  : "https://welmio.dev";
 
-export const PRIVACY_URL = APP_URL
-  ? `${APP_URL.replace(/\/$/, "")}/privacy`
-  : "";
+const WELMIO_TERMS_URL = `${WELMIO_APP_URL}/terms`;
+const WELMIO_PRIVACY_URL = `${WELMIO_APP_URL}/privacy`;
 
 export default function LegalScreen() {
   const { width } = useWindowDimensions();
@@ -41,7 +40,7 @@ export default function LegalScreen() {
   const handleOpenLink = async (url: string) => {
     try {
       const supported = await Linking.canOpenURL(url);
-      if (supported && APP_URL) {
+      if (supported) {
         await Linking.openURL(url);
       } else {
         feedback.error("Invalid URL");
@@ -84,7 +83,7 @@ export default function LegalScreen() {
               icon="document"
               label={t("profile.legal.terms") || "Terms of Use"}
               description={t("profile.legal.termsDescription") || "Read our terms and conditions"}
-              onPress={() => handleOpenLink(TERMS_URL)}
+              onPress={() => handleOpenLink(WELMIO_TERMS_URL)}
               isDesktop={isDesktop}
             />
 
@@ -92,7 +91,7 @@ export default function LegalScreen() {
               icon="shield"
               label={t("profile.legal.privacy") || "Privacy Policy"}
               description={t("profile.legal.privacyDescription") || "Read our privacy guidelines"}
-              onPress={() => handleOpenLink(PRIVACY_URL)}
+              onPress={() => handleOpenLink(WELMIO_PRIVACY_URL)}
               isDesktop={isDesktop}
             />
           </View>

@@ -24,8 +24,10 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 const WELMIO_AVATAR_BASE = require("@/assets/images/welmio-avatar-base.png");
-const WELMIO_APP_URL =
-  process.env.EXPO_PUBLIC_WELMIO_APP_URL ?? "https://welmio.dev";
+const rawWelmioAppUrl = process.env.EXPO_PUBLIC_WELMIO_APP_URL?.trim();
+const WELMIO_APP_URL = rawWelmioAppUrl
+  ? rawWelmioAppUrl.replace(/\/+$/, "")
+  : "https://welmio.dev";
 
 const WELMIO_TERMS_URL = `${WELMIO_APP_URL}/terms` as ExternalPathString;
 const WELMIO_PRIVACY_URL = `${WELMIO_APP_URL}/privacy` as ExternalPathString;
