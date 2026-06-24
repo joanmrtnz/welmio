@@ -10,7 +10,6 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { t } from "@/lib/i18n";
 import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
@@ -45,8 +44,9 @@ type BackendErrorResponse = {
   message?: string;
 };
 
-function getLoginErrorMessage(error: unknown) {
+function getLoginErrorMessage(error: unknown, fallbackMessage: string) {
   const backendError = error as BackendErrorResponse;
+
   const responseMessage =
     backendError.response?.data?.message ?? backendError.data?.message;
 
@@ -62,7 +62,7 @@ function getLoginErrorMessage(error: unknown) {
     return backendError.message;
   }
 
-  return t("auth.login.errors.invalidCredentials");
+  return fallbackMessage;
 }
 
 export default function LoginScreen() {
@@ -83,7 +83,12 @@ export default function LoginScreen() {
 
       if (res) router.replace("/(app)/(tabs)/home");
     } catch (error) {
-      feedback.error(getLoginErrorMessage(error));
+      feedback.error(
+        getLoginErrorMessage(
+          error,
+          t("auth.login.errors.invalidCredentials")
+        )
+      );
       console.warn(error);
     }
   }

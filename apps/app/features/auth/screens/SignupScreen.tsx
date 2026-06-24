@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { ExternalPathString, Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { useSignup } from "@/features/auth/hooks/useSignup";
 import { feedback } from "@/components/ui/feedback/feedback.service";
@@ -144,6 +143,7 @@ export default function SignupScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { t } = useTranslation();
 
   async function handleSignup() {
     try {
