@@ -4,7 +4,7 @@
     "slug": "welmio",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/ios-icon.png",
     "scheme": "welmio",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -12,7 +12,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "dev.welmio.app",
       "buildNumber": "1",
-      "icon": "./assets/images/icon.png",
+      "icon": "./assets/images/ios-icon.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
