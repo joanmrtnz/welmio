@@ -11,6 +11,7 @@ import {
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { AppImage } from "@/components/images/AppImage";
+import { t } from "@/lib/i18n";
 const WELMIO_BASE_AVATAR = require("@/assets/images/welmio-avatar-base.png");
 const WELMIO_AVATAR_1 = require("@/assets/images/welmio-avatar-1.png");
 const WELMIO_AVATAR_2 = require("@/assets/images/welmio-avatar-2.png");
@@ -111,7 +112,7 @@ export function AvatarPickerModal({
 
         <View style={styles.modalCard}>
           <View style={styles.header}>
-            <Text style={styles.title}>Edit Avatar</Text>
+            <Text style={styles.title}>{t("profile.avatarPicker.title")}</Text>
 
             <Pressable style={styles.closeButton} onPress={onClose}>
               <Icon name="close" size={20} strokeWidth={2.4} color={BLACK} />
@@ -128,14 +129,14 @@ export function AvatarPickerModal({
               />
             </View>
 
-            <Text style={styles.previewText}>Choose your profile avatar</Text>
+            <Text style={styles.previewText}>{t("profile.avatarPicker.previewText")}</Text>
           </View>
 
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.content}
           >
-            <Text style={styles.sectionTitle}>Avatar</Text>
+            <Text style={styles.sectionTitle}>{t("profile.avatarPicker.avatar")}</Text>
 
             <View style={styles.avatarGrid}>
               {AVATAR_OPTIONS.map((avatar) => {
@@ -191,11 +192,11 @@ export function AvatarPickerModal({
 
             <View style={styles.actions}>
               <Pressable style={styles.clearButton} onPress={onClose}>
-                <Text style={styles.clearButtonText}>Cancel</Text>
+                <Text style={styles.clearButtonText}>{t("profile.avatarPicker.cancel")}</Text>
               </Pressable>
 
               <Pressable style={styles.applyButton} onPress={handleApply}>
-                <Text style={styles.applyButtonText}>Apply</Text>
+                <Text style={styles.applyButtonText}>{t("profile.avatarPicker.apply")}</Text>
               </Pressable>
             </View>
           </ScrollView>

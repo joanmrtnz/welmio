@@ -12,8 +12,36 @@ on:
         type: string
 
 jobs:
+  test-api-prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter api db:generate
+
+      - name: Run API tests
+        run: pnpm --filter api test --runInBand
+
   build-and-push-prod:
     if: github.event_name == 'push'
+    needs: test-api-prod
     runs-on: ubuntu-latest
     environment: prod
     env:
@@ -51,7 +79,7 @@ jobs:
 
   deploy-prod:
     if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.build-and-push-prod.result == 'success') }}
-    needs: build-and-push-prod
+    needs: [test-api-prod, build-and-push-prod]
     runs-on: [self-hosted, welmio]
     environment: prod
     env:

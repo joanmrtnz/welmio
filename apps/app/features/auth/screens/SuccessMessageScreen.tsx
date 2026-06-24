@@ -2,7 +2,9 @@ import { View, Text, StyleSheet, Animated, useWindowDimensions } from "react-nat
 import { useEffect, useRef } from "react";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
+import { clearResetPasswordFlow } from "@/lib/auth/reset-password-flow-storage";
 
 const SCREEN_BG = "#dff7ef";
 const CARD_BG = "rgba(255, 255, 255, 0.88)";
@@ -10,15 +12,17 @@ const MINT_SOFT = "#d6f6ec";
 const MINT_STRONG = "#08b692";
 const TEXT = "#062f33";
 const MUTED = "#6f858a";
+const REDIRECT_DELAY_MS = 5000;
 
 export default function SuccessMessageScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const scale = useRef(new Animated.Value(0.6)).current;
   const opacity = useRef(new Animated.Value(0)).current;
+  const progress = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    Animated.parallel([
+    const animation = Animated.parallel([
       Animated.spring(scale, {
         toValue: 1,
         friction: 6,
@@ -29,20 +33,36 @@ export default function SuccessMessageScreen() {
         duration: 400,
         useNativeDriver: true,
       }),
-    ]).start();
+      Animated.timing(progress, {
+        toValue: 0,
+        duration: REDIRECT_DELAY_MS,
+        useNativeDriver: false,
+      }),
+    ]);
+
+    animation.start();
 
     const timeout = setTimeout(() => {
-     router.replace("/(public)/login");
-    }, 5000);
+      void clearResetPasswordFlow().finally(() => {
+        router.replace("/(public)/login");
+      });
+    }, REDIRECT_DELAY_MS);
 
-    return () => clearTimeout(timeout);
-  }, []);
+    return () => {
+      clearTimeout(timeout);
+      animation.stop();
+    };
+  }, [opacity, progress, scale]);
 
   return (
     <View style={styles.screen}>
       <LinearGradient
         pointerEvents="none"
-        colors={["rgba(255,255,255,0.82)", "rgba(223,247,239,0.96)", "rgba(255,255,255,0.72)"]}
+        colors={[
+          "rgba(255,255,255,0.82)",
+          "rgba(223,247,239,0.96)",
+          "rgba(255,255,255,0.72)",
+        ]}
         locations={[0, 0.58, 1]}
         style={StyleSheet.absoluteFill}
       />
@@ -50,10 +70,12 @@ export default function SuccessMessageScreen() {
       <View style={[styles.content, isDesktop && styles.contentDesktop]}>
         {isDesktop ? (
           <View style={styles.desktopIntro}>
-            <Text style={styles.desktopHeadline}>Your account is secure</Text>
+            <Text style={styles.desktopHeadline}>
+              {t("auth.successMessageScreen.desktopHeadline")}
+            </Text>
+
             <Text style={styles.desktopText}>
-              Your password was changed successfully. You will be redirected to
-              sign in again with your new credentials.
+              {t("auth.successMessageScreen.desktopText")}
             </Text>
           </View>
         ) : null}
@@ -73,11 +95,26 @@ export default function SuccessMessageScreen() {
           </View>
 
           <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
-            Password Changed
+            {t("auth.successMessageScreen.title")}
           </Text>
+
           <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
-            Your password has been updated successfully
+            {t("auth.successMessageScreen.subtitle")}
           </Text>
+
+          <View style={styles.progressTrack}>
+            <Animated.View
+              style={[
+                styles.progressFill,
+                {
+                  width: progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ["0%", "100%"],
+                  }),
+                },
+              ]}
+            />
+          </View>
         </Animated.View>
       </View>
     </View>
@@ -165,6 +202,7 @@ const styles = StyleSheet.create({
     shadowRadius: 26,
     shadowOffset: { width: 0, height: 14 },
     elevation: 12,
+    overflow: "hidden",
   },
 
   cardDesktop: {
@@ -233,5 +271,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     maxWidth: 300,
+  },
+
+  progressTrack: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 4,
+    backgroundColor: "rgba(8, 182, 146, 0.12)",
+  },
+
+  progressFill: {
+    height: "100%",
+    backgroundColor: MINT_STRONG,
   },
 });

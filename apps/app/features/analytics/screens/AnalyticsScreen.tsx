@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { fonts } from "@/theme/fonts";
+import { t } from "@/lib/i18n";
 import { useAnalytics } from "../hooks/useAnalytics";
 import {
   getChartMaxValue,
@@ -35,14 +36,83 @@ const GRID = "rgba(6, 59, 58, 0.09)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
-const PERIOD_LABELS = {
-  daily: "Daily",
-  weekly: "Weekly",
-  monthly: "Monthly",
-  yearly: "Yearly",
-} as const;
+const PERIOD_KEYS = ["daily", "weekly", "monthly", "yearly"] as const;
 
-type AnalyticsPeriod = keyof typeof PERIOD_LABELS;
+type AnalyticsPeriod = (typeof PERIOD_KEYS)[number];
+
+const MONTH_KEY_BY_ENGLISH_LABEL: Record<string, string> = {
+  jan: "jan",
+  january: "jan",
+  feb: "feb",
+  february: "feb",
+  mar: "mar",
+  march: "mar",
+  apr: "apr",
+  april: "apr",
+  may: "may",
+  jun: "jun",
+  june: "jun",
+  jul: "jul",
+  july: "jul",
+  aug: "aug",
+  august: "aug",
+  sep: "sep",
+  sept: "sep",
+  september: "sep",
+  oct: "oct",
+  october: "oct",
+  nov: "nov",
+  november: "nov",
+  dec: "dec",
+  december: "dec",
+};
+
+const WEEKDAY_KEY_BY_ENGLISH_LABEL: Record<string, string> = {
+  mon: "mon",
+  monday: "mon",
+  tue: "tue",
+  tuesday: "tue",
+  wed: "wed",
+  wednesday: "wed",
+  thu: "thu",
+  thursday: "thu",
+  fri: "fri",
+  friday: "fri",
+  sat: "sat",
+  saturday: "sat",
+  sun: "sun",
+  sunday: "sun",
+};
+
+function getPeriodLabel(period: AnalyticsPeriod) {
+  return t(`analytics.periods.${period}`);
+}
+
+function normalizePeriod(value: string): AnalyticsPeriod {
+  return PERIOD_KEYS.includes(value as AnalyticsPeriod)
+    ? (value as AnalyticsPeriod)
+    : "daily";
+}
+
+function translateChartLabel(label: string, isShort: boolean) {
+  const normalizedLabel = label.trim().toLowerCase().replace(".", "");
+  const monthKey = MONTH_KEY_BY_ENGLISH_LABEL[normalizedLabel];
+  const weekDayKey = WEEKDAY_KEY_BY_ENGLISH_LABEL[normalizedLabel];
+
+  if (monthKey) {
+    return t(
+      isShort
+        ? `analytics.monthsShort.${monthKey}`
+        : `analytics.months.${monthKey}`,
+    );
+  }
+
+  if (weekDayKey) {
+    return t(`common.weekDays.${weekDayKey}`);
+  }
+
+  return isShort && label.length > 3 ? label.slice(0, 3) : label;
+}
 
 function PeriodBadge({ label }: { label: string }) {
   return (
@@ -71,62 +141,80 @@ function ExpensesByCategoryCard({
     <View style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}>
       <View style={styles.graphHeader}>
         <View style={styles.graphTitleWrap}>
-          <Text style={styles.graphTitle}>Expenses by Category</Text>
-          <Text style={styles.graphSubtitle}>Distribution by category</Text>
+          <Text style={styles.graphTitle}>
+            {t("analytics.expensesByCategory.title")}
+          </Text>
+          <Text style={styles.graphSubtitle}>
+            {t("analytics.expensesByCategory.subtitle")}
+          </Text>
         </View>
         <PeriodBadge label={periodLabel} />
       </View>
 
       {isLoading ? (
         <View style={styles.chartStateBox}>
-          <Text style={styles.chartStateTitle}>Loading expenses...</Text>
+          <Text style={styles.chartStateTitle}>
+            {t("analytics.expensesByCategory.loadingTitle")}
+          </Text>
           <Text style={styles.chartStateText}>
-            Getting your category totals for this period.
+            {t("analytics.expensesByCategory.loadingText")}
           </Text>
         </View>
       ) : hasError ? (
         <View style={styles.chartStateBox}>
-          <Text style={styles.chartStateTitle}>Could not load categories</Text>
+          <Text style={styles.chartStateTitle}>
+            {t("analytics.expensesByCategory.errorTitle")}
+          </Text>
           <Text style={styles.chartStateText}>
-            Try changing the period or refreshing the screen.
+            {t("analytics.expensesByCategory.errorText")}
           </Text>
         </View>
       ) : showEmptyState ? (
         <View style={styles.chartStateBox}>
-          <Text style={styles.chartStateTitle}>No expenses yet</Text>
+          <Text style={styles.chartStateTitle}>
+            {t("analytics.expensesByCategory.emptyTitle")}
+          </Text>
           <Text style={styles.chartStateText}>
-            Add expense transactions to see this chart.
+            {t("analytics.expensesByCategory.emptyText")}
           </Text>
         </View>
       ) : (
         <View style={styles.categoryChartList}>
-          {categories.map((category) => (
-            <View key={category.id} style={styles.categoryChartItem}>
-              <View style={styles.categoryChartTopRow}>
-                <Text style={styles.categoryLabel}>{category.label}</Text>
-                <Text style={styles.categoryAmount}>
-                  {formatCurrency(category.amount)}
+          {categories.map((category) => {
+            const transactionLabel =
+              category.transactionsCount === 1
+                ? t("analytics.labels.transactionSingular")
+                : t("analytics.labels.transactionPlural");
+
+            return (
+              <View key={category.id} style={styles.categoryChartItem}>
+                <View style={styles.categoryChartTopRow}>
+                  <Text style={styles.categoryLabel}>{category.label}</Text>
+                  <Text style={styles.categoryAmount}>
+                    {formatCurrency(category.amount)}
+                  </Text>
+                </View>
+                <View style={styles.horizontalBarTrack}>
+                  <View
+                    style={[
+                      styles.horizontalBarFill,
+                      {
+                        width: `${category.percent}%`,
+                        backgroundColor: TEAL,
+                      },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.categoryPercent}>
+                  {t("analytics.expensesByCategory.meta", {
+                    percent: category.percent,
+                    count: category.transactionsCount,
+                    transactionLabel,
+                  })}
                 </Text>
               </View>
-              <View style={styles.horizontalBarTrack}>
-                <View
-                  style={[
-                    styles.horizontalBarFill,
-                    {
-                      width: `${category.percent}%`,
-                      backgroundColor: TEAL,
-                    },
-                  ]}
-                />
-              </View>
-              <Text style={styles.categoryPercent}>
-                {category.percent}% of expenses · {category.transactionsCount}{" "}
-                {category.transactionsCount === 1
-                  ? "transaction"
-                  : "transactions"}
-              </Text>
-            </View>
-          ))}
+            );
+          })}
         </View>
       )}
     </View>
@@ -152,9 +240,11 @@ function GoalContributionsCard({
     <View style={[styles.graphicCard, isDesktop && styles.graphicCardDesktop]}>
       <View style={styles.graphHeader}>
         <View style={styles.graphTitleWrap}>
-          <Text style={styles.graphTitle}>Goal Contributions</Text>
+          <Text style={styles.graphTitle}>
+            {t("analytics.goalContributions.title")}
+          </Text>
           <Text style={styles.graphSubtitle}>
-            Contributions received by goal
+            {t("analytics.goalContributions.subtitle")}
           </Text>
         </View>
         <PeriodBadge label={periodLabel} />
@@ -162,61 +252,76 @@ function GoalContributionsCard({
 
       {isLoading ? (
         <View style={styles.chartStateBox}>
-          <Text style={styles.chartStateTitle}>Loading contributions...</Text>
+          <Text style={styles.chartStateTitle}>
+            {t("analytics.goalContributions.loadingTitle")}
+          </Text>
           <Text style={styles.chartStateText}>
-            Getting your goal contribution totals for this period.
+            {t("analytics.goalContributions.loadingText")}
           </Text>
         </View>
       ) : hasError ? (
         <View style={styles.chartStateBox}>
-          <Text style={styles.chartStateTitle}>Could not load goals</Text>
+          <Text style={styles.chartStateTitle}>
+            {t("analytics.goalContributions.errorTitle")}
+          </Text>
           <Text style={styles.chartStateText}>
-            Try changing the period or refreshing the screen.
+            {t("analytics.goalContributions.errorText")}
           </Text>
         </View>
       ) : showEmptyState ? (
         <View style={styles.chartStateBox}>
-          <Text style={styles.chartStateTitle}>No contributions yet</Text>
+          <Text style={styles.chartStateTitle}>
+            {t("analytics.goalContributions.emptyTitle")}
+          </Text>
           <Text style={styles.chartStateText}>
-            Add goal contributions to see this chart.
+            {t("analytics.goalContributions.emptyText")}
           </Text>
         </View>
       ) : (
         <View style={styles.goalContributionList}>
-          {goals.map((goal) => (
-            <View key={goal.id} style={styles.goalContributionItem}>
-              <View style={styles.goalContributionHeader}>
-                <View style={styles.goalRingTrack}>
-                  <View style={[styles.goalRingArc, { borderColor: TEAL }]} />
-                  <Text style={styles.goalRingText}>{goal.percent}%</Text>
-                </View>
-                <View style={styles.goalContributionInfo}>
-                  <Text style={styles.goalContributionTitle}>{goal.label}</Text>
-                  <Text style={styles.goalContributionAmount}>
-                    {formatCurrency(goal.amount)} contributed
-                  </Text>
-                  <View style={styles.horizontalBarTrack}>
-                    <View
-                      style={[
-                        styles.goalBarFill,
-                        {
-                          width: `${goal.percent}%`,
-                          backgroundColor: TEAL,
-                        },
-                      ]}
-                    />
+          {goals.map((goal) => {
+            const contributionLabel =
+              goal.contributionsCount === 1
+                ? t("analytics.labels.contributionSingular")
+                : t("analytics.labels.contributionPlural");
+
+            return (
+              <View key={goal.id} style={styles.goalContributionItem}>
+                <View style={styles.goalContributionHeader}>
+                  <View style={styles.goalRingTrack}>
+                    <View style={[styles.goalRingArc, { borderColor: TEAL }]} />
+                    <Text style={styles.goalRingText}>{goal.percent}%</Text>
                   </View>
-                  <Text style={styles.goalContributionMeta}>
-                    {goal.percent}% of goal contributions ·{" "}
-                    {goal.contributionsCount}{" "}
-                    {goal.contributionsCount === 1
-                      ? "contribution"
-                      : "contributions"}
-                  </Text>
+                  <View style={styles.goalContributionInfo}>
+                    <Text style={styles.goalContributionTitle}>{goal.label}</Text>
+                    <Text style={styles.goalContributionAmount}>
+                      {t("analytics.goalContributions.amountContributed", {
+                        amount: formatCurrency(goal.amount),
+                      })}
+                    </Text>
+                    <View style={styles.horizontalBarTrack}>
+                      <View
+                        style={[
+                          styles.goalBarFill,
+                          {
+                            width: `${goal.percent}%`,
+                            backgroundColor: TEAL,
+                          },
+                        ]}
+                      />
+                    </View>
+                    <Text style={styles.goalContributionMeta}>
+                      {t("analytics.goalContributions.meta", {
+                        percent: goal.percent,
+                        count: goal.contributionsCount,
+                        contributionLabel,
+                      })}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </View>
       )}
     </View>
@@ -244,8 +349,9 @@ export default function AnalyticsScreen() {
   const isYearlyChart =
     (selected === "yearly" || chartBars.length > 6) && !isDesktop;
   const yearlyChartWidth = Math.max(chartBars.length * 42, 310);
-  const selectedPeriod = selected as AnalyticsPeriod;
-  const selectedPeriodLabel = PERIOD_LABELS[selectedPeriod] ?? "Daily";
+  const selectedPeriod = normalizePeriod(selected);
+  const selectedPeriodLabel = getPeriodLabel(selectedPeriod);
+  const expenseRatio = Math.min(data?.summary.expenseRatio ?? 0, 100);
   const {
     categories: expenseCategories,
     isLoading: isLoadingExpenseCategories,
@@ -262,12 +368,12 @@ export default function AnalyticsScreen() {
   }
 
   function getBarLabel(label: string) {
-    return isYearlyChart && label.length > 3 ? label.slice(0, 3) : label;
+    return translateChartLabel(label, isYearlyChart);
   }
 
   return (
     <View style={styles.screen}>
-      <AppScreenHeader title="Analytics" />
+      <AppScreenHeader title={t("analytics.title")} />
 
       <ScrollView
         contentContainerStyle={[
@@ -280,20 +386,20 @@ export default function AnalyticsScreen() {
           style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}
         >
           <View style={styles.balanceColumn}>
-            <Text style={styles.label}>Total Balance</Text>
+            <Text style={styles.label}>{t("analytics.summary.totalBalance")}</Text>
             <Text style={styles.balance}>
-              {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
+              {data ? formatCurrency(data.summary.totalBalance) : formatCurrency(0)}
             </Text>
           </View>
 
           <View style={styles.separator} />
 
           <View style={styles.balanceColumn}>
-            <Text style={styles.label}>Total Expense</Text>
+            <Text style={styles.label}>{t("analytics.summary.totalExpense")}</Text>
             <Text style={styles.balance}>
               {data
                 ? `-${formatCurrency(data.summary.totalExpense)}`
-                : "-€0.00"}
+                : `-${formatCurrency(0)}`}
             </Text>
           </View>
         </View>
@@ -308,13 +414,14 @@ export default function AnalyticsScreen() {
             <View
               style={[
                 styles.progressFill,
-                { width: `${Math.min(data?.summary.expenseRatio ?? 0, 100)}%` },
+                { width: `${expenseRatio}%` },
               ]}
             />
           </View>
           <Text style={styles.progressText}>
-            {data?.summary.progressMessage ??
-              "0% of your income has been spent."}
+            {t("analytics.progress.spent", {
+              percent: Math.round(expenseRatio),
+            })}
           </Text>
         </View>
 
@@ -324,17 +431,10 @@ export default function AnalyticsScreen() {
             isDesktop && styles.segmentedControlDesktop,
           ]}
         >
-          {[
-            ["daily", "Daily"],
-            ["weekly", "Weekly"],
-            ["monthly", "Monthly"],
-            ["yearly", "Yearly"],
-          ].map(([value, label]) => (
+          {PERIOD_KEYS.map((value) => (
             <Pressable
               key={value}
-              onPress={() =>
-                setSelected(value as "daily" | "weekly" | "monthly" | "yearly")
-              }
+              onPress={() => setSelected(value)}
               style={[
                 styles.segmentItem,
                 selected === value && styles.segmentItemActive,
@@ -346,7 +446,7 @@ export default function AnalyticsScreen() {
                   selected === value && styles.segmentTextActive,
                 ]}
               >
-                {label}
+                {getPeriodLabel(value)}
               </Text>
             </Pressable>
           ))}
@@ -357,8 +457,12 @@ export default function AnalyticsScreen() {
         >
           <View style={styles.graphHeader}>
             <View style={styles.graphTitleWrap}>
-              <Text style={styles.graphTitle}>Income & Expenses</Text>
-              <Text style={styles.graphSubtitle}>Income vs expenses</Text>
+              <Text style={styles.graphTitle}>
+                {t("analytics.incomeExpenseChart.title")}
+              </Text>
+              <Text style={styles.graphSubtitle}>
+                {t("analytics.incomeExpenseChart.subtitle")}
+              </Text>
             </View>
 
             <PeriodBadge label={selectedPeriodLabel} />
@@ -367,12 +471,12 @@ export default function AnalyticsScreen() {
           <View style={styles.legendRow}>
             <View style={styles.legendItem}>
               <View style={styles.incomeDot} />
-              <Text style={styles.legendText}>Income</Text>
+              <Text style={styles.legendText}>{t("analytics.labels.income")}</Text>
             </View>
 
             <View style={styles.legendItem}>
               <View style={styles.expenseDot} />
-              <Text style={styles.legendText}>Expense</Text>
+              <Text style={styles.legendText}>{t("analytics.labels.expense")}</Text>
             </View>
           </View>
 
@@ -451,7 +555,7 @@ export default function AnalyticsScreen() {
                           ]}
                         />
                       </View>
-                      <Text style={styles.barLabel}>{item.label}</Text>
+                      <Text style={styles.barLabel}>{getBarLabel(item.label)}</Text>
                     </View>
                   ))}
                 </View>

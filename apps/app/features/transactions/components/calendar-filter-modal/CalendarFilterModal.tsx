@@ -1,7 +1,14 @@
 import { useMemo, useState } from "react";
-import { Modal, Pressable, Text, useWindowDimensions, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
+import i18n, { t } from "@/lib/i18n";
 
 import {
   calendarFilterModalColors,
@@ -9,8 +16,7 @@ import {
 } from "./calendarFilterModal.styles";
 import { CalendarFilterModalProps, DateRange } from "@repo/shared-types";
 
-
-const WEEK_DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const WEEK_DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
 export function CalendarFilterModal({
   visible,
@@ -30,7 +36,7 @@ export function CalendarFilterModal({
   }, [currentMonth]);
 
   const monthTitle = useMemo(() => {
-    return currentMonth.toLocaleDateString("en-US", {
+    return currentMonth.toLocaleDateString(i18n.locale, {
       month: "long",
       year: "numeric",
     });
@@ -110,12 +116,16 @@ export function CalendarFilterModal({
         style={[styles.backdrop, isDesktop && styles.backdropDesktop]}
         onPress={handleClose}
       >
-        <Pressable style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
+        <Pressable
+          style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}
+        >
           <View style={styles.header}>
-            <Text style={[styles.title, isDesktop && styles.titleDesktop]}>Filter by date</Text>
+            <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
+              {t("transactions.calendarFilter.title")}
+            </Text>
 
             <Pressable onPress={handleClose} style={styles.closeButton}>
-              <Icon name="close"  size={15} color={BLACK} />
+              <Icon name="close" size={15} color={BLACK} />
             </Pressable>
           </View>
 
@@ -124,23 +134,37 @@ export function CalendarFilterModal({
               onPress={handlePreviousMonth}
               style={styles.monthArrowButton}
             >
-              <Icon name="arrowLeft" size={20} strokeWidth={1.5} color={BLACK} />
+              <Icon
+                name="arrowLeft"
+                size={20}
+                strokeWidth={1.5}
+                color={BLACK}
+              />
             </Pressable>
 
-            <Text style={[styles.monthTitle, isDesktop && styles.monthTitleDesktop]}>{monthTitle}</Text>
+            <Text
+              style={[styles.monthTitle, isDesktop && styles.monthTitleDesktop]}
+            >
+              {monthTitle}
+            </Text>
 
             <Pressable
               onPress={handleNextMonth}
               style={styles.monthArrowButton}
             >
-              <Icon name="arrowRight" size={20} strokeWidth={1.5} color={BLACK} />
+              <Icon
+                name="arrowRight"
+                size={20}
+                strokeWidth={1.5}
+                color={BLACK}
+              />
             </Pressable>
           </View>
 
           <View style={styles.weekDaysRow}>
-            {WEEK_DAYS.map((day) => (
+            {WEEK_DAY_KEYS.map((day) => (
               <Text key={day} style={styles.weekDayText}>
-                {day}
+                {t(`common.weekDays.${day}`)}
               </Text>
             ))}
           </View>
@@ -148,7 +172,15 @@ export function CalendarFilterModal({
           <View style={[styles.daysGrid, isDesktop && styles.daysGridDesktop]}>
             {monthDays.map((day, index) => {
               if (!day) {
-                return <View key={`empty-${index}`} style={[styles.dayCell, isDesktop && styles.dayCellDesktop]} />;
+                return (
+                  <View
+                    key={`empty-${index}`}
+                    style={[
+                      styles.dayCell,
+                      isDesktop && styles.dayCellDesktop,
+                    ]}
+                  />
+                );
               }
 
               const isStart =
@@ -195,11 +227,15 @@ export function CalendarFilterModal({
 
           <View style={[styles.actions, isDesktop && styles.actionsDesktop]}>
             <Pressable style={styles.clearButton} onPress={handleClear}>
-              <Text style={styles.clearButtonText}>Clear</Text>
+              <Text style={styles.clearButtonText}>
+                {t("transactions.calendarFilter.clear")}
+              </Text>
             </Pressable>
 
             <Pressable style={styles.applyButton} onPress={handleApply}>
-              <Text style={styles.applyButtonText}>Apply filter</Text>
+              <Text style={styles.applyButtonText}>
+                {t("transactions.calendarFilter.applyFilter")}
+              </Text>
             </Pressable>
           </View>
         </Pressable>

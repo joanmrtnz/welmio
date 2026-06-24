@@ -17,6 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { changePassword } from "../services/profile-service";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
+import { t } from "@/lib/i18n";
 
 export default function ChangePasswordScreen() {
   const { width } = useWindowDimensions();
@@ -34,12 +35,12 @@ export default function ChangePasswordScreen() {
         !newPassword.trim() ||
         !repeatPassword.trim()
       ) {
-        feedback.error("Please fill in all fields");
+        feedback.error(t("profile.changePassword.feedback.requiredFields"));
         return;
       }
 
       if (newPassword !== repeatPassword) {
-        feedback.error("Passwords do not match");
+        feedback.error(t("profile.changePassword.feedback.passwordsDontMatch"));
         return;
       }
 
@@ -50,11 +51,11 @@ export default function ChangePasswordScreen() {
         newPassword,
       });
 
-      feedback.success("Password updated successfully");
+      feedback.success(t("profile.changePassword.feedback.updateSuccess"));
       router.replace("/profile/settings");
     } catch (error) {
       console.warn(error);
-      feedback.error("Error updating password");
+      feedback.error(t("profile.changePassword.feedback.updateError"));
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +97,7 @@ export default function ChangePasswordScreen() {
       style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <AppScreenHeader title="Change Password" />
+      <AppScreenHeader title={t("profile.changePassword.title")} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -123,10 +124,9 @@ export default function ChangePasswordScreen() {
               </View>
 
               <View style={styles.headingBlock}>
-                <Text style={styles.sectionTitle}>Password Settings</Text>
+                <Text style={styles.sectionTitle}>{t("profile.changePassword.hero.title")}</Text>
                 <Text style={styles.description}>
-                  Update your password regularly to keep your Welmio account
-                  protected.
+                  {t("profile.changePassword.hero.description")}
                 </Text>
               </View>
             </View>
@@ -138,37 +138,37 @@ export default function ChangePasswordScreen() {
                 <Icon name="shield" size={40} strokeWidth={1} color={TEAL} />
               </View>
               <View style={styles.noticeTextWrap}>
-                <Text style={styles.noticeTitle}>Use a strong password</Text>
+                <Text style={styles.noticeTitle}>{t("profile.changePassword.notice.title")}</Text>
                 <Text style={styles.noticeText}>
-                  Mix letters, numbers and symbols for better security.
+                  {t("profile.changePassword.notice.description")}
                 </Text>
               </View>
             </View>
           </View>
 
           <View style={[styles.formCard, isDesktop && styles.formCardDesktop]}>
-            <Text style={styles.formTitle}>Update password</Text>
+            <Text style={styles.formTitle}>{t("profile.changePassword.form.title")}</Text>
 
             <View style={styles.form}>
               {renderPasswordField({
-                label: "Current Password",
-                placeholder: "Enter current password",
+                label: t("profile.changePassword.form.fields.currentPassword"),
+                placeholder: t("profile.changePassword.form.placeholders.currentPassword"),
                 value: currentPassword,
                 onChangeText: setCurrentPassword,
                 textContentType: "password",
               })}
 
               {renderPasswordField({
-                label: "New Password",
-                placeholder: "Enter new password",
+                label: t("profile.changePassword.form.fields.newPassword"),
+                placeholder: t("profile.changePassword.form.placeholders.newPassword"),
                 value: newPassword,
                 onChangeText: setNewPassword,
                 textContentType: "newPassword",
               })}
 
               {renderPasswordField({
-                label: "Confirm Password",
-                placeholder: "Repeat new password",
+                label: t("profile.changePassword.form.fields.confirmPassword"),
+                placeholder: t("profile.changePassword.form.placeholders.confirmPassword"),
                 value: repeatPassword,
                 onChangeText: setRepeatPassword,
                 textContentType: "newPassword",
@@ -185,7 +185,9 @@ export default function ChangePasswordScreen() {
                 disabled={isLoading}
               >
                 <Text style={styles.updateButtonText}>
-                  {isLoading ? "Updating..." : "Update Password"}
+                  {isLoading
+                    ? t("profile.changePassword.form.actions.updating")
+                    : t("profile.changePassword.form.actions.updatePassword")}
                 </Text>
               </Pressable>
             </View>

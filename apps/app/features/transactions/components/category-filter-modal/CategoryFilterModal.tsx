@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Modal,
   Pressable,
@@ -9,18 +10,16 @@ import {
 } from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
+import { t } from "@/lib/i18n";
 
+import { CATEGORY_ICONS } from "../../constants/categoryOptions";
 import { useCategoryFilterModal } from "../../hooks/useCategoryFilterModal";
-import {
-  CATEGORY_ICONS,
-} from "../../constants/categoryOptions";
 
 import {
   categoryFilterModalColors,
   styles,
 } from "./categoryFilterModal.styles";
-import { useState } from "react";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 
 type CategoryFilterModalProps = {
   visible: boolean;
@@ -37,8 +36,6 @@ export function CategoryFilterModal({
 }: CategoryFilterModalProps) {
   const {
     mode,
-    setMode,
-
     categories,
     draftSelectedIds,
 
@@ -50,9 +47,6 @@ export function CategoryFilterModal({
 
     selectedIcon,
     setSelectedIcon,
-
-    selectedColor,
-    setSelectedColor,
 
     isSaving,
     canSaveCategory,
@@ -76,7 +70,7 @@ export function CategoryFilterModal({
     onApply,
   });
 
-  const { BLACK, WHITE, RED, TAB_GREEN } = categoryFilterModalColors;
+  const { BLACK, RED, TAB_GREEN } = categoryFilterModalColors;
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
@@ -86,6 +80,15 @@ export function CategoryFilterModal({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeletingCategories, setIsDeletingCategories] = useState(false);
 
+  const deleteDialogMessage =
+    draftSelectedIds.length === 1
+      ? t("transactions.categoryFilter.deleteDialog.singleMessage")
+      : t("transactions.categoryFilter.deleteDialog.multipleMessage");
+
+  const deleteDialogConfirmLabel =
+    draftSelectedIds.length === 1
+      ? t("transactions.categoryFilter.deleteDialog.singleConfirmLabel")
+      : t("transactions.categoryFilter.deleteDialog.multipleConfirmLabel");
 
   function handleOpenDeleteDialog() {
     setShowDeleteDialog(true);
@@ -122,11 +125,15 @@ export function CategoryFilterModal({
         style={[styles.backdrop, isDesktop && styles.backdropDesktop]}
         onPress={handleClose}
       >
-        <Pressable style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
+        <Pressable
+          style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}
+        >
           {mode === "filter" ? (
             <>
               <View style={styles.header}>
-                <Text style={styles.title}>Filter by category</Text>
+                <Text style={styles.title}>
+                  {t("transactions.categoryFilter.title")}
+                </Text>
 
                 <View style={styles.headerActions}>
                   {hasSelectedCategories && (
@@ -145,7 +152,7 @@ export function CategoryFilterModal({
                         </Pressable>
                       )}
 
-                     <Pressable
+                      <Pressable
                         onPress={handleOpenDeleteDialog}
                         style={[
                           styles.headerIconButton,
@@ -184,7 +191,10 @@ export function CategoryFilterModal({
                     return (
                       <Pressable
                         key={item.id}
-                        style={[styles.gridItem, isDesktop && styles.gridItemDesktop]}
+                        style={[
+                          styles.gridItem,
+                          isDesktop && styles.gridItemDesktop,
+                        ]}
                         onPress={() => handleToggleCategory(item.id)}
                       >
                         <View
@@ -217,21 +227,33 @@ export function CategoryFilterModal({
                 </View>
 
                 <Pressable
-                  style={[styles.addMoreButton, isDesktop && styles.addMoreButtonDesktop]}
+                  style={[
+                    styles.addMoreButton,
+                    isDesktop && styles.addMoreButtonDesktop,
+                  ]}
                   onPress={handleOpenCreateCategory}
                 >
                   <Icon name="plus" size={23} color={BLACK} />
-                  <Text style={styles.addMoreText}>Add more categories</Text>
+
+                  <Text style={styles.addMoreText}>
+                    {t("transactions.categoryFilter.addMoreCategories")}
+                  </Text>
                 </Pressable>
               </ScrollView>
 
-              <View style={[styles.actions, isDesktop && styles.actionsDesktop]}>
+              <View
+                style={[styles.actions, isDesktop && styles.actionsDesktop]}
+              >
                 <Pressable style={styles.clearButton} onPress={clearFilters}>
-                  <Text style={styles.clearButtonText}>Clear</Text>
+                  <Text style={styles.clearButtonText}>
+                    {t("transactions.categoryFilter.clear")}
+                  </Text>
                 </Pressable>
 
                 <Pressable style={styles.applyButton} onPress={applyFilters}>
-                  <Text style={styles.applyButtonText}>Apply filter</Text>
+                  <Text style={styles.applyButtonText}>
+                    {t("transactions.categoryFilter.applyFilter")}
+                  </Text>
                 </Pressable>
               </View>
             </>
@@ -239,7 +261,9 @@ export function CategoryFilterModal({
             <>
               <View style={styles.header}>
                 <Text style={styles.title}>
-                  {isEditingCategory ? "Edit Category" : "New Category"}
+                  {isEditingCategory
+                    ? t("transactions.categoryFilter.editCategory")
+                    : t("transactions.categoryFilter.newCategory")}
                 </Text>
 
                 <Pressable
@@ -262,12 +286,16 @@ export function CategoryFilterModal({
                 <TextInput
                   value={categoryName}
                   onChangeText={setCategoryName}
-                  placeholder="Category name"
+                  placeholder={t(
+                    "transactions.categoryFilter.categoryNamePlaceholder",
+                  )}
                   placeholderTextColor="rgba(5, 46, 43, 0.45)"
                   style={styles.input}
                 />
 
-                <Text style={styles.sectionLabel}>Type</Text>
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.categoryFilter.type")}
+                </Text>
 
                 <View style={styles.typeRow}>
                   <Pressable
@@ -284,7 +312,7 @@ export function CategoryFilterModal({
                           styles.typeButtonTextSelected,
                       ]}
                     >
-                      Income
+                      {t("transactions.types.income")}
                     </Text>
                   </Pressable>
 
@@ -302,12 +330,14 @@ export function CategoryFilterModal({
                           styles.typeButtonTextSelected,
                       ]}
                     >
-                      Expense
+                      {t("transactions.types.expense")}
                     </Text>
                   </Pressable>
                 </View>
 
-                <Text style={styles.sectionLabel}>Icon</Text>
+                <Text style={styles.sectionLabel}>
+                  {t("transactions.categoryFilter.icon")}
+                </Text>
 
                 <View style={styles.iconSelectorGrid}>
                   {CATEGORY_ICONS.map((item) => {
@@ -354,12 +384,16 @@ export function CategoryFilterModal({
                 </View> */}
               </ScrollView>
 
-              <View style={[styles.actions, isDesktop && styles.actionsDesktop]}>
+              <View
+                style={[styles.actions, isDesktop && styles.actionsDesktop]}
+              >
                 <Pressable
                   style={styles.clearButton}
                   onPress={handleBackToFilter}
                 >
-                  <Text style={styles.clearButtonText}>Cancel</Text>
+                  <Text style={styles.clearButtonText}>
+                    {t("transactions.categoryFilter.cancel")}
+                  </Text>
                 </Pressable>
 
                 <Pressable
@@ -371,28 +405,24 @@ export function CategoryFilterModal({
                 >
                   <Text style={styles.applyButtonText}>
                     {isSaving
-                      ? "Saving..."
+                      ? t("transactions.categoryFilter.saving")
                       : isEditingCategory
-                        ? "Save changes"
-                        : "Save"}
+                        ? t("transactions.categoryFilter.saveChanges")
+                        : t("transactions.categoryFilter.save")}
                   </Text>
                 </Pressable>
               </View>
             </>
           )}
         </Pressable>
+
         <ConfirmDialog
           visible={showDeleteDialog}
-          title="Delete Category"
-          message={`Are you sure you want to delete ${
-            draftSelectedIds.length === 1 ? "this category" : "these categories"
-          }?
-          This action cannot be undone.`}
-          confirmLabel={
-            draftSelectedIds.length === 1 ? "Yes, Delete" : "Yes, Delete All"
-          }
-          cancelLabel="Cancel"
-          loadingLabel="Deleting..."
+          title={t("transactions.categoryFilter.deleteDialog.title")}
+          message={deleteDialogMessage}
+          confirmLabel={deleteDialogConfirmLabel}
+          cancelLabel={t("transactions.categoryFilter.deleteDialog.cancelLabel")}
+          loadingLabel={t("transactions.categoryFilter.deleteDialog.loadingLabel")}
           destructive
           isLoading={isDeletingCategories}
           onConfirm={handleConfirmDeleteCategories}

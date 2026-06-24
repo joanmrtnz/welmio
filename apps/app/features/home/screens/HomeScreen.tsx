@@ -10,6 +10,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fonts } from "@/theme/fonts";
+import i18n, { t } from "@/lib/i18n";
 import { Icon } from "@/components/icons/Icon";
 import { apiFetch } from "@/lib/api/client";
 import type {
@@ -41,26 +42,25 @@ const LIGHT_GREEN = "#f8fffc";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
-const EMPTY_ANALYTICS_DATA = [
-  { label: "Mon", income: 0, expense: 0 },
-  { label: "Tue", income: 0, expense: 0 },
-  { label: "Wed", income: 0, expense: 0 },
-  { label: "Thu", income: 0, expense: 0 },
-  { label: "Fri", income: 0, expense: 0 },
-  { label: "Sat", income: 0, expense: 0 },
-  { label: "Sun", income: 0, expense: 0 },
+const getEmptyAnalyticsData = () => [
+  { label: t("common.weekdays.mon"), income: 0, expense: 0 },
+  { label: t("common.weekdays.tue"), income: 0, expense: 0 },
+  { label: t("common.weekdays.wed"), income: 0, expense: 0 },
+  { label: t("common.weekdays.thu"), income: 0, expense: 0 },
+  { label: t("common.weekdays.fri"), income: 0, expense: 0 },
+  { label: t("common.weekdays.sat"), income: 0, expense: 0 },
+  { label: t("common.weekdays.sun"), income: 0, expense: 0 },
 ];
-
 
 function isAvatarId(value: unknown): value is AvatarId {
   return typeof value === "string" && value in AVATAR_IMAGES;
 }
 
-function formatAnalyticsLabel(label: string) {
+function formatAnalyticsLabel(label: string, locale: string) {
   const parsedDate = new Date(label);
 
   if (!Number.isNaN(parsedDate.getTime())) {
-    return parsedDate.toLocaleDateString("en-US", { weekday: "short" });
+    return parsedDate.toLocaleDateString(locale, { weekday: "short" });
   }
 
   return label.length > 3 ? label.slice(0, 3) : label;
@@ -144,11 +144,11 @@ export default function HomeScreen() {
 
   const weeklyAnalyticsData = useMemo(() => {
     if (!analyticsData?.chart.labels.length) {
-      return EMPTY_ANALYTICS_DATA;
+      return getEmptyAnalyticsData();
     }
 
     return analyticsData.chart.labels.map((label, index) => ({
-      label: formatAnalyticsLabel(label),
+      label: formatAnalyticsLabel(label, i18n.locale),
       income: Number(analyticsData.chart.income[index] ?? 0),
       expense: Number(analyticsData.chart.expense[index] ?? 0),
     }));
@@ -180,7 +180,7 @@ export default function HomeScreen() {
       setGoalsOverview(response);
     } catch (error) {
       console.warn("[HomeScreen] load goals overview error:", error);
-      setGoalsErrorMessage("Could not load goals.");
+      setGoalsErrorMessage(t("home.errors.loadGoals"));
     }
   }, []);
 
@@ -220,7 +220,9 @@ export default function HomeScreen() {
             </Pressable>
 
             <View>
-             <Text style={styles.greeting}>Hi, {fullName || "User"}</Text>
+             <Text style={styles.greeting}>
+                {t("home.greeting", { name: fullName || t("home.defaultUser") })}
+              </Text>
               <Text style={styles.greetingSub}>{getGreetingLabel()}</Text>
             </View>
           </View>
@@ -234,7 +236,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
       >
-        <SectionHeader title="Overview" />
+        <SectionHeader title={t("home.sections.overview")} />
 
         <View style={[styles.overviewRow, isDesktop && styles.overviewRowDesktop]}>
           <Pressable style={[styles.overviewCard, isDesktop && styles.overviewCardDesktop]}>
@@ -248,7 +250,7 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.overviewTextWrap}>
-              <Text style={styles.overviewLabel}>Total Balance</Text>
+              <Text style={styles.overviewLabel}>{t("home.overview.totalBalance")}</Text>
               <Text style={styles.overviewPositive}>
                 {formatCurrency(totalBalance)}
               </Text>
@@ -261,7 +263,7 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.overviewTextWrap}>
-              <Text style={styles.overviewLabel}>Total Expense</Text>
+              <Text style={styles.overviewLabel}>{t("home.overview.totalExpense")}</Text>
               <Text style={styles.overviewAmount}>
                 -{formatCurrency(totalExpense)}
               </Text>
@@ -270,8 +272,8 @@ export default function HomeScreen() {
         </View>
 
         <SectionHeader
-          title="Goals"
-          action="View All"
+          title={t("home.sections.goals")}
+          action={t("home.actions.viewAll")}
           onActionPress={() => router.push("/goals")}
         />
 
@@ -283,21 +285,21 @@ export default function HomeScreen() {
         />
 
         <SectionHeader
-          title="Analytics"
-          action="View All"
+          title={t("home.sections.analytics")}
+          action={t("home.actions.viewAll")}
           onActionPress={() => router.push("/analytics")}
         />
 
         <QuickAnalyticsCard
           data={weeklyAnalyticsData}
-          title="This week chart"
-          actionLabel="Weekly"
+          title={t("home.analytics.thisWeekChart")}
+          actionLabel={t("home.analytics.weekly")}
           onPress={() => router.push("/analytics")}
         />
 
         <SectionHeader
-          title="Recent Transactions"
-          action="View All"
+          title={t("home.sections.recentTransactions")}
+          action={t("home.actions.viewAll")}
           onActionPress={() => router.push("/transactions")}
         />
 
@@ -315,7 +317,7 @@ export default function HomeScreen() {
             ))
           ) : (
             <Text style={styles.emptyTransactions}>
-              No recent transactions yet.
+              {t("home.transactions.empty")}
             </Text>
           )}
         </View>

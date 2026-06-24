@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import {
-  ActivityIndicator,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
-import { Redirect, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-import { checkAccessToken } from "@/features/auth/services/auth.service";
-import { clearAuthTokens } from "@/lib/auth-storage";
 import { AppImage } from "@/components/images/AppImage";
+import { t } from "@/lib/i18n";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { fonts } from "@/theme/fonts";
 
 const APP_VERSION = process.env.EXPO_PUBLIC_APP_VERSION?.trim() || "pre";
@@ -46,40 +45,22 @@ function DesktopSidebar() {
 export default function TabLayout() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
+  const { locale } = useLocale();
 
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    async function validateSession() {
-      try {
-        await checkAccessToken();
-        setIsAuthenticated(true);
-      } catch {
-        await clearAuthTokens();
-        setIsAuthenticated(false);
-      } finally {
-        setIsCheckingAuth(false);
-      }
-    }
-
-    validateSession();
-  }, []);
-
-  if (isCheckingAuth) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator />
-      </View>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Redirect href="/login" />;
-  }
+  const tabTitles = useMemo(
+    () => ({
+      home: t("home.title"),
+      analytics: t("analytics.title"),
+      transactions: t("transactions.title"),
+      goals: t("goals.title"),
+      profile: t("profile.title"),
+    }),
+    [locale],
+  );
 
   return (
     <Tabs
+      key={`tabs-${locale}`}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: GREEN,
@@ -106,9 +87,11 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        key={`home-${locale}`}
         name="home/index"
         options={{
-          title: "Home",
+          title: tabTitles.home,
+          tabBarLabel: tabTitles.home,
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="home" color={color} />
           ),
@@ -116,9 +99,11 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        key={`analytics-${locale}`}
         name="analytics/index"
         options={{
-          title: "Analytics",
+          title: tabTitles.analytics,
+          tabBarLabel: tabTitles.analytics,
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="bar-chart" color={color} />
           ),
@@ -126,9 +111,11 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        key={`transactions-${locale}`}
         name="transactions/index"
         options={{
-          title: "Transactions",
+          title: tabTitles.transactions,
+          tabBarLabel: tabTitles.transactions,
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="exchange" color={color} />
           ),
@@ -136,9 +123,11 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        key={`goals-${locale}`}
         name="goals/index"
         options={{
-          title: "Goals",
+          title: tabTitles.goals,
+          tabBarLabel: tabTitles.goals,
           tabBarIcon: ({ color }) => (
             <FontAwesome name="flag" size={24} color={color} />
           ),
@@ -146,9 +135,11 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        key={`profile-${locale}`}
         name="profile/index"
         options={{
-          title: "Profile",
+          title: tabTitles.profile,
+          tabBarLabel: tabTitles.profile,
           tabBarIcon: ({ color }) => (
             <FontAwesome size={24} name="user" color={color} />
           ),
@@ -159,12 +150,6 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
   tabBar: {
     backgroundColor: LIGHT_GREEN,
     borderColor: "rgba(9, 169, 130, 0.12)",

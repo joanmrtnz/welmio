@@ -35,6 +35,7 @@ export const ICON_NAMES = [
   "phone",
   "mail",
   "document",
+  "language",
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];

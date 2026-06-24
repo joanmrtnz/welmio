@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Image,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -11,13 +11,21 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 import { useValidateResetPasswordCode } from "@/features/auth/hooks/useValidateResetPasswordCode";
 import { useSendResetPasswordCode } from "@/features/auth/hooks/useSendResetPasswordCode";
 import { AppImage } from "@/components/images/AppImage";
+import {
+  canAccessVerifyCode,
+  getResetPasswordFlow,
+  setResetPasswordCodeSent,
+  setResetPasswordCodeVerified,
+} from "@/lib/auth/reset-password-flow-storage";
+import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 const WELMIO_LOGO = require("@/assets/images/welmio-logo.png");
 
@@ -28,40 +36,84 @@ const DARK = "#052e2b";
 const MUTED = "#6f8586";
 const CARD = "#ffffff";
 const SOFT_GREEN = "#e3f8f1";
-const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
+
+type ValidateResetPasswordCodeResponse = {
+  valid?: boolean;
+  resetToken?: string;
+  token?: string;
+};
+
+function getResetTokenFromResponse(response: unknown) {
+  if (!response || typeof response !== "object") {
+    return undefined;
+  }
+
+  const result = response as ValidateResetPasswordCodeResponse;
+  const token = result.resetToken ?? result.token;
+
+  return typeof token === "string" && token.trim() ? token.trim() : undefined;
+}
 
 export default function VerifyCodeScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const [code, setCode] = useState("");
-  const { email } = useLocalSearchParams<{ email?: string }>();
+  const [email, setEmail] = useState("");
+  const [isCheckingFlow, setIsCheckingFlow] = useState(true);
+  const { t } = useTranslation();
 
   const { execute, loading } = useValidateResetPasswordCode();
   const { execute: resendCode, loading: resendLoading } =
     useSendResetPasswordCode();
 
+  useEffect(() => {
+    let isMounted = true;
+
+    async function hydrateResetFlow() {
+      const flow = await getResetPasswordFlow();
+
+      if (!canAccessVerifyCode(flow)) {
+        router.replace("/(public)/forgot-password");
+        return;
+      }
+
+      if (isMounted && flow) {
+        setEmail(flow.email);
+        setIsCheckingFlow(false);
+      }
+    }
+
+    void hydrateResetFlow();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   async function handleAccept() {
     try {
       if (!email) {
-        console.warn("Email is missing");
+        console.warn(t("auth.verifyCodeScreen.errors.emailMissing"));
         return;
       }
 
-      if (!code.trim()) {
-        console.warn("Recovery code is required");
+      const normalizedCode = code.trim();
+
+      if (!normalizedCode) {
+        console.warn(t("auth.verifyCodeScreen.errors.codeRequired"));
         return;
       }
 
-      const res = await execute(email, code.trim());
+      const res = await execute(email, normalizedCode);
 
       if (res?.valid) {
-        router.push({
-          pathname: "/(public)/forgot-password/new-password",
-          params: {
-            email,
-            code: code.trim(),
-          },
+        await setResetPasswordCodeVerified({
+          email,
+          verificationCode: normalizedCode,
+          resetToken: getResetTokenFromResponse(res),
         });
+
+        router.push("/(public)/forgot-password/new-password");
       }
     } catch (error) {
       console.warn(error);
@@ -71,14 +123,26 @@ export default function VerifyCodeScreen() {
   async function handleSendAgain() {
     try {
       if (!email) {
-        console.warn("Email is missing");
+        console.warn(t("auth.verifyCodeScreen.errors.emailMissing"));
         return;
       }
 
-      await resendCode(email);
+      const res = await resendCode(email);
+
+      if (res) {
+        await setResetPasswordCodeSent(email);
+      }
     } catch (error) {
       console.warn(error);
     }
+  }
+
+  if (isCheckingFlow) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator color={PRIMARY} />
+      </View>
+    );
   }
 
   return (
@@ -102,12 +166,10 @@ export default function VerifyCodeScreen() {
           >
             <View style={styles.brandRow}>
               <View style={styles.logoBadge}>
-                <AppImage
-                  source={WELMIO_LOGO}
-                  style={styles.logoImage}
-                />
+                <AppImage source={WELMIO_LOGO} style={styles.logoImage} />
               </View>
-              <Text style={styles.brandName}>Welmio</Text>
+
+              <Text style={styles.brandName}>{t("common.appName")}</Text>
             </View>
 
             {isDesktop ? (
@@ -115,12 +177,13 @@ export default function VerifyCodeScreen() {
                 <View style={styles.desktopIntroIcon}>
                   <FontAwesome name="lock" size={30} color={PRIMARY} />
                 </View>
+
                 <Text style={styles.desktopIntroTitle}>
-                  Confirm your recovery code
+                  {t("auth.verifyCodeScreen.desktopTitle")}
                 </Text>
+
                 <Text style={styles.desktopIntroText}>
-                  Enter the verification code from your email to keep your
-                  password reset secure.
+                  {t("auth.verifyCodeScreen.desktopText")}
                 </Text>
               </View>
             ) : null}
@@ -139,17 +202,21 @@ export default function VerifyCodeScreen() {
 
             <View style={[styles.card, isDesktop && styles.cardDesktop]}>
               <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
-                Verify code
+                {t("auth.verifyCodeScreen.title")}
               </Text>
+
               <Text
                 style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}
               >
-                Enter the recovery code we sent to your email to continue.
+                {t("auth.verifyCodeScreen.subtitle")}
               </Text>
 
               <View style={styles.form}>
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Recovery code</Text>
+                  <Text style={styles.inputLabel}>
+                    {t("auth.verifyCodeScreen.recoveryCode")}
+                  </Text>
+
                   <View style={styles.inputShell}>
                     <FontAwesome
                       name="key"
@@ -157,9 +224,10 @@ export default function VerifyCodeScreen() {
                       color="rgba(5, 46, 43, 0.5)"
                       style={styles.inputIcon}
                     />
+
                     <TextInput
                       style={styles.textInput}
-                      placeholder="Enter your code"
+                      placeholder={t("auth.verifyCodeScreen.codePlaceholder")}
                       placeholderTextColor="rgba(5, 46, 43, 0.42)"
                       keyboardType="number-pad"
                       textContentType="oneTimeCode"
@@ -182,7 +250,9 @@ export default function VerifyCodeScreen() {
                     ]}
                   >
                     <Text style={styles.primaryButtonText}>
-                      {loading ? "Checking..." : "Accept"}
+                      {loading
+                        ? t("auth.verifyCodeScreen.checking")
+                        : t("auth.verifyCodeScreen.accept")}
                     </Text>
                   </Pressable>
 
@@ -196,7 +266,9 @@ export default function VerifyCodeScreen() {
                     ]}
                   >
                     <Text style={styles.secondaryButtonText}>
-                      {resendLoading ? "Sending..." : "Send again"}
+                      {resendLoading
+                        ? t("auth.verifyCodeScreen.sending")
+                        : t("auth.verifyCodeScreen.sendAgain")}
                     </Text>
                   </Pressable>
                 </View>
@@ -208,15 +280,21 @@ export default function VerifyCodeScreen() {
                     pressed ? styles.buttonPressed : null,
                   ]}
                 >
-                  <Text style={styles.ghostButtonText}>Back to Log In</Text>
+                  <Text style={styles.ghostButtonText}>
+                    {t("auth.verifyCodeScreen.backToLogin")}
+                  </Text>
                 </Pressable>
 
                 <Link href="/(public)/signup" style={styles.footer}>
                   <Text>
-                    Don’t have an account?{" "}
-                    <Text style={styles.link}>Sign Up</Text>
+                    {t("auth.verifyCodeScreen.noAccount")}{" "}
+                    <Text style={styles.link}>
+                      {t("auth.verifyCodeScreen.signUp")}
+                    </Text>
                   </Text>
                 </Link>
+
+                <PublicAuthLanguageSelector />
               </View>
             </View>
           </View>
@@ -233,7 +311,15 @@ export default function VerifyCodeScreen() {
     </KeyboardAvoidingView>
   );
 }
+
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: GREEN,
+  },
+
   screen: {
     flex: 1,
     backgroundColor: GREEN,

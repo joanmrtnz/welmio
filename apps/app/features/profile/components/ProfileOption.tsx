@@ -13,10 +13,11 @@ const LOGOUT_BG = "#ffe9e9";
 type OptionProps = {
   icon: any;
   label: string;
+  size?: number,
   onPress?: () => void;
 };
 
-export function ProfileOption({ icon, label, onPress }: OptionProps) {
+export function ProfileOption({ icon, label, size=23, onPress }: OptionProps) {
   const isLogout = icon === "logout";
 
   return (
@@ -25,7 +26,7 @@ export function ProfileOption({ icon, label, onPress }: OptionProps) {
         <View style={[styles.optionIcon, isLogout && styles.logoutIcon]}>
           <Icon
             name={icon}
-            size={23}
+            size={size}
             strokeWidth={1.7}
             color={isLogout ? LOGOUT : TEAL}
           />

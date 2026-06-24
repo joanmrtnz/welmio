@@ -35,6 +35,7 @@ import { CreateTransactionModal } from "@/features/transactions/components/creat
 import { formatGoalTargetDate } from "../utils/formatGoalTargetDate";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { t } from "@/lib/i18n";
 
 const GREEN = "#dff7ef";
 const DIVIDER_GREEN = "#7adcc8";
@@ -49,7 +50,6 @@ const BUTTON_GREEN = "#10b992";
 const SOFT_SHADOW = "rgba(28, 105, 91, 0.14)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
-
 
 export default function GoalsScreen() {
   const { width } = useWindowDimensions();
@@ -90,14 +90,10 @@ export default function GoalsScreen() {
       await loadGoalsOverview();
 
       setIsCreateGoalModalVisible(false);
-      feedback.success("Goal created successfully.");
+      feedback.success(t("goals.feedback.createSuccess"));
     } catch (error) {
       console.warn(error);
-
-      const message =
-        error instanceof Error ? error.message : "Could not create goal.";
-
-      feedback.error(message);
+      feedback.error(t("goals.feedback.createError"));
     }
   }
 
@@ -110,35 +106,25 @@ export default function GoalsScreen() {
       setEditingGoal(null);
       setCreateGoalModalMode("create");
 
-      feedback.success("Goal updated successfully.");
+      feedback.success(t("goals.feedback.updateSuccess"));
     } catch (error) {
       console.warn(error);
-
-      const message =
-        error instanceof Error ? error.message : "Could not update goal.";
-
-      feedback.error(message);
+      feedback.error(t("goals.feedback.updateError"));
     }
   }
 
   async function handleDeleteGoal(goal: GoalOverviewItem) {
     try {
-      console.log("Delete goal later", goal.id);
-
       await deleteGoal(goal.id);
       await loadGoalsOverview();
 
       setIsGoalDetailsModalVisible(false);
       setSelectedGoal(null);
 
-      feedback.success("Goal deleted successfully.");
+      feedback.success(t("goals.feedback.deleteSuccess"));
     } catch (error) {
       console.warn(error);
-
-      const message =
-        error instanceof Error ? error.message : "Could not delete goal.";
-
-      feedback.error(message);
+      feedback.error(t("goals.feedback.deleteError"));
 
       throw error;
     }
@@ -154,7 +140,7 @@ export default function GoalsScreen() {
       setData(response);
     } catch (error) {
       console.warn(error);
-      setErrorMessage("Could not load goals.");
+      setErrorMessage(t("goals.feedback.loadError"));
     } finally {
       setIsLoading(false);
     }
@@ -191,8 +177,12 @@ export default function GoalsScreen() {
     setTransactionInitialValues({
       type: "income",
       goalId: goal.id,
-      description: `Contribution to ${goal.name}`,
-      notes: `Goal contribution · ${goal.name}`,
+      description: t("goals.contributions.defaultDescription", {
+        goalName: goal.name,
+      }),
+      notes: t("goals.contributions.defaultNotes", {
+        goalName: goal.name,
+      }),
     });
 
     setIsCreateTransactionModalVisible(true);
@@ -206,16 +196,10 @@ export default function GoalsScreen() {
       await deleteGoalContribution(goal.id, contribution.id);
       await loadGoalsOverview();
 
-      feedback.success("Contribution removed successfully.");
+      feedback.success(t("goals.feedback.contributionDeleteSuccess"));
     } catch (error) {
       console.warn(error);
-
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Could not remove contribution.";
-
-      feedback.error(message);
+      feedback.error(t("goals.feedback.contributionDeleteError"));
 
       throw error;
     }
@@ -240,9 +224,16 @@ export default function GoalsScreen() {
   const mainGoal = data?.mainGoal ?? null;
   const goals = data?.goals ?? [];
 
+  const progressMessage = getProgressMessage({
+    isLoading,
+    errorMessage,
+    goalsCount: goals.length,
+    globalProgress,
+  });
+
   return (
     <View style={styles.screen}>
-      <AppScreenHeader title="Goals" />
+      <AppScreenHeader title={t("goals.title")} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -255,14 +246,14 @@ export default function GoalsScreen() {
           style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}
         >
           <View style={styles.balanceColumn}>
-            <Text style={styles.label}>Total Saved</Text>
+            <Text style={styles.label}>{t("goals.summary.totalSaved")}</Text>
             <Text style={styles.balance}>{formatCurrency(totalSaved)}</Text>
           </View>
 
           <View style={styles.separator} />
 
           <View style={styles.balanceColumn}>
-            <Text style={styles.label}>Target Amount</Text>
+            <Text style={styles.label}>{t("goals.summary.targetAmount")}</Text>
             <Text style={styles.expense}>{formatCurrency(totalTarget)}</Text>
           </View>
         </View>
@@ -275,13 +266,7 @@ export default function GoalsScreen() {
               style={[styles.progressFill, { width: `${globalProgress}%` }]}
             />
           </View>
-          <Text style={styles.progressText}>
-            {isLoading
-              ? "Loading goals..."
-              : (errorMessage ??
-                data?.summary.progressMessage ??
-                "No goals yet.")}
-          </Text>
+          <Text style={styles.progressText}>{progressMessage}</Text>
         </View>
 
         {mainGoal ? (
@@ -294,7 +279,9 @@ export default function GoalsScreen() {
           >
             <View style={styles.mainGoalHeader}>
               <View style={styles.mainGoalTextWrap}>
-                <Text style={styles.sectionEyebrow}>Main Goal</Text>
+                <Text style={styles.sectionEyebrow}>
+                  {t("goals.mainGoal.eyebrow")}
+                </Text>
                 <Text style={styles.mainGoalTitle} numberOfLines={1}>
                   {mainGoal.name}
                 </Text>
@@ -323,11 +310,17 @@ export default function GoalsScreen() {
                 </Text>
 
                 <Text style={styles.goalMeta} numberOfLines={1}>
-                  saved of {formatCurrency(mainGoal.target)}
+                  {t("goals.mainGoal.savedOf", {
+                    amount: formatCurrency(mainGoal.target),
+                  })}
                 </Text>
 
                 <Text style={styles.goalMeta} numberOfLines={1}>
-                  Target date · {formatGoalTargetDate(mainGoal.targetDate)}
+                  {t("goals.mainGoal.targetDate", {
+                    date: formatGoalTargetDate(mainGoal.targetDate, {
+                      fallback: t("goals.details.noDeadline"),
+                    }),
+                  })}
                 </Text>
               </View>
             </View>
@@ -348,9 +341,11 @@ export default function GoalsScreen() {
               isDesktop && styles.mainGoalCardDesktop,
             ]}
           >
-            <Text style={styles.mainGoalTitle}>No goals yet</Text>
+            <Text style={styles.mainGoalTitle}>
+              {t("goals.empty.title")}
+            </Text>
             <Text style={styles.goalMeta}>
-              Create your first goal to start tracking your progress.
+              {t("goals.empty.description")}
             </Text>
           </View>
         )}
@@ -360,7 +355,9 @@ export default function GoalsScreen() {
             <View style={styles.smallIconBox}>
               <Icon name="calendar" size={23} color={TAB_GREEN} />
             </View>
-            <Text style={styles.paceLabel}>Monthly Needed</Text>
+            <Text style={styles.paceLabel}>
+              {t("goals.pace.monthlyNeeded")}
+            </Text>
             <Text style={styles.paceValue}>
               {formatCurrency(totalMonthlyNeeded)}
             </Text>
@@ -372,17 +369,19 @@ export default function GoalsScreen() {
             <View style={styles.smallIconBox}>
               <Icon name="income" size={23} color={TAB_GREEN} />
             </View>
-            <Text style={styles.paceLabel}>Active Goals</Text>
+            <Text style={styles.paceLabel}>
+              {t("goals.pace.activeGoals")}
+            </Text>
             <Text style={styles.paceValue}>{goals.length}</Text>
           </View>
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>My Goals</Text>
+          <Text style={styles.sectionTitle}>{t("goals.list.title")}</Text>
 
           <View style={styles.sectionActions}>
             <Pressable style={styles.filterButton}>
-              <Text style={styles.filterText}>Active</Text>
+              <Text style={styles.filterText}>{t("goals.filters.active")}</Text>
             </Pressable>
 
             {isDesktop && (
@@ -391,7 +390,7 @@ export default function GoalsScreen() {
                 onPress={openCreateGoalModal}
               >
                 <Icon name="plus" size={16} color={BLACK} strokeWidth={2} />
-                <Text style={styles.filterText}>New goal</Text>
+                <Text style={styles.filterText}>{t("goals.actions.newGoal")}</Text>
               </Pressable>
             )}
           </View>
@@ -421,8 +420,10 @@ export default function GoalsScreen() {
                     </Text>
 
                     <Text style={styles.goalSubtitle} numberOfLines={1}>
-                      {formatGoalTargetDate(goal.targetDate)} ·{" "}
-                      {goal.statusLabel}
+                      {formatGoalTargetDate(goal.targetDate, {
+                        fallback: t("goals.details.noDeadline"),
+                      })} ·{" "}
+                      {formatGoalStatusLabel(goal.statusLabel)}
                     </Text>
                   </View>
                 </View>
@@ -443,7 +444,9 @@ export default function GoalsScreen() {
 
               <View style={styles.goalBottomRow}>
                 <Text style={styles.goalSmallText} numberOfLines={1}>
-                  {formatCurrency(goal.saved)} saved
+                  {t("goals.list.savedAmount", {
+                    amount: formatCurrency(goal.saved),
+                  })}
                 </Text>
 
                 <Text style={styles.goalSmallText} numberOfLines={1}>
@@ -460,12 +463,14 @@ export default function GoalsScreen() {
           </View>
 
           <View style={styles.tipContent}>
-            <Text style={styles.tipTitle}>Smart tip</Text>
+            <Text style={styles.tipTitle}>{t("goals.smartTip.title")}</Text>
             <Text style={styles.tipText}>
               {mainGoal
-                ? `You need around ${formatCurrency(mainGoal.monthlyNeeded
-                )} per month to reach your ${mainGoal.name.toLowerCase()} goal on time.`
-                : "Create a goal to receive simple progress tips."}
+                ? t("goals.smartTip.withMainGoal", {
+                    amount: formatCurrency(mainGoal.monthlyNeeded),
+                    goalName: mainGoal.name.toLowerCase(),
+                  })
+                : t("goals.smartTip.empty")}
             </Text>
           </View>
         </View>
@@ -512,6 +517,56 @@ export default function GoalsScreen() {
       />
     </View>
   );
+}
+
+type ProgressMessageInput = {
+  isLoading: boolean;
+  errorMessage: string | null;
+  goalsCount: number;
+  globalProgress: number;
+};
+
+function getProgressMessage({
+  isLoading,
+  errorMessage,
+  goalsCount,
+  globalProgress,
+}: ProgressMessageInput) {
+  if (isLoading) {
+    return t("goals.progress.loading");
+  }
+
+  if (errorMessage) {
+    return errorMessage;
+  }
+
+  if (goalsCount === 0) {
+    return t("goals.progress.empty");
+  }
+
+  return t("goals.progress.saved", {
+    percent: Math.round(globalProgress),
+  });
+}
+
+function formatGoalStatusLabel(statusLabel: string) {
+  const statusKey = normalizeGoalStatusLabel(statusLabel);
+  const translationKey = `goals.statusLabels.${statusKey}`;
+  const translated = t(translationKey);
+
+  if (typeof translated === "string" && !isMissingTranslation(translated)) {
+    return translated;
+  }
+
+  return statusLabel;
+}
+
+function normalizeGoalStatusLabel(statusLabel: string) {
+  return statusLabel.trim().toLowerCase().replace(/[\s-]+/g, "_");
+}
+
+function isMissingTranslation(value: string) {
+  return value.startsWith("[missing");
 }
 
 const styles = StyleSheet.create({

@@ -1,6 +1,14 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
@@ -22,7 +30,7 @@ export default function SecurityScreen() {
 
   return (
     <View style={styles.screen}>
-      <AppScreenHeader title="Security" />
+      <AppScreenHeader title={t("profile.security.title")} />
 
       <View style={[styles.card, isDesktop && styles.cardDesktop]}>
         <ScrollView
@@ -33,35 +41,48 @@ export default function SecurityScreen() {
           ]}
         >
           <View style={isDesktop && styles.desktopHeaderBlock}>
-            <Text style={[styles.sectionTitle, isDesktop && styles.sectionTitleDesktop]}>
-              Security Settings
+            <Text
+              style={[
+                styles.sectionTitle,
+                isDesktop && styles.sectionTitleDesktop,
+              ]}
+            >
+              {t("profile.security.sectionTitle")}
             </Text>
+
             {isDesktop ? (
               <Text style={styles.sectionDescriptionDesktop}>
-                Manage account protection, biometric access, and security policies.
+                {t("profile.security.sectionDescription")}
               </Text>
             ) : null}
           </View>
 
-          <View style={[styles.optionsContainer, isDesktop && styles.optionsContainerDesktop]}>
+          <View
+            style={[
+              styles.optionsContainer,
+              isDesktop && styles.optionsContainerDesktop,
+            ]}
+          >
             <SecurityOption
               icon="key"
-              label="Change Pin"
-              description="Update your secure access pin"
+              label={t("profile.security.options.changePin.label")}
+              description={t("profile.security.options.changePin.description")}
               isDesktop={isDesktop}
             />
 
             <SecurityOption
               icon="fingerPrint"
-              label="Fingerprint"
-              description="Manage biometric authentication"
+              label={t("profile.security.options.fingerprint.label")}
+              description={t("profile.security.options.fingerprint.description")}
               isDesktop={isDesktop}
             />
 
             <SecurityOption
               icon="document"
-              label="Terms And Conditions"
-              description="Review app security and usage terms"
+              label={t("profile.security.options.termsAndConditions.label")}
+              description={t(
+                "profile.security.options.termsAndConditions.description",
+              )}
               isDesktop={isDesktop}
             />
           </View>
@@ -86,7 +107,12 @@ type SecurityOptionProps = {
   isDesktop?: boolean;
 };
 
-function SecurityOption({ icon, label, description, isDesktop }: SecurityOptionProps) {
+function SecurityOption({
+  icon,
+  label,
+  description,
+  isDesktop,
+}: SecurityOptionProps) {
   const isFingerprint = icon === "fingerPrint";
 
   return (
@@ -96,15 +122,27 @@ function SecurityOption({ icon, label, description, isDesktop }: SecurityOptionP
           <Icon
             name={icon}
             size={isFingerprint ? 25 : 21}
-            strokeWidth={isFingerprint ? 6: 2}
+            strokeWidth={isFingerprint ? 6 : 2}
             color={MINT_STRONG}
           />
         </View>
 
         <View style={styles.optionTextWrap}>
-          <Text style={[styles.optionLabel, isDesktop && styles.optionLabelDesktop]}>{label}</Text>
+          <Text
+            style={[styles.optionLabel, isDesktop && styles.optionLabelDesktop]}
+          >
+            {label}
+          </Text>
+
           {description ? (
-            <Text style={[styles.optionDescription, isDesktop && styles.optionDescriptionDesktop]}>{description}</Text>
+            <Text
+              style={[
+                styles.optionDescription,
+                isDesktop && styles.optionDescriptionDesktop,
+              ]}
+            >
+              {description}
+            </Text>
           ) : null}
         </View>
       </View>
@@ -151,7 +189,7 @@ const styles = StyleSheet.create({
     shadowColor: "rgba(7, 59, 56, 0.08)",
     shadowOpacity: 1,
     shadowRadius: 22,
-    shadowOffset: { width: 0, height: 10},
+    shadowOffset: { width: 0, height: 10 },
     elevation: 4,
   },
 
