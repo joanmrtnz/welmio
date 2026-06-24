@@ -152,8 +152,6 @@ export const screenshotsDesktop: Screenshot[] = [
     text: "Recover access with a guided email verification flow for resetting your password.",
     image: "/screenshots/desktop/welmio-forgot-password.png",
   },
-    image: "/screenshots/welmio-edit-avatar.png",
-  }
 ];
 
 export const steps: IconCard[] = [
