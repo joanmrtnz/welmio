@@ -14,7 +14,6 @@ import {
 import { Link, router } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
-import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 import { useResetPassword } from "@/features/auth/hooks/useResetPassword";
 import { AppImage } from "@/components/images/AppImage";
