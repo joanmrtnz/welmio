@@ -50,6 +50,29 @@
   backdrop-filter: blur(16px);
 }
 
+.deleteAccountButton {
+  display: flex;
+  width: 100%;
+  max-width: 280px;
+  min-height: 48px;
+  margin: 24px auto 0;
+  padding: 0 24px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 999px;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #05be92, #009e78);
+  box-shadow: 0 16px 36px rgba(0, 173, 131, 0.28);
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
