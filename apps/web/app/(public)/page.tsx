@@ -206,6 +206,7 @@ export default function Home(): ReactElement {
           <a href="mailto:hello@welmio.app">Contact</a>
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms of Use</Link>
+          <Link href="/delete-account">Delete Account</Link>
         </div>
 
         <div className={styles.socials}>
