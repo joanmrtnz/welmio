@@ -82,6 +82,75 @@ function formatDatePickerValueToIso(value: string) {
   return `${year}-${month}-${day}`;
 }
 
+function formatDateToIsoDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function getTodayDate() {
+  const today = new Date();
+
+  return new Date(today.getFullYear(), today.getMonth(), today.getDate());
+}
+
+function getMaxTargetDate() {
+  const maxDate = getTodayDate();
+
+  maxDate.setFullYear(maxDate.getFullYear() + 100);
+
+  return maxDate;
+}
+
+function getTodayIsoDate() {
+  return formatDateToIsoDate(getTodayDate());
+}
+
+function getMaxTargetDateIso() {
+  return formatDateToIsoDate(getMaxTargetDate());
+}
+
+function parseIsoDate(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const parsedDate = new Date(year, month - 1, day);
+
+  if (
+    parsedDate.getFullYear() !== year ||
+    parsedDate.getMonth() !== month - 1 ||
+    parsedDate.getDate() !== day
+  ) {
+    return null;
+  }
+
+  return parsedDate;
+}
+
+function isCompleteIsoDate(value: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function isTargetDateAllowed(value: string) {
+  const targetDate = parseIsoDate(value);
+  const today = parseIsoDate(getTodayIsoDate());
+  const maxTargetDate = parseIsoDate(getMaxTargetDateIso());
+
+  if (!targetDate || !today || !maxTargetDate) {
+    return false;
+  }
+
+  return targetDate >= today && targetDate <= maxTargetDate;
+}
+
 export function CreateGoalModal({
   visible,
   mode = "create",
@@ -93,6 +162,8 @@ export function CreateGoalModal({
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
   const isEditMode = mode === "edit";
+  const targetDateMinimumDate = getTodayDate();
+  const targetDateMaximumDate = getMaxTargetDate();
 
   const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
@@ -148,13 +219,28 @@ export function CreateGoalModal({
         throw new Error(t("goals.createModal.errors.currentGreaterThanTarget"));
       }
 
+      const normalizedTargetDate = targetDate.trim();
+
+      if (
+        normalizedTargetDate &&
+        (!isCompleteIsoDate(normalizedTargetDate) ||
+          !isTargetDateAllowed(normalizedTargetDate))
+      ) {
+        throw new Error(
+          t("goals.createModal.errors.targetDateInvalid", {
+            defaultValue:
+              "Target date must be between today and the next 100 years.",
+          }),
+        );
+      }
+
       const payload: CreateGoalPayload = {
         name: name.trim(),
         description: goal?.description ?? null,
         targetAmount: parsedTargetAmount,
         currentAmount: parsedCurrentAmount,
         currency: goal?.currency ?? "USD",
-        targetDate: targetDate.trim() || null,
+        targetDate: normalizedTargetDate || null,
         startDate: null,
         type: selectedType,
         icon: selectedIcon,
@@ -299,8 +385,20 @@ export function CreateGoalModal({
                     icon="calendar-o"
                     placeholder={t("goals.createModal.placeholders.targetDate")}
                     value={formatIsoDateForDatePicker(targetDate)}
+                    minimumDate={targetDateMinimumDate}
+                    maximumDate={targetDateMaximumDate}
+                    pickerDefaultDate={targetDateMinimumDate}
                     onChangeText={(value) => {
-                      setTargetDate(formatDatePickerValueToIso(value));
+                      const nextTargetDate = formatDatePickerValueToIso(value);
+
+                      if (
+                        isCompleteIsoDate(nextTargetDate) &&
+                        !isTargetDateAllowed(nextTargetDate)
+                      ) {
+                        return;
+                      }
+
+                      setTargetDate(nextTargetDate);
                     }}
                   />
                 </View>

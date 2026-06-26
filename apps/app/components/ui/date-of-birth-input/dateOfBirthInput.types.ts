@@ -7,4 +7,7 @@ export type DateOfBirthInputProps = {
   placeholder: string;
   value: string;
   onChangeText: (value: string) => void;
+  minimumDate?: Date;
+  maximumDate?: Date;
+  pickerDefaultDate?: Date;
 };

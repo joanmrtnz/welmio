@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DateTimePicker, {
@@ -11,7 +11,6 @@ const TEXT = "#073b3a";
 const INPUT_BG = "#ffffff";
 const INPUT_BORDER = "rgba(7, 59, 58, 0.12)";
 
-
 function formatDateForInput(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -20,13 +19,13 @@ function formatDateForInput(date: Date) {
   return `${day} / ${month} / ${year}`;
 }
 
-function parseDateForPicker(value: string) {
+function parseDateForPicker(value: string, fallbackDate: Date) {
   const [day, month, year] = value
     .split("/")
     .map((part) => Number(part.trim()));
 
   if (!day || !month || !year) {
-    return new Date(2000, 0, 1);
+    return fallbackDate;
   }
 
   return new Date(year, month - 1, day);
@@ -38,14 +37,30 @@ export function DateOfBirthInput({
   value,
   placeholder,
   onChangeText,
+  minimumDate,
+  maximumDate,
+  pickerDefaultDate,
 }: DateOfBirthInputProps) {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const resolvedMaximumDate = useMemo(
+    () => maximumDate ?? new Date(),
+    [maximumDate],
+  );
+
+  const fallbackPickerDate =
+    pickerDefaultDate ?? minimumDate ?? resolvedMaximumDate ?? new Date(2000, 0, 1);
+
   function handleValueChange(
-    _event: DateTimePickerChangeEvent,
-    selectedDate: Date
+    event: DateTimePickerChangeEvent,
+    selectedDate?: Date,
   ) {
     setShowDatePicker(false);
+
+    if (event.type === "dismissed" || !selectedDate) {
+      return;
+    }
+
     onChangeText(formatDateForInput(selectedDate));
   }
 
@@ -73,10 +88,11 @@ export function DateOfBirthInput({
 
       {showDatePicker ? (
         <DateTimePicker
-          value={parseDateForPicker(value)}
+          value={parseDateForPicker(value, fallbackPickerDate)}
           mode="date"
           display="default"
-          maximumDate={new Date()}
+          minimumDate={minimumDate}
+          maximumDate={resolvedMaximumDate}
           onValueChange={handleValueChange}
           onDismiss={() => setShowDatePicker(false)}
         />

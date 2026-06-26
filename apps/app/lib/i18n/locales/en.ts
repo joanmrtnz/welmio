@@ -624,6 +624,7 @@ const en = {
         nameRequired: "Goal name is required.",
         targetAmountInvalid: "Target amount must be greater than 0.",
         currentAmountInvalid: "Current amount must be 0 or greater.",
+        targetDateInvalid: "Target date must be between today and the next 100 years.",
         currentGreaterThanTarget:
           "Current amount cannot be greater than target amount.",
       },

@@ -624,6 +624,7 @@ const ca = {
         nameRequired: "El nom de l’objectiu és obligatori.",
         targetAmountInvalid: "La quantitat objectiu ha de ser superior a 0.",
         currentAmountInvalid: "L’estalvi actual ha de ser 0 o superior.",
+        targetDateInvalid: "La data objectiu ha d’estar entre avui i els pròxims 100 anys.",
         currentGreaterThanTarget:
           "L’estalvi actual no pot ser superior a la quantitat objectiu.",
       },
