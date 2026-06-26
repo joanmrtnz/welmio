@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
-import { DateOfBirthInputProps } from "./dateOfBirthInput.types";
+import { DateInputProps } from "./dateInput.types";
 
 const TEXT = "#073b3a";
 const INPUT_BG = "#ffffff";
@@ -61,7 +61,7 @@ function parseDateForWebInput(value: string) {
   )}`;
 }
 
-export function DateOfBirthInput({
+export function DateInput({
   label,
   icon,
   value,
@@ -69,7 +69,7 @@ export function DateOfBirthInput({
   onChangeText,
   minimumDate,
   maximumDate,
-}: DateOfBirthInputProps) {
+}: DateInputProps) {
   const resolvedMaximumDate = useMemo(
     () => maximumDate ?? new Date(),
     [maximumDate],

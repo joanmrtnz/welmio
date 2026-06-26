@@ -2,10 +2,11 @@ import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DateTimePicker, {
-  DateTimePickerChangeEvent,
+  type DateTimePickerChangeEvent,
 } from "@react-native-community/datetimepicker";
+
 import { fonts } from "@/theme/fonts";
-import { DateOfBirthInputProps } from "./dateOfBirthInput.types";
+import { DateInputProps } from "./dateInput.types";
 
 const TEXT = "#073b3a";
 const INPUT_BG = "#ffffff";
@@ -31,7 +32,7 @@ function parseDateForPicker(value: string, fallbackDate: Date) {
   return new Date(year, month - 1, day);
 }
 
-export function DateOfBirthInput({
+export function DateInput({
   label,
   icon,
   value,
@@ -40,7 +41,7 @@ export function DateOfBirthInput({
   minimumDate,
   maximumDate,
   pickerDefaultDate,
-}: DateOfBirthInputProps) {
+}: DateInputProps) {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const resolvedMaximumDate = useMemo(
@@ -49,15 +50,18 @@ export function DateOfBirthInput({
   );
 
   const fallbackPickerDate =
-    pickerDefaultDate ?? minimumDate ?? resolvedMaximumDate ?? new Date(2000, 0, 1);
+    pickerDefaultDate ??
+    minimumDate ??
+    resolvedMaximumDate ??
+    new Date(2000, 0, 1);
 
   function handleValueChange(
-    event: DateTimePickerChangeEvent,
+    _event: DateTimePickerChangeEvent,
     selectedDate?: Date,
   ) {
     setShowDatePicker(false);
 
-    if (event.type === "dismissed" || !selectedDate) {
+    if (!selectedDate) {
       return;
     }
 

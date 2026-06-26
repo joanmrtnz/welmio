@@ -11,7 +11,7 @@ import {
 import { useState, useEffect } from "react";
 
 import { Icon } from "@/components/icons/Icon";
-import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
+import { DateInput } from "@/components/ui/date-input/dateInput";
 import { t } from "@/lib/i18n";
 import { fonts } from "@/theme/fonts";
 
@@ -380,7 +380,7 @@ export function CreateGoalModal({
                 </View>
 
                 <View style={styles.fieldGroup}>
-                  <DateOfBirthInput
+                  <DateInput
                     label={t("goals.createModal.fields.targetDate")}
                     icon="calendar-o"
                     placeholder={t("goals.createModal.placeholders.targetDate")}

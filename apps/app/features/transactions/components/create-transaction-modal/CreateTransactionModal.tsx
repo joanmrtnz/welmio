@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
-import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
+import { DateInput } from "@/components/ui/date-input/dateInput";
 import { t } from "@/lib/i18n";
 
 import { useCreateTransactionForm } from "@/features/transactions/hooks/useCreateTransactionForm";
@@ -253,7 +253,7 @@ export function CreateTransactionModal({
                   </View>
                 )}
 
-                <DateOfBirthInput
+                <DateInput
                   label={t("transactions.form.date")}
                   icon="calendar-o"
                   placeholder={t("transactions.form.datePlaceholder")}

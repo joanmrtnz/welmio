@@ -15,7 +15,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
 import { useSignup } from "@/features/auth/hooks/useSignup";
 import { feedback } from "@/components/ui/feedback/feedback.service";
-import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
+import { DateInput } from "@/components/ui/date-input/dateInput";
 import { toIsoDate } from "@/lib/date";
 import { AppImage } from "@/components/images/AppImage";
 import { PublicAuthLanguageSelector } from "@/components/ui/public-auth-language-selector/PublicAuthLanguageSelector";
@@ -247,7 +247,7 @@ export default function SignupScreen() {
           onChangeText={setMobileNumber}
         />
 
-        <DateOfBirthInput
+        <DateInput
           label={t("auth.signup.dateOfBirth")}
           icon="calendar-o"
           placeholder={t("auth.signup.dateOfBirthPlaceholder")}

@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import type { FontAwesome } from "@expo/vector-icons";
 
-export type DateOfBirthInputProps = {
+export type DateInputProps = {
   label: string;
   icon: ComponentProps<typeof FontAwesome>["name"];
   placeholder: string;
