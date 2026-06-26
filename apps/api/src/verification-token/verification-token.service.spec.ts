@@ -6,7 +6,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { VerificationTokenService } from './verification-token.service';
 
 const hashToken = (token: string) =>
-  createHash('sha256').update(token).digest('hex');
+  createHash('sha256').update(token.trim()).digest('hex');
 
 describe('VerificationTokenService', () => {
   let service: VerificationTokenService;
@@ -16,7 +16,6 @@ describe('VerificationTokenService', () => {
       updateMany: jest.fn(),
       create: jest.fn(),
       findFirst: jest.fn(),
-      update: jest.fn(),
     },
   };
 
@@ -25,6 +24,8 @@ describe('VerificationTokenService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     jest.useFakeTimers().setSystemTime(fixedNow);
+
+    prisma.verificationToken.updateMany.mockResolvedValue({ count: 1 });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -108,6 +109,7 @@ describe('VerificationTokenService', () => {
       };
 
       prisma.verificationToken.findFirst.mockResolvedValue(row);
+      prisma.verificationToken.updateMany.mockResolvedValue({ count: 1 });
 
       await expect(
         service.verifyToken(
@@ -130,9 +132,10 @@ describe('VerificationTokenService', () => {
         },
       });
 
-      expect(prisma.verificationToken.update).toHaveBeenCalledWith({
+      expect(prisma.verificationToken.updateMany).toHaveBeenCalledWith({
         where: {
           id: 'verification-1',
+          usedAt: null,
         },
         data: {
           usedAt: fixedNow,
@@ -151,6 +154,7 @@ describe('VerificationTokenService', () => {
       };
 
       prisma.verificationToken.findFirst.mockResolvedValue(row);
+      prisma.verificationToken.updateMany.mockResolvedValue({ count: 1 });
 
       await expect(
         service.verifyToken('reset-token', VerificationTokenType.password_reset),
@@ -167,6 +171,16 @@ describe('VerificationTokenService', () => {
         },
         include: {
           user: true,
+        },
+      });
+
+      expect(prisma.verificationToken.updateMany).toHaveBeenCalledWith({
+        where: {
+          id: 'verification-1',
+          usedAt: null,
+        },
+        data: {
+          usedAt: fixedNow,
         },
       });
     });
@@ -192,7 +206,75 @@ describe('VerificationTokenService', () => {
         },
       });
 
-      expect(prisma.verificationToken.update).not.toHaveBeenCalled();
+      expect(prisma.verificationToken.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('rejects when a valid token is consumed by another request first', async () => {
+      const row = {
+        id: 'verification-1',
+        userId: 'user-1',
+        type: VerificationTokenType.email_verification,
+        user: {
+          id: 'user-1',
+          email: 'user@test.com',
+        },
+      };
+
+      prisma.verificationToken.findFirst.mockResolvedValue(row);
+      prisma.verificationToken.updateMany.mockResolvedValue({ count: 0 });
+
+      await expect(
+        service.verifyToken(
+          'raw-token',
+          VerificationTokenType.email_verification,
+        ),
+      ).rejects.toBeInstanceOf(BadRequestException);
+
+      expect(prisma.verificationToken.updateMany).toHaveBeenCalledWith({
+        where: {
+          id: 'verification-1',
+          usedAt: null,
+        },
+        data: {
+          usedAt: fixedNow,
+        },
+      });
+    });
+
+    it('trims tokens before hashing them', async () => {
+      const row = {
+        id: 'verification-1',
+        userId: 'user-1',
+        type: VerificationTokenType.email_verification,
+        user: {
+          id: 'user-1',
+          email: 'user@test.com',
+        },
+      };
+
+      prisma.verificationToken.findFirst.mockResolvedValue(row);
+      prisma.verificationToken.updateMany.mockResolvedValue({ count: 1 });
+
+      await expect(
+        service.verifyToken(
+          '  raw-token  ',
+          VerificationTokenType.email_verification,
+        ),
+      ).resolves.toBe(row);
+
+      expect(prisma.verificationToken.findFirst).toHaveBeenCalledWith({
+        where: {
+          tokenHash: hashToken('raw-token'),
+          type: VerificationTokenType.email_verification,
+          usedAt: null,
+          expiresAt: {
+            gt: fixedNow,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
     });
   });
 });

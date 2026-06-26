@@ -129,12 +129,12 @@ describe('AuthController', () => {
       {
         methodName: 'verifyEmail',
         path: 'verify-email',
-        requestMethod: RequestMethod.GET,
+        requestMethod: RequestMethod.POST,
       },
       {
         methodName: 'verifyEmailChange',
         path: 'verify-email-change',
-        requestMethod: RequestMethod.GET,
+        requestMethod: RequestMethod.POST,
       },
       {
         methodName: 'login',
