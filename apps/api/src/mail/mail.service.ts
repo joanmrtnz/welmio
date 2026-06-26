@@ -80,7 +80,7 @@ export class MailService {
       token,
     });
 
-    return `${appUrl}/auth/${verificationPath}?${params.toString()}`;
+    return `${appUrl}/${verificationPath}?${params.toString()}`;
   }
 
   private getVerificationEmailTemplate({
