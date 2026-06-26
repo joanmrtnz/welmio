@@ -9,7 +9,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
-import { router } from "expo-router";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useCallback, useEffect, useState } from "react";
 import {
   CreateGoalPayload,
@@ -21,8 +21,6 @@ import {
 } from "@repo/shared-types";
 import {
   createGoal,
-  createGoalContribution,
-  CreateGoalContributionPayload,
   deleteGoal,
   deleteGoalContribution,
   getGoalsOverview,
@@ -54,6 +52,10 @@ const DESKTOP_CONTENT_WIDTH = 1040;
 export default function GoalsScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
+  const tabBarHeight = useBottomTabBarHeight();
+  const contentBottomPadding = isDesktop ? 36 : tabBarHeight + 36;
+  const floatingButtonBottom = tabBarHeight + 26;
+  const bottomFadeHeight = tabBarHeight + 32;
 
   const [data, setData] = useState<GoalsOverviewResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -239,6 +241,7 @@ export default function GoalsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
+          { paddingBottom: contentBottomPadding },
           isDesktop && styles.contentDesktop,
         ]}
       >
@@ -477,7 +480,11 @@ export default function GoalsScreen() {
       </ScrollView>
 
       <Pressable
-        style={[styles.fab, isDesktop && styles.hidden]}
+        style={[
+          styles.fab,
+          !isDesktop && { bottom: floatingButtonBottom },
+          isDesktop && styles.hidden,
+        ]}
         onPress={openCreateGoalModal}
       >
         <Icon name="plus" size={30} color={WHITE} strokeWidth={1.8} />
@@ -486,7 +493,11 @@ export default function GoalsScreen() {
       <LinearGradient
         pointerEvents="none"
         colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
-        style={[styles.bottomFade, isDesktop && styles.hidden]}
+        style={[
+          styles.bottomFade,
+          !isDesktop && { height: bottomFadeHeight },
+          isDesktop && styles.hidden,
+        ]}
       />
 
       <CreateGoalModal
@@ -577,7 +588,6 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 142,
   },
 
   contentDesktop: {
@@ -585,7 +595,6 @@ const styles = StyleSheet.create({
     maxWidth: DESKTOP_CONTENT_WIDTH,
     alignSelf: "center",
     paddingHorizontal: 32,
-    paddingBottom: 130,
   },
 
   balanceRow: {

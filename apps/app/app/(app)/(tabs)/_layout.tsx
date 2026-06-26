@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import {
+  Platform,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -7,6 +8,7 @@ import {
 } from "react-native";
 import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppImage } from "@/components/images/AppImage";
 import { t } from "@/lib/i18n";
@@ -22,6 +24,8 @@ const DARK = "#0b3437";
 const CARD = "#ffffff";
 const MUTED = "#6f8586";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
+const TAB_BAR_HEIGHT = 90;
+const ANDROID_FALLBACK_BOTTOM_INSET = 10;
 
 function DesktopSidebar() {
   return (
@@ -46,6 +50,14 @@ export default function TabLayout() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   const { locale } = useLocale();
+  const insets = useSafeAreaInsets();
+
+  const bottomInset = isDesktop
+    ? 0
+    : Math.max(
+        insets.bottom,
+        Platform.OS === "android" ? ANDROID_FALLBACK_BOTTOM_INSET : 0,
+      );
 
   const tabTitles = useMemo(
     () => ({
@@ -74,6 +86,10 @@ export default function TabLayout() {
         tabBarStyle: [
           styles.tabBar,
           isDesktop ? styles.tabBarDesktop : styles.tabBarMobile,
+          !isDesktop && {
+            height: TAB_BAR_HEIGHT + bottomInset,
+            paddingBottom: bottomInset,
+          },
         ],
         tabBarItemStyle: [
           styles.tabItem,
@@ -162,7 +178,7 @@ const styles = StyleSheet.create({
 
   tabBarMobile: {
     position: "absolute",
-    height: 90,
+    height: TAB_BAR_HEIGHT,
     left: 0,
     right: 0,
     bottom: 0,

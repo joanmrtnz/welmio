@@ -19,6 +19,7 @@ import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHead
 import { AVATAR_IMAGES, type AvatarId } from "../components/AvatarPickerModal";
 import { AppImage } from "@/components/images/AppImage";
 import { t } from "@/lib/i18n";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -42,6 +43,8 @@ function getAvatarId(value?: string | null): AvatarId {
 export default function ProfileScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
+  const tabBarHeight = useBottomTabBarHeight();
+  const contentBottomPadding = isDesktop ? 36 : tabBarHeight + 36;
 
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -116,6 +119,7 @@ export default function ProfileScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
+          { paddingBottom: contentBottomPadding },
           isDesktop && styles.contentDesktop,
         ]}
         showsVerticalScrollIndicator={false}
@@ -217,7 +221,6 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 118,
   },
 
   contentDesktop: {
@@ -225,7 +228,6 @@ const styles = StyleSheet.create({
     maxWidth: DESKTOP_CONTENT_WIDTH,
     alignSelf: "center",
     paddingHorizontal: 32,
-    paddingBottom: 150,
   },
 
   mobileGrid: {
