@@ -27,6 +27,7 @@ import { getUserProfile } from "@/features/profile/services/profile-service";
 import { getGreetingLabel } from "./utils/getGreetingLabel";
 import { AVATAR_IMAGES, type AvatarId } from "@/features/profile/components/AvatarPickerModal";
 import { AppImage } from "@/components/images/AppImage";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -106,6 +107,7 @@ export default function HomeScreen() {
   const [goalsErrorMessage, setGoalsErrorMessage] = useState<string | null>(
     null,
   );
+  const tabBarHeight = useBottomTabBarHeight();
 
   const { selected, setSelected, data: analyticsData } = useAnalytics();
 
@@ -234,7 +236,12 @@ export default function HomeScreen() {
         </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingBottom: tabBarHeight + 36,
+          },
+          isDesktop && styles.contentDesktop]}
       >
         <SectionHeader title={t("home.sections.overview")} />
 
@@ -340,7 +347,6 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 18,
-    paddingBottom: 132,
   },
 
   contentDesktop: {
@@ -348,7 +354,6 @@ const styles = StyleSheet.create({
     maxWidth: DESKTOP_CONTENT_WIDTH,
     alignSelf: "center",
     paddingHorizontal: 32,
-    paddingBottom: 150,
   },
 
   header: {

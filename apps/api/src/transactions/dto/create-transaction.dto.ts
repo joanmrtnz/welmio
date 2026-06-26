@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -13,9 +14,16 @@ import {
   TransactionType,
 } from '@prisma/client';
 
+export const MAX_TRANSACTION_AMOUNT = 9999999999.99;
+
 export class CreateTransactionDto {
-  @IsNumber()
+  @IsNumber({
+    allowInfinity: false,
+    allowNaN: false,
+    maxDecimalPlaces: 2,
+  })
   @Min(0.01)
+  @Max(MAX_TRANSACTION_AMOUNT)
   amount: number;
 
   @IsString()
@@ -32,7 +40,7 @@ export class CreateTransactionDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  notes?: string;
+  notes?: string | null;
 
   @IsDateString()
   date: string;

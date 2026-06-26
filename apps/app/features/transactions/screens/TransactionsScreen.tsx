@@ -25,6 +25,7 @@ import { feedback } from "@/components/ui/feedback/feedback.service";
 import { CalendarFilterModal } from "../components/calendar-filter-modal/CalendarFilterModal";
 import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { t } from "@/lib/i18n";
@@ -51,6 +52,10 @@ type DateRange = {
 export default function TransactionScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
+  const tabBarHeight = useBottomTabBarHeight();
+  const contentBottomPadding = isDesktop ? 36 : tabBarHeight + 36;
+  const floatingButtonBottom = tabBarHeight + 26;
+  const bottomFadeHeight = isDesktop ? 0 : tabBarHeight + 32;
 
   function handleEditTransaction(transaction: TransactionOverviewItem) {
     setTransactionToEdit(transaction);
@@ -128,12 +133,17 @@ export default function TransactionScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
+          { paddingBottom: contentBottomPadding },
           isDesktop && styles.contentDesktop,
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.balanceCard, isDesktop && styles.balanceCardDesktop]}>
-          <Text style={styles.balanceCardLabel}>{t("transactions.totalBalance")}</Text>
+        <View
+          style={[styles.balanceCard, isDesktop && styles.balanceCardDesktop]}
+        >
+          <Text style={styles.balanceCardLabel}>
+            {t("transactions.totalBalance")}
+          </Text>
           <Text style={styles.balanceCardTitle}>
             {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
           </Text>
@@ -223,9 +233,13 @@ export default function TransactionScreen() {
           </Pressable>
         </View>
 
-        <View style={[styles.cardWrapper, isDesktop && styles.cardWrapperDesktop]}>
+        <View
+          style={[styles.cardWrapper, isDesktop && styles.cardWrapperDesktop]}
+        >
           <View style={styles.cardHeader}>
-            <Text style={styles.cardHeaderTitle}>{t("transactions.title")}</Text>
+            <Text style={styles.cardHeaderTitle}>
+              {t("transactions.title")}
+            </Text>
 
             <View style={styles.listHeaderActions}>
               <Pressable
@@ -291,11 +305,12 @@ export default function TransactionScreen() {
 
       {!isDesktop && (
         <Pressable
-          style={styles.floatingAddButton}
+          style={[styles.floatingAddButton, { bottom: floatingButtonBottom }]}
           onPress={() => {
             setTransactionToEdit(null);
             setIsCreateTransactionModalVisible(true);
-          }}>
+          }}
+        >
           <Icon name="plus" size={30} color={WHITE} strokeWidth={1.8} />
         </Pressable>
       )}
@@ -325,11 +340,11 @@ export default function TransactionScreen() {
         }}
         onCreated={loadTransactions}
       />
-       <LinearGradient
-          pointerEvents="none"
-          colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
-          style={styles.bottomFade}
-        />
+      <LinearGradient
+        pointerEvents="none"
+        colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
+        style={[styles.bottomFade, { height: bottomFadeHeight }]}
+      />
     </View>
   );
 }
@@ -342,7 +357,6 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 132,
   },
 
   contentDesktop: {
@@ -350,7 +364,6 @@ const styles = StyleSheet.create({
     maxWidth: DESKTOP_CONTENT_WIDTH,
     alignSelf: "center",
     paddingHorizontal: 32,
-    paddingBottom: 150,
   },
 
   balanceCard: {

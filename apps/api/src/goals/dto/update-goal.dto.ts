@@ -5,10 +5,12 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
   Min,
 } from 'class-validator';
 import { GoalType } from '@prisma/client';
+import { MAX_GOAL_AMOUNT } from './create-goal.dto';
 
 export class UpdateGoalDto {
   @IsOptional()
@@ -22,13 +24,23 @@ export class UpdateGoalDto {
   description?: string | null;
 
   @IsOptional()
-  @IsNumber()
+  @IsNumber({
+    allowInfinity: false,
+    allowNaN: false,
+    maxDecimalPlaces: 2,
+  })
   @Min(0.01)
+  @Max(MAX_GOAL_AMOUNT)
   targetAmount?: number;
 
   @IsOptional()
-  @IsNumber()
+  @IsNumber({
+    allowInfinity: false,
+    allowNaN: false,
+    maxDecimalPlaces: 2,
+  })
   @Min(0)
+  @Max(MAX_GOAL_AMOUNT)
   currentAmount?: number;
 
   @IsOptional()
@@ -55,5 +67,6 @@ export class UpdateGoalDto {
 
   @IsOptional()
   @IsHexColor()
+  @MaxLength(20)
   color?: string | null;
 }

@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { fonts } from "@/theme/fonts";
-import { DateOfBirthInputProps } from "./dateOfBirthInput.types";
+import { DateInputProps } from "./dateInput.types";
 
 const TEXT = "#073b3a";
 const INPUT_BG = "#ffffff";
@@ -57,17 +57,24 @@ function parseDateForWebInput(value: string) {
 
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(
     2,
-    "0"
+    "0",
   )}`;
 }
 
-export function DateOfBirthInput({
+export function DateInput({
   label,
   icon,
   value,
   placeholder,
   onChangeText,
-}: DateOfBirthInputProps) {
+  minimumDate,
+  maximumDate,
+}: DateInputProps) {
+  const resolvedMaximumDate = useMemo(
+    () => maximumDate ?? new Date(),
+    [maximumDate],
+  );
+
   return (
     <View style={styles.inputGroup}>
       <Text style={styles.inputLabel}>{label}</Text>
@@ -83,7 +90,8 @@ export function DateOfBirthInput({
         {React.createElement("input", {
           type: "date",
           value: parseDateForWebInput(value),
-          max: formatDateForWebInput(new Date()),
+          min: minimumDate ? formatDateForWebInput(minimumDate) : undefined,
+          max: formatDateForWebInput(resolvedMaximumDate),
           placeholder,
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
             onChangeText(formatDateFromWebInput(event.target.value));
