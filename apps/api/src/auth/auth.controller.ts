@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -18,14 +27,16 @@ export class AuthController {
   }
 
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  @Get('verify-email')
-  verifyEmail(@Query('token') token: string) {
+  @Post('verify-email')
+  @HttpCode(HttpStatus.OK)
+  verifyEmail(@Body('token') token: string) {
     return this.authService.verifyEmail(token);
   }
 
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  @Get('verify-email-change')
-  verifyEmailChange(@Query('token') token: string) {
+  @Post('verify-email-change')
+  @HttpCode(HttpStatus.OK)
+  verifyEmailChange(@Body('token') token: string) {
     return this.authService.verifyEmailChange(token);
   }
 

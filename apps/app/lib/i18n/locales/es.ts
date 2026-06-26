@@ -624,6 +624,7 @@ const es = {
         nameRequired: "El nombre del objetivo es obligatorio.",
         targetAmountInvalid: "La cantidad objetivo debe ser mayor que 0.",
         currentAmountInvalid: "El ahorro actual debe ser 0 o mayor.",
+        targetDateInvalid: "La fecha objetivo debe estar entre hoy y los próximos 100 años.",
         currentGreaterThanTarget:
           "El ahorro actual no puede ser mayor que la cantidad objetivo.",
       },

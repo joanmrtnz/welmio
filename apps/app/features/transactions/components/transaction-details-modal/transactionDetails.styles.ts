@@ -64,11 +64,20 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
 
+  headerText: {
+    flex: 1,
+    minWidth: 0,
+    paddingRight: 4,
+  },
+
   title: {
-    fontSize: 18,
+    fontSize: 19,
+    lineHeight: 24,
     fontFamily: fonts.bold,
     color: BLACK,
     letterSpacing: 0.2,
+    flexShrink: 1,
+    flexWrap: "wrap",
   },
 
   subtitle: {
@@ -76,10 +85,12 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: MUTED,
     marginTop: 5,
+    flexShrink: 1,
   },
 
   headerActions: {
     flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     flexShrink: 0,
   },

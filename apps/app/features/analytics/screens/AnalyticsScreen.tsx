@@ -21,6 +21,7 @@ import { useExpensesByCategoryAnalytics } from "../hooks/useExpensesByCategoryAn
 import type { ExpenseCategoryChartItem } from "../hooks/useExpensesByCategoryAnalytics";
 import { useGoalContributionsAnalytics } from "../hooks/useGoalContributionsAnalytics";
 import type { GoalContributionChartItem } from "../hooks/useGoalContributionsAnalytics";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -331,6 +332,9 @@ function GoalContributionsCard({
 export default function AnalyticsScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
+  const tabBarHeight = useBottomTabBarHeight();
+  const contentBottomPadding = isDesktop ? 36 : tabBarHeight + 36;
+  const bottomFadeHeight = isDesktop ? 0 : tabBarHeight + 32;
   const { selected, setSelected, data } = useAnalytics();
   const chartBars = data
     ? normalizeChartBars(
@@ -378,6 +382,7 @@ export default function AnalyticsScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
+          { paddingBottom: contentBottomPadding },
           isDesktop && styles.contentDesktop,
         ]}
         showsVerticalScrollIndicator={false}
@@ -582,7 +587,7 @@ export default function AnalyticsScreen() {
       <LinearGradient
         pointerEvents="none"
         colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
-        style={styles.bottomFade}
+        style={[styles.bottomFade, { height: bottomFadeHeight }]}
       />
     </View>
   );
@@ -596,7 +601,6 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 20,
-    paddingBottom: 118,
   },
 
   contentDesktop: {
@@ -604,7 +608,6 @@ const styles = StyleSheet.create({
     maxWidth: DESKTOP_CONTENT_WIDTH,
     alignSelf: "center",
     paddingHorizontal: 32,
-    paddingBottom: 150,
   },
 
   balanceRow: {

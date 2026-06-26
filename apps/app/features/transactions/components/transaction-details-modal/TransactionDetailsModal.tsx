@@ -82,7 +82,7 @@ export function TransactionDetailsModal({
 
         <View style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
           <View style={styles.header}>
-            <View>
+            <View style={styles.headerText}>
               <Text style={styles.title}>
                 {t("transactions.details.title")}
               </Text>

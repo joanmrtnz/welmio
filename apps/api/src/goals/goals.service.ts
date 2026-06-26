@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   GoalOverviewItemDto,
   GoalsOverviewResponseDto,
@@ -15,6 +19,15 @@ import {
   SortOrder,
 } from './dto/get-goal-contributions-analytics-query.dto';
 import { GoalContributionsAnalyticsResponseDto } from './dto/goal-contributions-analytics-response.dto';
+
+const MAX_DATABASE_DECIMAL_AMOUNT = new Prisma.Decimal('9999999999.99');
+const DECIMAL_SCALE = 2;
+
+const MAX_GOAL_NAME_LENGTH = 120;
+const MAX_GOAL_DESCRIPTION_LENGTH = 500;
+const MAX_GOAL_ICON_LENGTH = 40;
+const MAX_GOAL_COLOR_LENGTH = 20;
+const MAX_CONTRIBUTION_NOTES_LENGTH = 500;
 
 @Injectable()
 export class GoalsService {
@@ -185,7 +198,7 @@ export class GoalsService {
         return {
           startDate: new Date(Date.UTC(now.getUTCFullYear(), 0, 1, 0, 0, 0, 0)),
           endDate: new Date(
-            Date.UTC(now.getUTCFullYear() + 1, 0, 1, 0, 0, 0, 0),
+            Date.UTC(now.getUTCFullYear() + 1, 0, 1, 0, 0),
           ),
         };
 
@@ -200,7 +213,6 @@ export class GoalsService {
               now.getUTCFullYear(),
               now.getUTCMonth() + 1,
               1,
-              0,
               0,
               0,
               0,
@@ -292,56 +304,89 @@ export class GoalsService {
   async createGoal(
     userId: string,
     createGoalDto: CreateGoalDto,
-    ): Promise<GoalOverviewItemDto> {
+  ): Promise<GoalOverviewItemDto> {
     const user = await this.prisma.user.findUnique({
-        where: { id: userId },
-        select: { id: true },
+      where: { id: userId },
+      select: { id: true },
     });
 
     if (!user) {
-        throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found');
     }
 
-    const targetAmount = new Prisma.Decimal(createGoalDto.targetAmount);
-    const currentAmount = new Prisma.Decimal(createGoalDto.currentAmount ?? 0);
+    const targetAmount = this.toDecimalAmount(
+      createGoalDto.targetAmount,
+      'Target amount',
+    );
+    const currentAmount = this.toDecimalAmount(
+      createGoalDto.currentAmount ?? 0,
+      'Current amount',
+    );
+
+    this.validateAmount(targetAmount, 'Target amount', {
+      allowZero: false,
+    });
+    this.validateAmount(currentAmount, 'Current amount', {
+      allowZero: true,
+    });
 
     if (currentAmount.greaterThan(targetAmount)) {
-        throw new BadRequestException(
+      throw new BadRequestException(
         'Current amount cannot be greater than target amount.',
-        );
+      );
     }
 
-    const currency = createGoalDto.currency.trim().toUpperCase();
+    const name = this.normalizeRequiredText(
+      createGoalDto.name,
+      'Name',
+      MAX_GOAL_NAME_LENGTH,
+    );
+    const description = this.normalizeOptionalText(
+      createGoalDto.description,
+      'Description',
+      MAX_GOAL_DESCRIPTION_LENGTH,
+    );
+    const icon = this.normalizeOptionalText(
+      createGoalDto.icon,
+      'Icon',
+      MAX_GOAL_ICON_LENGTH,
+    );
+    const color = this.normalizeOptionalText(
+      createGoalDto.color,
+      'Color',
+      MAX_GOAL_COLOR_LENGTH,
+    );
+    const currency = this.normalizeCurrency(createGoalDto.currency);
 
     const startDate = createGoalDto.startDate
-        ? new Date(createGoalDto.startDate)
-        : new Date();
+      ? new Date(createGoalDto.startDate)
+      : new Date();
 
     const targetDate = createGoalDto.targetDate
-        ? new Date(createGoalDto.targetDate)
-        : null;
+      ? new Date(createGoalDto.targetDate)
+      : null;
 
     const goal = await this.prisma.$transaction(async (tx) => {
-        const createdGoal = await tx.goal.create({
+      const createdGoal = await tx.goal.create({
         data: {
-            userId,
-            name: createGoalDto.name.trim(),
-            description: createGoalDto.description?.trim() || null,
-            targetAmount,
-            currentAmount,
-            currency,
-            targetDate,
-            startDate,
-            type: createGoalDto.type,
-            status: 'active',
-            icon: createGoalDto.icon?.trim() || null,
-            color: createGoalDto.color?.trim() || null,
+          userId,
+          name,
+          description,
+          targetAmount,
+          currentAmount,
+          currency,
+          targetDate,
+          startDate,
+          type: createGoalDto.type,
+          status: 'active',
+          icon,
+          color,
         },
-        });
+      });
 
-        if (currentAmount.greaterThan(0)) {
+      if (currentAmount.greaterThan(0)) {
         await tx.goalContribution.create({
-            data: {
+          data: {
             goalId: createdGoal.id,
             userId,
             amount: currentAmount,
@@ -349,7 +394,7 @@ export class GoalsService {
             date: startDate,
             notes: 'Initial goal amount.',
             transactionId: null,
-            },
+          },
         });
       }
 
@@ -357,7 +402,7 @@ export class GoalsService {
     });
 
     return this.toGoalOverviewItem(goal);
- }
+  }
 
   private toGoalOverviewItem(
     goal: Goal & {
@@ -439,7 +484,7 @@ export class GoalsService {
     });
 
     const goalItems: GoalOverviewItemDto[] = goals.map((goal) =>
-        this.toGoalOverviewItem(goal),
+      this.toGoalOverviewItem(goal),
     );
 
     const activeGoals = goalItems.filter((goal) => goal.status === 'active');
@@ -471,7 +516,10 @@ export class GoalsService {
         globalProgress,
         activeGoals: activeGoals.length,
         monthlyNeeded,
-        progressMessage: this.getProgressMessage(globalProgress, activeGoals.length),
+        progressMessage: this.getProgressMessage(
+          globalProgress,
+          activeGoals.length,
+        ),
       },
       mainGoal,
       goals: goalItems,
@@ -569,7 +617,10 @@ export class GoalsService {
     return 'Behind';
   }
 
-  private getProgressMessage(globalProgress: number, activeGoals: number): string {
+  private getProgressMessage(
+    globalProgress: number,
+    activeGoals: number,
+  ): string {
     if (activeGoals === 0) {
       return 'Create your first goal to start tracking your progress.';
     }
@@ -595,13 +646,20 @@ export class GoalsService {
 
     const nextTargetAmount =
       updateGoalDto.targetAmount !== undefined
-        ? new Prisma.Decimal(updateGoalDto.targetAmount)
+        ? this.toDecimalAmount(updateGoalDto.targetAmount, 'Target amount')
         : existingGoal.targetAmount;
 
     const nextCurrentAmount =
       updateGoalDto.currentAmount !== undefined
-        ? new Prisma.Decimal(updateGoalDto.currentAmount)
+        ? this.toDecimalAmount(updateGoalDto.currentAmount, 'Current amount')
         : existingGoal.currentAmount;
+
+    this.validateAmount(nextTargetAmount, 'Target amount', {
+      allowZero: false,
+    });
+    this.validateAmount(nextCurrentAmount, 'Current amount', {
+      allowZero: true,
+    });
 
     if (nextCurrentAmount.greaterThan(nextTargetAmount)) {
       throw new BadRequestException(
@@ -609,9 +667,46 @@ export class GoalsService {
       );
     }
 
-    const nextCurrency = updateGoalDto.currency
-      ? updateGoalDto.currency.trim().toUpperCase()
-      : existingGoal.currency;
+    const nextCurrency =
+      updateGoalDto.currency !== undefined
+        ? this.normalizeCurrency(updateGoalDto.currency)
+        : existingGoal.currency;
+
+    const nextName =
+      updateGoalDto.name !== undefined
+        ? this.normalizeRequiredText(
+            updateGoalDto.name,
+            'Name',
+            MAX_GOAL_NAME_LENGTH,
+          )
+        : undefined;
+
+    const nextDescription =
+      updateGoalDto.description !== undefined
+        ? this.normalizeOptionalText(
+            updateGoalDto.description,
+            'Description',
+            MAX_GOAL_DESCRIPTION_LENGTH,
+          )
+        : undefined;
+
+    const nextIcon =
+      updateGoalDto.icon !== undefined
+        ? this.normalizeOptionalText(
+            updateGoalDto.icon,
+            'Icon',
+            MAX_GOAL_ICON_LENGTH,
+          )
+        : undefined;
+
+    const nextColor =
+      updateGoalDto.color !== undefined
+        ? this.normalizeOptionalText(
+            updateGoalDto.color,
+            'Color',
+            MAX_GOAL_COLOR_LENGTH,
+          )
+        : undefined;
 
     const currentAmountHasChanged =
       updateGoalDto.currentAmount !== undefined &&
@@ -626,11 +721,11 @@ export class GoalsService {
         },
         data: {
           ...(updateGoalDto.name !== undefined && {
-            name: updateGoalDto.name.trim(),
+            name: nextName,
           }),
 
           ...(updateGoalDto.description !== undefined && {
-            description: updateGoalDto.description?.trim() || null,
+            description: nextDescription,
           }),
 
           ...(updateGoalDto.targetAmount !== undefined && {
@@ -662,11 +757,11 @@ export class GoalsService {
           }),
 
           ...(updateGoalDto.icon !== undefined && {
-            icon: updateGoalDto.icon?.trim() || null,
+            icon: nextIcon,
           }),
 
           ...(updateGoalDto.color !== undefined && {
-            color: updateGoalDto.color?.trim() || null,
+            color: nextColor,
           }),
         },
       });
@@ -713,7 +808,15 @@ export class GoalsService {
       throw new NotFoundException('Goal not found');
     }
 
-    const amount = new Prisma.Decimal(createGoalContributionDto.amount);
+    const amount = this.toDecimalAmount(
+      createGoalContributionDto.amount,
+      'Contribution amount',
+    );
+
+    this.validateAmount(amount, 'Contribution amount', {
+      allowZero: false,
+    });
+
     const nextCurrentAmount = goal.currentAmount.plus(amount);
 
     if (nextCurrentAmount.greaterThan(goal.targetAmount)) {
@@ -722,8 +825,13 @@ export class GoalsService {
       );
     }
 
-    const currency = createGoalContributionDto.currency.trim().toUpperCase();
+    const currency = this.normalizeCurrency(createGoalContributionDto.currency);
     const transactionId = createGoalContributionDto.transactionId ?? null;
+    const notes = this.normalizeOptionalText(
+      createGoalContributionDto.notes,
+      'Notes',
+      MAX_CONTRIBUTION_NOTES_LENGTH,
+    );
 
     if (transactionId) {
       const transaction = await this.prisma.transaction.findFirst({
@@ -773,7 +881,7 @@ export class GoalsService {
           amount,
           currency,
           date: new Date(createGoalContributionDto.date),
-          notes: createGoalContributionDto.notes?.trim() || null,
+          notes,
         },
         include: {
           transaction: {
@@ -874,5 +982,99 @@ export class GoalsService {
     return {
       message: 'Contribution removed successfully.',
     };
+  }
+
+  private toDecimalAmount(value: number, fieldName: string): Prisma.Decimal {
+    try {
+      const amount = new Prisma.Decimal(value);
+
+      if (!amount.isFinite()) {
+        throw new Error('Invalid decimal amount');
+      }
+
+      return amount;
+    } catch {
+      throw new BadRequestException(`${fieldName} must be a valid amount.`);
+    }
+  }
+
+  private validateAmount(
+    amount: Prisma.Decimal,
+    fieldName: string,
+    options: { allowZero: boolean },
+  ) {
+    if (amount.decimalPlaces() > DECIMAL_SCALE) {
+      throw new BadRequestException(
+        `${fieldName} cannot have more than ${DECIMAL_SCALE} decimal places.`,
+      );
+    }
+
+    if (options.allowZero) {
+      if (amount.lessThan(0)) {
+        throw new BadRequestException(`${fieldName} cannot be negative.`);
+      }
+    } else if (amount.lessThanOrEqualTo(0)) {
+      throw new BadRequestException(`${fieldName} must be greater than 0.`);
+    }
+
+    if (amount.greaterThan(MAX_DATABASE_DECIMAL_AMOUNT)) {
+      throw new BadRequestException(
+        `${fieldName} cannot be greater than ${MAX_DATABASE_DECIMAL_AMOUNT.toFixed(
+          2,
+        )}.`,
+      );
+    }
+  }
+
+  private normalizeRequiredText(
+    value: string,
+    fieldName: string,
+    maxLength: number,
+  ) {
+    const normalizedValue = value.trim();
+
+    this.validateTextLength(normalizedValue, fieldName, maxLength);
+
+    return normalizedValue;
+  }
+
+  private normalizeOptionalText(
+    value: string | null | undefined,
+    fieldName: string,
+    maxLength: number,
+  ) {
+    const normalizedValue = value?.trim();
+
+    if (!normalizedValue) {
+      return null;
+    }
+
+    this.validateTextLength(normalizedValue, fieldName, maxLength);
+
+    return normalizedValue;
+  }
+
+  private validateTextLength(
+    value: string,
+    fieldName: string,
+    maxLength: number,
+  ) {
+    if (value.length > maxLength) {
+      throw new BadRequestException(
+        `${fieldName} cannot be longer than ${maxLength} characters.`,
+      );
+    }
+  }
+
+  private normalizeCurrency(currency: string) {
+    const normalizedCurrency = currency.trim().toUpperCase();
+
+    if (normalizedCurrency.length > 3) {
+      throw new BadRequestException(
+        'Currency cannot be longer than 3 characters.',
+      );
+    }
+
+    return normalizedCurrency;
   }
 }

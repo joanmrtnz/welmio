@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import { Icon } from "@/components/icons/Icon";
-import { DateOfBirthInput } from "@/components/ui/date-of-birth-input/dateOfBirthInput";
+import { DateInput } from "@/components/ui/date-input/dateInput";
 import { t } from "@/lib/i18n";
 
 import { useCreateTransactionForm } from "@/features/transactions/hooks/useCreateTransactionForm";
@@ -172,10 +172,10 @@ export function CreateTransactionModal({
       animationType="fade"
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.backdrop} onPress={handleClose}>
-        <Pressable
-          style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}
-        >
+      <View style={[styles.overlay, isDesktop && styles.overlayDesktop]}>
+        <Pressable style={styles.backdrop} onPress={handleClose} />
+
+        <View style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
           <View style={styles.header}>
             <Text style={styles.title}>
               {transactionToEdit
@@ -253,7 +253,7 @@ export function CreateTransactionModal({
                   </View>
                 )}
 
-                <DateOfBirthInput
+                <DateInput
                   label={t("transactions.form.date")}
                   icon="calendar-o"
                   placeholder={t("transactions.form.datePlaceholder")}
@@ -517,8 +517,8 @@ export function CreateTransactionModal({
               </View>
             </View>
           </ScrollView>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
