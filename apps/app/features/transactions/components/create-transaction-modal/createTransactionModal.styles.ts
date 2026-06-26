@@ -21,13 +21,24 @@ export const createTransactionModalColors = {
 };
 
 export const styles = StyleSheet.create({
-  backdrop: {
+
+  overlay: {
     flex: 1,
-    backgroundColor: "rgba(223, 247, 239, 0.96)",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(223, 247, 239, 0.96)",
     paddingHorizontal: 20,
     paddingVertical: 14,
+  },
+
+  overlayDesktop: {
+    paddingHorizontal: 32,
+    paddingVertical: 32,
+  },
+
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "transparent",
   },
 
   modalCard: {

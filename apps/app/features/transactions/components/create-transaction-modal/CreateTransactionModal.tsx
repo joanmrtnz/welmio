@@ -172,10 +172,10 @@ export function CreateTransactionModal({
       animationType="fade"
       onRequestClose={handleClose}
     >
-      <Pressable style={styles.backdrop} onPress={handleClose}>
-        <Pressable
-          style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}
-        >
+      <View style={[styles.overlay, isDesktop && styles.overlayDesktop]}>
+        <Pressable style={styles.backdrop} onPress={handleClose} />
+
+        <View style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}>
           <View style={styles.header}>
             <Text style={styles.title}>
               {transactionToEdit
@@ -517,8 +517,8 @@ export function CreateTransactionModal({
               </View>
             </View>
           </ScrollView>
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 }
