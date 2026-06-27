@@ -86,7 +86,7 @@ describe('MailService', () => {
     );
   });
 
-  it('sends email verification links with the auth verification path by default', async () => {
+  it('sends account verification links with the frontend verify account path by default', async () => {
     await expect(
       service.sendEmailVerification({
         to: 'user@test.com',
@@ -101,13 +101,13 @@ describe('MailService', () => {
         to: ['user@test.com'],
         subject: expect.stringMatching(/verify/i),
         html: expect.stringContaining(
-          'https://app.test/auth/verify-email?token=verify-token',
+          'https://app.test/verify-account?token=verify-token',
         ),
       }),
     );
   });
 
-  it('uses the email-change path for pending email updates', async () => {
+  it('uses the frontend email change verification path for pending email updates', async () => {
     await expect(
       service.sendEmailVerification({
         to: 'new@test.com',
@@ -122,7 +122,7 @@ describe('MailService', () => {
         to: ['new@test.com'],
         subject: expect.stringMatching(/email/i),
         html: expect.stringContaining(
-          'https://app.test/auth/verify-email-change?token=change-token',
+          'https://app.test/verify-email-change?token=change-token',
         ),
       }),
     );

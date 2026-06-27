@@ -16,6 +16,12 @@ import {
 } from './dto/get-transactions-by-category-query.dto';
 import { TransactionsByCategoryResponseDto } from './dto/transactions-by-category-response.dto';
 
+const MAX_DATABASE_DECIMAL_AMOUNT = new Prisma.Decimal('9999999999.99');
+const DECIMAL_SCALE = 2;
+
+const MAX_TRANSACTION_DESCRIPTION_LENGTH = 120;
+const MAX_TRANSACTION_NOTES_LENGTH = 500;
+
 @Injectable()
 export class TransactionsService {
   constructor(
@@ -308,7 +314,12 @@ export class TransactionsService {
     userId: string,
     createTransactionDto: CreateTransactionDto,
   ) {
-    const amount = new Prisma.Decimal(createTransactionDto.amount);
+    const amount = this.toDecimalAmount(
+      createTransactionDto.amount,
+      'Amount',
+    );
+
+    this.validateAmount(amount, 'Amount');
 
     const category = await this.prisma.category.findFirst({
       where: {
@@ -345,16 +356,28 @@ export class TransactionsService {
       throw new NotFoundException('Account not found.');
     }
 
+    const currency = this.normalizeCurrency(createTransactionDto.currency);
+    const description = this.normalizeText(
+      createTransactionDto.description,
+      'Description',
+      MAX_TRANSACTION_DESCRIPTION_LENGTH,
+    );
+    const notes = this.normalizeOptionalText(
+      createTransactionDto.notes,
+      'Notes',
+      MAX_TRANSACTION_NOTES_LENGTH,
+    );
+
     return this.prisma.transaction.create({
       data: {
         userId,
         accountId: account.id,
         categoryId: category.id,
         amount,
-        currency: createTransactionDto.currency.trim().toUpperCase(),
+        currency,
         type: createTransactionDto.type,
-        description: createTransactionDto.description.trim(),
-        notes: createTransactionDto.notes?.trim() || null,
+        description,
+        notes,
         date: new Date(createTransactionDto.date),
         frequencyType: createTransactionDto.frequencyType ?? 'one_time',
         transactionNature: createTransactionDto.transactionNature ?? 'other',
@@ -429,25 +452,57 @@ export class TransactionsService {
       throw new NotFoundException('Account not found.');
     }
 
+    const nextAmount =
+      updateTransactionDto.amount !== undefined
+        ? this.toDecimalAmount(updateTransactionDto.amount, 'Amount')
+        : undefined;
+
+    if (nextAmount !== undefined) {
+      this.validateAmount(nextAmount, 'Amount');
+    }
+
+    const nextCurrency =
+      updateTransactionDto.currency !== undefined
+        ? this.normalizeCurrency(updateTransactionDto.currency)
+        : undefined;
+
+    const nextDescription =
+      updateTransactionDto.description !== undefined
+        ? this.normalizeText(
+            updateTransactionDto.description,
+            'Description',
+            MAX_TRANSACTION_DESCRIPTION_LENGTH,
+          )
+        : undefined;
+
+    const nextNotes =
+      updateTransactionDto.notes !== undefined
+        ? this.normalizeOptionalText(
+            updateTransactionDto.notes,
+            'Notes',
+            MAX_TRANSACTION_NOTES_LENGTH,
+          )
+        : undefined;
+
     return this.prisma.transaction.update({
       where: {
         id: existingTransaction.id,
       },
       data: {
-        ...(updateTransactionDto.amount !== undefined && {
-          amount: new Prisma.Decimal(updateTransactionDto.amount),
+        ...(nextAmount !== undefined && {
+          amount: nextAmount,
         }),
-        ...(updateTransactionDto.currency !== undefined && {
-          currency: updateTransactionDto.currency.trim().toUpperCase(),
+        ...(nextCurrency !== undefined && {
+          currency: nextCurrency,
         }),
         ...(updateTransactionDto.type !== undefined && {
           type: updateTransactionDto.type,
         }),
-        ...(updateTransactionDto.description !== undefined && {
-          description: updateTransactionDto.description.trim(),
+        ...(nextDescription !== undefined && {
+          description: nextDescription,
         }),
         ...(updateTransactionDto.notes !== undefined && {
-          notes: updateTransactionDto.notes?.trim() || null,
+          notes: nextNotes,
         }),
         ...(updateTransactionDto.date !== undefined && {
           date: new Date(updateTransactionDto.date),
@@ -497,6 +552,92 @@ export class TransactionsService {
       id: existingTransaction.id,
       deleted: true,
     };
+  }
+
+  private toDecimalAmount(value: number, fieldName: string): Prisma.Decimal {
+    try {
+      const amount = new Prisma.Decimal(value);
+
+      if (!amount.isFinite()) {
+        throw new Error('Invalid decimal amount');
+      }
+
+      return amount;
+    } catch {
+      throw new BadRequestException(`${fieldName} must be a valid amount.`);
+    }
+  }
+
+  private validateAmount(amount: Prisma.Decimal, fieldName: string) {
+    if (amount.decimalPlaces() > DECIMAL_SCALE) {
+      throw new BadRequestException(
+        `${fieldName} cannot have more than ${DECIMAL_SCALE} decimal places.`,
+      );
+    }
+
+    if (amount.lessThanOrEqualTo(0)) {
+      throw new BadRequestException(`${fieldName} must be greater than 0.`);
+    }
+
+    if (amount.greaterThan(MAX_DATABASE_DECIMAL_AMOUNT)) {
+      throw new BadRequestException(
+        `${fieldName} cannot be greater than ${MAX_DATABASE_DECIMAL_AMOUNT.toFixed(
+          2,
+        )}.`,
+      );
+    }
+  }
+
+  private normalizeText(
+    value: string,
+    fieldName: string,
+    maxLength: number,
+  ) {
+    const normalizedValue = value.trim();
+
+    this.validateTextLength(normalizedValue, fieldName, maxLength);
+
+    return normalizedValue;
+  }
+
+  private normalizeOptionalText(
+    value: string | null | undefined,
+    fieldName: string,
+    maxLength: number,
+  ) {
+    const normalizedValue = value?.trim();
+
+    if (!normalizedValue) {
+      return null;
+    }
+
+    this.validateTextLength(normalizedValue, fieldName, maxLength);
+
+    return normalizedValue;
+  }
+
+  private validateTextLength(
+    value: string,
+    fieldName: string,
+    maxLength: number,
+  ) {
+    if (value.length > maxLength) {
+      throw new BadRequestException(
+        `${fieldName} cannot be longer than ${maxLength} characters.`,
+      );
+    }
+  }
+
+  private normalizeCurrency(currency: string) {
+    const normalizedCurrency = currency.trim().toUpperCase();
+
+    if (normalizedCurrency.length > 3) {
+      throw new BadRequestException(
+        'Currency cannot be longer than 3 characters.',
+      );
+    }
+
+    return normalizedCurrency;
   }
 
 }

@@ -12,6 +12,8 @@ const VERIFICATION_TOKEN_EXPIRATION_MINUTES: Record<
   password_reset: 15,
 };
 
+type PrismaExecutor = PrismaService | Prisma.TransactionClient;
+
 @Injectable()
 export class VerificationTokenService {
   constructor(private readonly prisma: PrismaService) {}
@@ -48,9 +50,22 @@ export class VerificationTokenService {
   }
 
   async verifyToken(token: string, type: VerificationTokenType) {
-    const tokenHash = this.hashToken(token);
+    const verificationToken = await this.findValidToken(token, type);
 
-    const verificationToken = await this.prisma.verificationToken.findFirst({
+    await this.markTokenAsUsed(verificationToken.id);
+
+    return verificationToken;
+  }
+
+  async findValidToken(
+    token: string,
+    type: VerificationTokenType,
+    prisma: PrismaExecutor = this.prisma,
+  ) {
+    const normalizedToken = this.normalizeToken(token);
+    const tokenHash = this.hashToken(normalizedToken);
+
+    const verificationToken = await prisma.verificationToken.findFirst({
       where: {
         tokenHash,
         type,
@@ -68,16 +83,36 @@ export class VerificationTokenService {
       throw new BadRequestException('Invalid or expired verification token');
     }
 
-    await this.prisma.verificationToken.update({
+    return verificationToken;
+  }
+
+  async markTokenAsUsed(
+    verificationTokenId: string,
+    prisma: PrismaExecutor = this.prisma,
+  ) {
+    const result = await prisma.verificationToken.updateMany({
       where: {
-        id: verificationToken.id,
+        id: verificationTokenId,
+        usedAt: null,
       },
       data: {
         usedAt: new Date(),
       },
     });
 
-    return verificationToken;
+    if (result.count !== 1) {
+      throw new BadRequestException('Invalid or expired verification token');
+    }
+  }
+
+  private normalizeToken(token: string) {
+    const normalizedToken = token?.trim();
+
+    if (!normalizedToken) {
+      throw new BadRequestException('Verification token is required');
+    }
+
+    return normalizedToken;
   }
 
   private hashToken(token: string) {
