@@ -29,7 +29,12 @@ const BUTTON_GREEN = "#93e2c9";
 const TAB_GREEN = "#12c79b";
 const BORDER_GREEN = "rgba(8, 120, 98, 0.14)";
 const MUTED = "rgba(5, 46, 43, 0.58)";
+const ERROR_RED = "#d64545";
 const DESKTOP_BREAKPOINT = 768;
+
+const MAX_GOAL_AMOUNT = 9999999999.99;
+const DECIMAL_SCALE = 2;
+const MAX_GOAL_NAME_LENGTH = 120;
 
 type CreateGoalModalMode = "create" | "edit";
 
@@ -151,6 +156,117 @@ function isTargetDateAllowed(value: string) {
   return targetDate >= today && targetDate <= maxTargetDate;
 }
 
+function normalizeAmountInput(value: string) {
+  return value.trim().replace(",", ".");
+}
+
+function getDecimalPlaces(value: number) {
+  const valueString = value.toString().toLowerCase();
+
+  if (valueString.includes("e-")) {
+    const [base, exponent] = valueString.split("e-");
+    const baseDecimals = base.split(".")[1]?.length ?? 0;
+
+    return baseDecimals + Number(exponent);
+  }
+
+  return valueString.split(".")[1]?.length ?? 0;
+}
+
+function parseAmount(value: string, fallback = 0) {
+  const normalizedValue = normalizeAmountInput(value);
+
+  if (!normalizedValue) {
+    return fallback;
+  }
+
+  return Number(normalizedValue);
+}
+
+function getTargetAmountValidationMessage(value: string) {
+  const normalizedValue = normalizeAmountInput(value);
+
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const decimalPart = normalizedValue.includes(".")
+    ? normalizedValue.split(".")[1] ?? ""
+    : "";
+
+  if (decimalPart.length > DECIMAL_SCALE) {
+    return t("goals.createModal.validation.targetAmountMaxDecimals", {
+      count: DECIMAL_SCALE,
+    });
+  }
+
+  const numericValue = Number(normalizedValue);
+
+  if (!Number.isFinite(numericValue)) {
+    return t("goals.createModal.validation.targetAmountInvalid");
+  }
+
+  if (getDecimalPlaces(numericValue) > DECIMAL_SCALE) {
+    return t("goals.createModal.validation.targetAmountMaxDecimals", {
+      count: DECIMAL_SCALE,
+    });
+  }
+
+  if (numericValue <= 0) {
+    return t("goals.createModal.validation.targetAmountGreaterThanZero");
+  }
+
+  if (numericValue > MAX_GOAL_AMOUNT) {
+    return t("goals.createModal.validation.targetAmountMax", {
+      amount: MAX_GOAL_AMOUNT,
+    });
+  }
+
+  return null;
+}
+
+function getCurrentAmountValidationMessage(value: string) {
+  const normalizedValue = normalizeAmountInput(value);
+
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const decimalPart = normalizedValue.includes(".")
+    ? normalizedValue.split(".")[1] ?? ""
+    : "";
+
+  if (decimalPart.length > DECIMAL_SCALE) {
+    return t("goals.createModal.validation.currentAmountMaxDecimals", {
+      count: DECIMAL_SCALE,
+    });
+  }
+
+  const numericValue = Number(normalizedValue);
+
+  if (!Number.isFinite(numericValue)) {
+    return t("goals.createModal.validation.currentAmountInvalid");
+  }
+
+  if (getDecimalPlaces(numericValue) > DECIMAL_SCALE) {
+    return t("goals.createModal.validation.currentAmountMaxDecimals", {
+      count: DECIMAL_SCALE,
+    });
+  }
+
+  if (numericValue < 0) {
+    return t("goals.createModal.validation.currentAmountNegative");
+  }
+
+  if (numericValue > MAX_GOAL_AMOUNT) {
+    return t("goals.createModal.validation.currentAmountMax", {
+      amount: MAX_GOAL_AMOUNT,
+    });
+  }
+
+  return null;
+}
+
 export function CreateGoalModal({
   visible,
   mode = "create",
@@ -172,6 +288,46 @@ export function CreateGoalModal({
   const [selectedType, setSelectedType] = useState<GoalType>("savings");
   const [selectedIcon, setSelectedIcon] = useState("rent");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const trimmedName = name.trim();
+  const normalizedTargetDate = targetDate.trim();
+
+  const isNameTooLong = trimmedName.length > MAX_GOAL_NAME_LENGTH;
+  const targetAmountValidationMessage =
+    getTargetAmountValidationMessage(targetAmount);
+  const currentAmountValidationMessage =
+    getCurrentAmountValidationMessage(currentAmount);
+
+  const parsedTargetAmount = parseAmount(targetAmount);
+  const parsedCurrentAmount = parseAmount(currentAmount, 0);
+
+  const currentGreaterThanTargetMessage =
+    !targetAmountValidationMessage &&
+    !currentAmountValidationMessage &&
+    targetAmount.trim() &&
+    parsedCurrentAmount > parsedTargetAmount
+      ? t("goals.createModal.validation.currentGreaterThanTarget")
+      : null;
+
+  const targetDateValidationMessage =
+    normalizedTargetDate &&
+    (!isCompleteIsoDate(normalizedTargetDate) ||
+      !isTargetDateAllowed(normalizedTargetDate))
+      ? t("goals.createModal.validation.targetDateInvalid")
+      : null;
+
+  const hasValidationError =
+    isNameTooLong ||
+    Boolean(targetAmountValidationMessage) ||
+    Boolean(currentAmountValidationMessage) ||
+    Boolean(currentGreaterThanTargetMessage) ||
+    Boolean(targetDateValidationMessage);
+
+  const canSubmitGoal =
+    Boolean(trimmedName) &&
+    Boolean(targetAmount.trim()) &&
+    !hasValidationError &&
+    !isSubmitting;
 
   useEffect(() => {
     if (!visible) return;
@@ -195,47 +351,15 @@ export function CreateGoalModal({
   }, [visible, isEditMode, goal]);
 
   async function handleSubmitGoal() {
+    if (!canSubmitGoal) {
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
-      const parsedTargetAmount = Number(targetAmount);
-      const parsedCurrentAmount = currentAmount.trim()
-        ? Number(currentAmount)
-        : 0;
-
-      if (!name.trim()) {
-        throw new Error(t("goals.createModal.errors.nameRequired"));
-      }
-
-      if (!Number.isFinite(parsedTargetAmount) || parsedTargetAmount <= 0) {
-        throw new Error(t("goals.createModal.errors.targetAmountInvalid"));
-      }
-
-      if (!Number.isFinite(parsedCurrentAmount) || parsedCurrentAmount < 0) {
-        throw new Error(t("goals.createModal.errors.currentAmountInvalid"));
-      }
-
-      if (parsedCurrentAmount > parsedTargetAmount) {
-        throw new Error(t("goals.createModal.errors.currentGreaterThanTarget"));
-      }
-
-      const normalizedTargetDate = targetDate.trim();
-
-      if (
-        normalizedTargetDate &&
-        (!isCompleteIsoDate(normalizedTargetDate) ||
-          !isTargetDateAllowed(normalizedTargetDate))
-      ) {
-        throw new Error(
-          t("goals.createModal.errors.targetDateInvalid", {
-            defaultValue:
-              "Target date must be between today and the next 100 years.",
-          }),
-        );
-      }
-
       const payload: CreateGoalPayload = {
-        name: name.trim(),
+        name: trimmedName,
         description: goal?.description ?? null,
         targetAmount: parsedTargetAmount,
         currentAmount: parsedCurrentAmount,
@@ -314,7 +438,7 @@ export function CreateGoalModal({
                 </Text>
 
                 <Text style={styles.previewTitle}>
-                  {name.trim() || t("goals.createModal.placeholders.name")}
+                  {trimmedName || t("goals.createModal.placeholders.name")}
                 </Text>
 
                 <Text style={styles.previewMeta}>
@@ -341,6 +465,14 @@ export function CreateGoalModal({
                     placeholderTextColor="rgba(5, 46, 43, 0.45)"
                     style={styles.input}
                   />
+
+                  {isNameTooLong && (
+                    <Text style={styles.validationWarningLabel}>
+                      {t("goals.createModal.validation.nameMaxLength", {
+                        count: MAX_GOAL_NAME_LENGTH,
+                      })}
+                    </Text>
+                  )}
                 </View>
 
                 <View style={styles.row}>
@@ -355,10 +487,16 @@ export function CreateGoalModal({
                       placeholder={t(
                         "goals.createModal.placeholders.targetAmount",
                       )}
-                      keyboardType="numeric"
+                      keyboardType="decimal-pad"
                       placeholderTextColor="rgba(5, 46, 43, 0.45)"
                       style={styles.input}
                     />
+
+                    {targetAmountValidationMessage && (
+                      <Text style={styles.validationWarningLabel}>
+                        {targetAmountValidationMessage}
+                      </Text>
+                    )}
                   </View>
 
                   <View style={styles.halfField}>
@@ -372,12 +510,26 @@ export function CreateGoalModal({
                       placeholder={t(
                         "goals.createModal.placeholders.currentSaved",
                       )}
-                      keyboardType="numeric"
+                      keyboardType="decimal-pad"
                       placeholderTextColor="rgba(5, 46, 43, 0.45)"
                       style={styles.input}
                     />
+
+                    {(currentAmountValidationMessage ||
+                      currentGreaterThanTargetMessage) && (
+                      <Text style={styles.validationWarningLabel}>
+                        {currentAmountValidationMessage ??
+                          currentGreaterThanTargetMessage}
+                      </Text>
+                    )}
                   </View>
                 </View>
+
+                {targetDateValidationMessage && (
+                  <Text style={styles.validationWarningLabel}>
+                    {targetDateValidationMessage}
+                  </Text>
+                )}
 
                 <View style={styles.fieldGroup}>
                   <DateInput
@@ -475,10 +627,10 @@ export function CreateGoalModal({
               style={[
                 styles.createButton,
                 isDesktop && styles.createButtonDesktop,
-                isSubmitting && styles.createButtonDisabled,
+                !canSubmitGoal && styles.createButtonDisabled,
               ]}
               onPress={handleSubmitGoal}
-              disabled={isSubmitting}
+              disabled={!canSubmitGoal}
             >
               <Text style={styles.createButtonText}>
                 {isSubmitting
@@ -665,6 +817,17 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     color: BLACK,
     marginBottom: 10,
+  },
+
+  validationWarningLabel: {
+    marginTop: 8,
+    color: ERROR_RED,
+    fontSize: 13,
+    fontFamily: fonts.semibold,
+    lineHeight: 18,
+    flexShrink: 1,
+    flexWrap: "wrap",
+    width: "100%",
   },
 
   input: {

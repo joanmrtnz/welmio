@@ -628,6 +628,20 @@ const ca = {
         currentGreaterThanTarget:
           "L’estalvi actual no pot ser superior a la quantitat objectiu.",
       },
+
+      validation: {
+        nameMaxLength: "El nom de l'objectiu no pot tenir més de {{count}} caràcters.",
+        targetAmountMaxDecimals: "L'import objectiu no pot tenir més de {{count}} decimals.",
+        targetAmountInvalid: "L'import objectiu ha de ser un número vàlid.",
+        targetAmountGreaterThanZero: "L'import objectiu ha de ser superior a 0.",
+        targetAmountMax: "L'import objectiu no pot ser superior a {{amount}}.",
+        currentAmountMaxDecimals: "L'import actual no pot tenir més de {{count}} decimals.",
+        currentAmountInvalid: "L'import actual ha de ser un número vàlid.",
+        currentAmountNegative: "L'import actual no pot ser negatiu.",
+        currentAmountMax: "L'import actual no pot ser superior a {{amount}}.",
+        currentGreaterThanTarget: "L'import actual no pot ser superior a l'import objectiu.",
+        targetDateInvalid: "La data objectiu ha d'estar entre avui i els pròxims 100 anys.",
+      },
     },
 
     quickGoals: {
