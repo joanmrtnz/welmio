@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 25,
     marginTop: 26,
-    marginBottom: 30,
+    marginBottom: 18,
     minHeight: 42,
   },
 

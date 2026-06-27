@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 5,
     marginTop: 30,
-    marginBottom: 18,
+    marginBottom: 10,
   },
 
   headerDesktop: {
