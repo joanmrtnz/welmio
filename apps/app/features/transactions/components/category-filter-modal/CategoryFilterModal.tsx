@@ -50,6 +50,8 @@ export function CategoryFilterModal({
 
     isSaving,
     canSaveCategory,
+    isCategoryNameTooLong,
+    maxCategoryNameLength,
 
     editingCategoryId,
 
@@ -293,6 +295,14 @@ export function CategoryFilterModal({
                   style={styles.input}
                 />
 
+                {isCategoryNameTooLong && (
+                  <Text style={styles.validationWarningLabel}>
+                    {t("transactions.categoryFilter.categoryNameMaxLengthStart")}{" "}
+                    {maxCategoryNameLength}{" "}
+                    {t("transactions.categoryFilter.categoryNameMaxLengthEnd")}
+                  </Text>
+                )}
+
                 <Text style={styles.sectionLabel}>
                   {t("transactions.categoryFilter.type")}
                 </Text>
@@ -402,6 +412,7 @@ export function CategoryFilterModal({
                     !canSaveCategory && styles.applyButtonDisabled,
                   ]}
                   onPress={handleSubmitCategory}
+                  disabled={!canSaveCategory || isSaving}
                 >
                   <Text style={styles.applyButtonText}>
                     {isSaving

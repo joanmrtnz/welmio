@@ -745,6 +745,8 @@ const en = {
       save: "Save",
       saving: "Saving...",
       saveChanges: "Save changes",
+      categoryNameMaxLengthStart: "Category name cannot be longer than",
+      categoryNameMaxLengthEnd: "characters.",
 
       deleteDialog: {
         title: "Delete Category",

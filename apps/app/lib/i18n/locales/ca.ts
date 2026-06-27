@@ -745,6 +745,8 @@ const ca = {
       save: "Desar",
       saving: "Desant...",
       saveChanges: "Desar canvis",
+      categoryNameMaxLengthStart: "El nom de la categoria no pot tenir més de",
+      categoryNameMaxLengthEnd: "caràcters.",
 
       deleteDialog: {
         title: "Eliminar categoria",

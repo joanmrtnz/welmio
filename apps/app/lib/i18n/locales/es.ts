@@ -745,6 +745,8 @@ const es = {
       save: "Guardar",
       saving: "Guardando...",
       saveChanges: "Guardar cambios",
+      categoryNameMaxLengthStart: "El nombre de la categoría no puede tener más de",
+      categoryNameMaxLengthEnd: "caracteres.",
 
       deleteDialog: {
         title: "Eliminar categoría",
