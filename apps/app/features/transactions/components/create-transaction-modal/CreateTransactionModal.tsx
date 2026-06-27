@@ -39,6 +39,11 @@ type CreateTransactionModalProps = {
   lockType?: boolean;
 };
 
+const MAX_TRANSACTION_AMOUNT = 9999999999.99;
+const DECIMAL_SCALE = 2;
+const MAX_TRANSACTION_DESCRIPTION_LENGTH = 120;
+const MAX_TRANSACTION_NOTES_LENGTH = 500;
+
 function formatIsoDateForDatePicker(value: string) {
   const [year, month, day] = value.split("-");
 
@@ -77,6 +82,42 @@ function translateOptionLabel(
   return t(`transactions.form.${group}.${key}`, {
     defaultValue: fallback,
   });
+}
+
+function getAmountValidationMessage(value: string) {
+  const normalizedValue = value.trim().replace(",", ".");
+
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const decimalPart = normalizedValue.includes(".")
+    ? normalizedValue.split(".")[1] ?? ""
+    : "";
+
+  if (decimalPart.length > DECIMAL_SCALE) {
+    return t("transactions.form.validation.amountMaxDecimals", {
+      count: DECIMAL_SCALE,
+    });
+  }
+
+  const numericValue = Number(normalizedValue);
+
+  if (!Number.isFinite(numericValue)) {
+    return t("transactions.form.validation.amountInvalid");
+  }
+
+  if (numericValue <= 0) {
+    return t("transactions.form.validation.amountGreaterThanZero");
+  }
+
+  if (numericValue > MAX_TRANSACTION_AMOUNT) {
+    return t("transactions.form.validation.amountMax", {
+      amount: MAX_TRANSACTION_AMOUNT,
+    });
+  }
+
+  return null;
 }
 
 export function CreateTransactionModal({
@@ -142,6 +183,25 @@ export function CreateTransactionModal({
   const isDesktop = width >= 768;
 
   const { BLACK, TAB_GREEN } = createTransactionModalColors;
+
+  const amountValidationMessage = getAmountValidationMessage(amount);
+  const isDescriptionTooLong =
+    description.trim().length > MAX_TRANSACTION_DESCRIPTION_LENGTH;
+  const isNotesTooLong = notes.trim().length > MAX_TRANSACTION_NOTES_LENGTH;
+
+  const hasValidationError = Boolean(amountValidationMessage)
+    || isDescriptionTooLong
+    || isNotesTooLong;
+
+  const canSubmitTransaction = canSave && !hasValidationError && !isSaving;
+
+  async function handleValidatedSubmitTransaction() {
+    if (!canSubmitTransaction) {
+      return;
+    }
+
+    await handleSubmitTransaction();
+  }
 
   useEffect(() => {
     if (!visible) return;
@@ -297,6 +357,12 @@ export function CreateTransactionModal({
                   /> */}
                 </View>
 
+                {amountValidationMessage && (
+                  <Text style={styles.validationWarningLabel}>
+                    {amountValidationMessage}
+                  </Text>
+                )}
+
                 <Text style={styles.sectionLabel}>
                   {t("transactions.form.description")}
                 </Text>
@@ -308,6 +374,14 @@ export function CreateTransactionModal({
                   placeholderTextColor="rgba(5, 46, 43, 0.45)"
                   style={styles.input}
                 />
+
+                {isDescriptionTooLong && (
+                  <Text style={styles.validationWarningLabel}>
+                    {t("transactions.form.validation.descriptionMaxLength", {
+                      count: MAX_TRANSACTION_DESCRIPTION_LENGTH,
+                    })}
+                  </Text>
+                )}
 
                 <Text style={styles.sectionLabel}>
                   {t("transactions.form.category")}
@@ -489,6 +563,14 @@ export function CreateTransactionModal({
                   style={styles.textArea}
                 />
 
+                {isNotesTooLong && (
+                  <Text style={styles.validationWarningLabel}>
+                    {t("transactions.form.validation.notesMaxLength", {
+                      count: MAX_TRANSACTION_NOTES_LENGTH,
+                    })}
+                  </Text>
+                )}
+
                 <View style={styles.actions}>
                   <Pressable style={styles.clearButton} onPress={handleClose}>
                     <Text style={styles.clearButtonText}>
@@ -499,9 +581,10 @@ export function CreateTransactionModal({
                   <Pressable
                     style={[
                       styles.applyButton,
-                      !canSave && styles.applyButtonDisabled,
+                      !canSubmitTransaction && styles.applyButtonDisabled,
                     ]}
-                    onPress={handleSubmitTransaction}
+                    onPress={handleValidatedSubmitTransaction}
+                    disabled={!canSubmitTransaction}
                   >
                     <Text style={styles.applyButtonText}>
                       {isSaving

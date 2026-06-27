@@ -700,6 +700,15 @@ const ca = {
       update: "Actualitzar",
       updating: "Actualitzant...",
 
+      validation: {
+        amountMaxDecimals: "L'import no pot tenir més de {{count}} decimals.",
+        amountInvalid: "L'import ha de ser un número vàlid.",
+        amountGreaterThanZero: "L'import ha de ser superior a 0.",
+        amountMax: "L'import no pot ser superior a {{amount}}.",
+        descriptionMaxLength: "La descripció no pot tenir més de {{count}} caràcters.",
+        notesMaxLength: "Les notes no poden tenir més de {{count}} caràcters.",
+      },
+
       natureOptions: {
         fixed: "Fixa",
         variable: "Variable",

@@ -699,6 +699,15 @@ const en = {
       saving: "Saving...",
       update: "Update",
       updating: "Updating...",
+      
+      validation: {
+        amountMaxDecimals: "Amount cannot have more than {{count}} decimal places.",
+        amountInvalid: "Amount must be a valid number.",
+        amountGreaterThanZero: "Amount must be greater than 0.",
+        amountMax: "Amount cannot be greater than {{amount}}.",
+        descriptionMaxLength: "Description cannot be longer than {{count}} characters.",
+        notesMaxLength: "Notes cannot be longer than {{count}} characters."
+      },
 
       natureOptions: {
         fixed: "Fixed",

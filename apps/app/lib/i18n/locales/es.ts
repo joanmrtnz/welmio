@@ -699,6 +699,15 @@ const es = {
       saving: "Guardando...",
       update: "Actualizar",
       updating: "Actualizando...",
+      
+      validation: {
+        amountMaxDecimals: "El importe no puede tener más de {{count}} decimales.",
+        amountInvalid: "El importe debe ser un número válido.",
+        amountGreaterThanZero: "El importe debe ser mayor que 0.",
+        amountMax: "El importe no puede ser superior a {{amount}}.",
+        descriptionMaxLength: "La descripción no puede tener más de {{count}} caracteres.",
+        notesMaxLength: "Las notas no pueden tener más de {{count}} caracteres.",
+      },
 
       natureOptions: {
         fixed: "Fija",
