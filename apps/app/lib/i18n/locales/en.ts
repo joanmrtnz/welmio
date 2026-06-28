@@ -628,6 +628,20 @@ const en = {
         currentGreaterThanTarget:
           "Current amount cannot be greater than target amount.",
       },
+
+      validation: {
+        nameMaxLength: "Goal name cannot be longer than {{count}} characters.",
+        targetAmountMaxDecimals: "Target amount cannot have more than {{count}} decimal places.",
+        targetAmountInvalid: "Target amount must be a valid number.",
+        targetAmountGreaterThanZero: "Target amount must be greater than 0.",
+        targetAmountMax: "Target amount cannot be greater than {{amount}}.",
+        currentAmountMaxDecimals: "Current amount cannot have more than {{count}} decimal places.",
+        currentAmountInvalid: "Current amount must be a valid number.",
+        currentAmountNegative: "Current amount cannot be negative.",
+        currentAmountMax: "Current amount cannot be greater than {{amount}}.",
+        currentGreaterThanTarget: "Current amount cannot be greater than target amount.",
+        targetDateInvalid: "Target date must be between today and the next 100 years.",
+      },
     },
 
     quickGoals: {
@@ -699,6 +713,15 @@ const en = {
       saving: "Saving...",
       update: "Update",
       updating: "Updating...",
+      
+      validation: {
+        amountMaxDecimals: "Amount cannot have more than {{count}} decimal places.",
+        amountInvalid: "Amount must be a valid number.",
+        amountGreaterThanZero: "Amount must be greater than 0.",
+        amountMax: "Amount cannot be greater than {{amount}}.",
+        descriptionMaxLength: "Description cannot be longer than {{count}} characters.",
+        notesMaxLength: "Notes cannot be longer than {{count}} characters."
+      },
 
       natureOptions: {
         fixed: "Fixed",
@@ -745,6 +768,8 @@ const en = {
       save: "Save",
       saving: "Saving...",
       saveChanges: "Save changes",
+      categoryNameMaxLengthStart: "Category name cannot be longer than",
+      categoryNameMaxLengthEnd: "characters.",
 
       deleteDialog: {
         title: "Delete Category",

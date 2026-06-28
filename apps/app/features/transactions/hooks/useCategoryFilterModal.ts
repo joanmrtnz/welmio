@@ -30,6 +30,8 @@ type UseCategoryFilterModalParams = {
   onApply: (categoryIds: string[]) => void;
 };
 
+const MAX_CATEGORY_NAME_LENGTH = 40;
+
 export function useCategoryFilterModal({
   visible,
   selectedCategoryIds,
@@ -48,9 +50,16 @@ export function useCategoryFilterModal({
   const [selectedColor, setSelectedColor] = useState(DEFAULT_CATEGORY_COLOR);
 
   const [isSaving, setIsSaving] = useState(false);
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
+    null,
+  );
 
-  const canSaveCategory = Boolean(categoryName.trim()) && !isSaving;
+  const trimmedCategoryName = categoryName.trim();
+  const isCategoryNameTooLong =
+    trimmedCategoryName.length > MAX_CATEGORY_NAME_LENGTH;
+
+  const canSaveCategory =
+    Boolean(trimmedCategoryName) && !isCategoryNameTooLong && !isSaving;
 
   async function loadCategories() {
     try {
@@ -67,12 +76,8 @@ export function useCategoryFilterModal({
     setMode("filter");
     setDraftSelectedIds(selectedCategoryIds);
 
-    
-
     loadCategories();
   }, [visible, selectedCategoryIds]);
-
-
 
   function resetCategoryForm() {
     setCategoryName("");
@@ -151,13 +156,22 @@ export function useCategoryFilterModal({
   }
 
   async function handleSubmitCategory() {
-    if (!canSaveCategory || isSaving) return;
+    const name = categoryName.trim();
+
+    if (!name || isSaving) return;
+
+    if (name.length > MAX_CATEGORY_NAME_LENGTH) {
+      feedback.error(
+        `Category name cannot be longer than ${MAX_CATEGORY_NAME_LENGTH} characters.`,
+      );
+      return;
+    }
 
     try {
       setIsSaving(true);
 
       const payload = {
-        name: categoryName.trim(),
+        name,
         type: selectedType,
         icon: selectedIcon,
         color: selectedColor,
@@ -185,7 +199,6 @@ export function useCategoryFilterModal({
       setIsSaving(false);
     }
   }
-
 
   function handleClose() {
     setMode("filter");
@@ -215,6 +228,13 @@ export function useCategoryFilterModal({
     const trimmedName = normalizeCategoryName(categoryName);
 
     if (!trimmedName || isSaving) return;
+
+    if (trimmedName.length > MAX_CATEGORY_NAME_LENGTH) {
+      feedback.error(
+        `Category name cannot be longer than ${MAX_CATEGORY_NAME_LENGTH} characters.`,
+      );
+      return;
+    }
 
     try {
       setIsSaving(true);
@@ -262,6 +282,8 @@ export function useCategoryFilterModal({
 
     isSaving,
     canSaveCategory,
+    isCategoryNameTooLong,
+    maxCategoryNameLength: MAX_CATEGORY_NAME_LENGTH,
 
     editingCategoryId,
 
