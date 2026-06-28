@@ -1,10 +1,17 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { FinanceSummaryService } from '../finance/finance-summary.service';
 import { CategoriesOverviewResponseDto } from './dto/categories-overview-response.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { Prisma } from '@prisma/client';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+
+const MAX_CATEGORY_NAME_LENGTH = 40;
 
 @Injectable()
 export class CategoriesService {
@@ -50,6 +57,8 @@ export class CategoriesService {
 
   async createCategory(userId: string, createCategoryDto: CreateCategoryDto) {
     const name = createCategoryDto.name.trim();
+
+    this.validateCategoryNameLength(name);
 
     try {
       return await this.prisma.category.create({
@@ -157,6 +166,14 @@ export class CategoriesService {
     };
   }
 
+  private validateCategoryNameLength(name: string) {
+    if (name.length > MAX_CATEGORY_NAME_LENGTH) {
+      throw new BadRequestException(
+        `Category name cannot be longer than ${MAX_CATEGORY_NAME_LENGTH} characters.`,
+      );
+    }
+  }
+
   private buildCategoryId(name: string) {
     const normalizedName = name
       .trim()
@@ -169,5 +186,4 @@ export class CategoriesService {
 
     return `cat_${normalizedName}_ui`;
   }
-
 }

@@ -130,7 +130,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-
   gridItemDesktop: {
     width: "18%",
   },
@@ -364,5 +363,16 @@ export const styles = StyleSheet.create({
 
   deleteIconButton: {
     backgroundColor: "rgba(239, 68, 68, 0.1)",
+  },
+
+  validationWarningLabel: {
+    marginBottom: 12,
+    color: "#d64545",
+    fontSize: 14,
+    fontWeight: "600",
+    lineHeight: 20,
+    flexShrink: 1,
+    flexWrap: "wrap",
+    width: "100%",
   },
 });

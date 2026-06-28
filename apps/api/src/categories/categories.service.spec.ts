@@ -1,4 +1,8 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -153,6 +157,21 @@ describe('CategoriesService', () => {
           color: '#F97316',
         },
       });
+    });
+
+    it('rejects category names longer than 120 characters when creating', async () => {
+      const longName = 'a'.repeat(121);
+
+      await expect(
+        service.createCategory('user-1', {
+          name: longName,
+          type: 'expense' as any,
+          icon: 'food',
+          color: '#F97316',
+        }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+
+      expect(prisma.category.create).not.toHaveBeenCalled();
     });
 
     it('maps duplicate category constraints to a conflict when creating', async () => {

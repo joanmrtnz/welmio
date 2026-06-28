@@ -628,6 +628,20 @@ const es = {
         currentGreaterThanTarget:
           "El ahorro actual no puede ser mayor que la cantidad objetivo.",
       },
+
+      validation: {
+        nameMaxLength: "El nombre del objetivo no puede tener más de {{count}} caracteres.",
+        targetAmountMaxDecimals: "El importe objetivo no puede tener más de {{count}} decimales.",
+        targetAmountInvalid: "El importe objetivo debe ser un número válido.",
+        targetAmountGreaterThanZero: "El importe objetivo debe ser mayor que 0.",
+        targetAmountMax: "El importe objetivo no puede ser superior a {{amount}}.",
+        currentAmountMaxDecimals: "El importe actual no puede tener más de {{count}} decimales.",
+        currentAmountInvalid: "El importe actual debe ser un número válido.",
+        currentAmountNegative: "El importe actual no puede ser negativo.",
+        currentAmountMax: "El importe actual no puede ser superior a {{amount}}.",
+        currentGreaterThanTarget: "El importe actual no puede ser mayor que el importe objetivo.",
+        targetDateInvalid: "La fecha objetivo debe estar entre hoy y los próximos 100 años.",
+      },
     },
 
     quickGoals: {
@@ -699,6 +713,15 @@ const es = {
       saving: "Guardando...",
       update: "Actualizar",
       updating: "Actualizando...",
+      
+      validation: {
+        amountMaxDecimals: "El importe no puede tener más de {{count}} decimales.",
+        amountInvalid: "El importe debe ser un número válido.",
+        amountGreaterThanZero: "El importe debe ser mayor que 0.",
+        amountMax: "El importe no puede ser superior a {{amount}}.",
+        descriptionMaxLength: "La descripción no puede tener más de {{count}} caracteres.",
+        notesMaxLength: "Las notas no pueden tener más de {{count}} caracteres.",
+      },
 
       natureOptions: {
         fixed: "Fija",
@@ -745,6 +768,8 @@ const es = {
       save: "Guardar",
       saving: "Guardando...",
       saveChanges: "Guardar cambios",
+      categoryNameMaxLengthStart: "El nombre de la categoría no puede tener más de",
+      categoryNameMaxLengthEnd: "caracteres.",
 
       deleteDialog: {
         title: "Eliminar categoría",

@@ -9,6 +9,7 @@ const BUTTON_GREEN = "#93e2c9";
 const DARK_GREEN = "#00a87d";
 const TAB_GREEN = "#12c79b";
 const BORDER_GREEN = "rgba(8, 120, 98, 0.14)";
+const ERROR_RED = "#d64545";
 
 export const createTransactionModalColors = {
   WHITE,
@@ -21,7 +22,6 @@ export const createTransactionModalColors = {
 };
 
 export const styles = StyleSheet.create({
-
   overlay: {
     flex: 1,
     justifyContent: "center",
@@ -119,6 +119,18 @@ export const styles = StyleSheet.create({
     color: BLACK,
     marginBottom: 10,
     marginTop: 2,
+  },
+
+  validationWarningLabel: {
+    marginTop: -8,
+    marginBottom: 14,
+    color: ERROR_RED,
+    fontSize: 13,
+    fontFamily: fonts.semibold,
+    lineHeight: 18,
+    flexShrink: 1,
+    flexWrap: "wrap",
+    width: "100%",
   },
 
   input: {
@@ -379,7 +391,6 @@ export const styles = StyleSheet.create({
     backgroundColor: BUTTON_GREEN,
     alignItems: "center",
     justifyContent: "center",
-
   },
 
   applyButtonDisabled: {
