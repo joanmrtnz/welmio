@@ -28,6 +28,12 @@ import { getGreetingLabel } from "./utils/getGreetingLabel";
 import { AVATAR_IMAGES, type AvatarId } from "@/features/profile/components/AvatarPickerModal";
 import { AppImage } from "@/components/images/AppImage";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { SkeletonText } from "@/components/ui/loading/Skeleton";
+import {
+  HomeAnalyticsSkeleton,
+  HomeGoalsSkeleton,
+  HomeTransactionsSkeleton,
+} from "../components/HomeSkeletons";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -44,13 +50,13 @@ const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
 const getEmptyAnalyticsData = () => [
-  { label: t("common.weekdays.mon"), income: 0, expense: 0 },
-  { label: t("common.weekdays.tue"), income: 0, expense: 0 },
-  { label: t("common.weekdays.wed"), income: 0, expense: 0 },
-  { label: t("common.weekdays.thu"), income: 0, expense: 0 },
-  { label: t("common.weekdays.fri"), income: 0, expense: 0 },
-  { label: t("common.weekdays.sat"), income: 0, expense: 0 },
-  { label: t("common.weekdays.sun"), income: 0, expense: 0 },
+  { label: t("common.weekDays.mon"), income: 0, expense: 0 },
+  { label: t("common.weekDays.tue"), income: 0, expense: 0 },
+  { label: t("common.weekDays.wed"), income: 0, expense: 0 },
+  { label: t("common.weekDays.thu"), income: 0, expense: 0 },
+  { label: t("common.weekDays.fri"), income: 0, expense: 0 },
+  { label: t("common.weekDays.sat"), income: 0, expense: 0 },
+  { label: t("common.weekDays.sun"), income: 0, expense: 0 },
 ];
 
 function isAvatarId(value: unknown): value is AvatarId {
@@ -104,21 +110,32 @@ export default function HomeScreen() {
     useState<GoalsOverviewResponse | null>(null);
   const [fullName, setFullName] = useState("");
   const [avatarId, setAvatarId] = useState<AvatarId>("avatar-0");
+  const [isTransactionsLoading, setIsTransactionsLoading] = useState(true);
+  const [isGoalsLoading, setIsGoalsLoading] = useState(true);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [goalsErrorMessage, setGoalsErrorMessage] = useState<string | null>(
     null,
   );
   const tabBarHeight = useBottomTabBarHeight();
 
-  const { selected, setSelected, data: analyticsData } = useAnalytics();
+  const {
+    selected,
+    setSelected,
+    data: analyticsData,
+    loading: isAnalyticsLoading,
+  } = useAnalytics();
 
   const loadUserProfile = useCallback(async () => {
     try {
+      setIsProfileLoading(true);
       const user = await getUserProfile();
 
       setFullName(user.fullName ?? "");
       setAvatarId(isAvatarId(user.avatarIcon) ? user.avatarIcon : "avatar-0");
     } catch (error) {
       console.warn("[HomeScreen] load user profile error:", error);
+    } finally {
+      setIsProfileLoading(false);
     }
   }, []);
 
@@ -163,6 +180,7 @@ export default function HomeScreen() {
 
   const loadTransactionsOverview = useCallback(async () => {
     try {
+      setIsTransactionsLoading(true);
       const response = await apiFetch<TransactionsOverviewResponse>(
         "/transactions/overview",
       );
@@ -170,11 +188,14 @@ export default function HomeScreen() {
       setTransactionsOverview(response);
     } catch (error) {
       console.warn("[HomeScreen] load transactions overview error:", error);
+    } finally {
+      setIsTransactionsLoading(false);
     }
   }, []);
 
   const loadGoalsOverview = useCallback(async () => {
     try {
+      setIsGoalsLoading(true);
       setGoalsErrorMessage(null);
 
       const response = await getGoalsOverview();
@@ -183,6 +204,8 @@ export default function HomeScreen() {
     } catch (error) {
       console.warn("[HomeScreen] load goals overview error:", error);
       setGoalsErrorMessage(t("home.errors.loadGoals"));
+    } finally {
+      setIsGoalsLoading(false);
     }
   }, []);
 
@@ -222,8 +245,12 @@ export default function HomeScreen() {
             </Pressable>
 
             <View>
-             <Text style={styles.greeting}>
-                {t("home.greeting", { name: fullName || t("home.defaultUser") })}
+              <Text style={styles.greeting}>
+                {isProfileLoading
+                  ? t("home.greeting", { name: t("home.defaultUser") })
+                  : t("home.greeting", {
+                      name: fullName || t("home.defaultUser"),
+                    })}
               </Text>
               <Text style={styles.greetingSub}>{getGreetingLabel()}</Text>
             </View>
@@ -258,9 +285,13 @@ export default function HomeScreen() {
 
             <View style={styles.overviewTextWrap}>
               <Text style={styles.overviewLabel}>{t("home.overview.totalBalance")}</Text>
-              <Text style={styles.overviewPositive}>
-                {formatCurrency(totalBalance)}
-              </Text>
+              {isTransactionsLoading && !transactionsOverview ? (
+                <SkeletonText width={96} height={19} style={styles.skeletonTextGap} />
+              ) : (
+                <Text style={styles.overviewPositive}>
+                  {formatCurrency(totalBalance)}
+                </Text>
+              )}
             </View>
           </Pressable>
 
@@ -271,9 +302,13 @@ export default function HomeScreen() {
 
             <View style={styles.overviewTextWrap}>
               <Text style={styles.overviewLabel}>{t("home.overview.totalExpense")}</Text>
-              <Text style={styles.overviewAmount}>
-                -{formatCurrency(totalExpense)}
-              </Text>
+              {isTransactionsLoading && !transactionsOverview ? (
+                <SkeletonText width={96} height={19} style={styles.skeletonTextGap} />
+              ) : (
+                <Text style={styles.overviewAmount}>
+                  -{formatCurrency(totalExpense)}
+                </Text>
+              )}
             </View>
           </Pressable>
         </View>
@@ -284,12 +319,16 @@ export default function HomeScreen() {
           onActionPress={() => router.push("/goals")}
         />
 
-        <QuickGoalsRow
-          goals={homeGoals}
-          errorMessage={goalsErrorMessage}
-          onGoalPress={() => router.push("/goals")}
-          onEmptyPress={() => router.push("/goals")}
-        />
+        {isGoalsLoading && !goalsOverview ? (
+          <HomeGoalsSkeleton isDesktop={isDesktop} />
+        ) : (
+          <QuickGoalsRow
+            goals={homeGoals}
+            errorMessage={goalsErrorMessage}
+            onGoalPress={() => router.push("/goals")}
+            onEmptyPress={() => router.push("/goals")}
+          />
+        )}
 
         <SectionHeader
           title={t("home.sections.analytics")}
@@ -297,12 +336,19 @@ export default function HomeScreen() {
           onActionPress={() => router.push("/analytics")}
         />
 
-        <QuickAnalyticsCard
-          data={weeklyAnalyticsData}
-          title={t("home.analytics.thisWeekChart")}
-          actionLabel={t("home.analytics.weekly")}
-          onPress={() => router.push("/analytics")}
-        />
+        {isAnalyticsLoading && !analyticsData ? (
+          <HomeAnalyticsSkeleton />
+        ) : (
+          <QuickAnalyticsCard
+            data={weeklyAnalyticsData}
+            title={t("home.analytics.thisWeekChart")}
+            subtitle={t("analytics.incomeExpenseChart.subtitle")}
+            actionLabel={t("home.analytics.weekly")}
+            incomeLabel={t("analytics.labels.income")}
+            expenseLabel={t("analytics.labels.expense")}
+            onPress={() => router.push("/analytics")}
+          />
+        )}
 
         <SectionHeader
           title={t("home.sections.recentTransactions")}
@@ -311,7 +357,9 @@ export default function HomeScreen() {
         />
 
         <View style={styles.transactionsCard}>
-          {recentTransactions.length > 0 ? (
+          {isTransactionsLoading && !transactionsOverview ? (
+            <HomeTransactionsSkeleton />
+          ) : recentTransactions.length > 0 ? (
             recentTransactions.map((transaction, index) => (
               <TransactionRow
                 key={transaction.id}
@@ -506,6 +554,10 @@ const styles = StyleSheet.create({
 
   overviewTextWrap: {
     marginTop: 12,
+  },
+
+  skeletonTextGap: {
+    marginTop: 6,
   },
 
   overviewLabel: {

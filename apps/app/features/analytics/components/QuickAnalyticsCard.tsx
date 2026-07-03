@@ -19,7 +19,10 @@ type AnalyticsPoint = {
 
 type QuickAnalyticsCardProps = {
   title?: string;
+  subtitle?: string;
   actionLabel?: string;
+  incomeLabel?: string;
+  expenseLabel?: string;
   data: AnalyticsPoint[];
   onPress?: () => void;
 };
@@ -46,7 +49,10 @@ function normalizeHeight(value: number, maxValue: number) {
 
 export function QuickAnalyticsCard({
   title = "Last week chart",
+  subtitle = "Income vs expenses",
   actionLabel = "Analytics",
+  incomeLabel = "Income",
+  expenseLabel = "Expense",
   data,
   onPress,
 }: QuickAnalyticsCardProps) {
@@ -58,7 +64,7 @@ export function QuickAnalyticsCard({
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>Income vs expenses</Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
         </View>
 
         <View style={styles.actionPill}>
@@ -69,12 +75,12 @@ export function QuickAnalyticsCard({
       <View style={styles.legendRow}>
         <View style={styles.legendItem}>
           <View style={styles.incomeDot} />
-          <Text style={styles.legendText}>Income</Text>
+          <Text style={styles.legendText}>{incomeLabel}</Text>
         </View>
 
         <View style={styles.legendItem}>
           <View style={styles.expenseDot} />
-          <Text style={styles.legendText}>Expense</Text>
+          <Text style={styles.legendText}>{expenseLabel}</Text>
         </View>
       </View>
 

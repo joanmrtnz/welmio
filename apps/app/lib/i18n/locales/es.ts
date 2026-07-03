@@ -726,6 +726,11 @@ const es = {
       natureOptions: {
         fixed: "Fija",
         variable: "Variable",
+        rent: "Alquiler",
+        subscription: "Suscripción",
+        salary: "Salario",
+        refund: "Reembolso",
+        other: "Otra",
         essential: "Esencial",
         non_essential: "No esencial",
         need: "Necesidad",

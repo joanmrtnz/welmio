@@ -34,6 +34,7 @@ import { formatGoalTargetDate } from "../utils/formatGoalTargetDate";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { t } from "@/lib/i18n";
+import { GoalsScreenSkeleton } from "../components/GoalsScreenSkeleton";
 
 const GREEN = "#dff7ef";
 const DIVIDER_GREEN = "#7adcc8";
@@ -232,6 +233,7 @@ export default function GoalsScreen() {
     goalsCount: goals.length,
     globalProgress,
   });
+  const showInitialSkeleton = isLoading && !data;
 
   return (
     <View style={styles.screen}>
@@ -245,6 +247,10 @@ export default function GoalsScreen() {
           isDesktop && styles.contentDesktop,
         ]}
       >
+        {showInitialSkeleton ? (
+          <GoalsScreenSkeleton isDesktop={isDesktop} />
+        ) : (
+          <>
         <View
           style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}
         >
@@ -477,6 +483,8 @@ export default function GoalsScreen() {
             </Text>
           </View>
         </View>
+          </>
+        )}
       </ScrollView>
 
       <Pressable
