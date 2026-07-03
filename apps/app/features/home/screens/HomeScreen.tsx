@@ -28,7 +28,12 @@ import { getGreetingLabel } from "./utils/getGreetingLabel";
 import { AVATAR_IMAGES, type AvatarId } from "@/features/profile/components/AvatarPickerModal";
 import { AppImage } from "@/components/images/AppImage";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { Skeleton, SkeletonText } from "@/components/ui/loading/Skeleton";
+import { SkeletonText } from "@/components/ui/loading/Skeleton";
+import {
+  HomeAnalyticsSkeleton,
+  HomeGoalsSkeleton,
+  HomeTransactionsSkeleton,
+} from "../components/HomeSkeletons";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -382,77 +387,6 @@ export default function HomeScreen() {
   );
 }
 
-function HomeGoalsSkeleton({ isDesktop }: { isDesktop: boolean }) {
-  if (isDesktop) {
-    return (
-      <View style={styles.homeGoalsSkeletonGrid}>
-        {[0, 1, 2, 3].map((item) => (
-          <Skeleton key={item} style={styles.homeGoalSkeletonCard} rounded={24} />
-        ))}
-      </View>
-    );
-  }
-
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.homeGoalsSkeletonScroller}
-      contentContainerStyle={styles.homeGoalsSkeletonRow}
-    >
-      {[0, 1, 2].map((item) => (
-        <Skeleton key={item} style={styles.homeGoalSkeletonCard} rounded={24} />
-      ))}
-    </ScrollView>
-  );
-}
-
-function HomeAnalyticsSkeleton() {
-  return (
-    <View style={styles.homeAnalyticsSkeletonCard}>
-      <View style={styles.homeAnalyticsSkeletonHeader}>
-        <View style={styles.homeAnalyticsSkeletonTitleWrap}>
-          <SkeletonText width={130} height={16} />
-          <SkeletonText width={102} height={12} />
-        </View>
-        <Skeleton style={styles.homeAnalyticsSkeletonPill} rounded={999} />
-      </View>
-
-      <View style={styles.homeAnalyticsSkeletonBars}>
-        {[76, 92, 54, 86, 64, 102, 72].map((height, index) => (
-          <View key={`${height}-${index}`} style={styles.homeAnalyticsBarGroup}>
-            <View style={styles.homeAnalyticsBarPair}>
-              <Skeleton style={[styles.homeAnalyticsBar, { height }]} rounded={999} />
-              <Skeleton
-                style={[styles.homeAnalyticsBar, { height: Math.max(height - 30, 34) }]}
-                rounded={999}
-              />
-            </View>
-            <SkeletonText width={24} height={9} />
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-}
-
-function HomeTransactionsSkeleton() {
-  return (
-    <View style={styles.homeTransactionsSkeletonList}>
-      {[0, 1, 2].map((item) => (
-        <View key={item} style={styles.homeTransactionSkeletonRow}>
-          <Skeleton style={styles.homeTransactionSkeletonIcon} rounded={18} />
-          <View style={styles.homeTransactionSkeletonContent}>
-            <SkeletonText width="60%" height={14} />
-            <SkeletonText width="42%" height={11} />
-          </View>
-          <SkeletonText width={58} height={14} />
-        </View>
-      ))}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -733,105 +667,6 @@ const styles = StyleSheet.create({
     paddingRight: 18,
     paddingBottom: 2,
     marginBottom: 22,
-  },
-
-  homeGoalsSkeletonScroller: {
-    marginBottom: 22,
-  },
-
-  homeGoalsSkeletonRow: {
-    gap: 12,
-    paddingRight: 18,
-    paddingBottom: 2,
-  },
-
-  homeGoalsSkeletonGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 22,
-  },
-
-  homeGoalSkeletonCard: {
-    width: 238,
-    height: 116,
-  },
-
-  homeAnalyticsSkeletonCard: {
-    minHeight: 252,
-    backgroundColor: CARD,
-    borderRadius: 28,
-    borderWidth: 1,
-    borderColor: BORDER,
-    padding: 18,
-    marginBottom: 22,
-    shadowColor: "rgba(29, 100, 89, 0.12)",
-    shadowOpacity: 1,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 5,
-  },
-
-  homeAnalyticsSkeletonHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 14,
-  },
-
-  homeAnalyticsSkeletonTitleWrap: {
-    gap: 8,
-  },
-
-  homeAnalyticsSkeletonPill: {
-    width: 76,
-    height: 30,
-  },
-
-  homeAnalyticsSkeletonBars: {
-    height: 152,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 12,
-    marginTop: 28,
-  },
-
-  homeAnalyticsBarGroup: {
-    flex: 1,
-    alignItems: "center",
-    gap: 8,
-  },
-
-  homeAnalyticsBarPair: {
-    height: 116,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 4,
-  },
-
-  homeAnalyticsBar: {
-    width: 9,
-  },
-
-  homeTransactionsSkeletonList: {
-    gap: 12,
-  },
-
-  homeTransactionSkeletonRow: {
-    minHeight: 58,
-    marginHorizontal: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-
-  homeTransactionSkeletonIcon: {
-    width: 48,
-    height: 48,
-  },
-
-  homeTransactionSkeletonContent: {
-    flex: 1,
-    gap: 8,
   },
 
   goalMiniCard: {

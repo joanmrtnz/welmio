@@ -22,7 +22,11 @@ import type { ExpenseCategoryChartItem } from "../hooks/useExpensesByCategoryAna
 import { useGoalContributionsAnalytics } from "../hooks/useGoalContributionsAnalytics";
 import type { GoalContributionChartItem } from "../hooks/useGoalContributionsAnalytics";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { Skeleton, SkeletonText } from "@/components/ui/loading/Skeleton";
+import { SkeletonText } from "@/components/ui/loading/Skeleton";
+import {
+  AnalyticsChartSkeleton,
+  AnalyticsListSkeleton,
+} from "../components/AnalyticsSkeletons";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -593,47 +597,6 @@ export default function AnalyticsScreen() {
   );
 }
 
-function AnalyticsChartSkeleton() {
-  return (
-    <View style={styles.skeletonChartArea}>
-      <View style={styles.skeletonAxis}>
-        <SkeletonText width={38} height={10} />
-        <SkeletonText width={34} height={10} />
-        <SkeletonText width={24} height={10} />
-      </View>
-      <View style={styles.skeletonBarsRow}>
-        {[72, 104, 58, 92, 82, 110].map((height, index) => (
-          <View key={`${height}-${index}`} style={styles.skeletonBarGroup}>
-            <View style={styles.skeletonBarPair}>
-              <Skeleton style={[styles.skeletonBar, { height }]} rounded={999} />
-              <Skeleton
-                style={[styles.skeletonBar, { height: Math.max(height - 28, 36) }]}
-                rounded={999}
-              />
-            </View>
-            <SkeletonText width={28} height={10} />
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-}
-
-function AnalyticsListSkeleton() {
-  return (
-    <View style={styles.skeletonList}>
-      {[0, 1, 2].map((item) => (
-        <View key={item} style={styles.skeletonListItem}>
-          <SkeletonText width="46%" height={14} />
-          <SkeletonText width={78} height={14} />
-          <Skeleton style={styles.skeletonHorizontalBar} rounded={999} />
-          <SkeletonText width="58%" height={11} />
-        </View>
-      ))}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -672,58 +635,6 @@ const styles = StyleSheet.create({
 
   skeletonTextGap: {
     marginTop: 8,
-  },
-
-  skeletonChartArea: {
-    minHeight: 172,
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 14,
-  },
-
-  skeletonAxis: {
-    width: 42,
-    justifyContent: "space-between",
-    paddingVertical: 4,
-  },
-
-  skeletonBarsRow: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-
-  skeletonBarGroup: {
-    flex: 1,
-    alignItems: "center",
-    gap: 8,
-  },
-
-  skeletonBarPair: {
-    height: 132,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 5,
-  },
-
-  skeletonBar: {
-    width: 10,
-  },
-
-  skeletonList: {
-    gap: 18,
-    paddingTop: 6,
-  },
-
-  skeletonListItem: {
-    gap: 9,
-  },
-
-  skeletonHorizontalBar: {
-    width: "100%",
-    height: 9,
   },
 
   label: {

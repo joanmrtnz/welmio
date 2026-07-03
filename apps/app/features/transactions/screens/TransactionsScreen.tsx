@@ -29,7 +29,8 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { t } from "@/lib/i18n";
-import { Skeleton, SkeletonText } from "@/components/ui/loading/Skeleton";
+import { SkeletonText } from "@/components/ui/loading/Skeleton";
+import { TransactionsListSkeleton } from "../components/transactions-list-skeleton/TransactionsListSkeleton";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -377,24 +378,6 @@ export default function TransactionScreen() {
   );
 }
 
-function TransactionsListSkeleton() {
-  return (
-    <View style={styles.skeletonList}>
-      <SkeletonText width={112} height={14} />
-      {[0, 1, 2].map((item) => (
-        <View key={item} style={styles.skeletonTransactionRow}>
-          <Skeleton style={styles.skeletonTransactionIcon} rounded={18} />
-          <View style={styles.skeletonTransactionContent}>
-            <SkeletonText width="62%" height={14} />
-            <SkeletonText width="42%" height={11} />
-          </View>
-          <SkeletonText width={64} height={14} />
-        </View>
-      ))}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -586,28 +569,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 0,
-  },
-
-  skeletonList: {
-    gap: 14,
-    paddingVertical: 6,
-  },
-
-  skeletonTransactionRow: {
-    minHeight: 62,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-
-  skeletonTransactionIcon: {
-    width: 54,
-    height: 54,
-  },
-
-  skeletonTransactionContent: {
-    flex: 1,
-    gap: 9,
   },
 
   floatingAddButton: {
