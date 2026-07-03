@@ -505,11 +505,7 @@ export function CreateTransactionModal({
                             isSelected && styles.chipTextSelected,
                           ]}
                         >
-                          {translateOptionLabel(
-                            "natureOptions",
-                            item.value,
-                            item.label,
-                          )}
+                          {t(item.translationKey)}
                         </Text>
                       </Pressable>
                     );
@@ -538,11 +534,7 @@ export function CreateTransactionModal({
                             isSelected && styles.chipTextSelected,
                           ]}
                         >
-                          {translateOptionLabel(
-                            "frequencyOptions",
-                            item.value,
-                            item.label,
-                          )}
+                          {t(item.translationKey)}
                         </Text>
                       </Pressable>
                     );

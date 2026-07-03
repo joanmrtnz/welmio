@@ -14,7 +14,7 @@ import {
   TransactionsOverviewResponse,
   TransactionOverviewItem,
 } from "@repo/shared-types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
 import { TransactionsGroupedList } from "../components/transactions-grouped-list/TransactionsGroupedList";
@@ -29,6 +29,8 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { t } from "@/lib/i18n";
+import { SkeletonText } from "@/components/ui/loading/Skeleton";
+import { TransactionsListSkeleton } from "../components/transactions-list-skeleton/TransactionsListSkeleton";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -76,6 +78,8 @@ export default function TransactionScreen() {
   }
 
   const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const hasLoadedTransactionsRef = useRef(false);
   const [totalsFilter, setTotalsFilter] = useState<
     "all" | "income" | "expense"
   >("all");
@@ -106,15 +110,24 @@ export default function TransactionScreen() {
 
   const loadTransactions = useCallback(async () => {
     try {
+      if (!hasLoadedTransactionsRef.current) {
+        setIsLoading(true);
+      }
+
       const response = await apiFetch<TransactionsOverviewResponse>(
         "/transactions/overview",
       );
 
       setData(response);
+      hasLoadedTransactionsRef.current = true;
     } catch (error) {
       console.warn(error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
+
+  const showInitialSkeleton = isLoading && !data;
 
   useEffect(() => {
     loadTransactions();
@@ -144,9 +157,13 @@ export default function TransactionScreen() {
           <Text style={styles.balanceCardLabel}>
             {t("transactions.totalBalance")}
           </Text>
-          <Text style={styles.balanceCardTitle}>
-            {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
-          </Text>
+          {showInitialSkeleton ? (
+            <SkeletonText width={128} height={28} />
+          ) : (
+            <Text style={styles.balanceCardTitle}>
+              {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
+            </Text>
+          )}
         </View>
 
         <View style={[styles.totalsRow, isDesktop && styles.totalsRowDesktop]}>
@@ -180,14 +197,18 @@ export default function TransactionScreen() {
             >
               {t("transactions.income")}
             </Text>
-            <Text
-              style={[
-                styles.expense,
-                totalsFilter === "income" && styles.totalLabelActive,
-              ]}
-            >
-              {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
-            </Text>
+            {showInitialSkeleton ? (
+              <SkeletonText width={84} height={18} style={styles.totalSkeleton} />
+            ) : (
+              <Text
+                style={[
+                  styles.expense,
+                  totalsFilter === "income" && styles.totalLabelActive,
+                ]}
+              >
+                {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
+              </Text>
+            )}
           </Pressable>
 
           <Pressable
@@ -222,14 +243,18 @@ export default function TransactionScreen() {
             >
               {t("transactions.expense")}
             </Text>
-            <Text
-              style={[
-                styles.expense,
-                totalsFilter === "expense" && styles.totalLabelActive,
-              ]}
-            >
-              {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
-            </Text>
+            {showInitialSkeleton ? (
+              <SkeletonText width={84} height={18} style={styles.totalSkeleton} />
+            ) : (
+              <Text
+                style={[
+                  styles.expense,
+                  totalsFilter === "expense" && styles.totalLabelActive,
+                ]}
+              >
+                {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
+              </Text>
+            )}
           </Pressable>
         </View>
 
@@ -292,13 +317,17 @@ export default function TransactionScreen() {
           </View>
 
           <View style={styles.cardContent}>
-            <TransactionsGroupedList
-              groups={filteredGroups}
-              isDesktop={isDesktop}
-              onChanged={loadTransactions}
-              onDeleteTransaction={handleDeleteTransaction}
-              onEditTransaction={handleEditTransaction}
-            />
+            {showInitialSkeleton ? (
+              <TransactionsListSkeleton />
+            ) : (
+              <TransactionsGroupedList
+                groups={filteredGroups}
+                isDesktop={isDesktop}
+                onChanged={loadTransactions}
+                onDeleteTransaction={handleDeleteTransaction}
+                onEditTransaction={handleEditTransaction}
+              />
+            )}
           </View>
         </View>
       </ScrollView>
@@ -470,6 +499,10 @@ const styles = StyleSheet.create({
 
   totalLabelActive: {
     color: BLACK,
+  },
+
+  totalSkeleton: {
+    marginTop: 4,
   },
 
   cardWrapper: {

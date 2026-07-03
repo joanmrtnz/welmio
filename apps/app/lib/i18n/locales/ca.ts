@@ -726,6 +726,11 @@ const ca = {
       natureOptions: {
         fixed: "Fixa",
         variable: "Variable",
+        rent: "Lloguer",
+        subscription: "Subscripcio",
+        salary: "Salari",
+        refund: "Reemborsament",
+        other: "Altres",
         essential: "Essencial",
         non_essential: "No essencial",
         need: "Necessitat",

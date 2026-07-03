@@ -20,6 +20,7 @@ import { AVATAR_IMAGES, type AvatarId } from "../components/AvatarPickerModal";
 import { AppImage } from "@/components/images/AppImage";
 import { t } from "@/lib/i18n";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { SkeletonText } from "@/components/ui/loading/Skeleton";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -50,6 +51,7 @@ export default function ProfileScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [avatarIcon, setAvatarIcon] = useState<AvatarId>("avatar-0");
   const [avatarColor, setAvatarColor] = useState(WHITE);
 
@@ -58,6 +60,7 @@ export default function ProfileScreen() {
 
  const loadUserProfile = useCallback(async () => {
     try {
+      setIsLoadingProfile(true);
       const user = await getUserProfile();
 
       setFullName(user.fullName ?? "");
@@ -66,8 +69,12 @@ export default function ProfileScreen() {
       setAvatarColor(user.avatarColor ?? "#00c896");
     } catch (error) {
       console.warn("Error loading profile", error);
+    } finally {
+      setIsLoadingProfile(false);
     }
   }, []);
+
+  const showProfileSkeleton = isLoadingProfile && !fullName && !email;
 
   useFocusEffect(
     useCallback(() => {
@@ -140,10 +147,19 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.nameContainer}>
-              <Text style={styles.name}>
-                {fullName || t("profile.defaultUser")}
-              </Text>
-              <Text style={styles.userId}>{email ? email : "-"}</Text>
+              {showProfileSkeleton ? (
+                <>
+                  <SkeletonText width={148} height={22} />
+                  <SkeletonText width={186} height={13} style={styles.profileSkeletonEmail} />
+                </>
+              ) : (
+                <>
+                  <Text style={styles.name}>
+                    {fullName || t("profile.defaultUser")}
+                  </Text>
+                  <Text style={styles.userId}>{email ? email : "-"}</Text>
+                </>
+              )}
             </View>
           </View>
 
@@ -302,6 +318,10 @@ const styles = StyleSheet.create({
 
   nameContainer: {
     alignItems: "center",
+  },
+
+  profileSkeletonEmail: {
+    marginTop: 8,
   },
 
   name: {

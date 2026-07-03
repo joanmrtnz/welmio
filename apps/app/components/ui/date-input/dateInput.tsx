@@ -7,6 +7,7 @@ import { DateInputProps } from "./dateInput.types";
 const TEXT = "#073b3a";
 const INPUT_BG = "#ffffff";
 const INPUT_BORDER = "rgba(7, 59, 58, 0.12)";
+const DEFAULT_MINIMUM_DATE = new Date(1900, 0, 1);
 
 const WEB_DATE_INPUT_STYLE: React.CSSProperties = {
   flex: 1,
@@ -74,6 +75,10 @@ export function DateInput({
     () => maximumDate ?? new Date(),
     [maximumDate],
   );
+  const resolvedMinimumDate = useMemo(
+    () => minimumDate ?? DEFAULT_MINIMUM_DATE,
+    [minimumDate],
+  );
 
   return (
     <View style={styles.inputGroup}>
@@ -90,7 +95,7 @@ export function DateInput({
         {React.createElement("input", {
           type: "date",
           value: parseDateForWebInput(value),
-          min: minimumDate ? formatDateForWebInput(minimumDate) : undefined,
+          min: formatDateForWebInput(resolvedMinimumDate),
           max: formatDateForWebInput(resolvedMaximumDate),
           placeholder,
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {

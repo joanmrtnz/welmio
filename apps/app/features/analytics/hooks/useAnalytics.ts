@@ -5,7 +5,7 @@ import { AnalyticsPeriod, AnalyticsResponse } from "@repo/shared-types";
 export function useAnalytics() {
   const [selected, setSelected] = useState<AnalyticsPeriod>("monthly");
   const [data, setData] = useState<AnalyticsResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadAnalytics() {
