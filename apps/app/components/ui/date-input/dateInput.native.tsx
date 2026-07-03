@@ -11,6 +11,7 @@ import { DateInputProps } from "./dateInput.types";
 const TEXT = "#073b3a";
 const INPUT_BG = "#ffffff";
 const INPUT_BORDER = "rgba(7, 59, 58, 0.12)";
+const DEFAULT_MINIMUM_DATE = new Date(1900, 0, 1);
 
 function formatDateForInput(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
@@ -48,12 +49,13 @@ export function DateInput({
     () => maximumDate ?? new Date(),
     [maximumDate],
   );
+  const resolvedMinimumDate = useMemo(
+    () => minimumDate ?? DEFAULT_MINIMUM_DATE,
+    [minimumDate],
+  );
 
   const fallbackPickerDate =
-    pickerDefaultDate ??
-    minimumDate ??
-    resolvedMaximumDate ??
-    new Date(2000, 0, 1);
+    pickerDefaultDate ?? minimumDate ?? resolvedMaximumDate ?? new Date();
 
   function handleValueChange(
     _event: DateTimePickerChangeEvent,
@@ -95,7 +97,7 @@ export function DateInput({
           value={parseDateForPicker(value, fallbackPickerDate)}
           mode="date"
           display="default"
-          minimumDate={minimumDate}
+          minimumDate={resolvedMinimumDate}
           maximumDate={resolvedMaximumDate}
           onValueChange={handleValueChange}
           onDismiss={() => setShowDatePicker(false)}
