@@ -14,7 +14,7 @@ import {
   TransactionsOverviewResponse,
   TransactionOverviewItem,
 } from "@repo/shared-types";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 import { getFilteredTransactionGroups } from "../utils/transactions";
 import { TransactionsGroupedList } from "../components/transactions-grouped-list/TransactionsGroupedList";
@@ -29,6 +29,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { t } from "@/lib/i18n";
+import { Skeleton, SkeletonText } from "@/components/ui/loading/Skeleton";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -76,6 +77,8 @@ export default function TransactionScreen() {
   }
 
   const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const hasLoadedTransactionsRef = useRef(false);
   const [totalsFilter, setTotalsFilter] = useState<
     "all" | "income" | "expense"
   >("all");
@@ -106,15 +109,24 @@ export default function TransactionScreen() {
 
   const loadTransactions = useCallback(async () => {
     try {
+      if (!hasLoadedTransactionsRef.current) {
+        setIsLoading(true);
+      }
+
       const response = await apiFetch<TransactionsOverviewResponse>(
         "/transactions/overview",
       );
 
       setData(response);
+      hasLoadedTransactionsRef.current = true;
     } catch (error) {
       console.warn(error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
+
+  const showInitialSkeleton = isLoading && !data;
 
   useEffect(() => {
     loadTransactions();
@@ -144,9 +156,13 @@ export default function TransactionScreen() {
           <Text style={styles.balanceCardLabel}>
             {t("transactions.totalBalance")}
           </Text>
-          <Text style={styles.balanceCardTitle}>
-            {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
-          </Text>
+          {showInitialSkeleton ? (
+            <SkeletonText width={128} height={28} />
+          ) : (
+            <Text style={styles.balanceCardTitle}>
+              {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
+            </Text>
+          )}
         </View>
 
         <View style={[styles.totalsRow, isDesktop && styles.totalsRowDesktop]}>
@@ -180,14 +196,18 @@ export default function TransactionScreen() {
             >
               {t("transactions.income")}
             </Text>
-            <Text
-              style={[
-                styles.expense,
-                totalsFilter === "income" && styles.totalLabelActive,
-              ]}
-            >
-              {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
-            </Text>
+            {showInitialSkeleton ? (
+              <SkeletonText width={84} height={18} style={styles.totalSkeleton} />
+            ) : (
+              <Text
+                style={[
+                  styles.expense,
+                  totalsFilter === "income" && styles.totalLabelActive,
+                ]}
+              >
+                {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
+              </Text>
+            )}
           </Pressable>
 
           <Pressable
@@ -222,14 +242,18 @@ export default function TransactionScreen() {
             >
               {t("transactions.expense")}
             </Text>
-            <Text
-              style={[
-                styles.expense,
-                totalsFilter === "expense" && styles.totalLabelActive,
-              ]}
-            >
-              {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
-            </Text>
+            {showInitialSkeleton ? (
+              <SkeletonText width={84} height={18} style={styles.totalSkeleton} />
+            ) : (
+              <Text
+                style={[
+                  styles.expense,
+                  totalsFilter === "expense" && styles.totalLabelActive,
+                ]}
+              >
+                {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
+              </Text>
+            )}
           </Pressable>
         </View>
 
@@ -292,13 +316,17 @@ export default function TransactionScreen() {
           </View>
 
           <View style={styles.cardContent}>
-            <TransactionsGroupedList
-              groups={filteredGroups}
-              isDesktop={isDesktop}
-              onChanged={loadTransactions}
-              onDeleteTransaction={handleDeleteTransaction}
-              onEditTransaction={handleEditTransaction}
-            />
+            {showInitialSkeleton ? (
+              <TransactionsListSkeleton />
+            ) : (
+              <TransactionsGroupedList
+                groups={filteredGroups}
+                isDesktop={isDesktop}
+                onChanged={loadTransactions}
+                onDeleteTransaction={handleDeleteTransaction}
+                onEditTransaction={handleEditTransaction}
+              />
+            )}
           </View>
         </View>
       </ScrollView>
@@ -345,6 +373,24 @@ export default function TransactionScreen() {
         colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
         style={[styles.bottomFade, { height: bottomFadeHeight }]}
       />
+    </View>
+  );
+}
+
+function TransactionsListSkeleton() {
+  return (
+    <View style={styles.skeletonList}>
+      <SkeletonText width={112} height={14} />
+      {[0, 1, 2].map((item) => (
+        <View key={item} style={styles.skeletonTransactionRow}>
+          <Skeleton style={styles.skeletonTransactionIcon} rounded={18} />
+          <View style={styles.skeletonTransactionContent}>
+            <SkeletonText width="62%" height={14} />
+            <SkeletonText width="42%" height={11} />
+          </View>
+          <SkeletonText width={64} height={14} />
+        </View>
+      ))}
     </View>
   );
 }
@@ -472,6 +518,10 @@ const styles = StyleSheet.create({
     color: BLACK,
   },
 
+  totalSkeleton: {
+    marginTop: 4,
+  },
+
   cardWrapper: {
     backgroundColor: LIGHT_GREEN,
     borderRadius: 18,
@@ -536,6 +586,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 0,
+  },
+
+  skeletonList: {
+    gap: 14,
+    paddingVertical: 6,
+  },
+
+  skeletonTransactionRow: {
+    minHeight: 62,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  skeletonTransactionIcon: {
+    width: 54,
+    height: 54,
+  },
+
+  skeletonTransactionContent: {
+    flex: 1,
+    gap: 9,
   },
 
   floatingAddButton: {

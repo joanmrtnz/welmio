@@ -22,6 +22,7 @@ import type { ExpenseCategoryChartItem } from "../hooks/useExpensesByCategoryAna
 import { useGoalContributionsAnalytics } from "../hooks/useGoalContributionsAnalytics";
 import type { GoalContributionChartItem } from "../hooks/useGoalContributionsAnalytics";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { Skeleton, SkeletonText } from "@/components/ui/loading/Skeleton";
 
 const TEAL = "#00c896";
 const DARK_TEAL = "#063b3a";
@@ -153,14 +154,7 @@ function ExpensesByCategoryCard({
       </View>
 
       {isLoading ? (
-        <View style={styles.chartStateBox}>
-          <Text style={styles.chartStateTitle}>
-            {t("analytics.expensesByCategory.loadingTitle")}
-          </Text>
-          <Text style={styles.chartStateText}>
-            {t("analytics.expensesByCategory.loadingText")}
-          </Text>
-        </View>
+        <AnalyticsListSkeleton />
       ) : hasError ? (
         <View style={styles.chartStateBox}>
           <Text style={styles.chartStateTitle}>
@@ -252,14 +246,7 @@ function GoalContributionsCard({
       </View>
 
       {isLoading ? (
-        <View style={styles.chartStateBox}>
-          <Text style={styles.chartStateTitle}>
-            {t("analytics.goalContributions.loadingTitle")}
-          </Text>
-          <Text style={styles.chartStateText}>
-            {t("analytics.goalContributions.loadingText")}
-          </Text>
-        </View>
+        <AnalyticsListSkeleton />
       ) : hasError ? (
         <View style={styles.chartStateBox}>
           <Text style={styles.chartStateTitle}>
@@ -335,7 +322,7 @@ export default function AnalyticsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const contentBottomPadding = isDesktop ? 36 : tabBarHeight + 36;
   const bottomFadeHeight = isDesktop ? 0 : tabBarHeight + 32;
-  const { selected, setSelected, data } = useAnalytics();
+  const { selected, setSelected, data, loading } = useAnalytics();
   const chartBars = data
     ? normalizeChartBars(
         data.chart.labels,
@@ -356,6 +343,7 @@ export default function AnalyticsScreen() {
   const selectedPeriod = normalizePeriod(selected);
   const selectedPeriodLabel = getPeriodLabel(selectedPeriod);
   const expenseRatio = Math.min(data?.summary.expenseRatio ?? 0, 100);
+  const showInitialSkeleton = loading && !data;
   const {
     categories: expenseCategories,
     isLoading: isLoadingExpenseCategories,
@@ -392,20 +380,28 @@ export default function AnalyticsScreen() {
         >
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>{t("analytics.summary.totalBalance")}</Text>
-            <Text style={styles.balance}>
-              {data ? formatCurrency(data.summary.totalBalance) : formatCurrency(0)}
-            </Text>
+            {showInitialSkeleton ? (
+              <SkeletonText width={116} height={24} style={styles.skeletonTextGap} />
+            ) : (
+              <Text style={styles.balance}>
+                {data ? formatCurrency(data.summary.totalBalance) : formatCurrency(0)}
+              </Text>
+            )}
           </View>
 
           <View style={styles.separator} />
 
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>{t("analytics.summary.totalExpense")}</Text>
-            <Text style={styles.balance}>
-              {data
-                ? `-${formatCurrency(data.summary.totalExpense)}`
-                : `-${formatCurrency(0)}`}
-            </Text>
+            {showInitialSkeleton ? (
+              <SkeletonText width={116} height={24} style={styles.skeletonTextGap} />
+            ) : (
+              <Text style={styles.balance}>
+                {data
+                  ? `-${formatCurrency(data.summary.totalExpense)}`
+                  : `-${formatCurrency(0)}`}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -485,88 +481,92 @@ export default function AnalyticsScreen() {
             </View>
           </View>
 
-          <View style={styles.chartArea}>
-            <View style={styles.chartLabels}>
-              {yAxisLabels.map((label, index) => (
-                <Text key={`${label}-${index}`} style={styles.chartYAxis}>
-                  {label}
-                </Text>
-              ))}
-            </View>
-
-            <View style={styles.chartContent}>
-              <View style={styles.chartGrid}>
-                <View style={styles.gridLine} />
-                <View style={styles.gridLine} />
-                <View style={styles.gridLine} />
-                <View style={styles.gridLine} />
+          {showInitialSkeleton ? (
+            <AnalyticsChartSkeleton />
+          ) : (
+            <View style={styles.chartArea}>
+              <View style={styles.chartLabels}>
+                {yAxisLabels.map((label, index) => (
+                  <Text key={`${label}-${index}`} style={styles.chartYAxis}>
+                    {label}
+                  </Text>
+                ))}
               </View>
 
-              {isYearlyChart ? (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={[
-                    styles.chartBarsRow,
-                    styles.yearlyChartBarsRow,
-                    { width: yearlyChartWidth },
-                  ]}
-                >
-                  {chartBars.map((item) => (
-                    <View
-                      key={item.label}
-                      style={[styles.barGroup, styles.yearlyBarGroup]}
-                    >
-                      <View style={[styles.barPair, styles.yearlyBarPair]}>
-                        <View
-                          style={[
-                            styles.barIncome,
-                            styles.yearlyBar,
-                            { height: getVisibleBarHeight(item.income) },
-                          ]}
-                        />
-                        <View
-                          style={[
-                            styles.barExpense,
-                            styles.yearlyBar,
-                            { height: getVisibleBarHeight(item.expense) },
-                          ]}
-                        />
-                      </View>
-                      <Text
-                        numberOfLines={1}
-                        style={[styles.barLabel, styles.yearlyBarLabel]}
-                      >
-                        {getBarLabel(item.label)}
-                      </Text>
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : (
-                <View style={styles.chartBarsRow}>
-                  {chartBars.map((item) => (
-                    <View key={item.label} style={styles.barGroup}>
-                      <View style={styles.barPair}>
-                        <View
-                          style={[
-                            styles.barIncome,
-                            { height: getVisibleBarHeight(item.income) },
-                          ]}
-                        />
-                        <View
-                          style={[
-                            styles.barExpense,
-                            { height: getVisibleBarHeight(item.expense) },
-                          ]}
-                        />
-                      </View>
-                      <Text style={styles.barLabel}>{getBarLabel(item.label)}</Text>
-                    </View>
-                  ))}
+              <View style={styles.chartContent}>
+                <View style={styles.chartGrid}>
+                  <View style={styles.gridLine} />
+                  <View style={styles.gridLine} />
+                  <View style={styles.gridLine} />
+                  <View style={styles.gridLine} />
                 </View>
-              )}
+
+                {isYearlyChart ? (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={[
+                      styles.chartBarsRow,
+                      styles.yearlyChartBarsRow,
+                      { width: yearlyChartWidth },
+                    ]}
+                  >
+                    {chartBars.map((item) => (
+                      <View
+                        key={item.label}
+                        style={[styles.barGroup, styles.yearlyBarGroup]}
+                      >
+                        <View style={[styles.barPair, styles.yearlyBarPair]}>
+                          <View
+                            style={[
+                              styles.barIncome,
+                              styles.yearlyBar,
+                              { height: getVisibleBarHeight(item.income) },
+                            ]}
+                          />
+                          <View
+                            style={[
+                              styles.barExpense,
+                              styles.yearlyBar,
+                              { height: getVisibleBarHeight(item.expense) },
+                            ]}
+                          />
+                        </View>
+                        <Text
+                          numberOfLines={1}
+                          style={[styles.barLabel, styles.yearlyBarLabel]}
+                        >
+                          {getBarLabel(item.label)}
+                        </Text>
+                      </View>
+                    ))}
+                  </ScrollView>
+                ) : (
+                  <View style={styles.chartBarsRow}>
+                    {chartBars.map((item) => (
+                      <View key={item.label} style={styles.barGroup}>
+                        <View style={styles.barPair}>
+                          <View
+                            style={[
+                              styles.barIncome,
+                              { height: getVisibleBarHeight(item.income) },
+                            ]}
+                          />
+                          <View
+                            style={[
+                              styles.barExpense,
+                              { height: getVisibleBarHeight(item.expense) },
+                            ]}
+                          />
+                        </View>
+                        <Text style={styles.barLabel}>{getBarLabel(item.label)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         <ExpensesByCategoryCard
@@ -589,6 +589,47 @@ export default function AnalyticsScreen() {
         colors={["rgba(223, 247, 239, 0)", "rgba(223, 247, 239, 0.96)"]}
         style={[styles.bottomFade, { height: bottomFadeHeight }]}
       />
+    </View>
+  );
+}
+
+function AnalyticsChartSkeleton() {
+  return (
+    <View style={styles.skeletonChartArea}>
+      <View style={styles.skeletonAxis}>
+        <SkeletonText width={38} height={10} />
+        <SkeletonText width={34} height={10} />
+        <SkeletonText width={24} height={10} />
+      </View>
+      <View style={styles.skeletonBarsRow}>
+        {[72, 104, 58, 92, 82, 110].map((height, index) => (
+          <View key={`${height}-${index}`} style={styles.skeletonBarGroup}>
+            <View style={styles.skeletonBarPair}>
+              <Skeleton style={[styles.skeletonBar, { height }]} rounded={999} />
+              <Skeleton
+                style={[styles.skeletonBar, { height: Math.max(height - 28, 36) }]}
+                rounded={999}
+              />
+            </View>
+            <SkeletonText width={28} height={10} />
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function AnalyticsListSkeleton() {
+  return (
+    <View style={styles.skeletonList}>
+      {[0, 1, 2].map((item) => (
+        <View key={item} style={styles.skeletonListItem}>
+          <SkeletonText width="46%" height={14} />
+          <SkeletonText width={78} height={14} />
+          <Skeleton style={styles.skeletonHorizontalBar} rounded={999} />
+          <SkeletonText width="58%" height={11} />
+        </View>
+      ))}
     </View>
   );
 }
@@ -627,6 +668,62 @@ const styles = StyleSheet.create({
   balanceColumn: {
     minWidth: 104,
     alignItems: "center",
+  },
+
+  skeletonTextGap: {
+    marginTop: 8,
+  },
+
+  skeletonChartArea: {
+    minHeight: 172,
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 14,
+  },
+
+  skeletonAxis: {
+    width: 42,
+    justifyContent: "space-between",
+    paddingVertical: 4,
+  },
+
+  skeletonBarsRow: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+
+  skeletonBarGroup: {
+    flex: 1,
+    alignItems: "center",
+    gap: 8,
+  },
+
+  skeletonBarPair: {
+    height: 132,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 5,
+  },
+
+  skeletonBar: {
+    width: 10,
+  },
+
+  skeletonList: {
+    gap: 18,
+    paddingTop: 6,
+  },
+
+  skeletonListItem: {
+    gap: 9,
+  },
+
+  skeletonHorizontalBar: {
+    width: "100%",
+    height: 9,
   },
 
   label: {

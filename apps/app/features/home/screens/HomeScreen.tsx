@@ -28,6 +28,7 @@ import { getGreetingLabel } from "./utils/getGreetingLabel";
 import { AVATAR_IMAGES, type AvatarId } from "@/features/profile/components/AvatarPickerModal";
 import { AppImage } from "@/components/images/AppImage";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { Skeleton, SkeletonText } from "@/components/ui/loading/Skeleton";
 
 const SCREEN_BG = "#dff7ef";
 const CARD = "#ffffff";
@@ -44,13 +45,13 @@ const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 
 const getEmptyAnalyticsData = () => [
-  { label: t("common.weekdays.mon"), income: 0, expense: 0 },
-  { label: t("common.weekdays.tue"), income: 0, expense: 0 },
-  { label: t("common.weekdays.wed"), income: 0, expense: 0 },
-  { label: t("common.weekdays.thu"), income: 0, expense: 0 },
-  { label: t("common.weekdays.fri"), income: 0, expense: 0 },
-  { label: t("common.weekdays.sat"), income: 0, expense: 0 },
-  { label: t("common.weekdays.sun"), income: 0, expense: 0 },
+  { label: t("common.weekDays.mon"), income: 0, expense: 0 },
+  { label: t("common.weekDays.tue"), income: 0, expense: 0 },
+  { label: t("common.weekDays.wed"), income: 0, expense: 0 },
+  { label: t("common.weekDays.thu"), income: 0, expense: 0 },
+  { label: t("common.weekDays.fri"), income: 0, expense: 0 },
+  { label: t("common.weekDays.sat"), income: 0, expense: 0 },
+  { label: t("common.weekDays.sun"), income: 0, expense: 0 },
 ];
 
 function isAvatarId(value: unknown): value is AvatarId {
@@ -104,21 +105,32 @@ export default function HomeScreen() {
     useState<GoalsOverviewResponse | null>(null);
   const [fullName, setFullName] = useState("");
   const [avatarId, setAvatarId] = useState<AvatarId>("avatar-0");
+  const [isTransactionsLoading, setIsTransactionsLoading] = useState(true);
+  const [isGoalsLoading, setIsGoalsLoading] = useState(true);
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [goalsErrorMessage, setGoalsErrorMessage] = useState<string | null>(
     null,
   );
   const tabBarHeight = useBottomTabBarHeight();
 
-  const { selected, setSelected, data: analyticsData } = useAnalytics();
+  const {
+    selected,
+    setSelected,
+    data: analyticsData,
+    loading: isAnalyticsLoading,
+  } = useAnalytics();
 
   const loadUserProfile = useCallback(async () => {
     try {
+      setIsProfileLoading(true);
       const user = await getUserProfile();
 
       setFullName(user.fullName ?? "");
       setAvatarId(isAvatarId(user.avatarIcon) ? user.avatarIcon : "avatar-0");
     } catch (error) {
       console.warn("[HomeScreen] load user profile error:", error);
+    } finally {
+      setIsProfileLoading(false);
     }
   }, []);
 
@@ -163,6 +175,7 @@ export default function HomeScreen() {
 
   const loadTransactionsOverview = useCallback(async () => {
     try {
+      setIsTransactionsLoading(true);
       const response = await apiFetch<TransactionsOverviewResponse>(
         "/transactions/overview",
       );
@@ -170,11 +183,14 @@ export default function HomeScreen() {
       setTransactionsOverview(response);
     } catch (error) {
       console.warn("[HomeScreen] load transactions overview error:", error);
+    } finally {
+      setIsTransactionsLoading(false);
     }
   }, []);
 
   const loadGoalsOverview = useCallback(async () => {
     try {
+      setIsGoalsLoading(true);
       setGoalsErrorMessage(null);
 
       const response = await getGoalsOverview();
@@ -183,6 +199,8 @@ export default function HomeScreen() {
     } catch (error) {
       console.warn("[HomeScreen] load goals overview error:", error);
       setGoalsErrorMessage(t("home.errors.loadGoals"));
+    } finally {
+      setIsGoalsLoading(false);
     }
   }, []);
 
@@ -222,8 +240,12 @@ export default function HomeScreen() {
             </Pressable>
 
             <View>
-             <Text style={styles.greeting}>
-                {t("home.greeting", { name: fullName || t("home.defaultUser") })}
+              <Text style={styles.greeting}>
+                {isProfileLoading
+                  ? t("home.greeting", { name: t("home.defaultUser") })
+                  : t("home.greeting", {
+                      name: fullName || t("home.defaultUser"),
+                    })}
               </Text>
               <Text style={styles.greetingSub}>{getGreetingLabel()}</Text>
             </View>
@@ -258,9 +280,13 @@ export default function HomeScreen() {
 
             <View style={styles.overviewTextWrap}>
               <Text style={styles.overviewLabel}>{t("home.overview.totalBalance")}</Text>
-              <Text style={styles.overviewPositive}>
-                {formatCurrency(totalBalance)}
-              </Text>
+              {isTransactionsLoading && !transactionsOverview ? (
+                <SkeletonText width={96} height={19} style={styles.skeletonTextGap} />
+              ) : (
+                <Text style={styles.overviewPositive}>
+                  {formatCurrency(totalBalance)}
+                </Text>
+              )}
             </View>
           </Pressable>
 
@@ -271,9 +297,13 @@ export default function HomeScreen() {
 
             <View style={styles.overviewTextWrap}>
               <Text style={styles.overviewLabel}>{t("home.overview.totalExpense")}</Text>
-              <Text style={styles.overviewAmount}>
-                -{formatCurrency(totalExpense)}
-              </Text>
+              {isTransactionsLoading && !transactionsOverview ? (
+                <SkeletonText width={96} height={19} style={styles.skeletonTextGap} />
+              ) : (
+                <Text style={styles.overviewAmount}>
+                  -{formatCurrency(totalExpense)}
+                </Text>
+              )}
             </View>
           </Pressable>
         </View>
@@ -284,12 +314,16 @@ export default function HomeScreen() {
           onActionPress={() => router.push("/goals")}
         />
 
-        <QuickGoalsRow
-          goals={homeGoals}
-          errorMessage={goalsErrorMessage}
-          onGoalPress={() => router.push("/goals")}
-          onEmptyPress={() => router.push("/goals")}
-        />
+        {isGoalsLoading && !goalsOverview ? (
+          <HomeGoalsSkeleton isDesktop={isDesktop} />
+        ) : (
+          <QuickGoalsRow
+            goals={homeGoals}
+            errorMessage={goalsErrorMessage}
+            onGoalPress={() => router.push("/goals")}
+            onEmptyPress={() => router.push("/goals")}
+          />
+        )}
 
         <SectionHeader
           title={t("home.sections.analytics")}
@@ -297,12 +331,19 @@ export default function HomeScreen() {
           onActionPress={() => router.push("/analytics")}
         />
 
-        <QuickAnalyticsCard
-          data={weeklyAnalyticsData}
-          title={t("home.analytics.thisWeekChart")}
-          actionLabel={t("home.analytics.weekly")}
-          onPress={() => router.push("/analytics")}
-        />
+        {isAnalyticsLoading && !analyticsData ? (
+          <HomeAnalyticsSkeleton />
+        ) : (
+          <QuickAnalyticsCard
+            data={weeklyAnalyticsData}
+            title={t("home.analytics.thisWeekChart")}
+            subtitle={t("analytics.incomeExpenseChart.subtitle")}
+            actionLabel={t("home.analytics.weekly")}
+            incomeLabel={t("analytics.labels.income")}
+            expenseLabel={t("analytics.labels.expense")}
+            onPress={() => router.push("/analytics")}
+          />
+        )}
 
         <SectionHeader
           title={t("home.sections.recentTransactions")}
@@ -311,7 +352,9 @@ export default function HomeScreen() {
         />
 
         <View style={styles.transactionsCard}>
-          {recentTransactions.length > 0 ? (
+          {isTransactionsLoading && !transactionsOverview ? (
+            <HomeTransactionsSkeleton />
+          ) : recentTransactions.length > 0 ? (
             recentTransactions.map((transaction, index) => (
               <TransactionRow
                 key={transaction.id}
@@ -335,6 +378,77 @@ export default function HomeScreen() {
         colors={["rgba(223, 247, 239, 0)", SCREEN_BG]}
         style={styles.bottomFade}
       />
+    </View>
+  );
+}
+
+function HomeGoalsSkeleton({ isDesktop }: { isDesktop: boolean }) {
+  if (isDesktop) {
+    return (
+      <View style={styles.homeGoalsSkeletonGrid}>
+        {[0, 1, 2, 3].map((item) => (
+          <Skeleton key={item} style={styles.homeGoalSkeletonCard} rounded={24} />
+        ))}
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.homeGoalsSkeletonScroller}
+      contentContainerStyle={styles.homeGoalsSkeletonRow}
+    >
+      {[0, 1, 2].map((item) => (
+        <Skeleton key={item} style={styles.homeGoalSkeletonCard} rounded={24} />
+      ))}
+    </ScrollView>
+  );
+}
+
+function HomeAnalyticsSkeleton() {
+  return (
+    <View style={styles.homeAnalyticsSkeletonCard}>
+      <View style={styles.homeAnalyticsSkeletonHeader}>
+        <View style={styles.homeAnalyticsSkeletonTitleWrap}>
+          <SkeletonText width={130} height={16} />
+          <SkeletonText width={102} height={12} />
+        </View>
+        <Skeleton style={styles.homeAnalyticsSkeletonPill} rounded={999} />
+      </View>
+
+      <View style={styles.homeAnalyticsSkeletonBars}>
+        {[76, 92, 54, 86, 64, 102, 72].map((height, index) => (
+          <View key={`${height}-${index}`} style={styles.homeAnalyticsBarGroup}>
+            <View style={styles.homeAnalyticsBarPair}>
+              <Skeleton style={[styles.homeAnalyticsBar, { height }]} rounded={999} />
+              <Skeleton
+                style={[styles.homeAnalyticsBar, { height: Math.max(height - 30, 34) }]}
+                rounded={999}
+              />
+            </View>
+            <SkeletonText width={24} height={9} />
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function HomeTransactionsSkeleton() {
+  return (
+    <View style={styles.homeTransactionsSkeletonList}>
+      {[0, 1, 2].map((item) => (
+        <View key={item} style={styles.homeTransactionSkeletonRow}>
+          <Skeleton style={styles.homeTransactionSkeletonIcon} rounded={18} />
+          <View style={styles.homeTransactionSkeletonContent}>
+            <SkeletonText width="60%" height={14} />
+            <SkeletonText width="42%" height={11} />
+          </View>
+          <SkeletonText width={58} height={14} />
+        </View>
+      ))}
     </View>
   );
 }
@@ -508,6 +622,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
 
+  skeletonTextGap: {
+    marginTop: 6,
+  },
+
   overviewLabel: {
     fontSize: 12,
     lineHeight: 16,
@@ -615,6 +733,105 @@ const styles = StyleSheet.create({
     paddingRight: 18,
     paddingBottom: 2,
     marginBottom: 22,
+  },
+
+  homeGoalsSkeletonScroller: {
+    marginBottom: 22,
+  },
+
+  homeGoalsSkeletonRow: {
+    gap: 12,
+    paddingRight: 18,
+    paddingBottom: 2,
+  },
+
+  homeGoalsSkeletonGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    marginBottom: 22,
+  },
+
+  homeGoalSkeletonCard: {
+    width: 238,
+    height: 116,
+  },
+
+  homeAnalyticsSkeletonCard: {
+    minHeight: 252,
+    backgroundColor: CARD,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 18,
+    marginBottom: 22,
+    shadowColor: "rgba(29, 100, 89, 0.12)",
+    shadowOpacity: 1,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 5,
+  },
+
+  homeAnalyticsSkeletonHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 14,
+  },
+
+  homeAnalyticsSkeletonTitleWrap: {
+    gap: 8,
+  },
+
+  homeAnalyticsSkeletonPill: {
+    width: 76,
+    height: 30,
+  },
+
+  homeAnalyticsSkeletonBars: {
+    height: 152,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 12,
+    marginTop: 28,
+  },
+
+  homeAnalyticsBarGroup: {
+    flex: 1,
+    alignItems: "center",
+    gap: 8,
+  },
+
+  homeAnalyticsBarPair: {
+    height: 116,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 4,
+  },
+
+  homeAnalyticsBar: {
+    width: 9,
+  },
+
+  homeTransactionsSkeletonList: {
+    gap: 12,
+  },
+
+  homeTransactionSkeletonRow: {
+    minHeight: 58,
+    marginHorizontal: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  homeTransactionSkeletonIcon: {
+    width: 48,
+    height: 48,
+  },
+
+  homeTransactionSkeletonContent: {
+    flex: 1,
+    gap: 8,
   },
 
   goalMiniCard: {

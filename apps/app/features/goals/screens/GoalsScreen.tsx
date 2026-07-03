@@ -34,6 +34,7 @@ import { formatGoalTargetDate } from "../utils/formatGoalTargetDate";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { t } from "@/lib/i18n";
+import { Skeleton, SkeletonText } from "@/components/ui/loading/Skeleton";
 
 const GREEN = "#dff7ef";
 const DIVIDER_GREEN = "#7adcc8";
@@ -232,6 +233,7 @@ export default function GoalsScreen() {
     goalsCount: goals.length,
     globalProgress,
   });
+  const showInitialSkeleton = isLoading && !data;
 
   return (
     <View style={styles.screen}>
@@ -245,6 +247,10 @@ export default function GoalsScreen() {
           isDesktop && styles.contentDesktop,
         ]}
       >
+        {showInitialSkeleton ? (
+          <GoalsScreenSkeleton isDesktop={isDesktop} />
+        ) : (
+          <>
         <View
           style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}
         >
@@ -477,6 +483,8 @@ export default function GoalsScreen() {
             </Text>
           </View>
         </View>
+          </>
+        )}
       </ScrollView>
 
       <Pressable
@@ -526,6 +534,53 @@ export default function GoalsScreen() {
         initialValues={transactionInitialValues}
         lockType={Boolean(transactionInitialValues?.goalId)}
       />
+    </View>
+  );
+}
+
+function GoalsScreenSkeleton({ isDesktop }: { isDesktop: boolean }) {
+  return (
+    <View style={styles.goalsSkeleton}>
+      <View style={[styles.balanceRow, isDesktop && styles.balanceRowDesktop]}>
+        <View style={styles.balanceColumn}>
+          <SkeletonText width={92} height={13} />
+          <SkeletonText width={116} height={24} style={styles.skeletonTextGap} />
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.balanceColumn}>
+          <SkeletonText width={96} height={13} />
+          <SkeletonText width={116} height={24} style={styles.skeletonTextGap} />
+        </View>
+      </View>
+
+      <Skeleton
+        style={[styles.skeletonMainGoalCard, isDesktop && styles.mainGoalCardDesktop]}
+        rounded={28}
+      />
+
+      <View style={[styles.paceCard, isDesktop && styles.paceCardDesktop]}>
+        <View style={styles.paceItem}>
+          <Skeleton style={styles.skeletonSmallIcon} rounded={14} />
+          <SkeletonText width={92} height={12} />
+          <SkeletonText width={78} height={17} />
+        </View>
+        <View style={styles.paceSeparator} />
+        <View style={styles.paceItem}>
+          <Skeleton style={styles.skeletonSmallIcon} rounded={14} />
+          <SkeletonText width={86} height={12} />
+          <SkeletonText width={42} height={17} />
+        </View>
+      </View>
+
+      <View style={[styles.goalsList, isDesktop && styles.goalsGrid]}>
+        {[0, 1, 2].map((item) => (
+          <Skeleton
+            key={item}
+            style={[styles.skeletonGoalCard, isDesktop && styles.goalCardDesktop]}
+            rounded={22}
+          />
+        ))}
+      </View>
     </View>
   );
 }
@@ -613,6 +668,29 @@ const styles = StyleSheet.create({
   balanceColumn: {
     minWidth: 104,
     alignItems: "center",
+  },
+
+  goalsSkeleton: {
+    gap: 18,
+  },
+
+  skeletonTextGap: {
+    marginTop: 8,
+  },
+
+  skeletonMainGoalCard: {
+    minHeight: 224,
+    marginBottom: 18,
+  },
+
+  skeletonSmallIcon: {
+    width: 42,
+    height: 42,
+    marginBottom: 7,
+  },
+
+  skeletonGoalCard: {
+    minHeight: 132,
   },
 
   label: {
