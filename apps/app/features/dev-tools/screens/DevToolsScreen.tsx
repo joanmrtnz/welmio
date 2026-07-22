@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
+import { router } from "expo-router";
 
 import { ConfirmDialog } from "@/components/ui/confirm-dialog/ConfirmDialog";
 import { feedback } from "@/components/ui/feedback/feedback.service";
@@ -27,19 +29,56 @@ export function DevToolsScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= DESKTOP_BREAKPOINT;
 
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [loadingActionId, setLoadingActionId] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<DevToolAction | null>(null);
 
+  useEffect(() => {
+    let mounted = true;
+
+    async function verifyAdminAccess() {
+      try {
+        const user = await getUserProfile();
+        const canAccessDevTools = user.role === "ADMIN";
+
+        if (!mounted) return;
+
+        setIsAuthorized(canAccessDevTools);
+
+        if (!canAccessDevTools) {
+          feedback.warning("Dev tools are only available for admins.");
+          router.replace("/profile");
+        }
+      } catch (error) {
+        console.warn("[DevToolsScreen] access check error:", error);
+
+        if (!mounted) return;
+
+        feedback.error("Unable to verify dev tools access.");
+        router.replace("/profile");
+      } finally {
+        if (mounted) {
+          setIsCheckingAccess(false);
+        }
+      }
+    }
+
+    void verifyAdminAccess();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   async function runAction(action: DevToolAction) {
+    if (!isAuthorized) {
+      feedback.warning("Dev tools are only available for admins.");
+      return;
+    }
+
     try {
       setLoadingActionId(action.id);
-
-      const user = await getUserProfile();
-
-      if (user.role !== "ADMIN") {
-        feedback.warning("Dev tools are only available for admins.");
-        return;
-      }
 
       const result = await runDevToolAction(action.id);
 
@@ -76,6 +115,18 @@ export function DevToolsScreen() {
     if (loadingActionId) return;
 
     setPendingAction(null);
+  }
+
+  if (isCheckingAccess || !isAuthorized) {
+    return (
+      <View style={styles.screen}>
+        <AppScreenHeader title="Dev Tools" backHref="/profile" />
+
+        <View style={styles.loadingState}>
+          <ActivityIndicator color={DARK_TEAL} />
+        </View>
+      </View>
+    );
   }
 
   return (
@@ -158,6 +209,12 @@ const styles = StyleSheet.create({
     maxWidth: DESKTOP_CONTENT_WIDTH,
     alignSelf: "center",
     paddingHorizontal: 32,
+  },
+
+  loadingState: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   headerCard: {
