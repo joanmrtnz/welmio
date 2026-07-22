@@ -29,12 +29,16 @@ describe('DevToolsService', () => {
       findFirst: jest.fn(),
       create: jest.fn(),
     },
+    devToolActionLog: {
+      create: jest.fn(),
+    },
     $transaction: jest.fn(),
   };
 
   beforeEach(async () => {
     jest.clearAllMocks();
     prisma.user.findUnique.mockResolvedValue({ id: 'user-1', role: 'ADMIN' });
+    prisma.devToolActionLog.create.mockResolvedValue({ id: 'log-1' });
     prisma.$transaction.mockImplementation((queries) => Promise.all(queries));
 
     const module: TestingModule = await Test.createTestingModule({
@@ -247,5 +251,16 @@ describe('DevToolsService', () => {
     });
 
     loggerSpy.mockRestore();
+  });
+
+  it('records successful action executions in the audit table', async () => {
+    await service.runAction('user-1', 'refresh-analytics');
+
+    expect(prisma.devToolActionLog.create).toHaveBeenCalledWith({
+      data: {
+        userId: 'user-1',
+        actionId: 'refresh-analytics',
+      },
+    });
   });
 });

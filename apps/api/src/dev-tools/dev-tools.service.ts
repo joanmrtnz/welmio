@@ -40,6 +40,8 @@ export class DevToolsService {
 
     const result = await this.executeAction(userId, actionId);
 
+    await this.recordActionExecution(userId, actionId);
+
     this.logger.log({
       actionId,
       userId,
@@ -67,6 +69,18 @@ export class DevToolsService {
       default:
         throw new BadRequestException('Unsupported dev tool action.');
     }
+  }
+
+  private async recordActionExecution(
+    userId: string,
+    actionId: DevToolActionId,
+  ) {
+    await this.prisma.devToolActionLog.create({
+      data: {
+        userId,
+        actionId,
+      },
+    });
   }
 
   private async assertAdminUser(userId: string) {
