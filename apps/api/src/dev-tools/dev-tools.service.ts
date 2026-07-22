@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { GoalStatus, Prisma, TransactionType } from '@prisma/client';
@@ -27,6 +28,8 @@ type CategoryLookupItem = {
 
 @Injectable()
 export class DevToolsService {
+  private readonly logger = new Logger(DevToolsService.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async runAction(
@@ -35,6 +38,21 @@ export class DevToolsService {
   ): Promise<DevToolActionResult> {
     await this.assertAdminUser(userId);
 
+    const result = await this.executeAction(userId, actionId);
+
+    this.logger.log({
+      actionId,
+      userId,
+      summary: result.summary ?? {},
+    });
+
+    return result;
+  }
+
+  private executeAction(
+    userId: string,
+    actionId: DevToolActionId,
+  ): Promise<DevToolActionResult> | DevToolActionResult {
     switch (actionId) {
       case 'import-realistic-transactions':
         return this.importRealisticTransactions(userId);

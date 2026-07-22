@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -37,7 +38,10 @@ describe('DevToolsService', () => {
     prisma.$transaction.mockImplementation((queries) => Promise.all(queries));
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [DevToolsService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        DevToolsService,
+        { provide: PrismaService, useValue: prisma },
+      ],
     }).compile();
 
     service = module.get<DevToolsService>(DevToolsService);
@@ -226,5 +230,22 @@ describe('DevToolsService', () => {
         mode: 'computed-live',
       },
     });
+  });
+
+  it('logs successful action summaries without generated payloads', async () => {
+    const loggerSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation();
+
+    await service.runAction('user-1', 'refresh-analytics');
+
+    expect(loggerSpy).toHaveBeenCalledWith({
+      actionId: 'refresh-analytics',
+      userId: 'user-1',
+      summary: {
+        refreshed: true,
+        mode: 'computed-live',
+      },
+    });
+
+    loggerSpy.mockRestore();
   });
 });
