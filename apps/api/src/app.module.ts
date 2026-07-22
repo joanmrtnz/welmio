@@ -5,6 +5,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
+import { DevToolsModule } from './dev-tools/dev-tools.module';
 import { GoalsModule } from './goals/goals.module';
 import { GoalsService } from './goals/goals.service';
 import { TransactionsModule } from './transactions/transactions.module';
@@ -38,6 +39,7 @@ import * as Joi from 'joi';
     PrismaModule,
     TransactionsModule,
     CategoriesModule,
+    DevToolsModule,
     AnalyticsModule,
     AccountsModule,
     UsersModule,
