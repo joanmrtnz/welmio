@@ -9,7 +9,7 @@ import {
 import { getUserProfile } from "@/features/profile/services/profile-service";
 import { fonts } from "@/theme/fonts";
 import { ProfileOption } from "../components/ProfileOption";
-import { router, useFocusEffect } from "expo-router";
+import { router, type Href, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { clearAuthTokens, getRefreshToken } from "@/lib/auth/auth-storage";
 import { logout } from "@/lib/api/auth";
@@ -35,6 +35,7 @@ const LIGHT_GRAY = "rgba(0, 0, 0, 0.2)";
 const DESKTOP_BREAKPOINT = 768;
 const DESKTOP_CONTENT_WIDTH = 1040;
 const APP_VERSION = process.env.EXPO_PUBLIC_APP_VERSION?.trim() || "pre";
+const DEV_TOOLS_ROUTE = "/profile/dev-tools" as Href;
 
 
 function getAvatarId(value?: string | null): AvatarId {
@@ -54,6 +55,7 @@ export default function ProfileScreen() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [avatarIcon, setAvatarIcon] = useState<AvatarId>("avatar-0");
   const [avatarColor, setAvatarColor] = useState(WHITE);
+  const [userRole, setUserRole] = useState<"USER" | "ADMIN" | null>(null);
 
   const selectedAvatarImage =
     AVATAR_IMAGES[avatarIcon] ?? AVATAR_IMAGES["avatar-0"];
@@ -67,6 +69,7 @@ export default function ProfileScreen() {
       setEmail(user.email ?? "");
       setAvatarIcon(getAvatarId(user.avatarIcon));
       setAvatarColor(user.avatarColor ?? "#00c896");
+      setUserRole(user.role);
     } catch (error) {
       console.warn("Error loading profile", error);
     } finally {
@@ -117,6 +120,14 @@ export default function ProfileScreen() {
     } finally {
       setIsLoggingOut(false);
     }
+  }
+
+  function handleOpenDevTools() {
+    if (userRole !== "ADMIN") {
+      return;
+    }
+
+    router.push(DEV_TOOLS_ROUTE);
   }
 
   return (
@@ -200,6 +211,16 @@ export default function ProfileScreen() {
               onPress={() => router.push("/profile/language")}
             />
             <View style={styles.divider} />
+            {userRole === "ADMIN" ? (
+              <>
+                <ProfileOption
+                  icon="settings"
+                  label="Dev tools"
+                  onPress={handleOpenDevTools}
+                />
+                <View style={styles.divider} />
+              </>
+            ) : null}
             <ProfileOption
               icon="logout"
               label={t("profile.options.logout")}
