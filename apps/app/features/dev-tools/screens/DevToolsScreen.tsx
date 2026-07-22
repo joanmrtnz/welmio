@@ -44,7 +44,7 @@ export function DevToolsScreen() {
       const result = await runDevToolAction(action.id);
 
       if (result.success) {
-        feedback.success(result.message);
+        feedback.success(getActionSuccessMessage(result.message, result.summary));
       } else {
         feedback.error("Dev tool action failed.");
       }
@@ -92,7 +92,7 @@ export function DevToolsScreen() {
         <View style={styles.headerCard}>
           <Text style={styles.title}>Tester actions</Text>
           <Text style={styles.subtitle}>
-            These controls are mocked in Phase 1 and do not change real data.
+            These controls run backend tester actions on your admin account.
           </Text>
         </View>
 
@@ -105,7 +105,7 @@ export function DevToolsScreen() {
       <ConfirmDialog
         visible={Boolean(pendingAction)}
         title="Confirm action"
-        message="This will permanently delete up to 10 transactions from your account once backend support is added."
+        message="This will permanently delete up to 10 transactions from your account."
         confirmLabel="Run action"
         cancelLabel="Cancel"
         loadingLabel="Running..."
@@ -116,6 +116,29 @@ export function DevToolsScreen() {
       />
     </View>
   );
+}
+
+function getActionSuccessMessage(
+  message: string,
+  summary?: Record<string, number | string | boolean>,
+) {
+  if (!summary) {
+    return message;
+  }
+
+  if (typeof summary.created === "number") {
+    return `${message} Created: ${summary.created}.`;
+  }
+
+  if (typeof summary.deleted === "number") {
+    return `${message} Deleted: ${summary.deleted}.`;
+  }
+
+  if (typeof summary.updated === "number") {
+    return `${message} Updated: ${summary.updated}.`;
+  }
+
+  return message;
 }
 
 const styles = StyleSheet.create({
