@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { GoalStatus, Prisma, TransactionType } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
+import { RANDOM_CATEGORY_NAMES } from './data/random-category-names.data';
 import { REALISTIC_TRANSACTION_TEMPLATES } from './data/realistic-transactions.data';
 import { SAMPLE_CATEGORY_UPDATES } from './data/sample-categories.data';
 import { SAMPLE_SAVINGS_GOALS } from './data/sample-goals.data';
@@ -62,6 +63,8 @@ export class DevToolsService {
         return this.deleteRandomTransactions(userId);
       case 'update-sample-categories':
         return this.updateSampleCategories(userId);
+      case 'rotate-category-name':
+        return this.rotateCategoryName(userId);
       case 'create-savings-goal':
         return this.createSavingsGoal(userId);
       case 'refresh-analytics':
@@ -285,6 +288,57 @@ export class DevToolsService {
         matched,
         updated: matched,
         skipped: SAMPLE_CATEGORY_UPDATES.length - matched,
+      },
+    };
+  }
+
+  private async rotateCategoryName(
+    userId: string,
+  ): Promise<DevToolActionResult> {
+    const category = await this.prisma.category.findFirst({
+      where: {
+        userId,
+        type: TransactionType.expense,
+      },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Expense category not found');
+    }
+
+    const previousExecutions = await this.prisma.devToolActionLog.count({
+      where: {
+        userId,
+        actionId: 'rotate-category-name',
+      },
+    });
+    const nextName =
+      RANDOM_CATEGORY_NAMES[previousExecutions % RANDOM_CATEGORY_NAMES.length];
+
+    await this.prisma.category.update({
+      where: { id: category.id },
+      data: {
+        name: nextName,
+      },
+    });
+
+    return {
+      actionId: 'rotate-category-name',
+      success: true,
+      message: 'Category name rotated.',
+      summary: {
+        categoryId: category.id,
+        previousName: category.name,
+        nextName,
+        iteration: previousExecutions + 1,
       },
     };
   }
