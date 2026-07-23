@@ -26,6 +26,14 @@ export const DEV_TOOL_ACTIONS = [
     destructive: false,
   },
   {
+    id: "rotate-category-name",
+    label: "Rotate category name",
+    description: "Renames one category with the next backend test value.",
+    icon: "edit",
+    iconSize: 15,
+    destructive: false,
+  },
+  {
     id: "create-savings-goal",
     label: "Create savings goal",
     description: "Adds a realistic savings goal.",

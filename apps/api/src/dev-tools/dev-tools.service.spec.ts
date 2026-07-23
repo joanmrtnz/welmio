@@ -17,6 +17,7 @@ describe('DevToolsService', () => {
     user: { findUnique: jest.fn() },
     account: { findFirst: jest.fn() },
     category: {
+      findFirst: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
     },
@@ -30,6 +31,7 @@ describe('DevToolsService', () => {
       create: jest.fn(),
     },
     devToolActionLog: {
+      count: jest.fn(),
       create: jest.fn(),
     },
     $transaction: jest.fn(),
@@ -38,6 +40,7 @@ describe('DevToolsService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     prisma.user.findUnique.mockResolvedValue({ id: 'user-1', role: 'ADMIN' });
+    prisma.devToolActionLog.count.mockResolvedValue(0);
     prisma.devToolActionLog.create.mockResolvedValue({ id: 'log-1' });
     prisma.$transaction.mockImplementation((queries) => Promise.all(queries));
 
@@ -172,6 +175,53 @@ describe('DevToolsService', () => {
         color: '#22C55E',
       },
     });
+  });
+
+  it('rotates an expense category name using the next logged iteration', async () => {
+    prisma.category.findFirst.mockResolvedValue({
+      id: 'cat-groceries',
+      name: 'Groceries',
+      type: 'expense',
+    });
+    prisma.devToolActionLog.count.mockResolvedValue(1);
+    prisma.category.update.mockResolvedValue({});
+
+    await expect(
+      service.runAction('user-1', 'rotate-category-name'),
+    ).resolves.toMatchObject({
+      actionId: 'rotate-category-name',
+      success: true,
+      summary: {
+        categoryId: 'cat-groceries',
+        previousName: 'Groceries',
+        nextName: 'Regression Snacks',
+        iteration: 2,
+      },
+    });
+
+    expect(prisma.devToolActionLog.count).toHaveBeenCalledWith({
+      where: {
+        userId: 'user-1',
+        actionId: 'rotate-category-name',
+      },
+    });
+    expect(prisma.category.update).toHaveBeenCalledWith({
+      where: { id: 'cat-groceries' },
+      data: {
+        name: 'Regression Snacks',
+      },
+    });
+  });
+
+  it('rejects category name rotation when the user has no expense category', async () => {
+    prisma.category.findFirst.mockResolvedValue(null);
+
+    await expect(
+      service.runAction('user-1', 'rotate-category-name'),
+    ).rejects.toBeInstanceOf(NotFoundException);
+
+    expect(prisma.category.update).not.toHaveBeenCalled();
+    expect(prisma.devToolActionLog.create).not.toHaveBeenCalled();
   });
 
   it('creates a sample savings goal when no active duplicate exists', async () => {

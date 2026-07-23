@@ -2,6 +2,7 @@ export const DEV_TOOL_ACTION_IDS = [
   'import-realistic-transactions',
   'delete-random-transactions',
   'update-sample-categories',
+  'rotate-category-name',
   'create-savings-goal',
   'refresh-analytics',
 ] as const;
