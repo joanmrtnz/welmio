@@ -194,7 +194,7 @@ describe('DevToolsService', () => {
       summary: {
         categoryId: 'cat-groceries',
         previousName: 'Groceries',
-        nextName: 'Regression Snacks',
+        nextName: 'Regression Snacks cat-ries',
         iteration: 2,
       },
     });
@@ -208,7 +208,37 @@ describe('DevToolsService', () => {
     expect(prisma.category.update).toHaveBeenCalledWith({
       where: { id: 'cat-groceries' },
       data: {
-        name: 'Regression Snacks',
+        name: 'Regression Snacks cat-ries',
+      },
+    });
+  });
+
+  it('uses the category id suffix to avoid duplicate rotation names', async () => {
+    prisma.category.findFirst.mockResolvedValue({
+      id: 'cat-food',
+      name: 'Food & Dining',
+      type: 'expense',
+    });
+    prisma.devToolActionLog.count.mockResolvedValue(0);
+    prisma.category.update.mockResolvedValue({});
+
+    await expect(
+      service.runAction('user-1', 'rotate-category-name'),
+    ).resolves.toMatchObject({
+      actionId: 'rotate-category-name',
+      success: true,
+      summary: {
+        categoryId: 'cat-food',
+        previousName: 'Food & Dining',
+        nextName: 'QA Groceries cat-food',
+        iteration: 1,
+      },
+    });
+
+    expect(prisma.category.update).toHaveBeenCalledWith({
+      where: { id: 'cat-food' },
+      data: {
+        name: 'QA Groceries cat-food',
       },
     });
   });
