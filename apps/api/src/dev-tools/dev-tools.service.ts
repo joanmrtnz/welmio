@@ -320,8 +320,9 @@ export class DevToolsService {
         actionId: 'rotate-category-name',
       },
     });
-    const nextName =
+    const baseName =
       RANDOM_CATEGORY_NAMES[previousExecutions % RANDOM_CATEGORY_NAMES.length];
+    const nextName = this.buildUniqueCategoryName(baseName, category.id);
 
     await this.prisma.category.update({
       where: { id: category.id },
@@ -341,6 +342,10 @@ export class DevToolsService {
         iteration: previousExecutions + 1,
       },
     };
+  }
+
+  private buildUniqueCategoryName(baseName: string, categoryId: string) {
+    return `${baseName} cat-${categoryId.slice(-4)}`;
   }
 
   private async createSavingsGoal(
