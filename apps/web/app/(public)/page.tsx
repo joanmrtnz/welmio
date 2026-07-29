@@ -6,6 +6,7 @@ import ScreenshotsSwiper from "../../components/screenshotsSwiper/ScreenshotsSwi
 import { features, highlights, navLinks, screenshots,screenshotsDesktop, steps, techStack } from "./page.data";
 import LandingIcon from "../../components/landingIcon/LandingIcon";
 import ScrollToTopButton from "../../components/scrollToTopButton/ScrollToTopButton";
+import { AppBadges } from "../../components/shared/appBadges";
 
 export default function Home(): ReactElement {
 
@@ -58,14 +59,13 @@ export default function Home(): ReactElement {
 
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <p className={styles.badge}><LandingIcon name="sparkles" /> Web & Mobile Ready</p>
-          <h1>Welmio — personal finance for <span>web and mobile.</span></h1>
+          <p className={styles.badge}><LandingIcon name="sparkles" /> Available on Web · iOS · Android</p>
+          <h1>Personal finance that works across <span>web and mobile.</span></h1>
           <p className={styles.heroText}>Track income, expenses, savings goals, and spending insights in a clean, responsive app built as a full-stack portfolio project.</p>
           <div className={styles.heroActions}>
             <Link href={webAppLoginUrl} className={styles.primaryButton}>Use Welmio on Web <LandingIcon name="monitor" /></Link>
-            <Link href="#screenshots" className={styles.secondaryButton}>See How It Works<LandingIcon name="external" /></Link>
           </div>
-          <p className={styles.demoNote}><LandingIcon name="check" /> Free demo project. No real banking connection required.</p>
+          <AppBadges className={styles.heroStoreBadges} />
         </div>
 
         <div className={styles.heroVisual} aria-label="Welmio web and mobile dashboard preview">

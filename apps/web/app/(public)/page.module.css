@@ -282,6 +282,10 @@
   }
 }
 
+.heroStoreBadges {
+  margin-top: 18px;
+}
+
 .navCta,
 .primaryButton,
 .secondaryButton,

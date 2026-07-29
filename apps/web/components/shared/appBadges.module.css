@@ -1,0 +1,12 @@
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 13px;
+  align-items: center;
+}
+
+.badgeImage {
+  display: block;
+  width: auto;
+  height: 52px;
+}
