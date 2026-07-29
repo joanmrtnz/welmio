@@ -264,11 +264,17 @@
 }
 
 .badge {
-  margin: 0 0 24px;
+  margin: 0 0 30px;
   padding: 12px 18px;
   border-radius: 999px;
-  background: rgba(232, 250, 245, 0.92);
-  font-size: 0.98rem;
+  color: #000000;
+  background: rgb(228, 248, 242);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.badge svg {
+  color: var(--teal);
 }
 
 .hero h1 {
