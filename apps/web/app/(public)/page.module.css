@@ -196,16 +196,36 @@
 
 .mobileMenuCta {
   justify-content: center;
-  gap: 10px;
   margin-top: 4px;
+  min-height: 58px !important;
+  padding: 0 24px;
+  border-radius: 14px !important;
   color: #ffffff !important;
-  background: linear-gradient(135deg, #05be92, #009e78) !important;
-  box-shadow: 0 14px 30px rgba(0, 173, 131, 0.24);
+  background: linear-gradient(135deg, #019b78, #006f5b) !important;
+  box-shadow: none;
+  font-size: 0.9rem !important;
+  line-height: 1;
+  text-align: center;
 }
 
-.mobileMenuCta svg {
-  width: 20px;
-  height: 20px;
+.mobileMenuCta .primaryButtonLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.mobileMenuCta .primaryButtonLabel svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-1px);
+}
+
+.mobileMenuPanel .mobileMenuCta:hover {
+  border-color: transparent;
+  background: linear-gradient(135deg, #019b78, #006f5b) !important;
 }
 
 .hero {
@@ -277,8 +297,31 @@
   display: grid;
   gap: 14px;
   margin-top: 30px;
+
   .primaryButton {
+    min-height: 58px;
     color: #ffffff;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #019b78, #006f5b);
+    box-shadow: none;
+    font-size: 0.9rem;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .primaryButtonLabel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+
+  .primaryButtonLabel svg {
+    display: block;
+    width: 25px;
+    height: 25px;
+    transform: translateY(-1px);
   }
 }
 
@@ -314,10 +357,30 @@
 }
 
 .page .navCta {
-  min-height: 48px;
+  min-height: 58px;
   padding: 0 24px;
   font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
   color: #ffffff;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #019b78, #006f5b);
+  box-shadow: none;
+}
+
+.navCta .primaryButtonLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.navCta .primaryButtonLabel svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-1px);
 }
 
 .primaryButton,
@@ -825,8 +888,6 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .navCta:hover,
-  .primaryButton:hover,
   .secondaryButton:hover,
   .darkSecondaryButton:hover,
   .githubButton:hover {
@@ -873,6 +934,16 @@
 
   .swiperHeader {
     grid-template-columns: 1fr auto;
+  }
+}
+
+@media (max-width: 559px) {
+  .heroStoreBadges {
+    justify-content: center;
+  }
+
+  .heroStoreBadges img {
+    height: clamp(40px, 13vw, 48px);
   }
 }
 

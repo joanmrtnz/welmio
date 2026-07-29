@@ -34,7 +34,12 @@ export default function Home(): ReactElement {
           {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
         </nav>
 
-        <Link href={webAppLoginUrl} className={styles.navCta}>Use Welmio on Web <LandingIcon name="monitor" /></Link>
+        <Link href={webAppLoginUrl} className={styles.navCta}>
+          <span className={styles.primaryButtonLabel}>
+            Use Welmio on Web
+            <LandingIcon name="monitor" />
+          </span>
+        </Link>
 
         <details className={styles.mobileMenu}>
           <summary aria-label="Open navigation menu">
@@ -51,7 +56,10 @@ export default function Home(): ReactElement {
             ))}
 
             <Link href={webAppLoginUrl} className={styles.mobileMenuCta}>
-              Use Welmio on Web <LandingIcon name="monitor" />
+              <span className={styles.primaryButtonLabel}>
+                Use Welmio on Web
+                <LandingIcon name="monitor" />
+              </span>
             </Link>
           </nav>
         </details>
@@ -63,7 +71,12 @@ export default function Home(): ReactElement {
           <h1>Personal finance that works across <span>web and mobile.</span></h1>
           <p className={styles.heroText}>Track income, expenses, savings goals, and spending insights in a clean, responsive app built as a full-stack portfolio project.</p>
           <div className={styles.heroActions}>
-            <Link href={webAppLoginUrl} className={styles.primaryButton}>Use Welmio on Web <LandingIcon name="monitor" /></Link>
+            <Link href={webAppLoginUrl} className={styles.primaryButton}>
+              <span className={styles.primaryButtonLabel}>
+                Use Welmio on Web
+                <LandingIcon name="monitor" />
+              </span>
+            </Link>
           </div>
           <AppBadges className={styles.heroStoreBadges} />
         </div>
