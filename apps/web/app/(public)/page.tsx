@@ -27,7 +27,7 @@ export default function Home(): ReactElement {
       <header className={styles.navbar}>
         <Link href="/" className={styles.brand} aria-label="Welmio home">
           <Image src="/welmio-logo.png" alt="Welmio" width={52} height={52} priority />
-          <span><strong>Welmio</strong><small>Personal Finance App</small></span>
+          <strong>Welmio</strong>
         </Link>
 
         <nav className={styles.navLinks} aria-label="Landing navigation">
