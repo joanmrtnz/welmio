@@ -34,7 +34,7 @@
 .techSection,
 .ctaBand,
 .footer {
-  width: min(100% - 32px, 1180px);
+  width: calc(100% - 32px);
   margin-inline: auto;
 }
 
@@ -956,7 +956,7 @@
   .techSection,
   .ctaBand,
   .footer {
-    width: min(100% - 48px, 1180px);
+    width: calc(100% - 108px);
   }
 
   .brand img {
@@ -971,7 +971,7 @@
   .hero {
     grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
     align-items: center;
-    gap: clamp(28px, 5vw, 78px);
+    gap: clamp(28px, 4vw, 64px);
     padding: 64px 0 52px;
   }
 
@@ -983,15 +983,19 @@
   }
 
   .hero h1 {
-    font-size: clamp(3rem, 5.6vw, 4.2rem);
+    font-size: clamp(2.65rem, 4.2vw, 4.2rem);
   }
 
   .heroText {
-    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    font-size: clamp(1.05rem, 1.35vw, 1.35rem);
   }
 
   .heroVisual {
     min-height: 520px;
+  }
+
+  .heroStoreBadges img {
+    height: clamp(44px, 3.2vw, 52px);
   }
 
   .laptopFrame {
@@ -1004,7 +1008,7 @@
   .phoneFrame {
     right: clamp(16px, 4vw, 48px);
     top: clamp(24px, 5vw, 40px);
-    width: clamp(190px, 24vw, 255px);
+    width: clamp(190px, 35%, 255px);
   }
 
   .highlights,
@@ -1192,6 +1196,20 @@
 
   .ctaBandActions p {
     justify-content: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .laptopFrame {
+    left: 3%;
+    top: clamp(72px, 6vw, 96px);
+    width: min(92%, 920px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .laptopFrame {
+    top: 46px;
   }
 }
 
