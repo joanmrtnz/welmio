@@ -28,6 +28,7 @@ export default function Home(): ReactElement {
       <StickyLandingHeader
         className={styles.navbar}
         scrolledClassName={styles.navbarScrolled}
+        fullyHiddenClassName={styles.heroFullyHidden}
         heroId="landing-hero"
       >
         <Link href="/" className={styles.brand} aria-label="Welmio home">
@@ -57,7 +58,7 @@ export default function Home(): ReactElement {
           >
             <span className={styles.primaryButtonLabel}>
               Get the App
-              <LandingIcon name="arrowUp" />
+              <LandingIcon name="mobile" />
             </span>
           </a>
         </div>
@@ -73,28 +74,19 @@ export default function Home(): ReactElement {
             {navLinks.map((link) => (
               <a key={link.href} href={link.href}>
                 <p className={styles.navLabel}>{link.label}</p>
+                <span aria-hidden="true">&#8594;</span>
               </a>
             ))}
 
             <div className={styles.mobileMenuActions}>
-              <Link
-                href={webAppLoginUrl}
-                className={`${styles.mobileMenuCta} ${styles.mobileMenuCtaWeb}`}
-              >
-                <span className={styles.primaryButtonLabel}>
-                  Use Welmio on Web
-                  <LandingIcon name="monitor" />
-                </span>
-              </Link>
-
               <a
                 href="#landing-hero"
-                className={`${styles.mobileMenuCta} ${styles.mobileMenuCtaApp}`}
+                className={styles.mobileMenuCta}
                 aria-label="Go to the Welmio app download links"
               >
                 <span className={styles.primaryButtonLabel}>
                   Get the App
-                  <LandingIcon name="arrowUp" />
+                  <LandingIcon name="mobile" />
                 </span>
               </a>
             </div>

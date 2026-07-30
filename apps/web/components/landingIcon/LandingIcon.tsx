@@ -12,7 +12,7 @@ export default function LandingIcon({
   const common = {
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 2.2,
+    strokeWidth: name === "monitor" || name === "mobile" ? 1.6 : 2.2,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
   };
@@ -31,10 +31,10 @@ export default function LandingIcon({
         <path d="M12 16v5" />
       </>
     ),
-    arrowUp: (
+    mobile: (
       <>
-        <path d="m6 10 6-6 6 6" />
-        <path d="M12 4v16" />
+        <rect x="6" y="2" width="12" height="20" rx="2" />
+        <path d="M10 18h4" />
       </>
     ),
     external: (

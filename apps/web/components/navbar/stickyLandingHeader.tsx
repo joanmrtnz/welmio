@@ -13,6 +13,7 @@ interface StickyLandingHeaderProps {
   children: ReactNode;
   className: string;
   scrolledClassName: string;
+  fullyHiddenClassName: string;
   heroId: string;
 }
 
@@ -20,19 +21,23 @@ export default function StickyLandingHeader({
   children,
   className,
   scrolledClassName,
+  fullyHiddenClassName,
   heroId,
 }: StickyLandingHeaderProps): ReactElement {
   const headerRef = useRef<HTMLElement>(null);
   const [isHeroHidden, setIsHeroHidden] = useState(false);
+  const [isHeroFullyHidden, setIsHeroFullyHidden] = useState(false);
 
   useEffect(() => {
     let observer: IntersectionObserver | undefined;
+    let fullyHiddenObserver: IntersectionObserver | undefined;
 
     const observeHero = () => {
       const header = headerRef.current;
       const hero = document.getElementById(heroId);
 
       observer?.disconnect();
+      fullyHiddenObserver?.disconnect();
 
       if (!header || !hero) {
         return;
@@ -46,6 +51,15 @@ export default function StickyLandingHeader({
         },
       );
       observer.observe(hero);
+
+      fullyHiddenObserver = new IntersectionObserver(([entry]) => {
+        setIsHeroFullyHidden(
+          entry
+            ? !entry.isIntersecting && entry.boundingClientRect.bottom <= 0
+            : false,
+        );
+      });
+      fullyHiddenObserver.observe(hero);
     };
 
     observeHero();
@@ -53,11 +67,16 @@ export default function StickyLandingHeader({
 
     return () => {
       observer?.disconnect();
+      fullyHiddenObserver?.disconnect();
       window.removeEventListener("resize", observeHero);
     };
   }, [heroId]);
 
-  const classes = [className, isHeroHidden && scrolledClassName]
+  const classes = [
+    className,
+    isHeroHidden && scrolledClassName,
+    isHeroFullyHidden && fullyHiddenClassName,
+  ]
     .filter(Boolean)
     .join(" ");
 
