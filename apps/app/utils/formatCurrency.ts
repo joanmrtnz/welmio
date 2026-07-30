@@ -86,12 +86,18 @@ function toFiniteNumber(value: number | string | null | undefined) {
 }
 
 function getCurrencySymbol(currency: string) {
-  const parts = new Intl.NumberFormat("en-US", {
+  const options: Intl.NumberFormatOptions = {
     style: "currency",
     currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).formatToParts(0);
+  };
 
-  return parts.find((part) => part.type === "currency")?.value ?? currency;
+  const formattedCurrency = new Intl.NumberFormat("en-US", options).format(0);
+  const formattedNumber = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(0);
+
+  return formattedCurrency.replace(formattedNumber, "").trim() || currency;
 }

@@ -1,6 +1,7 @@
 export type IconName =
   | "sparkles"
   | "monitor"
+  | "mobile"
   | "external"
   | "check"
   | "globe"
@@ -8,6 +9,8 @@ export type IconName =
   | "shield"
   | "database"
   | "wallet"
+  | "cash"
+  | "trendDown"
   | "target"
   | "chart"
   | "swap"

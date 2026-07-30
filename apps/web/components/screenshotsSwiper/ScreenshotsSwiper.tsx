@@ -148,7 +148,7 @@ export default function ScreenshotsSwiper({
             onClick={() => goTo(activeIndex - 1)}
             aria-label="Previous screenshot"
           >
-            ‹
+            <span aria-hidden="true">&#8592;</span>
           </button>
 
           <button
@@ -156,7 +156,7 @@ export default function ScreenshotsSwiper({
             onClick={() => goTo(activeIndex + 1)}
             aria-label="Next screenshot"
           >
-            ›
+            <span aria-hidden="true">&#8594;</span>
           </button>
         </div>
       </div>

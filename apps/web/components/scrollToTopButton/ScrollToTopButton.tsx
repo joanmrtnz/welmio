@@ -39,19 +39,7 @@ export default function ScrollToTopButton(): ReactElement | null {
       onClick={handleClick}
       aria-label="Go to top"
     >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 19V5M12 5L6 11M12 5L18 11"
-          stroke="currentColor"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <span aria-hidden="true">&#8593;</span>
     </button>
   );
 }

@@ -19,14 +19,14 @@ export const highlights: IconCard[] = [
     text: "A real project built to showcase full-stack skills.",
   },
   {
-    icon: "shield",
-    title: "Secure by Design",
-    text: "Authentication and encrypted data protection.",
+    icon: "monitor",
+    title: "Thoughtful User Experience",
+    text: "A clean interface that keeps everyday money management simple.",
   },
   {
-    icon: "database",
-    title: "Demo Data Included",
-    text: "Explore all features with safe, preloaded demo data.",
+    icon: "chart",
+    title: "Useful Financial Insights",
+    text: "See spending, balances and goal progress in one place.",
   },
 ];
 
