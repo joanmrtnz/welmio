@@ -98,7 +98,7 @@ export default function Home(): ReactElement {
         <div className={styles.heroContent}>
           <h1>
             Personal finance that works across{" "}
-            <span>
+            <span className={styles.heroAccent}>
               web and mobile.
               <span className={styles.heroPenguin}>🐧</span>
             </span>

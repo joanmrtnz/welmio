@@ -288,13 +288,18 @@
   letter-spacing: -0.075em;
 }
 
-.hero h1 span {
-  color: var(--teal);
+.heroAccent {
+  color: transparent;
+  background: linear-gradient(135deg, #02aa82, #007b63);
+  background-clip: text;
+  -webkit-background-clip: text;
 }
 
 .hero h1 .heroPenguin {
   display: inline-block;
   margin-left: 0.14em;
+  color: initial;
+  background: none;
   font-size: 0.55em;
   vertical-align: 0.08em;
   filter: sepia(0.4) saturate(0.6) hue-rotate(100deg);
@@ -304,9 +309,9 @@
   max-width: 620px;
   margin: 24px 0 0;
   color: var(--muted);
-  font-size: 0.98rem;
+  font-size: 0.8rem;
   line-height: 1.55;
-  font-weight: 650;
+  text-align: center;
 }
 
 .heroDownloadActions {
@@ -961,7 +966,8 @@
 
 .footerBrand p {
   margin-top: 28px;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
+  font-weight: 400;
 }
 
 .footerColumns div:not(.socials) {
@@ -1138,6 +1144,7 @@
 
   .heroText {
     font-size: clamp(0.95rem, 1.15vw, 1.15rem);
+    text-align: left;
   }
 
   .heroVisual {
@@ -1313,7 +1320,7 @@
   .highlightCard:nth-child(n + 3) {
     border-bottom: 0;
     border-right: 1px solid var(--line);
-    padding: 8px 22px;
+    padding: 8px 22px 0;
   }
 
   .highlightCard:last-child {
