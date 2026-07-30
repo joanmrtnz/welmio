@@ -292,11 +292,19 @@
   color: var(--teal);
 }
 
+.hero h1 .heroPenguin {
+  display: inline-block;
+  margin-left: 0.14em;
+  font-size: 0.55em;
+  vertical-align: 0.08em;
+  filter: sepia(0.4) saturate(0.6) hue-rotate(100deg);
+}
+
 .heroText {
   max-width: 620px;
   margin: 24px 0 0;
   color: var(--muted);
-  font-size: 1.08rem;
+  font-size: 0.98rem;
   line-height: 1.55;
   font-weight: 650;
 }
@@ -1054,6 +1062,10 @@
 }
 
 @media (max-width: 559px) {
+  .heroDownloadActions {
+    margin-inline: auto;
+  }
+
   .heroStoreBadges {
     justify-content: center;
   }
@@ -1074,6 +1086,10 @@
 }
 
 @media (min-width: 760px) {
+  .hero h1 .heroPenguin {
+    font-size: 0.8em;
+  }
+
   .page {
     --section-space: 74px;
   }
@@ -1117,11 +1133,11 @@
   }
 
   .hero h1 {
-    font-size: clamp(2.65rem, 4.2vw, 4.2rem);
+    font-size: clamp(2.5rem, 4vw, 4rem);
   }
 
   .heroText {
-    font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+    font-size: clamp(0.95rem, 1.15vw, 1.15rem);
   }
 
   .heroVisual {
