@@ -46,13 +46,13 @@
   justify-content: space-between;
   gap: 18px;
   padding: 18px 0 12px;
-  border-bottom: 1px solid transparent;
-  background: var(--bg);
-  transition: border-color 0.2s ease;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+  transition: background-color 0.2s ease;
 }
 
 .navbarScrolled {
-  border-bottom-color: var(--line);
+  background: whitesmoke;
 }
 
 .page .navbar {
