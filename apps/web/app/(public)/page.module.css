@@ -10,9 +10,9 @@
   --line: rgba(6, 45, 58, 0.12);
   --shadow: 0 18px 52px rgba(6, 45, 58, 0.08);
   --radius: 24px;
+  --section-space: 58px;
 
   min-height: 100vh;
-  overflow-x: hidden;
   color: var(--ink);
   font-family: var(--font-landing), var(--font-geist-sans), system-ui, sans-serif;
   background:
@@ -32,9 +32,9 @@
 .section,
 .stepsSection,
 .techSection,
-.ctaBand,
+.ctaBandWrapper,
 .footer {
-  width: min(100% - 32px, 1180px);
+  width: calc(100% - 32px);
   margin-inline: auto;
 }
 
@@ -47,7 +47,19 @@
   justify-content: space-between;
   gap: 18px;
   padding: 18px 0 12px;
-  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+  transition: background-color 0.2s ease;
+}
+
+.navbarScrolled {
+  background: whitesmoke;
+}
+
+.page .navbar {
+  width: 100%;
+  margin-inline: 0;
+  padding-inline: 16px;
 }
 
 .deleteAccountButton {
@@ -81,11 +93,10 @@
 }
 
 .brand img {
-  width: 35px;
-  height: 35px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
-  border-radius: 50%;
-  filter: drop-shadow(0 10px 18px rgba(0, 109, 91, 0.16));
+  border-radius: 30%;
 }
 
 .brand strong {
@@ -107,7 +118,8 @@
 }
 
 .navLinks,
-.navCta {
+.navCta,
+.navActions {
   display: none;
 }
 
@@ -163,18 +175,16 @@
   display: grid;
   gap: 10px;
   padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 26px;
-  background:
-    radial-gradient(circle at 92% 8%, rgba(0, 173, 131, 0.12), #fff6 12rem),
-    rgba(255, 255, 255, 0.96);
-  box-shadow: 0 22px 60px rgba(6, 45, 58, 0.16);
+  border-top: 1px solid var(--line);
+  border-bottom: 2px solid var(--line);
+  background: var(--bg);
 }
 
 .mobileMenuPanel a {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
   min-height: 52px;
   padding: 0 16px;
   border: 1px solid transparent;
@@ -191,21 +201,48 @@
 }
 
 .navLabel {
-  border-bottom: 2.5px dotted gray;
+  /* border-bottom: 2.5px dotted gray; */
 }
 
 .mobileMenuCta {
   justify-content: center;
-  gap: 10px;
-  margin-top: 4px;
+  min-height: 58px !important;
+  padding: 0 24px;
+  border-radius: 14px !important;
   color: #ffffff !important;
-  background: linear-gradient(135deg, #05be92, #009e78) !important;
-  box-shadow: 0 14px 30px rgba(0, 173, 131, 0.24);
+  background: linear-gradient(135deg, #019b78, #006f5b) !important;
+  box-shadow: none;
+  font-size: 0.9rem !important;
+  line-height: 1;
+  text-align: center;
 }
 
-.mobileMenuCta svg {
-  width: 20px;
-  height: 20px;
+.mobileMenuPanel .mobileMenuCta {
+  border: 0;
+}
+
+.mobileMenuActions {
+  display: none;
+  margin-top: 4px;
+}
+
+.heroFullyHidden .mobileMenuActions {
+  display: grid;
+}
+
+.mobileMenuCta .primaryButtonLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.mobileMenuCta .primaryButtonLabel svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-1px);
 }
 
 .hero {
@@ -233,7 +270,6 @@
   z-index: 1;
 }
 
-.badge,
 .demoNote,
 .ctaBandActions p {
   display: inline-flex;
@@ -241,14 +277,6 @@
   gap: 10px;
   color: var(--teal-dark);
   font-weight: 850;
-}
-
-.badge {
-  margin: 0 0 24px;
-  padding: 12px 18px;
-  border-radius: 999px;
-  background: rgba(232, 250, 245, 0.92);
-  font-size: 0.98rem;
 }
 
 .hero h1 {
@@ -260,26 +288,76 @@
   letter-spacing: -0.075em;
 }
 
-.hero h1 span {
-  color: var(--teal);
+.heroAccent {
+  color: transparent;
+  background: linear-gradient(135deg, #02aa82, #007b63);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.hero h1 .heroPenguin {
+  display: inline-block;
+  margin-left: 0.14em;
+  color: initial;
+  background: none;
+  font-size: 0.55em;
+  vertical-align: 0.08em;
+  filter: sepia(0.4) saturate(0.6) hue-rotate(100deg);
 }
 
 .heroText {
   max-width: 620px;
   margin: 24px 0 0;
   color: var(--muted);
-  font-size: 1.08rem;
+  font-size: 0.8rem;
   line-height: 1.55;
-  font-weight: 650;
+  text-align: center;
+}
+
+.heroDownloadActions {
+  display: grid;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .heroActions {
   display: grid;
   gap: 14px;
   margin-top: 30px;
+
   .primaryButton {
+    min-height: 58px;
     color: #ffffff;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #019b78, #006f5b);
+    box-shadow: none;
+    font-size: 0.9rem;
+    line-height: 1;
+    text-align: center;
   }
+
+  .primaryButtonLabel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+
+  .primaryButtonLabel svg {
+    display: block;
+    width: 25px;
+    height: 25px;
+    transform: translateY(-1px);
+  }
+}
+
+.heroDownloadActions .heroActions .primaryButton {
+  width: 100%;
+}
+
+.heroStoreBadges {
+  margin-top: 18px;
 }
 
 .navCta,
@@ -310,10 +388,39 @@
 }
 
 .page .navCta {
-  min-height: 48px;
+  min-height: 58px;
   padding: 0 24px;
   font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
   color: #ffffff;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #019b78, #006f5b);
+  box-shadow: none;
+}
+
+.navCta .primaryButtonLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.navCta .primaryButtonLabel svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-1px);
+}
+
+.navCtaWeb,
+.navCtaApp {
+  grid-area: 1 / 1;
+  width: 100%;
+  transition:
+    opacity 0.18s ease,
+    visibility 0.18s ease;
 }
 
 .primaryButton,
@@ -336,7 +443,6 @@
 .secondaryButton svg,
 .darkSecondaryButton svg,
 .githubButton svg,
-.badge svg,
 .demoNote svg,
 .ctaBandActions p svg {
   width: 20px;
@@ -399,6 +505,7 @@
 .highlights {
   display: grid;
   grid-template-columns: 1fr;
+  margin-block: clamp(32px, 4vw, 56px);
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -434,6 +541,14 @@
   height: 31px;
 }
 
+.highlightCard .iconBubble svg,
+.featureCard .iconBubble svg,
+.stepCard .iconBubble svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.6;
+}
+
 .highlightCard h3,
 .featureCard h3,
 .stepCard h3,
@@ -466,7 +581,11 @@
 .section,
 .stepsSection,
 .techSection {
-  padding: 58px 0;
+  padding: var(--section-space) 0;
+}
+
+.sectionSeparator {
+  border-top: 1px solid var(--line);
 }
 
 .sectionHeader {
@@ -528,10 +647,7 @@
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 30px;
-  background:
-    radial-gradient(circle at 50% 12%, rgba(0, 173, 131, 0.12), transparent 18rem),
-    rgba(255, 255, 255, 0.82);
-  box-shadow: var(--shadow);
+  background:var(--bg);
 }
 
 .swiperHeader {
@@ -547,6 +663,7 @@
 
 .swiperActions {
   display: flex;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -559,10 +676,18 @@
   border-radius: 50%;
   color: var(--ink);
   background: #ffffff;
-  box-shadow: 0 10px 22px rgba(6, 45, 58, 0.08);
   cursor: pointer;
-  font-size: 1.75rem;
+  font-size: 1.15rem;
   font-weight: 900;
+  line-height: 1;
+}
+
+.swiperActions button span {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 
@@ -593,9 +718,9 @@
   width: min(78vw, 285px);
   padding: 0;
   margin-bottom: 2px;
-  border-radius: 32px;
+  border-radius: 20px;
+  border: 1px solid lightgray;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(232, 250, 245, 0.82));
-  box-shadow: 0 14px 14px rgba(6, 45, 58, 0.14);
 }
 
 .screenshotImageWrap img {
@@ -640,11 +765,6 @@
   height: auto;
   border-radius: 10px;
   object-fit: cover;
-}
-
-.stepsSection {
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
 }
 
 .stepsGrid {
@@ -702,6 +822,14 @@
   color: var(--ink);
   border: 1px solid var(--teal);
   background: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.githubButton svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 1.6;
 }
 
 .techCard {
@@ -726,6 +854,11 @@
   font-weight: 950;
 }
 
+.ctaBandWrapper {
+  margin-bottom: var(--section-space);
+  padding-top: var(--section-space);
+}
+
 .ctaBand {
   display: grid;
   grid-template-columns: 1fr;
@@ -738,7 +871,7 @@
     radial-gradient(circle at 88% 16%, rgba(0, 255, 195, 0.24), transparent 16rem),
     radial-gradient(circle at 15% 5%, rgba(255, 255, 255, 0.16), transparent 14rem),
     linear-gradient(135deg, #023540, #005f54 55%, #023540);
-  box-shadow: 0 24px 80px rgba(0, 80, 72, 0.2);
+  box-shadow: none;
 }
 
 .ctaBand .eyebrow,
@@ -751,10 +884,54 @@
   opacity: 0.88;
 }
 
+.ctaBandContent {
+  display: grid;
+  gap: 28px;
+}
+
+.ctaBandCopy .eyebrow {
+  margin-bottom: 18px;
+}
+
+.ctaDescription {
+  font-size: clamp(0.88rem, 1.2vw, 0.98rem);
+}
+
 .ctaBandActions {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
+}
+
+.ctaBandMedia {
+  display: none;
+}
+
+.ctaBand .primaryButton {
+  width: 210px;
+  flex: 0 0 210px;
+  min-height: 58px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #019b78, #006f5b);
+  box-shadow: none;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.ctaBand .primaryButtonLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.ctaBand .primaryButtonLabel svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-1px);
 }
 
 .darkSecondaryButton {
@@ -767,11 +944,15 @@
   justify-content: flex-start;
 }
 
+.ctaAvailability {
+  font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+}
+
 .footer {
   display: grid;
   grid-template-columns: 1fr;
   gap: 34px;
-  padding: 42px 0 56px;
+  padding: var(--section-space) 0 56px;
 }
 
 .footerBrand .brand {
@@ -785,7 +966,12 @@
 
 .footerBrand p {
   margin-top: 28px;
-  font-size: 0.88rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.footerStoreBadges {
+  margin-top: 16px;
 }
 
 .footerColumns div:not(.socials) {
@@ -821,11 +1007,24 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .navCta:hover,
-  .primaryButton:hover,
-  .secondaryButton:hover,
-  .darkSecondaryButton:hover,
+  .navCta:hover .primaryButtonLabel,
+  .primaryButton:hover .primaryButtonLabel,
+  .mobileMenuCta:hover .primaryButtonLabel {
+    text-decoration: underline;
+    text-decoration-color: #ffffff;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
   .githubButton:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--teal);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .secondaryButton:hover,
+  .darkSecondaryButton:hover {
     transform: translateY(-2px);
   }
 
@@ -872,16 +1071,53 @@
   }
 }
 
+@media (max-width: 559px) {
+  .heroDownloadActions {
+    margin-inline: auto;
+  }
+
+  .heroStoreBadges {
+    justify-content: center;
+  }
+
+  .heroStoreBadges img {
+    width: clamp(128px, 39vw, 165px);
+    height: clamp(38px, 11.6vw, 49px);
+  }
+
+  .ctaBandActions {
+    justify-content: center;
+  }
+
+  .ctaBand .primaryButton {
+    width: 180px;
+    flex-basis: 180px;
+  }
+
+}
+
 @media (min-width: 760px) {
+  .hero h1 .heroPenguin {
+    font-size: 0.8em;
+  }
+
+  .page {
+    --section-space: 74px;
+  }
+
   .navbar,
   .hero,
   .highlights,
   .section,
   .stepsSection,
   .techSection,
-  .ctaBand,
+  .ctaBandWrapper,
   .footer {
-    width: min(100% - 48px, 1180px);
+    width: calc(100% - 108px);
+  }
+
+  .page .navbar {
+    padding-inline: 54px;
   }
 
   .brand img {
@@ -896,7 +1132,7 @@
   .hero {
     grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
     align-items: center;
-    gap: clamp(28px, 5vw, 78px);
+    gap: clamp(28px, 4vw, 64px);
     padding: 64px 0 52px;
   }
 
@@ -908,15 +1144,20 @@
   }
 
   .hero h1 {
-    font-size: clamp(3rem, 5.6vw, 4.2rem);
+    font-size: clamp(2.5rem, 4vw, 4rem);
   }
 
   .heroText {
-    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    font-size: clamp(0.95rem, 1.15vw, 1.15rem);
+    text-align: left;
   }
 
   .heroVisual {
     min-height: 520px;
+  }
+
+  .heroStoreBadges img {
+    height: clamp(44px, 3.2vw, 52px);
   }
 
   .laptopFrame {
@@ -929,7 +1170,7 @@
   .phoneFrame {
     right: clamp(16px, 4vw, 48px);
     top: clamp(24px, 5vw, 40px);
-    width: clamp(190px, 24vw, 255px);
+    width: clamp(190px, 35%, 255px);
   }
 
   .highlights,
@@ -956,12 +1197,6 @@
 
   .highlightCard {
     border-right: 1px solid var(--line);
-  }
-
-  .section,
-  .stepsSection,
-  .techSection {
-    padding: 74px 0;
   }
 
   .sectionHeader {
@@ -1027,8 +1262,38 @@
 
 @media (min-width: 980px) {
   .navLinks,
-  .navCta {
+  .navCta,
+  .navActions {
     display: flex;
+  }
+
+  .navActions {
+    display: grid;
+    justify-self: end;
+  }
+
+  .navCtaWeb {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .navCtaApp {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .navbarScrolled .navCtaWeb {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .navbarScrolled .navCtaApp {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .navbar {
@@ -1060,7 +1325,7 @@
   .highlightCard:nth-child(n + 3) {
     border-bottom: 0;
     border-right: 1px solid var(--line);
-    padding: 8px 22px;
+    padding: 8px 22px 0;
   }
 
   .highlightCard:last-child {
@@ -1105,18 +1370,225 @@
   }
 
   .ctaBand {
-    grid-template-columns: 1fr auto;
-    gap: 32px;
+    grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(48px, 6vw, 96px);
     padding: 44px 72px;
   }
 
+  .ctaBandContent {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   .ctaBandActions {
-    justify-content: flex-end;
-    max-width: 560px;
+    justify-content: flex-start;
+    max-width: 620px;
   }
 
   .ctaBandActions p {
+    justify-content: flex-start;
+  }
+
+  .ctaBandMedia {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 260px;
+    position: relative;
+    display: flex;
+    align-items: center;
     justify-content: center;
+  }
+
+  .ctaMobileMockup {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: auto;
+    height: clamp(280px, 30vw, 380px);
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.28));
+  }
+
+  .ctaStatCard {
+    position: absolute;
+    z-index: 3;
+    width: clamp(112px, 10vw, 144px);
+    display: grid;
+    gap: 6px;
+    padding: clamp(11px, 1.2vw, 15px);
+    border: 1px solid var(--line);
+    border-radius: clamp(16px, 1.6vw, 21px);
+    background: #ffffff;
+    box-shadow: 0 14px 28px rgba(6, 45, 58, 0.16);
+  }
+
+  .ctaStatIcon {
+    width: clamp(32px, 3vw, 40px);
+    height: clamp(32px, 3vw, 40px);
+    display: grid;
+    place-items: center;
+    margin-bottom: 5px;
+    border-radius: 14px;
+  }
+
+  .ctaStatIcon svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.7;
+  }
+
+  .ctaBalanceIcon {
+    color: #00a985;
+    background: #d8f8ef;
+  }
+
+  .ctaExpenseIcon {
+    color: #ff3868;
+    background: #ffe0e8;
+  }
+
+  .ctaStatLabel {
+    color: #718792;
+    font-size: clamp(0.62rem, 0.7vw, 0.72rem);
+    font-weight: 650;
+    line-height: 1.2;
+  }
+
+  .ctaStatCard strong {
+    color: #06383a;
+    font-size: clamp(0.88rem, 1.05vw, 1.1rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+
+  .ctaBalanceCard {
+    left: 48%;
+    top: 10%;
+    transform: translateX(-115%);
+  }
+
+  .ctaBalanceCard strong {
+    color: #00a985;
+  }
+
+  .ctaExpenseCard {
+    left: 50%;
+    bottom: 12%;
+    transform: translateX(25%);
+  }
+}
+
+@media (max-width: 979px) {
+  .ctaBandActions {
+    justify-content: center;
+  }
+
+  .ctaBand .primaryButton {
+    width: min(100%, 260px);
+    flex: 0 1 260px;
+  }
+
+  .ctaBandMedia {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 290px;
+    margin-top: 4px;
+  }
+
+  .ctaMobileMockup {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: auto;
+    height: clamp(240px, 70vw, 300px);
+    max-width: 52%;
+    object-fit: contain;
+    filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.24));
+  }
+
+  .ctaStatCard {
+    position: absolute;
+    z-index: 3;
+    display: grid;
+    width: clamp(96px, 28vw, 118px);
+    gap: 5px;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 12px 22px rgba(6, 45, 58, 0.14);
+  }
+
+  .ctaStatIcon {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 3px;
+    border-radius: 11px;
+  }
+
+  .ctaStatIcon svg {
+    width: 15px;
+    height: 15px;
+    stroke-width: 1.6;
+  }
+
+  .ctaBalanceIcon {
+    color: #00a985;
+    background: #d8f8ef;
+  }
+
+  .ctaExpenseIcon {
+    color: #ff3868;
+    background: #ffe0e8;
+  }
+
+  .ctaStatLabel {
+    color: #718792;
+    font-size: 0.62rem;
+    font-weight: 650;
+    line-height: 1.2;
+  }
+
+  .ctaStatCard strong {
+    color: #06383a;
+    font-size: clamp(0.8rem, 3.6vw, 0.95rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+
+  .ctaBalanceCard {
+    top: 13%;
+    left: 1%;
+  }
+
+  .ctaBalanceCard strong {
+    color: #00a985;
+  }
+
+  .ctaExpenseCard {
+    right: 1%;
+    bottom: 13%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .laptopFrame {
+    left: 5%;
+    top: clamp(92px, 7vw, 116px);
+    width: min(80%, 740px);
+  }
+}
+
+@media (min-width: 1600px) {
+  .laptopFrame {
+    top: 66px;
   }
 }
 
@@ -1141,52 +1613,39 @@
     flex-basis: 50px;
   }
 
-  .badge {
-    margin: 0 0 18px;
-    padding: 10px 14px;
-    font-size: 0.80rem;
-  }
 }
 
 .scrollToTopButton {
   position: fixed;
-  right: max(18px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
   z-index: 60;
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.20);
+  border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 50%;
   color: #ffffff;
-  background: linear-gradient(135deg, #05be92, #009e78);
-  box-shadow: 0 16px 36px rgba(0, 173, 131, 0.28);
+  background:  var(--teal);
+  box-shadow: none;
   cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
-.scrollToTopButton svg {
-  width: 22px;
-  height: 22px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .scrollToTopButton:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 20px 44px rgba(0, 173, 131, 0.34);
-  }
+.scrollToTopButton span {
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: 400;
+  line-height: 1;
 }
 
 @media (min-width: 760px) {
   .scrollToTopButton {
     right: 28px;
     bottom: 28px;
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
   }
 }
 

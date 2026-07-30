@@ -6,6 +6,8 @@ import ScreenshotsSwiper from "../../components/screenshotsSwiper/ScreenshotsSwi
 import { features, highlights, navLinks, screenshots,screenshotsDesktop, steps, techStack } from "./page.data";
 import LandingIcon from "../../components/landingIcon/LandingIcon";
 import ScrollToTopButton from "../../components/scrollToTopButton/ScrollToTopButton";
+import { AppBadges } from "../../components/shared/appBadges";
+import StickyLandingHeader from "../../components/navbar/stickyLandingHeader";
 
 export default function Home(): ReactElement {
 
@@ -23,17 +25,43 @@ export default function Home(): ReactElement {
 
   return (
     <main className={styles.page}>
-      <header className={styles.navbar}>
+      <StickyLandingHeader
+        className={styles.navbar}
+        scrolledClassName={styles.navbarScrolled}
+        fullyHiddenClassName={styles.heroFullyHidden}
+        heroId="landing-hero"
+      >
         <Link href="/" className={styles.brand} aria-label="Welmio home">
           <Image src="/welmio-logo.png" alt="Welmio" width={52} height={52} priority />
-          <span><strong>Welmio</strong><small>Personal Finance App</small></span>
+          <strong>Welmio</strong>
         </Link>
 
         <nav className={styles.navLinks} aria-label="Landing navigation">
           {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
         </nav>
 
-        <Link href={webAppLoginUrl} className={styles.navCta}>Use Welmio on Web <LandingIcon name="monitor" /></Link>
+        <div className={styles.navActions}>
+          <Link
+            href={webAppLoginUrl}
+            className={`${styles.navCta} ${styles.navCtaWeb}`}
+          >
+            <span className={styles.primaryButtonLabel}>
+              Use Welmio on Web
+              <LandingIcon name="monitor" />
+            </span>
+          </Link>
+
+          <a
+            href="#landing-hero"
+            className={`${styles.navCta} ${styles.navCtaApp}`}
+            aria-label="Go to the Welmio app download links"
+          >
+            <span className={styles.primaryButtonLabel}>
+              Get the App
+              <LandingIcon name="mobile" />
+            </span>
+          </a>
+        </div>
 
         <details className={styles.mobileMenu}>
           <summary aria-label="Open navigation menu">
@@ -46,26 +74,47 @@ export default function Home(): ReactElement {
             {navLinks.map((link) => (
               <a key={link.href} href={link.href}>
                 <p className={styles.navLabel}>{link.label}</p>
+                <span aria-hidden="true">&#8594;</span>
               </a>
             ))}
 
-            <Link href={webAppLoginUrl} className={styles.mobileMenuCta}>
-              Use Welmio on Web <LandingIcon name="monitor" />
-            </Link>
+            <div className={styles.mobileMenuActions}>
+              <a
+                href="#landing-hero"
+                className={styles.mobileMenuCta}
+                aria-label="Go to the Welmio app download links"
+              >
+                <span className={styles.primaryButtonLabel}>
+                  Get the App
+                  <LandingIcon name="mobile" />
+                </span>
+              </a>
+            </div>
           </nav>
         </details>
-      </header>
+      </StickyLandingHeader>
 
-      <section className={styles.hero}>
+      <section id="landing-hero" className={styles.hero}>
         <div className={styles.heroContent}>
-          <p className={styles.badge}><LandingIcon name="sparkles" /> Web & Mobile Ready</p>
-          <h1>Welmio — personal finance for <span>web and mobile.</span></h1>
+          <h1>
+            Personal finance that works across{" "}
+            <span className={styles.heroAccent}>
+              web and mobile.
+              <span className={styles.heroPenguin}>🐧</span>
+            </span>
+          </h1>
           <p className={styles.heroText}>Track income, expenses, savings goals, and spending insights in a clean, responsive app built as a full-stack portfolio project.</p>
-          <div className={styles.heroActions}>
-            <Link href={webAppLoginUrl} className={styles.primaryButton}>Use Welmio on Web <LandingIcon name="monitor" /></Link>
-            <Link href="#screenshots" className={styles.secondaryButton}>See How It Works<LandingIcon name="external" /></Link>
+          <div className={styles.heroDownloadActions}>
+            <div className={styles.heroActions}>
+              <Link href={webAppLoginUrl} className={styles.primaryButton}>
+                <span className={styles.primaryButtonLabel}>
+                  Use Welmio on Web
+                  <LandingIcon name="monitor" />
+                </span>
+              </Link>
+            </div>
+            <AppBadges className={styles.heroStoreBadges} />
           </div>
-          <p className={styles.demoNote}><LandingIcon name="check" /> Free demo project. No real banking connection required.</p>
         </div>
 
         <div className={styles.heroVisual} aria-label="Welmio web and mobile dashboard preview">
@@ -88,7 +137,10 @@ export default function Home(): ReactElement {
         ))}
       </section>
 
-      <section id="features" className={styles.section}>
+      <section
+        id="features"
+        className={`${styles.section} ${styles.sectionSeparator}`}
+      >
         <div className={styles.sectionHeader}>
           <div><p className={styles.eyebrow}>Features</p><h2>Everything you need to manage your money</h2></div>
           <p>Explore all features inside the app.</p>
@@ -103,7 +155,10 @@ export default function Home(): ReactElement {
         </div>
       </section>
 
-      <section id="screenshots" className={styles.section}>
+      <section
+        id="screenshots"
+        className={`${styles.section} ${styles.sectionSeparator}`}
+      >
         <div className={styles.compactHeader}>
           <p className={styles.eyebrow}>Screenshots</p>
           <h2>Beautiful, clean and intuitive interface</h2>
@@ -114,7 +169,10 @@ export default function Home(): ReactElement {
          />
       </section>
 
-      <section id="how-it-works" className={styles.stepsSection}>
+      <section
+        id="how-it-works"
+        className={`${styles.stepsSection} ${styles.sectionSeparator}`}
+      >
         <div className={styles.compactHeader}>
           <p className={styles.eyebrow}>How it works</p>
           <h2>Simple steps to better finances</h2>
@@ -130,7 +188,10 @@ export default function Home(): ReactElement {
         </div>
       </section>
 
-      <section id="tech-stack" className={styles.techSection}>
+      <section
+        id="tech-stack"
+        className={`${styles.techSection} ${styles.sectionSeparator}`}
+      >
         <div className={styles.techCopy}>
           <p className={styles.eyebrow}>Built as a portfolio project</p>
           <h2>Built with modern technologies and best practices</h2>
@@ -164,22 +225,69 @@ export default function Home(): ReactElement {
       </div>
       </section>
 
-      <section className={styles.ctaBand}>
-        <div><p className={styles.eyebrow}>Use Welmio on Web</p><h2>Open the web app and explore all features</h2><p>No installation required. Just open and start using.</p></div>
-        <div className={styles.ctaBandActions}>
-          <Link href={webAppLoginUrl} className={styles.primaryButton}>Open Web App <LandingIcon name="monitor" /></Link>
-          <Link href="#tech-stack" className={styles.darkSecondaryButton}>View Tech Stack<LandingIcon name="external" /></Link>
-          <p><LandingIcon name="check" /> Welmio is available now on web. Native mobile apps for iOS and Android are coming soon.</p>
-        </div>
-      </section>
+      <div className={`${styles.ctaBandWrapper} ${styles.sectionSeparator}`}>
+        <section className={styles.ctaBand}>
+          <div className={styles.ctaBandContent}>
+            <div className={styles.ctaBandCopy}>
+              <p className={styles.eyebrow}>Welmio on mobile</p>
+              <h2>Your finances, always within reach</h2>
+              <p className={styles.ctaDescription}>Track your spending, review your goals, and understand your money wherever you are.</p>
+            </div>
 
-      <footer className={styles.footer}>
+            <div className={styles.ctaBandActions}>
+              <Link href={webAppLoginUrl} className={styles.primaryButton}>
+                <span className={styles.primaryButtonLabel}>
+                  Open on Web
+                  <LandingIcon name="monitor" />
+                </span>
+              </Link>
+              <a href="#landing-hero" className={styles.primaryButton}>
+                <span className={styles.primaryButtonLabel}>
+                  Get the App
+                  <LandingIcon name="mobile" />
+                </span>
+              </a>
+              <p className={styles.ctaAvailability}><LandingIcon name="check" /> Welmio is available now on web and iOS. Android coming soon.</p>
+            </div>
+          </div>
+
+          <div className={styles.ctaBandMedia} aria-hidden="true">
+            <Image
+              src="/welmio-mockup.png"
+              alt=""
+              width={420}
+              height={840}
+              sizes="(max-width: 559px) 150px, (max-width: 979px) 180px, 190px"
+              className={styles.ctaMobileMockup}
+            />
+
+            <div className={`${styles.ctaStatCard} ${styles.ctaBalanceCard}`}>
+              <span className={`${styles.ctaStatIcon} ${styles.ctaBalanceIcon}`}>
+                <LandingIcon name="cash" />
+              </span>
+              <span className={styles.ctaStatLabel}>Total Balance</span>
+              <strong>€2,368.74</strong>
+            </div>
+
+            <div className={`${styles.ctaStatCard} ${styles.ctaExpenseCard}`}>
+              <span className={`${styles.ctaStatIcon} ${styles.ctaExpenseIcon}`}>
+                <LandingIcon name="trendDown" />
+              </span>
+              <span className={styles.ctaStatLabel}>Total Expense</span>
+              <strong>-€1,087.25</strong>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer className={`${styles.footer} ${styles.sectionSeparator}`}>
         <div className={styles.footerBrand}>
           <Link href="/" className={styles.brand}>
             <Image src="/welmio-logo.png" alt="Welmio" width={56} height={56} />
             <span><strong>Welmio</strong><small>A personal finance app built to help you track, plan and achieve your financial goals.</small></span>
           </Link>
           <p>© 2026 Welmio. All rights reserved.</p>
+          <AppBadges className={styles.footerStoreBadges} />
         </div>
       <div className={styles.footerColumns}>
         <div>

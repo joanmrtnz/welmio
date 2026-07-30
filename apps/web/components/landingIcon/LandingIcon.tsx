@@ -12,7 +12,7 @@ export default function LandingIcon({
   const common = {
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 2.2,
+    strokeWidth: name === "monitor" || name === "mobile" ? 1.6 : 2.2,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
   };
@@ -30,6 +30,12 @@ export default function LandingIcon({
         <path d="M9 21h6" />
         <path d="M12 16v5" />
       </>
+    ),
+    mobile: (
+      <g transform="translate(2.16 2.16) scale(.82)">
+        <rect x="6" y="2" width="12" height="20" rx="2" />
+        <path d="M10 18h4" />
+      </g>
     ),
     external: (
       <>
@@ -72,6 +78,20 @@ export default function LandingIcon({
         <path d="M3 7h15a3 3 0 0 1 3 3v8H5a2 2 0 0 1-2-2V7Z" />
         <path d="M3 7V5a2 2 0 0 1 2-2h12v4" />
         <path d="M16 13h5" />
+      </>
+    ),
+    cash: (
+      <>
+        <path d="M5 8h14v10H5z" />
+        <path d="M8 5h13v10" />
+        <path d="M3 11v9h13" />
+        <circle cx="12" cy="13" r="2" />
+      </>
+    ),
+    trendDown: (
+      <>
+        <path d="m6 7 11 11" />
+        <path d="M10 18h7v-7" />
       </>
     ),
     target: (
