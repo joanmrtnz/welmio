@@ -31,6 +31,12 @@ export default function LandingIcon({
         <path d="M12 16v5" />
       </>
     ),
+    arrowUp: (
+      <>
+        <path d="m6 10 6-6 6 6" />
+        <path d="M12 4v16" />
+      </>
+    ),
     external: (
       <>
         <path d="M14 4h6v6" />

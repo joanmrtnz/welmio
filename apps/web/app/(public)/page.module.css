@@ -46,7 +46,13 @@
   justify-content: space-between;
   gap: 18px;
   padding: 18px 0 12px;
+  border-bottom: 1px solid transparent;
   background: #f8fffd;
+  transition: border-color 0.2s ease;
+}
+
+.navbarScrolled {
+  border-bottom-color: var(--line);
 }
 
 .page .navbar {
@@ -111,7 +117,8 @@
 }
 
 .navLinks,
-.navCta {
+.navCta,
+.navActions {
   display: none;
 }
 
@@ -200,7 +207,6 @@
 
 .mobileMenuCta {
   justify-content: center;
-  margin-top: 4px;
   min-height: 58px !important;
   padding: 0 24px;
   border-radius: 14px !important;
@@ -210,6 +216,44 @@
   font-size: 0.9rem !important;
   line-height: 1;
   text-align: center;
+}
+
+.mobileMenuActions {
+  display: grid;
+  margin-top: 4px;
+}
+
+.mobileMenuCtaWeb,
+.mobileMenuCtaApp {
+  grid-area: 1 / 1;
+  width: 100%;
+  transition:
+    opacity 0.18s ease,
+    visibility 0.18s ease;
+}
+
+.mobileMenuCtaWeb {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mobileMenuCtaApp {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.navbarScrolled .mobileMenuCtaWeb {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.navbarScrolled .mobileMenuCtaApp {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .mobileMenuCta .primaryButtonLabel {
@@ -391,6 +435,15 @@
   width: 25px;
   height: 25px;
   transform: translateY(-1px);
+}
+
+.navCtaWeb,
+.navCtaApp {
+  grid-area: 1 / 1;
+  width: 100%;
+  transition:
+    opacity 0.18s ease,
+    visibility 0.18s ease;
 }
 
 .primaryButton,
@@ -1145,8 +1198,38 @@
 
 @media (min-width: 980px) {
   .navLinks,
-  .navCta {
+  .navCta,
+  .navActions {
     display: flex;
+  }
+
+  .navActions {
+    display: grid;
+    justify-self: end;
+  }
+
+  .navCtaWeb {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .navCtaApp {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .navbarScrolled .navCtaWeb {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .navbarScrolled .navCtaApp {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .navbar {

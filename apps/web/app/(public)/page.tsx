@@ -7,6 +7,7 @@ import { features, highlights, navLinks, screenshots,screenshotsDesktop, steps, 
 import LandingIcon from "../../components/landingIcon/LandingIcon";
 import ScrollToTopButton from "../../components/scrollToTopButton/ScrollToTopButton";
 import { AppBadges } from "../../components/shared/appBadges";
+import StickyLandingHeader from "../../components/navbar/stickyLandingHeader";
 
 export default function Home(): ReactElement {
 
@@ -24,7 +25,11 @@ export default function Home(): ReactElement {
 
   return (
     <main className={styles.page}>
-      <header className={styles.navbar}>
+      <StickyLandingHeader
+        className={styles.navbar}
+        scrolledClassName={styles.navbarScrolled}
+        heroId="landing-hero"
+      >
         <Link href="/" className={styles.brand} aria-label="Welmio home">
           <Image src="/welmio-logo.png" alt="Welmio" width={52} height={52} priority />
           <strong>Welmio</strong>
@@ -34,12 +39,28 @@ export default function Home(): ReactElement {
           {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
         </nav>
 
-        <Link href={webAppLoginUrl} className={styles.navCta}>
-          <span className={styles.primaryButtonLabel}>
-            Use Welmio on Web
-            <LandingIcon name="monitor" />
-          </span>
-        </Link>
+        <div className={styles.navActions}>
+          <Link
+            href={webAppLoginUrl}
+            className={`${styles.navCta} ${styles.navCtaWeb}`}
+          >
+            <span className={styles.primaryButtonLabel}>
+              Use Welmio on Web
+              <LandingIcon name="monitor" />
+            </span>
+          </Link>
+
+          <a
+            href="#landing-hero"
+            className={`${styles.navCta} ${styles.navCtaApp}`}
+            aria-label="Go to the Welmio app download links"
+          >
+            <span className={styles.primaryButtonLabel}>
+              Get the App
+              <LandingIcon name="arrowUp" />
+            </span>
+          </a>
+        </div>
 
         <details className={styles.mobileMenu}>
           <summary aria-label="Open navigation menu">
@@ -55,17 +76,33 @@ export default function Home(): ReactElement {
               </a>
             ))}
 
-            <Link href={webAppLoginUrl} className={styles.mobileMenuCta}>
-              <span className={styles.primaryButtonLabel}>
-                Use Welmio on Web
-                <LandingIcon name="monitor" />
-              </span>
-            </Link>
+            <div className={styles.mobileMenuActions}>
+              <Link
+                href={webAppLoginUrl}
+                className={`${styles.mobileMenuCta} ${styles.mobileMenuCtaWeb}`}
+              >
+                <span className={styles.primaryButtonLabel}>
+                  Use Welmio on Web
+                  <LandingIcon name="monitor" />
+                </span>
+              </Link>
+
+              <a
+                href="#landing-hero"
+                className={`${styles.mobileMenuCta} ${styles.mobileMenuCtaApp}`}
+                aria-label="Go to the Welmio app download links"
+              >
+                <span className={styles.primaryButtonLabel}>
+                  Get the App
+                  <LandingIcon name="arrowUp" />
+                </span>
+              </a>
+            </div>
           </nav>
         </details>
-      </header>
+      </StickyLandingHeader>
 
-      <section className={styles.hero}>
+      <section id="landing-hero" className={styles.hero}>
         <div className={styles.heroContent}>
           <p className={styles.badge}><LandingIcon name="sparkles" /> Available on Web · iOS · Android</p>
           <h1>Personal finance that works across <span>web and mobile.</span></h1>

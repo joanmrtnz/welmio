@@ -1,6 +1,7 @@
 export type IconName =
   | "sparkles"
   | "monitor"
+  | "arrowUp"
   | "external"
   | "check"
   | "globe"
