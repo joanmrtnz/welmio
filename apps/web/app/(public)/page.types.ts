@@ -9,6 +9,8 @@ export type IconName =
   | "shield"
   | "database"
   | "wallet"
+  | "cash"
+  | "trendDown"
   | "target"
   | "chart"
   | "swap"

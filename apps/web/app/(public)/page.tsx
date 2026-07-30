@@ -217,19 +217,60 @@ export default function Home(): ReactElement {
       </div>
       </section>
 
-      <section className={styles.ctaBand}>
-        <div><p className={styles.eyebrow}>Use Welmio on Web</p><h2>Open the web app and explore all features</h2><p>No installation required. Just open and start using.</p></div>
-        <div className={styles.ctaBandActions}>
-          <Link href={webAppLoginUrl} className={styles.primaryButton}>
-            <span className={styles.primaryButtonLabel}>
-              Use Welmio on Web
-              <LandingIcon name="monitor" />
-            </span>
-          </Link>
-          <Link href="#tech-stack" className={styles.darkSecondaryButton}>View Tech Stack<LandingIcon name="external" /></Link>
-          <p><LandingIcon name="check" /> Welmio is available now on web and iOS. Android coming soon.</p>
-        </div>
-      </section>
+      <div className={`${styles.ctaBandWrapper} ${styles.sectionSeparator}`}>
+        <section className={styles.ctaBand}>
+          <div className={styles.ctaBandContent}>
+            <div>
+              <p className={styles.eyebrow}>Welmio on mobile</p>
+              <h2>Your finances, always within reach</h2>
+              <p>Track your spending, review your goals, and understand your money wherever you are.</p>
+            </div>
+
+            <div className={styles.ctaBandActions}>
+              <Link href={webAppLoginUrl} className={styles.primaryButton}>
+                <span className={styles.primaryButtonLabel}>
+                  Open on Web
+                  <LandingIcon name="monitor" />
+                </span>
+              </Link>
+              <a href="#landing-hero" className={styles.primaryButton}>
+                <span className={styles.primaryButtonLabel}>
+                  Get the App
+                  <LandingIcon name="mobile" />
+                </span>
+              </a>
+              <p><LandingIcon name="check" /> Welmio is available now on web and iOS. Android coming soon.</p>
+            </div>
+          </div>
+
+          <div className={styles.ctaBandMedia} aria-hidden="true">
+            <Image
+              src="/welmio-mockup.png"
+              alt=""
+              width={420}
+              height={840}
+              sizes="(min-width: 980px) 190px, 1px"
+              className={styles.ctaMobileMockup}
+            />
+
+            <div className={`${styles.ctaStatCard} ${styles.ctaBalanceCard}`}>
+              <span className={`${styles.ctaStatIcon} ${styles.ctaBalanceIcon}`}>
+                <LandingIcon name="cash" />
+              </span>
+              <span className={styles.ctaStatLabel}>Total Balance</span>
+              <strong>€2,368.74</strong>
+            </div>
+
+            <div className={`${styles.ctaStatCard} ${styles.ctaExpenseCard}`}>
+              <span className={`${styles.ctaStatIcon} ${styles.ctaExpenseIcon}`}>
+                <LandingIcon name="trendDown" />
+              </span>
+              <span className={styles.ctaStatLabel}>Total Expense</span>
+              <strong>-€1,087.25</strong>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <footer className={`${styles.footer} ${styles.sectionSeparator}`}>
         <div className={styles.footerBrand}>

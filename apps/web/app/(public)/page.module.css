@@ -32,7 +32,7 @@
 .section,
 .stepsSection,
 .techSection,
-.ctaBand,
+.ctaBandWrapper,
 .footer {
   width: calc(100% - 32px);
   margin-inline: auto;
@@ -824,6 +824,11 @@
   font-weight: 950;
 }
 
+.ctaBandWrapper {
+  margin-bottom: var(--section-space);
+  padding-top: var(--section-space);
+}
+
 .ctaBand {
   display: grid;
   grid-template-columns: 1fr;
@@ -836,7 +841,7 @@
     radial-gradient(circle at 88% 16%, rgba(0, 255, 195, 0.24), transparent 16rem),
     radial-gradient(circle at 15% 5%, rgba(255, 255, 255, 0.16), transparent 14rem),
     linear-gradient(135deg, #023540, #005f54 55%, #023540);
-  box-shadow: 0 24px 80px rgba(0, 80, 72, 0.2);
+  box-shadow: none;
 }
 
 .ctaBand .eyebrow,
@@ -849,13 +854,24 @@
   opacity: 0.88;
 }
 
+.ctaBandContent {
+  display: grid;
+  gap: 28px;
+}
+
 .ctaBandActions {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
 }
 
+.ctaBandMedia {
+  display: none;
+}
+
 .ctaBand .primaryButton {
+  width: 210px;
+  flex: 0 0 210px;
   min-height: 58px;
   border-radius: 14px;
   background: linear-gradient(135deg, #019b78, #006f5b);
@@ -1015,7 +1031,7 @@
   .section,
   .stepsSection,
   .techSection,
-  .ctaBand,
+  .ctaBandWrapper,
   .footer {
     width: calc(100% - 108px);
   }
@@ -1273,18 +1289,113 @@
   }
 
   .ctaBand {
-    grid-template-columns: 1fr auto;
-    gap: 32px;
+    grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(48px, 6vw, 96px);
     padding: 44px 72px;
   }
 
+  .ctaBandContent {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   .ctaBandActions {
-    justify-content: flex-end;
-    max-width: 560px;
+    justify-content: flex-start;
+    max-width: 620px;
   }
 
   .ctaBandActions p {
+    justify-content: flex-start;
+  }
+
+  .ctaBandMedia {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 260px;
+    position: relative;
+    display: flex;
+    align-items: center;
     justify-content: center;
+  }
+
+  .ctaMobileMockup {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: auto;
+    height: clamp(280px, 30vw, 380px);
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.28));
+  }
+
+  .ctaStatCard {
+    position: absolute;
+    z-index: 3;
+    width: clamp(112px, 10vw, 144px);
+    display: grid;
+    gap: 6px;
+    padding: clamp(11px, 1.2vw, 15px);
+    border: 1px solid var(--line);
+    border-radius: clamp(16px, 1.6vw, 21px);
+    background: #ffffff;
+    box-shadow: 0 14px 28px rgba(6, 45, 58, 0.16);
+  }
+
+  .ctaStatIcon {
+    width: clamp(32px, 3vw, 40px);
+    height: clamp(32px, 3vw, 40px);
+    display: grid;
+    place-items: center;
+    margin-bottom: 5px;
+    border-radius: 14px;
+  }
+
+  .ctaStatIcon svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.7;
+  }
+
+  .ctaBalanceIcon {
+    color: #00a985;
+    background: #d8f8ef;
+  }
+
+  .ctaExpenseIcon {
+    color: #ff3868;
+    background: #ffe0e8;
+  }
+
+  .ctaStatLabel {
+    color: #718792;
+    font-size: clamp(0.62rem, 0.7vw, 0.72rem);
+    font-weight: 650;
+    line-height: 1.2;
+  }
+
+  .ctaStatCard strong {
+    color: #06383a;
+    font-size: clamp(0.88rem, 1.05vw, 1.1rem);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+
+  .ctaBalanceCard {
+    left: 48%;
+    top: 10%;
+    transform: translateX(-115%);
+  }
+
+  .ctaBalanceCard strong {
+    color: #00a985;
+  }
+
+  .ctaExpenseCard {
+    left: 50%;
+    bottom: 12%;
+    transform: translateX(25%);
   }
 }
 
