@@ -180,9 +180,14 @@ export default function Home(): ReactElement {
       <section className={styles.ctaBand}>
         <div><p className={styles.eyebrow}>Use Welmio on Web</p><h2>Open the web app and explore all features</h2><p>No installation required. Just open and start using.</p></div>
         <div className={styles.ctaBandActions}>
-          <Link href={webAppLoginUrl} className={styles.primaryButton}>Open Web App <LandingIcon name="monitor" /></Link>
+          <Link href={webAppLoginUrl} className={styles.primaryButton}>
+            <span className={styles.primaryButtonLabel}>
+              Use Welmio on Web
+              <LandingIcon name="monitor" />
+            </span>
+          </Link>
           <Link href="#tech-stack" className={styles.darkSecondaryButton}>View Tech Stack<LandingIcon name="external" /></Link>
-          <p><LandingIcon name="check" /> Welmio is available now on web. Native mobile apps for iOS and Android are coming soon.</p>
+          <p><LandingIcon name="check" /> Welmio is available now on web and iOS. Android coming soon.</p>
         </div>
       </section>
 

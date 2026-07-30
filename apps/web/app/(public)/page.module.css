@@ -829,6 +829,31 @@
   gap: 14px;
 }
 
+.ctaBand .primaryButton {
+  min-height: 58px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #019b78, #006f5b);
+  box-shadow: none;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.ctaBand .primaryButtonLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.ctaBand .primaryButtonLabel svg {
+  display: block;
+  width: 25px;
+  height: 25px;
+  transform: translateY(-1px);
+}
+
 .darkSecondaryButton {
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.55);
