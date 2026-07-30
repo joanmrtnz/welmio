@@ -10,6 +10,7 @@
   --line: rgba(6, 45, 58, 0.12);
   --shadow: 0 18px 52px rgba(6, 45, 58, 0.08);
   --radius: 24px;
+  --section-space: 58px;
 
   min-height: 100vh;
   color: var(--ink);
@@ -498,6 +499,7 @@
 .highlights {
   display: grid;
   grid-template-columns: 1fr;
+  margin-block: clamp(32px, 4vw, 56px);
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -565,7 +567,11 @@
 .section,
 .stepsSection,
 .techSection {
-  padding: 58px 0;
+  padding: var(--section-space) 0;
+}
+
+.sectionSeparator {
+  border-top: 1px solid var(--line);
 }
 
 .sectionHeader {
@@ -741,11 +747,6 @@
   object-fit: cover;
 }
 
-.stepsSection {
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
 .stepsGrid {
   position: relative;
   gap: 28px;
@@ -895,7 +896,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 34px;
-  padding: 42px 0 56px;
+  padding: var(--section-space) 0 56px;
 }
 
 .footerBrand .brand {
@@ -1005,6 +1006,10 @@
 }
 
 @media (min-width: 760px) {
+  .page {
+    --section-space: 74px;
+  }
+
   .navbar,
   .hero,
   .highlights,
@@ -1096,12 +1101,6 @@
 
   .highlightCard {
     border-right: 1px solid var(--line);
-  }
-
-  .section,
-  .stepsSection,
-  .techSection {
-    padding: 74px 0;
   }
 
   .sectionHeader {

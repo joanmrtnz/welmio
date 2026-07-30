@@ -130,7 +130,10 @@ export default function Home(): ReactElement {
         ))}
       </section>
 
-      <section id="features" className={styles.section}>
+      <section
+        id="features"
+        className={`${styles.section} ${styles.sectionSeparator}`}
+      >
         <div className={styles.sectionHeader}>
           <div><p className={styles.eyebrow}>Features</p><h2>Everything you need to manage your money</h2></div>
           <p>Explore all features inside the app.</p>
@@ -145,7 +148,10 @@ export default function Home(): ReactElement {
         </div>
       </section>
 
-      <section id="screenshots" className={styles.section}>
+      <section
+        id="screenshots"
+        className={`${styles.section} ${styles.sectionSeparator}`}
+      >
         <div className={styles.compactHeader}>
           <p className={styles.eyebrow}>Screenshots</p>
           <h2>Beautiful, clean and intuitive interface</h2>
@@ -156,7 +162,10 @@ export default function Home(): ReactElement {
          />
       </section>
 
-      <section id="how-it-works" className={styles.stepsSection}>
+      <section
+        id="how-it-works"
+        className={`${styles.stepsSection} ${styles.sectionSeparator}`}
+      >
         <div className={styles.compactHeader}>
           <p className={styles.eyebrow}>How it works</p>
           <h2>Simple steps to better finances</h2>
@@ -172,7 +181,10 @@ export default function Home(): ReactElement {
         </div>
       </section>
 
-      <section id="tech-stack" className={styles.techSection}>
+      <section
+        id="tech-stack"
+        className={`${styles.techSection} ${styles.sectionSeparator}`}
+      >
         <div className={styles.techCopy}>
           <p className={styles.eyebrow}>Built as a portfolio project</p>
           <h2>Built with modern technologies and best practices</h2>
@@ -220,7 +232,7 @@ export default function Home(): ReactElement {
         </div>
       </section>
 
-      <footer className={styles.footer}>
+      <footer className={`${styles.footer} ${styles.sectionSeparator}`}>
         <div className={styles.footerBrand}>
           <Link href="/" className={styles.brand}>
             <Image src="/welmio-logo.png" alt="Welmio" width={56} height={56} />
