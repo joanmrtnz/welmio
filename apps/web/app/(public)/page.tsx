@@ -257,7 +257,7 @@ export default function Home(): ReactElement {
               alt=""
               width={420}
               height={840}
-              sizes="(min-width: 980px) 190px, 1px"
+              sizes="(max-width: 559px) 150px, (max-width: 979px) 180px, 190px"
               className={styles.ctaMobileMockup}
             />
 
