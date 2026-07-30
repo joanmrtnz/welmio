@@ -1580,15 +1580,15 @@
 
 @media (min-width: 1200px) {
   .laptopFrame {
-    left: 3%;
-    top: clamp(72px, 6vw, 96px);
-    width: min(92%, 920px);
+    left: 5%;
+    top: clamp(92px, 7vw, 116px);
+    width: min(80%, 740px);
   }
 }
 
 @media (min-width: 1600px) {
   .laptopFrame {
-    top: 46px;
+    top: 66px;
   }
 }
 
