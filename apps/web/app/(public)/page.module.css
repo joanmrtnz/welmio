@@ -12,7 +12,6 @@
   --radius: 24px;
 
   min-height: 100vh;
-  overflow-x: hidden;
   color: var(--ink);
   font-family: var(--font-landing), var(--font-geist-sans), system-ui, sans-serif;
   background:
@@ -47,7 +46,13 @@
   justify-content: space-between;
   gap: 18px;
   padding: 18px 0 12px;
-  backdrop-filter: blur(16px);
+  background: #f8fffd;
+}
+
+.page .navbar {
+  width: 100%;
+  margin-inline: 0;
+  padding-inline: 16px;
 }
 
 .deleteAccountButton {
@@ -987,6 +992,10 @@
   .ctaBand,
   .footer {
     width: calc(100% - 108px);
+  }
+
+  .page .navbar {
+    padding-inline: 54px;
   }
 
   .brand img {
