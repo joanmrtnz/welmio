@@ -11,9 +11,9 @@ import {
 
 interface StickyLandingHeaderProps {
   children: ReactNode;
-  className: string;
-  scrolledClassName: string;
-  fullyHiddenClassName: string;
+  className?: string;
+  scrolledClassName?: string;
+  fullyHiddenClassName?: string;
   heroId: string;
 }
 
