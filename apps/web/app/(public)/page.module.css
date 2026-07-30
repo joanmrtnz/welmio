@@ -271,7 +271,6 @@
   z-index: 1;
 }
 
-.badge,
 .demoNote,
 .ctaBandActions p {
   display: inline-flex;
@@ -279,20 +278,6 @@
   gap: 10px;
   color: var(--teal-dark);
   font-weight: 850;
-}
-
-.badge {
-  margin: 0 0 30px;
-  padding: 12px 18px;
-  border-radius: 999px;
-  color: #000000;
-  background: rgb(228, 248, 242);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.badge svg {
-  color: var(--teal);
 }
 
 .hero h1 {
@@ -436,7 +421,6 @@
 .secondaryButton svg,
 .darkSecondaryButton svg,
 .githubButton svg,
-.badge svg,
 .demoNote svg,
 .ctaBandActions p svg {
   width: 20px;
@@ -533,6 +517,14 @@
 .iconBubble svg {
   width: 31px;
   height: 31px;
+}
+
+.highlightCard .iconBubble svg,
+.featureCard .iconBubble svg,
+.stepCard .iconBubble svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.6;
 }
 
 .highlightCard h3,
@@ -1324,11 +1316,6 @@
     flex-basis: 50px;
   }
 
-  .badge {
-    margin: 0 0 18px;
-    padding: 10px 14px;
-    font-size: 0.80rem;
-  }
 }
 
 .scrollToTopButton {

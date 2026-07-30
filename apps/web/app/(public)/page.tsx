@@ -96,7 +96,6 @@ export default function Home(): ReactElement {
 
       <section id="landing-hero" className={styles.hero}>
         <div className={styles.heroContent}>
-          <p className={styles.badge}><LandingIcon name="sparkles" /> Available on Web · iOS · Android</p>
           <h1>Personal finance that works across <span>web and mobile.</span></h1>
           <p className={styles.heroText}>Track income, expenses, savings goals, and spending insights in a clean, responsive app built as a full-stack portfolio project.</p>
           <div className={styles.heroActions}>
