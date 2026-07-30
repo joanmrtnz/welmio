@@ -287,6 +287,7 @@ export default function Home(): ReactElement {
             <span><strong>Welmio</strong><small>A personal finance app built to help you track, plan and achieve your financial goals.</small></span>
           </Link>
           <p>© 2026 Welmio. All rights reserved.</p>
+          <AppBadges className={styles.footerStoreBadges} />
         </div>
       <div className={styles.footerColumns}>
         <div>

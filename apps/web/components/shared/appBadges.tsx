@@ -26,8 +26,8 @@ export const AppBadges = ({
         <Image
           src="/store-badges/download-on-the-app-store.svg"
           alt="Download on the App Store"
-          width={156}
-          height={52}
+          width={165}
+          height={49}
           className={styles.badgeImage}
         />
       </a>
@@ -41,8 +41,8 @@ export const AppBadges = ({
         <Image
           src="/store-badges/get-it-on-google-play.svg"
           alt="Get it on Google Play"
-          width={175}
-          height={52}
+          width={165}
+          height={49}
           className={styles.badgeImage}
         />
       </a>

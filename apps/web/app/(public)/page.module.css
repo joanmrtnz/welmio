@@ -970,6 +970,10 @@
   font-weight: 400;
 }
 
+.footerStoreBadges {
+  margin-top: 16px;
+}
+
 .footerColumns div:not(.socials) {
   display: grid;
   align-content: start;
@@ -1077,7 +1081,8 @@
   }
 
   .heroStoreBadges img {
-    height: clamp(40px, 13vw, 48px);
+    width: clamp(128px, 39vw, 165px);
+    height: clamp(38px, 11.6vw, 49px);
   }
 
   .ctaBandActions {
