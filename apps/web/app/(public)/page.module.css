@@ -217,6 +217,10 @@
   text-align: center;
 }
 
+.mobileMenuPanel .mobileMenuCta {
+  border: 0;
+}
+
 .mobileMenuActions {
   display: none;
   margin-top: 4px;
@@ -239,11 +243,6 @@
   width: 25px;
   height: 25px;
   transform: translateY(-1px);
-}
-
-.mobileMenuPanel .mobileMenuCta:hover {
-  border-color: transparent;
-  background: linear-gradient(135deg, #019b78, #006f5b) !important;
 }
 
 .hero {
@@ -302,6 +301,12 @@
   font-weight: 650;
 }
 
+.heroDownloadActions {
+  display: grid;
+  width: fit-content;
+  max-width: 100%;
+}
+
 .heroActions {
   display: grid;
   gap: 14px;
@@ -332,6 +337,10 @@
     height: 25px;
     transform: translateY(-1px);
   }
+}
+
+.heroDownloadActions .heroActions .primaryButton {
+  width: 100%;
 }
 
 .heroStoreBadges {
@@ -800,6 +809,14 @@
   color: var(--ink);
   border: 1px solid var(--teal);
   background: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.githubButton svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 1.6;
 }
 
 .techCard {
@@ -859,6 +876,14 @@
   gap: 28px;
 }
 
+.ctaBandCopy .eyebrow {
+  margin-bottom: 18px;
+}
+
+.ctaDescription {
+  font-size: clamp(0.88rem, 1.2vw, 0.98rem);
+}
+
 .ctaBandActions {
   display: flex;
   flex-wrap: wrap;
@@ -904,6 +929,10 @@
 .ctaBandActions p {
   flex-basis: 100%;
   justify-content: flex-start;
+}
+
+.ctaAvailability {
+  font-size: clamp(0.72rem, 0.9vw, 0.82rem);
 }
 
 .footer {
@@ -960,9 +989,24 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .secondaryButton:hover,
-  .darkSecondaryButton:hover,
+  .navCta:hover .primaryButtonLabel,
+  .primaryButton:hover .primaryButtonLabel,
+  .mobileMenuCta:hover .primaryButtonLabel {
+    text-decoration: underline;
+    text-decoration-color: #ffffff;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
   .githubButton:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--teal);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .secondaryButton:hover,
+  .darkSecondaryButton:hover {
     transform: translateY(-2px);
   }
 
@@ -1016,6 +1060,15 @@
 
   .heroStoreBadges img {
     height: clamp(40px, 13vw, 48px);
+  }
+
+  .ctaBandActions {
+    justify-content: center;
+  }
+
+  .ctaBand .primaryButton {
+    width: 180px;
+    flex-basis: 180px;
   }
 
 }

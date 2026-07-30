@@ -98,15 +98,17 @@ export default function Home(): ReactElement {
         <div className={styles.heroContent}>
           <h1>Personal finance that works across <span>web and mobile.🐧</span></h1>
           <p className={styles.heroText}>Track income, expenses, savings goals, and spending insights in a clean, responsive app built as a full-stack portfolio project.</p>
-          <div className={styles.heroActions}>
-            <Link href={webAppLoginUrl} className={styles.primaryButton}>
-              <span className={styles.primaryButtonLabel}>
-                Use Welmio on Web
-                <LandingIcon name="monitor" />
-              </span>
-            </Link>
+          <div className={styles.heroDownloadActions}>
+            <div className={styles.heroActions}>
+              <Link href={webAppLoginUrl} className={styles.primaryButton}>
+                <span className={styles.primaryButtonLabel}>
+                  Use Welmio on Web
+                  <LandingIcon name="monitor" />
+                </span>
+              </Link>
+            </div>
+            <AppBadges className={styles.heroStoreBadges} />
           </div>
-          <AppBadges className={styles.heroStoreBadges} />
         </div>
 
         <div className={styles.heroVisual} aria-label="Welmio web and mobile dashboard preview">
@@ -220,10 +222,10 @@ export default function Home(): ReactElement {
       <div className={`${styles.ctaBandWrapper} ${styles.sectionSeparator}`}>
         <section className={styles.ctaBand}>
           <div className={styles.ctaBandContent}>
-            <div>
+            <div className={styles.ctaBandCopy}>
               <p className={styles.eyebrow}>Welmio on mobile</p>
               <h2>Your finances, always within reach</h2>
-              <p>Track your spending, review your goals, and understand your money wherever you are.</p>
+              <p className={styles.ctaDescription}>Track your spending, review your goals, and understand your money wherever you are.</p>
             </div>
 
             <div className={styles.ctaBandActions}>
@@ -239,7 +241,7 @@ export default function Home(): ReactElement {
                   <LandingIcon name="mobile" />
                 </span>
               </a>
-              <p><LandingIcon name="check" /> Welmio is available now on web and iOS. Android coming soon.</p>
+              <p className={styles.ctaAvailability}><LandingIcon name="check" /> Welmio is available now on web and iOS. Android coming soon.</p>
             </div>
           </div>
 
