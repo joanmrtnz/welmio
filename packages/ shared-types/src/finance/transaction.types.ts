@@ -86,3 +86,11 @@ export type CreateTransactionPayload = {
   transactionNature: TransactionNature;
   goalId?: string | null;
 };
+
+export type ImportTransactionsPayload = {
+  transactions: CreateTransactionPayload[];
+};
+
+export type ImportTransactionsResponse = {
+  importedCount: number;
+};
