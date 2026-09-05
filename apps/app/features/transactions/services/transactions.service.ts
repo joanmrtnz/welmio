@@ -1,11 +1,20 @@
 import { apiFetch } from "@/lib/api/client";
 import {
   CreateTransactionPayload,
+  ImportTransactionsPayload,
+  ImportTransactionsResponse,
   TransactionOverviewItem,
 } from "@repo/shared-types";
 
 export async function createTransaction(payload: CreateTransactionPayload) {
   return apiFetch("/transactions", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function importTransactions(payload: ImportTransactionsPayload) {
+  return apiFetch<ImportTransactionsResponse>("/transactions/import", {
     method: "POST",
     body: JSON.stringify(payload),
   });

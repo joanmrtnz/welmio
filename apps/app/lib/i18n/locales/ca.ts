@@ -667,6 +667,34 @@ const ca = {
       expense: "Despeses",
     },
 
+    import: {
+      button: "Importar transaccions des d'un CSV",
+      previewTitle: "Revisar transaccions importades",
+      previewSummary:
+        "%{count} transaccions estan preparades per importar. Revisa la llista completa abans de continuar.",
+      confirm: "Importar %{count}",
+      importing: "Important...",
+      mapping: {
+        title: "Relacionar transaccions bancàries",
+        description:
+          "Aquest fitxer bancari no inclou les categories ni el compte de Welmio. Tria on importar les transaccions abans de revisar-les.",
+        account: "Compte de Welmio",
+        expenseCategory: "Categoria per a despeses",
+        incomeCategory: "Categoria per a ingressos",
+        noAccounts: "Crea un compte abans d'importar aquest fitxer.",
+        noExpenseCategories:
+          "Crea una categoria de despeses abans d'importar aquest fitxer.",
+        noIncomeCategories:
+          "Crea una categoria d'ingressos abans d'importar aquest fitxer.",
+        review: "Revisar transaccions",
+      },
+      feedback: {
+        readError: "No s'ha pogut llegir el fitxer CSV.",
+        importError: "No s'han pogut importar les transaccions.",
+        success: "%{count} transaccions importades correctament.",
+      },
+    },
+
     details: {
       title: "Detalls de la transacció",
       category: "Categoria",

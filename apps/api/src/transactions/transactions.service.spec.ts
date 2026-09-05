@@ -18,6 +18,7 @@ describe('TransactionsService', () => {
       findMany: jest.fn(),
       groupBy: jest.fn(),
       create: jest.fn(),
+      createMany: jest.fn(),
       findFirst: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -28,6 +29,7 @@ describe('TransactionsService', () => {
     },
     account: {
       findFirst: jest.fn(),
+      findMany: jest.fn(),
     },
   };
 
@@ -38,6 +40,64 @@ describe('TransactionsService', () => {
   const expectedUserFindUniqueArgs = (userId = 'user-1') => ({
     where: { id: userId },
     select: { id: true },
+  });
+
+  describe('importTransactions', () => {
+    const importedTransaction = {
+      accountId: 'account-1',
+      categoryId: 'cat-1',
+      amount: 12.5,
+      currency: ' eur ',
+      type: 'expense' as any,
+      description: '  Lunch  ',
+      notes: '  Menu  ',
+      date: '2026-06-22T12:00:00.000Z',
+      frequencyType: 'one_time' as any,
+      transactionNature: 'variable' as any,
+    };
+
+    it('validates references and writes the entire import in one bulk operation', async () => {
+      prisma.category.findMany.mockResolvedValue([
+        { id: 'cat-1', type: 'expense' },
+      ]);
+      prisma.account.findMany.mockResolvedValue([{ id: 'account-1' }]);
+      prisma.transaction.createMany.mockResolvedValue({ count: 1 });
+
+      await expect(
+        service.importTransactions('user-1', [importedTransaction]),
+      ).resolves.toEqual({ importedCount: 1 });
+
+      expect(prisma.category.findMany).toHaveBeenCalledWith({
+        where: { id: { in: ['cat-1'] }, userId: 'user-1' },
+        select: { id: true, type: true },
+      });
+      expect(prisma.account.findMany).toHaveBeenCalledWith({
+        where: { id: { in: ['account-1'] }, userId: 'user-1' },
+        select: { id: true },
+      });
+      expect(prisma.transaction.createMany).toHaveBeenCalledWith({
+        data: [
+          expect.objectContaining({
+            userId: 'user-1',
+            amount: expect.any(Prisma.Decimal),
+            currency: 'EUR',
+            description: 'Lunch',
+            notes: 'Menu',
+          }),
+        ],
+      });
+    });
+
+    it('does not write any rows when an imported category is invalid', async () => {
+      prisma.category.findMany.mockResolvedValue([]);
+      prisma.account.findMany.mockResolvedValue([{ id: 'account-1' }]);
+
+      await expect(
+        service.importTransactions('user-1', [importedTransaction]),
+      ).rejects.toBeInstanceOf(NotFoundException);
+
+      expect(prisma.transaction.createMany).not.toHaveBeenCalled();
+    });
   });
 
   const expectedTransactionInclude = {
