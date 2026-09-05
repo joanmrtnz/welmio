@@ -8,9 +8,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { TransactionsController } from './transactions.controller';
 import { TransactionsService } from './transactions.service';
+import { ImportTransactionsDto } from './dto/import-transactions.dto';
 
 type TransactionsControllerMethod =
   | 'createTransaction'
+  | 'importTransactions'
   | 'updateTransaction'
   | 'deleteTransaction'
   | 'getTransactionsByCategories'
@@ -25,6 +27,7 @@ describe('TransactionsController', () => {
 
   const transactionsService = {
     createTransaction: jest.fn(),
+    importTransactions: jest.fn(),
     updateTransaction: jest.fn(),
     deleteTransaction: jest.fn(),
     getTransactionsByCategories: jest.fn(),
@@ -85,6 +88,25 @@ describe('TransactionsController', () => {
       'user-1',
       'tx-1',
       updateDto,
+    );
+  });
+
+  it('passes imported transactions to the service for the authenticated user', async () => {
+    const user = { sub: 'user-1', email: 'u@test.com' };
+    const importDto = {
+      transactions: [{ description: 'Lunch' }],
+    } as ImportTransactionsDto;
+    const response = { importedCount: 1 };
+
+    transactionsService.importTransactions.mockResolvedValue(response);
+
+    await expect(
+      controller.importTransactions(user, importDto),
+    ).resolves.toBe(response);
+
+    expect(transactionsService.importTransactions).toHaveBeenCalledWith(
+      'user-1',
+      importDto.transactions,
     );
   });
 
@@ -174,6 +196,11 @@ describe('TransactionsController', () => {
         methodName: 'updateTransaction',
         path: ':id',
         requestMethod: RequestMethod.PUT,
+      },
+      {
+        methodName: 'importTransactions',
+        path: 'import',
+        requestMethod: RequestMethod.POST,
       },
       {
         methodName: 'deleteTransaction',

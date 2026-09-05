@@ -31,6 +31,8 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { t } from "@/lib/i18n";
 import { SkeletonText } from "@/components/ui/loading/Skeleton";
 import { TransactionsListSkeleton } from "../components/transactions-list-skeleton/TransactionsListSkeleton";
+import { ImportTransactionsModal } from "../components/import-transactions-modal/ImportTransactionsModal";
+import { useImportTransactions } from "../hooks/useImportTransactions";
 
 const GREEN = "#dff7ef";
 const DARK_GREEN = "#063b3a";
@@ -128,6 +130,16 @@ export default function TransactionScreen() {
   }, []);
 
   const showInitialSkeleton = isLoading && !data;
+  const {
+    preview: importPreview,
+    pendingImport,
+    isImporting,
+    selectCsvFile,
+    applyImportMapping,
+    confirmImport,
+    closeMapping,
+    closePreview,
+  } = useImportTransactions({ onImported: loadTransactions });
 
   useEffect(() => {
     loadTransactions();
@@ -198,7 +210,11 @@ export default function TransactionScreen() {
               {t("transactions.income")}
             </Text>
             {showInitialSkeleton ? (
-              <SkeletonText width={84} height={18} style={styles.totalSkeleton} />
+              <SkeletonText
+                width={84}
+                height={18}
+                style={styles.totalSkeleton}
+              />
             ) : (
               <Text
                 style={[
@@ -244,7 +260,11 @@ export default function TransactionScreen() {
               {t("transactions.expense")}
             </Text>
             {showInitialSkeleton ? (
-              <SkeletonText width={84} height={18} style={styles.totalSkeleton} />
+              <SkeletonText
+                width={84}
+                height={18}
+                style={styles.totalSkeleton}
+              />
             ) : (
               <Text
                 style={[
@@ -267,6 +287,20 @@ export default function TransactionScreen() {
             </Text>
 
             <View style={styles.listHeaderActions}>
+              <Pressable
+                onPress={selectCsvFile}
+                style={styles.listHeaderIconButton}
+                accessibilityRole="button"
+                accessibilityLabel={t("transactions.import.button")}
+              >
+                <Icon
+                  name="document"
+                  size={21}
+                  strokeWidth={1.6}
+                  color={DARK_GREEN}
+                />
+              </Pressable>
+
               <Pressable
                 onPress={() => setIsCategoryModalVisible(true)}
                 style={[
@@ -368,6 +402,15 @@ export default function TransactionScreen() {
           setTransactionToEdit(null);
         }}
         onCreated={loadTransactions}
+      />
+      <ImportTransactionsModal
+        preview={importPreview}
+        pendingImport={pendingImport}
+        isImporting={isImporting}
+        onClose={closePreview}
+        onCloseMapping={closeMapping}
+        onApplyMapping={applyImportMapping}
+        onImport={confirmImport}
       />
       <LinearGradient
         pointerEvents="none"

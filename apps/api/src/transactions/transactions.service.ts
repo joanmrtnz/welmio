@@ -389,6 +389,89 @@ export class TransactionsService {
     });
   }
 
+  async importTransactions(
+    userId: string,
+    transactions: CreateTransactionDto[],
+  ) {
+    const categoryIds = [
+      ...new Set(transactions.map(({ categoryId }) => categoryId)),
+    ];
+    const accountIds = [
+      ...new Set(transactions.map(({ accountId }) => accountId)),
+    ];
+
+    const [categories, accounts] = await Promise.all([
+      this.prisma.category.findMany({
+        where: { id: { in: categoryIds }, userId },
+        select: { id: true, type: true },
+      }),
+      this.prisma.account.findMany({
+        where: { id: { in: accountIds }, userId },
+        select: { id: true },
+      }),
+    ]);
+
+    const categoriesById = new Map(
+      categories.map((category) => [category.id, category]),
+    );
+    const accountIdSet = new Set(accounts.map((account) => account.id));
+
+    const data = transactions.map((transaction, index) => {
+      const rowNumber = index + 2;
+      const category = categoriesById.get(transaction.categoryId);
+
+      if (!category) {
+        throw new NotFoundException(
+          `Category not found on CSV row ${rowNumber}.`,
+        );
+      }
+
+      if (category.type !== transaction.type) {
+        throw new BadRequestException(
+          `Transaction type must match category type on CSV row ${rowNumber}.`,
+        );
+      }
+
+      if (!accountIdSet.has(transaction.accountId)) {
+        throw new NotFoundException(
+          `Account not found on CSV row ${rowNumber}.`,
+        );
+      }
+
+      const amount = this.toDecimalAmount(
+        transaction.amount,
+        `Amount on CSV row ${rowNumber}`,
+      );
+      this.validateAmount(amount, `Amount on CSV row ${rowNumber}`);
+
+      return {
+        userId,
+        accountId: transaction.accountId,
+        categoryId: transaction.categoryId,
+        amount,
+        currency: this.normalizeCurrency(transaction.currency),
+        type: transaction.type,
+        description: this.normalizeText(
+          transaction.description,
+          `Description on CSV row ${rowNumber}`,
+          MAX_TRANSACTION_DESCRIPTION_LENGTH,
+        ),
+        notes: this.normalizeOptionalText(
+          transaction.notes,
+          `Notes on CSV row ${rowNumber}`,
+          MAX_TRANSACTION_NOTES_LENGTH,
+        ),
+        date: new Date(transaction.date),
+        frequencyType: transaction.frequencyType ?? 'one_time',
+        transactionNature: transaction.transactionNature ?? 'other',
+      };
+    });
+
+    const result = await this.prisma.transaction.createMany({ data });
+
+    return { importedCount: result.count };
+  }
+
   async updateTransaction(
     userId: string,
     transactionId: string,

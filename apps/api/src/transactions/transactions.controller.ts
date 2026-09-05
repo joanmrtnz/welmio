@@ -16,13 +16,14 @@ import {
 } from '@nestjs/common';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { GetTransactionsByCategoryQueryDto } from './dto/get-transactions-by-category-query.dto';
+import { ImportTransactionsDto } from './dto/import-transactions.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
-   @Post()
+  @Post()
   createTransaction(
     @CurrentUser() user: JwtUser,
     @Body() createTransactionDto: CreateTransactionDto,
@@ -30,6 +31,17 @@ export class TransactionsController {
     return this.transactionsService.createTransaction(
       user.sub,
       createTransactionDto,
+    );
+  }
+
+  @Post('import')
+  importTransactions(
+    @CurrentUser() user: JwtUser,
+    @Body() importTransactionsDto: ImportTransactionsDto,
+  ) {
+    return this.transactionsService.importTransactions(
+      user.sub,
+      importTransactionsDto.transactions,
     );
   }
 

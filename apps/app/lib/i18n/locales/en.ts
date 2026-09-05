@@ -667,6 +667,34 @@ const en = {
       expense: "Expense",
     },
 
+    import: {
+      button: "Import transactions from CSV",
+      previewTitle: "Review imported transactions",
+      previewSummary:
+        "%{count} transactions are ready to import. Review the full list before continuing.",
+      confirm: "Import %{count}",
+      importing: "Importing...",
+      mapping: {
+        title: "Match bank transactions",
+        description:
+          "This bank file does not include Welmio categories or an account. Choose where the transactions should be imported before reviewing them.",
+        account: "Welmio account",
+        expenseCategory: "Category for expenses",
+        incomeCategory: "Category for income",
+        noAccounts: "Create an account before importing this file.",
+        noExpenseCategories:
+          "Create an expense category before importing this file.",
+        noIncomeCategories:
+          "Create an income category before importing this file.",
+        review: "Review transactions",
+      },
+      feedback: {
+        readError: "Could not read the CSV file.",
+        importError: "Could not import the transactions.",
+        success: "%{count} transactions imported successfully.",
+      },
+    },
+
     details: {
       title: "Transaction details",
       category: "Category",
