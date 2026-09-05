@@ -38,6 +38,11 @@ export const styles = StyleSheet.create({
     paddingTop: 22,
     paddingBottom: 24,
   },
+  modalCardMobile: {
+    height: "94%",
+    paddingTop: 18,
+    paddingBottom: 16,
+  },
   modalCardDesktop: {
     maxWidth: 720,
     height: "75%",
@@ -88,8 +93,13 @@ export const styles = StyleSheet.create({
     marginTop: 18,
     marginBottom: 10,
   },
+  summaryMobile: {
+    marginTop: 12,
+    marginBottom: 8,
+  },
   list: {
     flex: 1,
+    minHeight: 0,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: "rgba(9, 169, 130, 0.14)",
@@ -151,6 +161,9 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     paddingTop: 18,
+  },
+  actionsMobile: {
+    paddingTop: 12,
   },
   button: {
     flex: 1,

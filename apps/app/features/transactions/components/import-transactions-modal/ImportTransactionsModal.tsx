@@ -69,7 +69,11 @@ export function ImportTransactionsModal({
           />
         ) : (
           <View
-            style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}
+            style={[
+              styles.modalCard,
+              !isDesktop && styles.modalCardMobile,
+              isDesktop && styles.modalCardDesktop,
+            ]}
           >
             <View style={styles.header}>
               <View style={styles.titleBlock}>
@@ -90,7 +94,9 @@ export function ImportTransactionsModal({
               </Pressable>
             </View>
 
-            <Text style={styles.summary}>
+            <Text
+              style={[styles.summary, !isDesktop && styles.summaryMobile]}
+            >
               {t("transactions.import.previewSummary", {
                 count: preview?.transactions.length ?? 0,
               })}
@@ -111,7 +117,9 @@ export function ImportTransactionsModal({
               ))}
             </ScrollView>
 
-            <View style={styles.actions}>
+            <View
+              style={[styles.actions, !isDesktop && styles.actionsMobile]}
+            >
               <Pressable
                 style={[styles.button, styles.cancelButton]}
                 onPress={onClose}
