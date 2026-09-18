@@ -69,15 +69,20 @@ export class CsvImportError extends Error {}
 
 export function parseTransactionsCsv(csv: string): CsvImportRow[] {
   const normalizedCsv = csv.replace(/^\uFEFF/, "");
-  const rows = parseCsvRows(normalizedCsv, detectDelimiter(normalizedCsv));
-  const headerRowIndex = rows.findIndex(isTransactionHeaderRow);
+  const parsedCsv = [";", ",", "\t"]
+    .map((delimiter) => {
+      const rows = parseCsvRows(normalizedCsv, delimiter);
+      return { rows, headerRowIndex: rows.findIndex(isTransactionHeaderRow) };
+    })
+    .find(({ headerRowIndex }) => headerRowIndex >= 0);
 
-  if (headerRowIndex < 0) {
+  if (!parsedCsv) {
     throw new CsvImportError(
       "Could not find transaction columns. Expected date/fecha, description/concepto and amount/importe.",
     );
   }
 
+  const { rows, headerRowIndex } = parsedCsv;
   const headers = rows[headerRowIndex].map(normalizeHeader);
   const source = isWelmioHeaderRow(headers) ? "welmio" : "bank";
   const dataRows = rows
@@ -308,31 +313,6 @@ function parseCsvRows(csv: string, delimiter: string) {
   }
 
   return rows;
-}
-
-function detectDelimiter(csv: string) {
-  const candidateLines = csv.split(/\r?\n/).slice(0, 10);
-  let commaCount = 0;
-  let semicolonCount = 0;
-
-  for (const line of candidateLines) {
-    commaCount = Math.max(commaCount, countOutsideQuotes(line, ","));
-    semicolonCount = Math.max(semicolonCount, countOutsideQuotes(line, ";"));
-  }
-
-  return semicolonCount > commaCount ? ";" : ",";
-}
-
-function countOutsideQuotes(value: string, characterToCount: string) {
-  let count = 0;
-  let isQuoted = false;
-
-  for (const character of value) {
-    if (character === '"') isQuoted = !isQuoted;
-    if (!isQuoted && character === characterToCount) count += 1;
-  }
-
-  return count;
 }
 
 function normalizeHeader(value: string) {

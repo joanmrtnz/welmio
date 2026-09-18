@@ -1,3 +1,4 @@
+import { BrowseTransactionsQueryDto } from './dto/browse-transactions-query.dto';
 import { TransactionsService } from './transactions.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -71,7 +72,10 @@ export class TransactionsController {
     @CurrentUser() user: JwtUser,
     @Query() query: GetTransactionsByCategoryQueryDto,
   ) {
-    return this.transactionsService.getTransactionsByCategories(user.sub, query);
+    return this.transactionsService.getTransactionsByCategories(
+      user.sub,
+      query,
+    );
   }
 
   @Get()
@@ -79,9 +83,16 @@ export class TransactionsController {
     return this.transactionsService.getUserTransactions(user.sub);
   }
 
+  @Get('browse')
+  browseTransactions(
+    @CurrentUser() user: JwtUser,
+    @Query() query: BrowseTransactionsQueryDto,
+  ) {
+    return this.transactionsService.browseTransactions(user.sub, query);
+  }
+
   @Get('overview')
   getUserTransactionsOverview(@CurrentUser() user: JwtUser) {
     return this.transactionsService.getUserTransactionsOverview(user.sub);
   }
-
 }

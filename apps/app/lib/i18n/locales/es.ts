@@ -1,5 +1,9 @@
 const es = {
   common: {
+    exactAmount: "Importe exacto",
+    showExactAmount: "Mostrar el importe completo",
+    close: "Cerrar",
+
     appName: "Welmio",
     loading: "Cargando...",
     retry: "Intentar de nuevo",
@@ -190,6 +194,7 @@ const es = {
     },
 
     overview: {
+      currentMonthExpense: "Gastado este mes",
       totalBalance: "Balance total",
       totalExpense: "Gasto total",
     },
@@ -501,6 +506,7 @@ const es = {
     },
 
     statusLabels: {
+      cancelled: "Cancelado",
       active: "Activo",
       completed: "Completado",
       paused: "Pausado",
@@ -652,6 +658,39 @@ const es = {
   },
 
   transactions: {
+    browse: {
+      datePlaceholder: "AAAA-MM-DD",
+      pageStatus: "Página %{page} de %{totalPages}",
+      search: "Buscar transacciones",
+      searchPlaceholder: "Buscar descripciones o notas",
+      clearSearch: "Borrar búsqueda",
+      searchAllYears: "Buscar en todos los años",
+      totalsHint:
+        "Los totales muestran todo el período seleccionado; los filtros se aplican a la lista.",
+      noMatches: "Ninguna transacción coincide con estos filtros.",
+      emptyPeriod:
+        "No hay transacciones en este período. Elige otro intervalo para explorar tu historial.",
+      clearFilters: "Borrar filtros de la lista",
+
+      resultCount: "%{from}–%{to} de %{total} transacciones",
+      previous: "Anterior",
+      next: "Siguiente",
+      loadError: "No se pudieron cargar las transacciones.",
+
+      periodBalance: "Balance del período",
+      thisMonth: "Este mes",
+      lastMonth: "Mes pasado",
+      thisYear: "Este año",
+      allTime: "Todo el historial",
+      chooseMonth: "Ir a un mes",
+      year: "Año",
+      customRange: "Intervalo personalizado",
+      dateHint: "Introduce fechas como AAAA-MM-DD. Se incluyen ambas fechas.",
+      from: "Desde",
+      to: "Hasta",
+      invalidRange:
+        "Introduce fechas válidas, con Desde anterior o igual a Hasta.",
+    },
     title: "Transacciones",
     income: "Ingresos",
     expense: "Gastos",

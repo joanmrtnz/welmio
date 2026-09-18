@@ -1,3 +1,4 @@
+import { formatCurrency } from "@/utils/formatCurrency";
 import { formatCompactNumber } from "./format";
 
 export function getChartMaxValue(
@@ -9,7 +10,7 @@ export function getChartMaxValue(
   return Math.max(maxIncome, maxExpense, 1);
 }
 
-export function getChartYAxisLabels(maxValue: number): string[] {
+export function getChartYAxisLabels(maxValue: number, compact = true): string[] {
   const safeMax = Math.max(maxValue, 1);
 
   if (safeMax <= 4) {
@@ -19,7 +20,9 @@ export function getChartYAxisLabels(maxValue: number): string[] {
   const rawStep = safeMax / 4;
   const step = getNiceStep(rawStep);
 
-  return [step * 4, step * 3, step * 2, step].map(formatCompactNumber);
+  return [step * 4, step * 3, step * 2, step].map((value) =>
+    compact ? formatCompactNumber(value) : formatCurrency(value, undefined, { compact: false }),
+  );
 }
 
 function getNiceStep(value: number): number {

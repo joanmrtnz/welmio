@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { Icon } from "@/components/icons/Icon";
 import { fonts } from "@/theme/fonts";
@@ -89,7 +90,7 @@ export function TransactionRow({
       ) : null}
 
       <View style={[styles.amountColumn, compact && styles.amountColumnCompact]}>
-        <Text
+        <AmountText
           style={[
             styles.amount,
             isExpense ? styles.amountNegative : styles.amountPositive,
@@ -97,13 +98,15 @@ export function TransactionRow({
           ]}
           numberOfLines={1}
           ellipsizeMode="tail"
-        >
-          {formatSignedAmount(
-            transaction.amount,
-            transaction.type,
-            transaction.currency,
-          )}
-        </Text>
+          formatValue={(compact) =>
+            formatSignedAmount(
+              transaction.amount,
+              transaction.type,
+              transaction.currency,
+              compact,
+            )
+          }
+        />
       </View>
     </Pressable>
   );
