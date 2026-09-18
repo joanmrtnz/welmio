@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { BrowseTransactionsQueryDto } from './dto/browse-transactions-query.dto';
 import { RequestMethod } from '@nestjs/common';
 import {
   GUARDS_METADATA,
@@ -17,7 +19,8 @@ type TransactionsControllerMethod =
   | 'deleteTransaction'
   | 'getTransactionsByCategories'
   | 'getUserTransactions'
-  | 'getUserTransactionsOverview';
+  | 'getUserTransactionsOverview'
+  | 'browseTransactions';
 
 const getHandler = (methodName: TransactionsControllerMethod) =>
   TransactionsController.prototype[methodName];
@@ -33,6 +36,7 @@ describe('TransactionsController', () => {
     getTransactionsByCategories: jest.fn(),
     getUserTransactions: jest.fn(),
     getUserTransactionsOverview: jest.fn(),
+    browseTransactions: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -53,7 +57,7 @@ describe('TransactionsController', () => {
     const createDto = {
       accountId: 'account-1',
       categoryId: 'cat-1',
-      amount: 12.50,
+      amount: 12.5,
       currency: 'EUR',
       type: 'expense' as any,
       description: 'Lunch',
@@ -63,9 +67,9 @@ describe('TransactionsController', () => {
 
     transactionsService.createTransaction.mockResolvedValue(response);
 
-    await expect(
-      controller.createTransaction(user, createDto),
-    ).resolves.toBe(response);
+    await expect(controller.createTransaction(user, createDto)).resolves.toBe(
+      response,
+    );
 
     expect(transactionsService.createTransaction).toHaveBeenCalledWith(
       'user-1',
@@ -75,8 +79,8 @@ describe('TransactionsController', () => {
 
   it('passes update transaction commands to the service', async () => {
     const user = { sub: 'user-1', email: 'u@test.com' };
-    const updateDto = { amount: 13.00 };
-    const response = { id: 'tx-1', amount: 13.00 };
+    const updateDto = { amount: 13.0 };
+    const response = { id: 'tx-1', amount: 13.0 };
 
     transactionsService.updateTransaction.mockResolvedValue(response);
 
@@ -100,9 +104,9 @@ describe('TransactionsController', () => {
 
     transactionsService.importTransactions.mockResolvedValue(response);
 
-    await expect(
-      controller.importTransactions(user, importDto),
-    ).resolves.toBe(response);
+    await expect(controller.importTransactions(user, importDto)).resolves.toBe(
+      response,
+    );
 
     expect(transactionsService.importTransactions).toHaveBeenCalledWith(
       'user-1',
@@ -137,10 +141,9 @@ describe('TransactionsController', () => {
       controller.getTransactionsByCategories(user, query),
     ).resolves.toBe(response);
 
-    expect(transactionsService.getTransactionsByCategories).toHaveBeenCalledWith(
-      'user-1',
-      query,
-    );
+    expect(
+      transactionsService.getTransactionsByCategories,
+    ).toHaveBeenCalledWith('user-1', query);
   });
 
   it('uses the authenticated user for transaction list', async () => {
@@ -162,12 +165,26 @@ describe('TransactionsController', () => {
 
     transactionsService.getUserTransactionsOverview.mockResolvedValue(response);
 
-    await expect(
-      controller.getUserTransactionsOverview(user),
-    ).resolves.toBe(response);
+    await expect(controller.getUserTransactionsOverview(user)).resolves.toBe(
+      response,
+    );
 
-    expect(transactionsService.getUserTransactionsOverview).toHaveBeenCalledWith(
-      'user-1',
+    expect(
+      transactionsService.getUserTransactionsOverview,
+    ).toHaveBeenCalledWith('user-1');
+  });
+
+  it('browses using the authenticated user and validated query', async () => {
+    const query = new BrowseTransactionsQueryDto();
+    query.search = 'coffee';
+    transactionsService.browseTransactions.mockResolvedValue({ groups: [] });
+    await controller.browseTransactions(
+      { sub: 'user-2', email: 'u@test.com' },
+      query,
+    );
+    expect(transactionsService.browseTransactions).toHaveBeenCalledWith(
+      'user-2',
+      query,
     );
   });
 
@@ -218,6 +235,11 @@ describe('TransactionsController', () => {
         requestMethod: RequestMethod.GET,
       },
       {
+        methodName: 'browseTransactions',
+        path: 'browse',
+        requestMethod: RequestMethod.GET,
+      },
+      {
         methodName: 'getUserTransactionsOverview',
         path: 'overview',
         requestMethod: RequestMethod.GET,
@@ -228,9 +250,7 @@ describe('TransactionsController', () => {
       const handler = getHandler(methodName);
 
       expect(Reflect.getMetadata(PATH_METADATA, handler)).toBe(path);
-      expect(Reflect.getMetadata(METHOD_METADATA, handler)).toBe(
-        requestMethod,
-      );
+      expect(Reflect.getMetadata(METHOD_METADATA, handler)).toBe(requestMethod);
     });
   });
 });
