@@ -34,18 +34,28 @@ export function CalendarFilterModal({
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [year, setYear] = useState("");
-  const [activePreset, setActivePreset] = useState<DatePreset | null>(null);
+  const activePreset = PRESETS.find((preset) => {
+    const range = presetRange(preset);
+    return (
+      from === dateInputValue(range.startDate) &&
+      to === dateInputValue(range.endDate)
+    );
+  });
 
   function setDraft(range: DateRange) {
     setFrom(dateInputValue(range.startDate));
     setTo(dateInputValue(range.endDate));
   }
 
+  function applyRange(range: DateRange) {
+    onApply(range);
+    onClose();
+  }
+
   useEffect(() => {
     if (visible) {
       setDraft(selectedRange);
       setYear(String((selectedRange.startDate ?? new Date()).getFullYear()));
-      setActivePreset(null);
     }
   }, [visible, selectedRange]);
 
@@ -92,12 +102,7 @@ export function CalendarFilterModal({
                   accessibilityState={{ selected: activePreset === preset }}
                   style={[local.chip, activePreset === preset && local.active]}
                   onPress={() => {
-                    const range = presetRange(preset);
-                    setDraft(range);
-                    setActivePreset(preset);
-                    setYear(
-                      String((range.startDate ?? new Date()).getFullYear()),
-                    );
+                    applyRange(presetRange(preset));
                   }}
                 >
                   <Text style={local.text}>
@@ -142,8 +147,7 @@ export function CalendarFilterModal({
                     ]}
                     onPress={() => {
                       if (range) {
-                        setDraft(range);
-                        setActivePreset(null);
+                        applyRange(range);
                       }
                     }}
                   >
@@ -173,7 +177,6 @@ export function CalendarFilterModal({
                   autoCorrect={false}
                   onChangeText={(value) => {
                     setFrom(value);
-                    setActivePreset(null);
                   }}
                 />
               </View>
@@ -188,7 +191,6 @@ export function CalendarFilterModal({
                   autoCorrect={false}
                   onChangeText={(value) => {
                     setTo(value);
-                    setActivePreset(null);
                   }}
                 />
               </View>
@@ -213,8 +215,7 @@ export function CalendarFilterModal({
               disabled={!valid}
               style={[styles.applyButton, !valid && local.disabled]}
               onPress={() => {
-                onApply({ startDate, endDate });
-                onClose();
+                applyRange({ startDate, endDate });
               }}
             >
               <Text style={styles.applyButtonText}>
