@@ -194,6 +194,7 @@ const es = {
     },
 
     overview: {
+      currentMonthExpense: "Gastado este mes",
       totalBalance: "Balance total",
       totalExpense: "Gasto total",
     },

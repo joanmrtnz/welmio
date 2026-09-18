@@ -194,6 +194,7 @@ const ca = {
     },
 
     overview: {
+      currentMonthExpense: "Gastat aquest mes",
       totalBalance: "Balanç total",
       totalExpense: "Despesa total",
     },
