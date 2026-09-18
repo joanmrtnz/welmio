@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BrowseTransactionsQueryDto } from './dto/browse-transactions-query.dto';
+import type { BrowseTransactionsResponse } from '@repo/shared-types';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   TransactionOverviewGroupDto,
   TransactionOverviewItemDto,
@@ -28,7 +34,6 @@ export class TransactionsService {
     private readonly prisma: PrismaService,
     private readonly financeSummaryService: FinanceSummaryService,
   ) {}
-
 
   async getUserTransactions(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -216,6 +221,113 @@ export class TransactionsService {
     };
   }
 
+  async browseTransactions(
+    userId: string,
+    query: BrowseTransactionsQueryDto,
+  ): Promise<BrowseTransactionsResponse> {
+    const startDate = query.startDate ? new Date(query.startDate) : undefined;
+    const endDate = query.endDate ? new Date(query.endDate) : undefined;
+    if (startDate && endDate && startDate >= endDate) {
+      throw new BadRequestException('Start date must be before end date');
+    }
+    const periodWhere: Prisma.TransactionWhereInput = {
+      userId,
+      ...((startDate || endDate) && {
+        date: {
+          ...(startDate && { gte: startDate }),
+          ...(endDate && { lt: endDate }),
+        },
+      }),
+    };
+    const search = query.search?.trim();
+    const where: Prisma.TransactionWhereInput = {
+      ...periodWhere,
+      ...(query.type && { type: query.type }),
+      ...(query.categoryIds?.length && {
+        categoryId: { in: query.categoryIds },
+      }),
+      ...(search && {
+        OR: [
+          { description: { contains: search, mode: 'insensitive' } },
+          { notes: { contains: search, mode: 'insensitive' } },
+        ],
+      }),
+    };
+    // Count, page and totals share one snapshot, including after an import/delete.
+    return this.prisma.$transaction(
+      async (tx) => {
+        const total = await tx.transaction.count({ where });
+        const totalPages = Math.max(1, Math.ceil(total / query.pageSize));
+        const page = Math.min(query.page, totalPages);
+        const [transactions, amounts] = await Promise.all([
+          tx.transaction.findMany({
+            where,
+            include: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                  icon: true,
+                  color: true,
+                  type: true,
+                },
+              },
+              account: {
+                select: { id: true, name: true, type: true, currencies: true },
+              },
+            },
+            orderBy: [{ date: 'desc' }, { id: 'desc' }],
+            skip: (page - 1) * query.pageSize,
+            take: query.pageSize,
+          }),
+          tx.transaction.groupBy({
+            by: ['type'],
+            where: periodWhere,
+            _sum: { amount: true },
+          }),
+        ]);
+        const income =
+          amounts.find((item) => item.type === 'income')?._sum.amount ??
+          new Prisma.Decimal(0);
+        const expense =
+          amounts.find((item) => item.type === 'expense')?._sum.amount ??
+          new Prisma.Decimal(0);
+        const grouped = new Map<
+          string,
+          BrowseTransactionsResponse['groups'][number]['items']
+        >();
+        for (const transaction of transactions) {
+          const month = transaction.date.toISOString().slice(0, 7);
+          const items = grouped.get(month) ?? [];
+          items.push({
+            id: transaction.id,
+            description: transaction.description,
+            notes: transaction.notes,
+            amount: transaction.amount.toString(),
+            currency: transaction.currency,
+            type: transaction.type,
+            date: transaction.date.toISOString(),
+            frequencyType: transaction.frequencyType,
+            transactionNature: transaction.transactionNature,
+            category: transaction.category,
+            account: transaction.account,
+          });
+          grouped.set(month, items);
+        }
+        return {
+          summary: {
+            totalIncome: income.toFixed(2),
+            totalExpense: expense.toFixed(2),
+            totalBalance: income.minus(expense).toFixed(2),
+          },
+          groups: Array.from(grouped, ([month, items]) => ({ month, items })),
+          pagination: { page, pageSize: query.pageSize, total, totalPages },
+        };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead },
+    );
+  }
+
   async getUserTransactionsOverview(
     userId: string,
   ): Promise<TransactionsOverviewResponseDto> {
@@ -251,19 +363,14 @@ export class TransactionsService {
             },
           },
         },
-        orderBy: {
-          date: 'desc',
-        },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }],
       }),
     ]);
 
     const groupedByMonth = new Map<string, TransactionOverviewItemDto[]>();
 
     for (const transaction of transactions) {
-      const date = new Date(transaction.date);
-      const month = date.toLocaleString('en-US', {
-        month: 'long',
-      });
+      const month = transaction.date.toISOString().slice(0, 7);
 
       const item: TransactionOverviewItemDto = {
         id: transaction.id,
@@ -314,10 +421,7 @@ export class TransactionsService {
     userId: string,
     createTransactionDto: CreateTransactionDto,
   ) {
-    const amount = this.toDecimalAmount(
-      createTransactionDto.amount,
-      'Amount',
-    );
+    const amount = this.toDecimalAmount(createTransactionDto.amount, 'Amount');
 
     this.validateAmount(amount, 'Amount');
 
@@ -671,11 +775,7 @@ export class TransactionsService {
     }
   }
 
-  private normalizeText(
-    value: string,
-    fieldName: string,
-    maxLength: number,
-  ) {
+  private normalizeText(value: string, fieldName: string, maxLength: number) {
     const normalizedValue = value.trim();
 
     this.validateTextLength(normalizedValue, fieldName, maxLength);
@@ -722,5 +822,4 @@ export class TransactionsService {
 
     return normalizedCurrency;
   }
-
 }

@@ -683,7 +683,7 @@ describe('TransactionsService', () => {
   });
 
   describe('getUserTransactionsOverview', () => {
-    it('groups overview transactions by display month with formatted amounts', async () => {
+    it('groups overview transactions by year and month with formatted amounts', async () => {
       const summary = { totalBalance: '100.00' };
 
       financeSummaryService.getUserFinanceSummary.mockResolvedValue(summary);
@@ -720,7 +720,7 @@ describe('TransactionsService', () => {
           amount: new Prisma.Decimal('12.50'),
           currency: 'EUR',
           type: 'expense',
-          date: new Date('2026-07-01T00:00:00.000Z'),
+          date: new Date('2025-06-01T00:00:00.000Z'),
           frequencyType: 'one_time',
           transactionNature: 'other',
           category: {
@@ -745,7 +745,7 @@ describe('TransactionsService', () => {
         summary,
         groups: [
           {
-            month: 'June',
+            month: '2026-06',
             items: [
               {
                 id: 'tx-1',
@@ -774,7 +774,7 @@ describe('TransactionsService', () => {
             ],
           },
           {
-            month: 'July',
+            month: '2025-06',
             items: [
               {
                 id: 'tx-2',
@@ -783,7 +783,7 @@ describe('TransactionsService', () => {
                 amount: '12.5',
                 currency: 'EUR',
                 type: 'expense',
-                date: '2026-07-01T00:00:00.000Z',
+                date: '2025-06-01T00:00:00.000Z',
                 frequencyType: 'one_time',
                 transactionNature: 'other',
                 category: {
@@ -814,9 +814,7 @@ describe('TransactionsService', () => {
       expect(prisma.transaction.findMany).toHaveBeenCalledWith({
         where: { userId: 'user-1' },
         include: expectedOverviewTransactionInclude,
-        orderBy: {
-          date: 'desc',
-        },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }],
       });
     });
 
@@ -840,9 +838,7 @@ describe('TransactionsService', () => {
       expect(prisma.transaction.findMany).toHaveBeenCalledWith({
         where: { userId: 'user-1' },
         include: expectedOverviewTransactionInclude,
-        orderBy: {
-          date: 'desc',
-        },
+        orderBy: [{ date: 'desc' }, { id: 'desc' }],
       });
     });
 
