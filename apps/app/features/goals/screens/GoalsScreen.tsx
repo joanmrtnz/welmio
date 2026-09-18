@@ -310,9 +310,9 @@ export default function GoalsScreen() {
               <View style={styles.mainGoalIcon}>
                 <Icon
                   name={(mainGoal.icon ?? "target") as never}
-                  size={32}
+                  size={34}
                   color={BUTTON_GREEN}
-                  strokeWidth={1.6}
+                  strokeWidth={1.2}
                 />
               </View>
             </View>
