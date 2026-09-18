@@ -307,9 +307,10 @@ export default function TransactionScreen() {
                   if (searchVisible) clearSearch();
                 }}
               >
-                <FontAwesome
+                 <Icon
                   name="search"
-                  size={18}
+                  size={21}
+                  strokeWidth={1.6}
                   color={searchVisible ? WHITE : DARK_GREEN}
                 />
               </Pressable>
