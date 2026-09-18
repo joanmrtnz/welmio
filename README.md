@@ -292,18 +292,10 @@ Expo web export. GitHub Actions builds and deploys pre-production from the
 
 Native release metadata is configured in `apps/app/eas.json`.
 
-## Project status
+## App availability
 
-Welmio is under active development:
+Welmio is available across web, iOS, and Android:
 
-- The web experience is available.
-- The native iOS app is available on the Apple App Store.
-- The Android app is in the process of being published on Google Play.
-
-<a href="https://apps.apple.com/es/app/welmio/id6783388398">
-  <img
-    src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/es-es?size=250x83"
-    alt="Descargar Welmio en el App Store"
-    height="54"
-  />
-</a>
+* Use Welmio on the web at [app.welmio.dev](https://app.welmio.dev).
+* Download Welmio for iOS from the [Apple App Store](https://apps.apple.com/es/app/welmio/id6783388398).
+* Download Welmio for Android from [Google Play](https://play.google.com/store/apps/details?id=dev.welmio.app).
