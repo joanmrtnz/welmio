@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   View,
   Text,
@@ -160,9 +161,16 @@ export default function TransactionScreen() {
           {showInitialSkeleton ? (
             <SkeletonText width={128} height={28} />
           ) : (
-            <Text style={styles.balanceCardTitle}>
-              {!error && data ? formatCurrency(data.summary.totalBalance) : "—"}
-            </Text>
+            <AmountText
+              style={styles.balanceCardTitle}
+              formatValue={(compact) =>
+                !error && data
+                  ? formatCurrency(data.summary.totalBalance, undefined, {
+                      compact,
+                    })
+                  : "—"
+              }
+            />
           )}
         </View>
 
@@ -204,16 +212,19 @@ export default function TransactionScreen() {
                 style={styles.totalSkeleton}
               />
             ) : (
-              <Text
+              <AmountText
                 style={[
                   styles.expense,
                   totalsFilter === "income" && styles.totalLabelActive,
                 ]}
-              >
-                {!error && data
-                  ? formatCurrency(data.summary.totalIncome)
-                  : "—"}
-              </Text>
+                formatValue={(compact) =>
+                  !error && data
+                    ? formatCurrency(data.summary.totalIncome, undefined, {
+                        compact,
+                      })
+                    : "—"
+                }
+              />
             )}
           </Pressable>
 
@@ -254,16 +265,19 @@ export default function TransactionScreen() {
                 style={styles.totalSkeleton}
               />
             ) : (
-              <Text
+              <AmountText
                 style={[
                   styles.expense,
                   totalsFilter === "expense" && styles.totalLabelActive,
                 ]}
-              >
-                {!error && data
-                  ? formatCurrency(data.summary.totalExpense)
-                  : "—"}
-              </Text>
+                formatValue={(compact) =>
+                  !error && data
+                    ? formatCurrency(data.summary.totalExpense, undefined, {
+                        compact,
+                      })
+                    : "—"
+                }
+              />
             )}
           </Pressable>
         </View>

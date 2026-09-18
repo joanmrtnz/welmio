@@ -1,5 +1,9 @@
 const ca = {
   common: {
+    exactAmount: "Import exacte",
+    showExactAmount: "Mostra l’import complet",
+    close: "Tanca",
+
     appName: "Welmio",
     loading: "Carregant...",
     retry: "Torna-ho a provar",

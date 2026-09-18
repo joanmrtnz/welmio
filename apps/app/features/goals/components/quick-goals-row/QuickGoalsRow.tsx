@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   Pressable,
   ScrollView,
@@ -42,8 +43,6 @@ function GoalPreviewCard({
   desktopCardWidth?: number;
 }) {
   const progress = Math.min(Number(goal.progress) || 0, 100);
-  const savedAmount = formatCurrency(goal.saved);
-  const targetAmount = formatCurrency(goal.target);
 
   return (
     <Pressable
@@ -68,12 +67,17 @@ function GoalPreviewCard({
           {goal.name}
         </Text>
 
-        <Text style={styles.goalMeta} numberOfLines={1} ellipsizeMode="tail">
-          {t("goals.quickGoals.savedOf", {
-            saved: savedAmount,
-            target: targetAmount,
-          })}
-        </Text>
+        <AmountText
+          style={styles.goalMeta}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          formatValue={(compact) =>
+            t("goals.quickGoals.savedOf", {
+              saved: formatCurrency(goal.saved, undefined, { compact }),
+              target: formatCurrency(goal.target, undefined, { compact }),
+            })
+          }
+        />
 
         <View style={styles.progressRow}>
           <View style={styles.progressTrack}>

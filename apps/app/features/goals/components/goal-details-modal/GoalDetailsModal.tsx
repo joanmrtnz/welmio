@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   Modal,
   Pressable,
@@ -331,18 +332,24 @@ export function GoalDetailsModal({
             <View style={styles.amountsCard}>
               <View style={styles.amountItem}>
                 <Text style={styles.amountLabel}>{t("goals.details.saved")}</Text>
-                <Text style={styles.amountValue}>
-                  {formatCurrency(goal.saved)}
-                </Text>
+                <AmountText
+                  style={styles.amountValue}
+                  formatValue={(compact) =>
+                    formatCurrency(goal.saved, undefined, { compact })
+                  }
+                />
               </View>
 
               <View style={styles.amountSeparator} />
 
               <View style={styles.amountItem}>
                 <Text style={styles.amountLabel}>{t("goals.details.target")}</Text>
-                <Text style={styles.amountValue}>
-                  {formatCurrency(goal.target)}
-                </Text>
+                <AmountText
+                  style={styles.amountValue}
+                  formatValue={(compact) =>
+                    formatCurrency(goal.target, undefined, { compact })
+                  }
+                />
               </View>
             </View>
 
@@ -358,9 +365,12 @@ export function GoalDetailsModal({
                 </View>
 
                 <Text style={styles.statLabel}>{t("goals.details.remaining")}</Text>
-                <Text style={styles.statValue}>
-                  {formatCurrency(remainingAmount)}
-                </Text>
+                <AmountText
+                  style={styles.statValue}
+                  formatValue={(compact) =>
+                    formatCurrency(remainingAmount, undefined, { compact })
+                  }
+                />
               </View>
 
               <View style={styles.statCard}>
@@ -374,9 +384,12 @@ export function GoalDetailsModal({
                 </View>
 
                 <Text style={styles.statLabel}>{t("goals.details.monthlyNeeded")}</Text>
-                <Text style={styles.statValue}>
-                  {formatCurrency(goal.monthlyNeeded)}
-                </Text>
+                <AmountText
+                  style={styles.statValue}
+                  formatValue={(compact) =>
+                    formatCurrency(goal.monthlyNeeded, undefined, { compact })
+                  }
+                />
               </View>
             </View>
 
@@ -392,7 +405,13 @@ export function GoalDetailsModal({
               <Text style={styles.sectionTitle}>{t("goals.details.progressInsight")}</Text>
 
               <Text style={styles.infoText}>
-                {t("goals.details.progressInsightText", { saved: formatCurrency(goal.saved), target: formatCurrency(goal.target), monthlyNeeded: formatCurrency(goal.monthlyNeeded) })}
+                {t("goals.details.progressInsightText", {
+                  saved: formatCurrency(goal.saved, undefined, { compact: false }),
+                  target: formatCurrency(goal.target, undefined, { compact: false }),
+                  monthlyNeeded: formatCurrency(goal.monthlyNeeded, undefined, {
+                    compact: false,
+                  }),
+                })}
               </Text>
             </View>
 
@@ -449,12 +468,15 @@ export function GoalDetailsModal({
                       </Text>
                     </View>
 
-                    <Text style={styles.historyAmount}>
-                      +
-                      {formatCurrency(
-                        contribution.amount,
-                      )}
-                    </Text>
+                    <AmountText
+                      style={styles.historyAmount}
+                      formatValue={(compact) =>
+                        "+" +
+                        formatCurrency(contribution.amount, undefined, {
+                          compact,
+                        })
+                      }
+                    />
 
                     <Pressable
                       style={styles.deleteContributionButton}

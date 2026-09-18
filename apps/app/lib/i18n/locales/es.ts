@@ -1,5 +1,9 @@
 const es = {
   common: {
+    exactAmount: "Importe exacto",
+    showExactAmount: "Mostrar el importe completo",
+    close: "Cerrar",
+
     appName: "Welmio",
     loading: "Cargando...",
     retry: "Intentar de nuevo",

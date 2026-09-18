@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   View,
   Text,
@@ -256,14 +257,24 @@ export default function GoalsScreen() {
         >
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>{t("goals.summary.totalSaved")}</Text>
-            <Text style={styles.balance}>{formatCurrency(totalSaved)}</Text>
+            <AmountText
+              style={styles.balance}
+              formatValue={(compact) =>
+                formatCurrency(totalSaved, undefined, { compact })
+              }
+            />
           </View>
 
           <View style={styles.separator} />
 
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>{t("goals.summary.targetAmount")}</Text>
-            <Text style={styles.expense}>{formatCurrency(totalTarget)}</Text>
+            <AmountText
+              style={styles.expense}
+              formatValue={(compact) =>
+                formatCurrency(totalTarget, undefined, { compact })
+              }
+            />
           </View>
         </View>
 
@@ -314,15 +325,25 @@ export default function GoalsScreen() {
               </View>
 
               <View style={styles.mainGoalInfo}>
-                <Text style={styles.goalAmount} numberOfLines={1}>
-                  {formatCurrency(mainGoal.saved)}
-                </Text>
+                <AmountText
+                  style={styles.goalAmount}
+                  numberOfLines={1}
+                  formatValue={(compact) =>
+                    formatCurrency(mainGoal.saved, undefined, { compact })
+                  }
+                />
 
-                <Text style={styles.goalMeta} numberOfLines={1}>
-                  {t("goals.mainGoal.savedOf", {
-                    amount: formatCurrency(mainGoal.target),
-                  })}
-                </Text>
+                <AmountText
+                  style={styles.goalMeta}
+                  numberOfLines={1}
+                  formatValue={(compact) =>
+                    t("goals.mainGoal.savedOf", {
+                      amount: formatCurrency(mainGoal.target, undefined, {
+                        compact,
+                      }),
+                    })
+                  }
+                />
 
                 <Text style={styles.goalMeta} numberOfLines={1}>
                   {t("goals.mainGoal.targetDate", {
@@ -367,9 +388,12 @@ export default function GoalsScreen() {
             <Text style={styles.paceLabel}>
               {t("goals.pace.monthlyNeeded")}
             </Text>
-            <Text style={styles.paceValue}>
-              {formatCurrency(totalMonthlyNeeded)}
-            </Text>
+            <AmountText
+              style={styles.paceValue}
+              formatValue={(compact) =>
+                formatCurrency(totalMonthlyNeeded, undefined, { compact })
+              }
+            />
           </View>
 
           <View style={styles.paceSeparator} />
@@ -452,15 +476,25 @@ export default function GoalsScreen() {
               </View>
 
               <View style={styles.goalBottomRow}>
-                <Text style={styles.goalSmallText} numberOfLines={1}>
-                  {t("goals.list.savedAmount", {
-                    amount: formatCurrency(goal.saved),
-                  })}
-                </Text>
+                <AmountText
+                  style={styles.goalSmallText}
+                  numberOfLines={1}
+                  formatValue={(compact) =>
+                    t("goals.list.savedAmount", {
+                      amount: formatCurrency(goal.saved, undefined, {
+                        compact,
+                      }),
+                    })
+                  }
+                />
 
-                <Text style={styles.goalSmallText} numberOfLines={1}>
-                  {formatCurrency(goal.target)}
-                </Text>
+                <AmountText
+                  style={styles.goalSmallText}
+                  numberOfLines={1}
+                  formatValue={(compact) =>
+                    formatCurrency(goal.target, undefined, { compact })
+                  }
+                />
               </View>
             </Pressable>
           ))}
@@ -473,14 +507,21 @@ export default function GoalsScreen() {
 
           <View style={styles.tipContent}>
             <Text style={styles.tipTitle}>{t("goals.smartTip.title")}</Text>
-            <Text style={styles.tipText}>
-              {mainGoal
-                ? t("goals.smartTip.withMainGoal", {
-                    amount: formatCurrency(mainGoal.monthlyNeeded),
-                    goalName: mainGoal.name.toLowerCase(),
-                  })
-                : t("goals.smartTip.empty")}
-            </Text>
+            <AmountText
+              style={styles.tipText}
+              formatValue={(compact) =>
+                mainGoal
+                  ? t("goals.smartTip.withMainGoal", {
+                      amount: formatCurrency(
+                        mainGoal.monthlyNeeded,
+                        undefined,
+                        { compact },
+                      ),
+                      goalName: mainGoal.name.toLowerCase(),
+                    })
+                  : t("goals.smartTip.empty")
+              }
+            />
           </View>
         </View>
           </>

@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   Pressable,
   ScrollView,
@@ -288,9 +289,12 @@ export default function HomeScreen() {
               {isTransactionsLoading && !transactionsOverview ? (
                 <SkeletonText width={96} height={19} style={styles.skeletonTextGap} />
               ) : (
-                <Text style={styles.overviewPositive}>
-                  {formatCurrency(totalBalance)}
-                </Text>
+                <AmountText
+                  style={styles.overviewPositive}
+                  formatValue={(compact) =>
+                    formatCurrency(totalBalance, undefined, { compact })
+                  }
+                />
               )}
             </View>
           </Pressable>
@@ -305,9 +309,12 @@ export default function HomeScreen() {
               {isTransactionsLoading && !transactionsOverview ? (
                 <SkeletonText width={96} height={19} style={styles.skeletonTextGap} />
               ) : (
-                <Text style={styles.overviewAmount}>
-                  -{formatCurrency(totalExpense)}
-                </Text>
+                <AmountText
+                  style={styles.overviewAmount}
+                  formatValue={(compact) =>
+                    "-" + formatCurrency(totalExpense, undefined, { compact })
+                  }
+                />
               )}
             </View>
           </Pressable>

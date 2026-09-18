@@ -1,5 +1,9 @@
 const en = {
   common: {
+    exactAmount: "Exact amount",
+    showExactAmount: "Show the full amount",
+    close: "Close",
+
     appName: "Welmio",
     loading: "Loading...",
     retry: "Try again",

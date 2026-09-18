@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   View,
   Text,
@@ -189,9 +190,12 @@ function ExpensesByCategoryCard({
               <View key={category.id} style={styles.categoryChartItem}>
                 <View style={styles.categoryChartTopRow}>
                   <Text style={styles.categoryLabel}>{category.label}</Text>
-                  <Text style={styles.categoryAmount}>
-                    {formatCurrency(category.amount)}
-                  </Text>
+                  <AmountText
+                    style={styles.categoryAmount}
+                    formatValue={(compact) =>
+                      formatCurrency(category.amount, undefined, { compact })
+                    }
+                  />
                 </View>
                 <View style={styles.horizontalBarTrack}>
                   <View
@@ -286,11 +290,16 @@ function GoalContributionsCard({
                   </View>
                   <View style={styles.goalContributionInfo}>
                     <Text style={styles.goalContributionTitle}>{goal.label}</Text>
-                    <Text style={styles.goalContributionAmount}>
-                      {t("analytics.goalContributions.amountContributed", {
-                        amount: formatCurrency(goal.amount),
-                      })}
-                    </Text>
+                    <AmountText
+                      style={styles.goalContributionAmount}
+                      formatValue={(compact) =>
+                        t("analytics.goalContributions.amountContributed", {
+                          amount: formatCurrency(goal.amount, undefined, {
+                            compact,
+                          }),
+                        })
+                      }
+                    />
                     <View style={styles.horizontalBarTrack}>
                       <View
                         style={[
@@ -341,6 +350,7 @@ export default function AnalyticsScreen() {
     : 1;
 
   const yAxisLabels = getChartYAxisLabels(maxValue);
+  const exactYAxisLabels = getChartYAxisLabels(maxValue, false);
   const isYearlyChart =
     (selected === "yearly" || chartBars.length > 6) && !isDesktop;
   const yearlyChartWidth = Math.max(chartBars.length * 42, 310);
@@ -387,9 +397,16 @@ export default function AnalyticsScreen() {
             {showInitialSkeleton ? (
               <SkeletonText width={116} height={24} style={styles.skeletonTextGap} />
             ) : (
-              <Text style={styles.balance}>
-                {data ? formatCurrency(data.summary.totalBalance) : formatCurrency(0)}
-              </Text>
+              <AmountText
+                style={styles.balance}
+                formatValue={(compact) =>
+                  data
+                    ? formatCurrency(data.summary.totalBalance, undefined, {
+                        compact,
+                      })
+                    : formatCurrency(0, undefined, { compact })
+                }
+              />
             )}
           </View>
 
@@ -400,11 +417,14 @@ export default function AnalyticsScreen() {
             {showInitialSkeleton ? (
               <SkeletonText width={116} height={24} style={styles.skeletonTextGap} />
             ) : (
-              <Text style={styles.balance}>
-                {data
-                  ? `-${formatCurrency(data.summary.totalExpense)}`
-                  : `-${formatCurrency(0)}`}
-              </Text>
+              <AmountText
+                style={styles.balance}
+                formatValue={(compact) =>
+                  data
+                    ? `-${formatCurrency(data.summary.totalExpense, undefined, { compact })}`
+                    : `-${formatCurrency(0, undefined, { compact })}`
+                }
+              />
             )}
           </View>
         </View>
@@ -491,9 +511,13 @@ export default function AnalyticsScreen() {
             <View style={styles.chartArea}>
               <View style={styles.chartLabels}>
                 {yAxisLabels.map((label, index) => (
-                  <Text key={`${label}-${index}`} style={styles.chartYAxis}>
-                    {label}
-                  </Text>
+                  <AmountText
+                    key={`${label}-${index}`}
+                    style={styles.chartYAxis}
+                    formatValue={(compact) =>
+                      compact ? label : exactYAxisLabels[index]
+                    }
+                  />
                 ))}
               </View>
 
