@@ -1,3 +1,5 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
+import { formatCurrency } from "@/utils/formatCurrency";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { fonts } from "@/theme/fonts";
 
@@ -86,8 +88,28 @@ export function QuickAnalyticsCard({
 
       <View style={styles.chartRow}>
         <View style={styles.axisColumn}>
-          <Text style={styles.axisText}>{formatCompactAmount(maxValue)}</Text>
-          <Text style={styles.axisText}>{formatCompactAmount(middleValue)}</Text>
+          <AmountText
+            style={styles.axisText}
+            formatValue={(compact) =>
+              compact
+                ? formatCompactAmount(maxValue)
+                : formatCurrency(maxValue, undefined, {
+                    compact: false,
+                    maximumFractionDigits: 2,
+                  })
+            }
+          />
+          <AmountText
+            style={styles.axisText}
+            formatValue={(compact) =>
+              compact
+                ? formatCompactAmount(middleValue)
+                : formatCurrency(middleValue, undefined, {
+                    compact: false,
+                    maximumFractionDigits: 2,
+                  })
+            }
+          />
           <Text style={styles.axisText}>$0</Text>
         </View>
 

@@ -1,15 +1,15 @@
-export type TransactionType = 'income' | 'expense';
+export type TransactionType = "income" | "expense";
 
-export type FrequencyType = 'one_time' | 'weekly' | 'monthly' | 'yearly';
+export type FrequencyType = "one_time" | "weekly" | "monthly" | "yearly";
 
 export type TransactionNature =
-  | 'fixed'
-  | 'variable'
-  | 'rent'
-  | 'subscription'
-  | 'salary'
-  | 'refund'
-  | 'other';
+  | "fixed"
+  | "variable"
+  | "rent"
+  | "subscription"
+  | "salary"
+  | "refund"
+  | "other";
 
 export interface Transaction {
   id: string;
@@ -94,3 +94,28 @@ export type ImportTransactionsPayload = {
 export type ImportTransactionsResponse = {
   importedCount: number;
 };
+
+/** Date bounds are ISO timestamps; endDate is exclusive. */
+export interface BrowseTransactionsQuery {
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+  type?: TransactionType;
+  categoryIds?: string[];
+  page?: number;
+  pageSize?: number;
+}
+
+export interface BrowseTransactionsResponse {
+  summary: Pick<
+    TransactionsOverviewResponse["summary"],
+    "totalBalance" | "totalIncome" | "totalExpense"
+  >;
+  groups: TransactionOverviewGroup[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+}

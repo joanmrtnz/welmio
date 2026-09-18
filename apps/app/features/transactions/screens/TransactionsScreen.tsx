@@ -1,6 +1,8 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   Pressable,
   ScrollView,
@@ -10,25 +12,22 @@ import { fonts } from "@/theme/fonts";
 import { Icon } from "@/components/icons/Icon";
 import { deleteTransaction } from "@/features/transactions/services/transactions.service";
 
-import {
-  TransactionsOverviewResponse,
-  TransactionOverviewItem,
-} from "@repo/shared-types";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { apiFetch } from "@/lib/api/client";
-import { getFilteredTransactionGroups } from "../utils/transactions";
+import { TransactionOverviewItem } from "@repo/shared-types";
+import { useRef, useState } from "react";
+import { TransactionPagination } from "../components/transaction-pagination/TransactionPagination";
+import { useTransactionBrowser } from "../hooks/useTransactionBrowser";
 import { TransactionsGroupedList } from "../components/transactions-grouped-list/TransactionsGroupedList";
 import { CategoryFilterModal } from "../components/category-filter-modal/CategoryFilterModal";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { CreateTransactionModal } from "../components/create-transaction-modal/CreateTransactionModal";
 import { feedback } from "@/components/ui/feedback/feedback.service";
 import { CalendarFilterModal } from "../components/calendar-filter-modal/CalendarFilterModal";
-import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { AppScreenHeader } from "@/components/ui/app-screen-header/AppScreenHeader";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { t } from "@/lib/i18n";
+import { i18n, t } from "@/lib/i18n";
+import { formatPeriod } from "../utils/dateRange";
 import { SkeletonText } from "@/components/ui/loading/Skeleton";
 import { TransactionsListSkeleton } from "../components/transactions-list-skeleton/TransactionsListSkeleton";
 import { ImportTransactionsModal } from "../components/import-transactions-modal/ImportTransactionsModal";
@@ -42,7 +41,6 @@ const BLACK = "#063b3a";
 const TAB_GREEN = "#a9efdf";
 const MINT = "#00c896";
 const MUTED = "#5e7b78";
-const SHADOW = "rgba(29, 100, 89, 0.12)";
 const BUTTON_GREEN = "#10b992";
 const LIGHT_GRAY = "rgba(0, 0, 0, 0.1)";
 const DESKTOP_BREAKPOINT = 768;
@@ -79,57 +77,42 @@ export default function TransactionScreen() {
     }
   }
 
-  const [data, setData] = useState<TransactionsOverviewResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const hasLoadedTransactionsRef = useRef(false);
-  const [totalsFilter, setTotalsFilter] = useState<
-    "all" | "income" | "expense"
-  >("all");
+  const {
+    data,
+    isLoading,
+    error,
+    filters,
+    updateFilters,
+    loadTransactions,
+    setPage,
+    searchInput,
+    setSearchInput,
+    clearSearch,
+  } = useTransactionBrowser();
+  const [searchVisible, setSearchVisible] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+  const listTop = useRef(0);
+  const changePage = (page: number) => {
+    setPage(page);
+    scrollRef.current?.scrollTo({ y: listTop.current, animated: true });
+  };
+  const totalsFilter = filters.type;
+  const selectedCategoryIds = filters.categoryIds;
+  const selectedDateRange = filters.range;
+  const setSelectedCategoryIds = (categoryIds: string[]) =>
+    updateFilters({ categoryIds });
+  const setSelectedDateRange = (range: DateRange) => updateFilters({ range });
+  const toggleType = (type: "income" | "expense") =>
+    updateFilters({ type: totalsFilter === type ? "all" : type });
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [isCreateTransactionModalVisible, setIsCreateTransactionModalVisible] =
     useState(false);
   const [isCalendarFilterModalVisible, setIsCalendarFilterModalVisible] =
     useState(false);
-  const [selectedDateRange, setSelectedDateRange] = useState<DateRange>({
-    startDate: null,
-    endDate: null,
-  });
-
   const hasSelectedDateRange =
     Boolean(selectedDateRange.startDate) || Boolean(selectedDateRange.endDate);
 
-  const filteredGroups = useMemo(
-    () =>
-      getFilteredTransactionGroups(
-        data,
-        totalsFilter,
-        selectedCategoryIds,
-        selectedDateRange,
-      ),
-    [data, totalsFilter, selectedCategoryIds, selectedDateRange],
-  );
-
-  const loadTransactions = useCallback(async () => {
-    try {
-      if (!hasLoadedTransactionsRef.current) {
-        setIsLoading(true);
-      }
-
-      const response = await apiFetch<TransactionsOverviewResponse>(
-        "/transactions/overview",
-      );
-
-      setData(response);
-      hasLoadedTransactionsRef.current = true;
-    } catch (error) {
-      console.warn(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const showInitialSkeleton = isLoading && !data;
+  const showInitialSkeleton = isLoading;
   const {
     preview: importPreview,
     pendingImport,
@@ -141,21 +124,12 @@ export default function TransactionScreen() {
     closePreview,
   } = useImportTransactions({ onImported: loadTransactions });
 
-  useEffect(() => {
-    loadTransactions();
-  }, [loadTransactions]);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadTransactions();
-    }, [loadTransactions]),
-  );
-
   return (
     <View style={styles.screen}>
       <AppScreenHeader title={t("transactions.title")} />
 
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={[
           styles.content,
           { paddingBottom: contentBottomPadding },
@@ -166,23 +140,45 @@ export default function TransactionScreen() {
         <View
           style={[styles.balanceCard, isDesktop && styles.balanceCardDesktop]}
         >
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("transactions.calendarFilter.title")}
+            onPress={() => setIsCalendarFilterModalVisible(true)}
+            style={{ padding: 10 }}
+          >
+            <Text style={styles.periodLabel}>
+              {formatPeriod(
+                selectedDateRange,
+                i18n.locale,
+                t("transactions.browse.allTime"),
+              )}{" "}
+              ▾
+            </Text>
+          </Pressable>
           <Text style={styles.balanceCardLabel}>
-            {t("transactions.totalBalance")}
+            {t("transactions.browse.periodBalance")}
           </Text>
           {showInitialSkeleton ? (
             <SkeletonText width={128} height={28} />
           ) : (
-            <Text style={styles.balanceCardTitle}>
-              {data ? formatCurrency(data.summary.totalBalance) : "€0.00"}
-            </Text>
+            <AmountText
+              style={styles.balanceCardTitle}
+              formatValue={(compact) =>
+                !error && data
+                  ? formatCurrency(data.summary.totalBalance, undefined, {
+                      compact,
+                    })
+                  : "—"
+              }
+            />
           )}
         </View>
 
         <View style={[styles.totalsRow, isDesktop && styles.totalsRowDesktop]}>
           <Pressable
-            onPress={() =>
-              setTotalsFilter((prev) => (prev === "income" ? "all" : "income"))
-            }
+            accessibilityRole="button"
+            accessibilityState={{ selected: totalsFilter === "income" }}
+            onPress={() => toggleType("income")}
             style={[
               styles.totalCard,
               totalsFilter === "income" && styles.totalCardActive,
@@ -216,23 +212,26 @@ export default function TransactionScreen() {
                 style={styles.totalSkeleton}
               />
             ) : (
-              <Text
+              <AmountText
                 style={[
                   styles.expense,
                   totalsFilter === "income" && styles.totalLabelActive,
                 ]}
-              >
-                {data ? formatCurrency(data.summary.totalIncome) : "€0.00"}
-              </Text>
+                formatValue={(compact) =>
+                  !error && data
+                    ? formatCurrency(data.summary.totalIncome, undefined, {
+                        compact,
+                      })
+                    : "—"
+                }
+              />
             )}
           </Pressable>
 
           <Pressable
-            onPress={() =>
-              setTotalsFilter((prev) =>
-                prev === "expense" ? "all" : "expense",
-              )
-            }
+            accessibilityRole="button"
+            accessibilityState={{ selected: totalsFilter === "expense" }}
+            onPress={() => toggleType("expense")}
             style={[
               styles.totalCard,
               totalsFilter === "expense" && styles.totalCardActive,
@@ -266,19 +265,27 @@ export default function TransactionScreen() {
                 style={styles.totalSkeleton}
               />
             ) : (
-              <Text
+              <AmountText
                 style={[
                   styles.expense,
                   totalsFilter === "expense" && styles.totalLabelActive,
                 ]}
-              >
-                {data ? formatCurrency(data.summary.totalExpense) : "€0.00"}
-              </Text>
+                formatValue={(compact) =>
+                  !error && data
+                    ? formatCurrency(data.summary.totalExpense, undefined, {
+                        compact,
+                      })
+                    : "—"
+                }
+              />
             )}
           </Pressable>
         </View>
 
         <View
+          onLayout={(event) => {
+            listTop.current = event.nativeEvent.layout.y;
+          }}
           style={[styles.cardWrapper, isDesktop && styles.cardWrapperDesktop]}
         >
           <View style={styles.cardHeader}>
@@ -287,6 +294,26 @@ export default function TransactionScreen() {
             </Text>
 
             <View style={styles.listHeaderActions}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t("transactions.browse.search")}
+                accessibilityState={{ expanded: searchVisible }}
+                style={[
+                  styles.listHeaderIconButton,
+                  searchVisible && styles.listHeaderIconButtonActive,
+                ]}
+                onPress={() => {
+                  setSearchVisible((value) => !value);
+                  if (searchVisible) clearSearch();
+                }}
+              >
+                 <Icon
+                  name="search"
+                  size={21}
+                  strokeWidth={1.6}
+                  color={searchVisible ? WHITE : DARK_GREEN}
+                />
+              </Pressable>
               <Pressable
                 onPress={selectCsvFile}
                 style={styles.listHeaderIconButton}
@@ -302,6 +329,8 @@ export default function TransactionScreen() {
               </Pressable>
 
               <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t("transactions.categoryFilter.title")}
                 onPress={() => setIsCategoryModalVisible(true)}
                 style={[
                   styles.listHeaderIconButton,
@@ -334,6 +363,8 @@ export default function TransactionScreen() {
               )}
 
               <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t("transactions.calendarFilter.title")}
                 onPress={() => setIsCalendarFilterModalVisible(true)}
                 style={[
                   styles.listHeaderIconButton,
@@ -350,12 +381,105 @@ export default function TransactionScreen() {
             </View>
           </View>
 
+          {searchVisible && (
+            <View style={styles.searchPanel}>
+              <View style={styles.searchRow}>
+                <TextInput
+                  autoFocus
+                  accessibilityLabel={t(
+                    "transactions.browse.searchPlaceholder",
+                  )}
+                  placeholder={t("transactions.browse.searchPlaceholder")}
+                  value={searchInput}
+                  onChangeText={setSearchInput}
+                  maxLength={200}
+                  autoCorrect={false}
+                  returnKeyType="search"
+                  style={styles.searchInput}
+                />
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t("transactions.browse.clearSearch")}
+                  onPress={clearSearch}
+                  style={styles.searchClear}
+                >
+                  <Icon name="close" size={16} color={DARK_GREEN} />
+                </Pressable>
+              </View>
+              <Text style={styles.searchHint}>
+                {formatPeriod(
+                  selectedDateRange,
+                  i18n.locale,
+                  t("transactions.browse.allTime"),
+                )}
+              </Text>
+              {hasSelectedDateRange && (
+                <Pressable
+                  accessibilityRole="button"
+                  style={styles.searchScope}
+                  onPress={() =>
+                    setSelectedDateRange({ startDate: null, endDate: null })
+                  }
+                >
+                  <Text style={styles.label}>
+                    {t("transactions.browse.searchAllYears")}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+          )}
+          {(totalsFilter !== "all" ||
+            selectedCategoryIds.length > 0 ||
+            Boolean(filters.search)) && (
+            <Text style={styles.searchHint}>
+              {t("transactions.browse.totalsHint")}
+            </Text>
+          )}
           <View style={styles.cardContent}>
-            {showInitialSkeleton ? (
+            {error ? (
+              <Pressable accessibilityRole="button" onPress={loadTransactions}>
+                <Text style={styles.label}>
+                  {t("transactions.browse.loadError")}
+                </Text>
+                <Text style={styles.label}>{t("common.retry")}</Text>
+              </Pressable>
+            ) : showInitialSkeleton ? (
               <TransactionsListSkeleton />
+            ) : data?.pagination.total === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.label}>
+                  {t(
+                    filters.search ||
+                      selectedCategoryIds.length ||
+                      totalsFilter !== "all"
+                      ? "transactions.browse.noMatches"
+                      : "transactions.browse.emptyPeriod",
+                  )}
+                </Text>
+                {(filters.search ||
+                  selectedCategoryIds.length > 0 ||
+                  totalsFilter !== "all") && (
+                  <Pressable
+                    accessibilityRole="button"
+                    style={styles.searchScope}
+                    onPress={() => {
+                      clearSearch();
+                      updateFilters({
+                        type: "all",
+                        categoryIds: [],
+                        search: "",
+                      });
+                    }}
+                  >
+                    <Text style={styles.label}>
+                      {t("transactions.browse.clearFilters")}
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
             ) : (
               <TransactionsGroupedList
-                groups={filteredGroups}
+                groups={data?.groups ?? []}
                 isDesktop={isDesktop}
                 onChanged={loadTransactions}
                 onDeleteTransaction={handleDeleteTransaction}
@@ -363,6 +487,13 @@ export default function TransactionScreen() {
               />
             )}
           </View>
+          {data && !error && (
+            <TransactionPagination
+              pagination={data.pagination}
+              loading={isLoading}
+              onPageChange={changePage}
+            />
+          )}
         </View>
       </ScrollView>
 
@@ -456,6 +587,13 @@ const styles = StyleSheet.create({
   balanceCardDesktop: {
     paddingVertical: 30,
     marginBottom: 20,
+  },
+
+  periodLabel: {
+    color: DARK_GREEN,
+    fontFamily: fonts.semibold,
+    textAlign: "center",
+    fontSize: 15,
   },
 
   balanceCardLabel: {
@@ -569,6 +707,8 @@ const styles = StyleSheet.create({
   },
 
   cardHeader: {
+    flexWrap: "wrap",
+    gap: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -588,8 +728,8 @@ const styles = StyleSheet.create({
   },
 
   listHeaderIconButton: {
-    width: 33,
-    height: 33,
+    width: 44,
+    height: 44,
     borderRadius: 10,
     backgroundColor: TAB_GREEN,
     alignItems: "center",
@@ -600,6 +740,35 @@ const styles = StyleSheet.create({
     backgroundColor: MINT,
   },
 
+  searchPanel: { gap: 8, marginBottom: 14 },
+  searchRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  searchInput: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 44,
+    borderWidth: 1,
+    borderColor: TAB_GREEN,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    color: DARK_GREEN,
+    backgroundColor: WHITE,
+  },
+  searchClear: {
+    minHeight: 44,
+    minWidth: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  searchHint: { fontSize: 12, color: MUTED, marginBottom: 8 },
+  searchScope: {
+    minHeight: 44,
+    justifyContent: "center",
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    backgroundColor: TAB_GREEN,
+    borderRadius: 10,
+  },
+  emptyState: { paddingVertical: 24, gap: 12, alignItems: "center" },
   cardContent: {
     paddingBottom: 2,
   },

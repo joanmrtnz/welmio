@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   View,
   Text,
@@ -256,14 +257,24 @@ export default function GoalsScreen() {
         >
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>{t("goals.summary.totalSaved")}</Text>
-            <Text style={styles.balance}>{formatCurrency(totalSaved)}</Text>
+            <AmountText
+              style={styles.balance}
+              formatValue={(compact) =>
+                formatCurrency(totalSaved, undefined, { compact })
+              }
+            />
           </View>
 
           <View style={styles.separator} />
 
           <View style={styles.balanceColumn}>
             <Text style={styles.label}>{t("goals.summary.targetAmount")}</Text>
-            <Text style={styles.expense}>{formatCurrency(totalTarget)}</Text>
+            <AmountText
+              style={styles.expense}
+              formatValue={(compact) =>
+                formatCurrency(totalTarget, undefined, { compact })
+              }
+            />
           </View>
         </View>
 
@@ -299,30 +310,47 @@ export default function GoalsScreen() {
               <View style={styles.mainGoalIcon}>
                 <Icon
                   name={(mainGoal.icon ?? "target") as never}
-                  size={32}
+                  size={34}
                   color={BUTTON_GREEN}
-                  strokeWidth={1.6}
+                  strokeWidth={1.2}
                 />
               </View>
             </View>
 
             <View style={styles.bigProgressRow}>
-              <View style={styles.progressCircle}>
-                <Text style={styles.progressCircleValue}>
-                  {mainGoal.progress}%
-                </Text>
+              <View style={styles.mainGoalProgress}>
+                <View style={styles.progressCircle}>
+                  <Text style={styles.progressCircleValue}>
+                    {mainGoal.progress}%
+                  </Text>
+                </View>
+                <View style={styles.statusBadge}>
+                  <Text style={styles.filterText}>
+                    {formatGoalStatusLabel(mainGoal.status)}
+                  </Text>
+                </View>
               </View>
 
               <View style={styles.mainGoalInfo}>
-                <Text style={styles.goalAmount} numberOfLines={1}>
-                  {formatCurrency(mainGoal.saved)}
-                </Text>
+                <AmountText
+                  style={styles.goalAmount}
+                  numberOfLines={1}
+                  formatValue={(compact) =>
+                    formatCurrency(mainGoal.saved, undefined, { compact })
+                  }
+                />
 
-                <Text style={styles.goalMeta} numberOfLines={1}>
-                  {t("goals.mainGoal.savedOf", {
-                    amount: formatCurrency(mainGoal.target),
-                  })}
-                </Text>
+                <AmountText
+                  style={styles.goalMeta}
+                  numberOfLines={1}
+                  formatValue={(compact) =>
+                    t("goals.mainGoal.savedOf", {
+                      amount: formatCurrency(mainGoal.target, undefined, {
+                        compact,
+                      }),
+                    })
+                  }
+                />
 
                 <Text style={styles.goalMeta} numberOfLines={1}>
                   {t("goals.mainGoal.targetDate", {
@@ -367,9 +395,12 @@ export default function GoalsScreen() {
             <Text style={styles.paceLabel}>
               {t("goals.pace.monthlyNeeded")}
             </Text>
-            <Text style={styles.paceValue}>
-              {formatCurrency(totalMonthlyNeeded)}
-            </Text>
+            <AmountText
+              style={styles.paceValue}
+              formatValue={(compact) =>
+                formatCurrency(totalMonthlyNeeded, undefined, { compact })
+              }
+            />
           </View>
 
           <View style={styles.paceSeparator} />
@@ -389,10 +420,6 @@ export default function GoalsScreen() {
           <Text style={styles.sectionTitle}>{t("goals.list.title")}</Text>
 
           <View style={styles.sectionActions}>
-            <Pressable style={styles.filterButton}>
-              <Text style={styles.filterText}>{t("goals.filters.active")}</Text>
-            </Pressable>
-
             {isDesktop && (
               <Pressable
                 style={styles.addGoalButton}
@@ -437,8 +464,15 @@ export default function GoalsScreen() {
                   </View>
                 </View>
 
-                <View style={styles.percentBadge}>
-                  <Text style={styles.percentText}>{goal.progress}%</Text>
+                <View style={styles.goalBadges}>
+                  <View style={styles.statusBadge}>
+                    <Text style={styles.filterText}>
+                      {formatGoalStatusLabel(goal.status)}
+                    </Text>
+                  </View>
+                  <View style={styles.percentBadge}>
+                    <Text style={styles.percentText}>{goal.progress}%</Text>
+                  </View>
                 </View>
               </View>
 
@@ -452,15 +486,25 @@ export default function GoalsScreen() {
               </View>
 
               <View style={styles.goalBottomRow}>
-                <Text style={styles.goalSmallText} numberOfLines={1}>
-                  {t("goals.list.savedAmount", {
-                    amount: formatCurrency(goal.saved),
-                  })}
-                </Text>
+                <AmountText
+                  style={styles.goalSmallText}
+                  numberOfLines={1}
+                  formatValue={(compact) =>
+                    t("goals.list.savedAmount", {
+                      amount: formatCurrency(goal.saved, undefined, {
+                        compact,
+                      }),
+                    })
+                  }
+                />
 
-                <Text style={styles.goalSmallText} numberOfLines={1}>
-                  {formatCurrency(goal.target)}
-                </Text>
+                <AmountText
+                  style={styles.goalSmallText}
+                  numberOfLines={1}
+                  formatValue={(compact) =>
+                    formatCurrency(goal.target, undefined, { compact })
+                  }
+                />
               </View>
             </Pressable>
           ))}
@@ -473,14 +517,21 @@ export default function GoalsScreen() {
 
           <View style={styles.tipContent}>
             <Text style={styles.tipTitle}>{t("goals.smartTip.title")}</Text>
-            <Text style={styles.tipText}>
-              {mainGoal
-                ? t("goals.smartTip.withMainGoal", {
-                    amount: formatCurrency(mainGoal.monthlyNeeded),
-                    goalName: mainGoal.name.toLowerCase(),
-                  })
-                : t("goals.smartTip.empty")}
-            </Text>
+            <AmountText
+              style={styles.tipText}
+              formatValue={(compact) =>
+                mainGoal
+                  ? t("goals.smartTip.withMainGoal", {
+                      amount: formatCurrency(
+                        mainGoal.monthlyNeeded,
+                        undefined,
+                        { compact },
+                      ),
+                      goalName: mainGoal.name.toLowerCase(),
+                    })
+                  : t("goals.smartTip.empty")
+              }
+            />
           </View>
         </View>
           </>
@@ -741,6 +792,12 @@ const styles = StyleSheet.create({
     marginBottom: 17,
   },
 
+  mainGoalProgress: {
+    alignItems: "center",
+    gap: 8,
+    marginRight: 18,
+  },
+
   progressCircle: {
     width: 82,
     height: 82,
@@ -749,7 +806,6 @@ const styles = StyleSheet.create({
     borderColor: "rgba(16, 185, 146, 0.25)",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 18,
     backgroundColor: WHITE,
   },
 
@@ -865,7 +921,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 
-  filterButton: {
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     backgroundColor: DIVIDER_GREEN,
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -926,6 +985,7 @@ const styles = StyleSheet.create({
 
   goalLeft: {
     flex: 1,
+    minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -958,6 +1018,15 @@ const styles = StyleSheet.create({
     opacity: 0.66,
     marginTop: 5,
     lineHeight: 15,
+  },
+
+  goalBadges: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 8,
+    maxWidth: "50%",
   },
 
   percentBadge: {

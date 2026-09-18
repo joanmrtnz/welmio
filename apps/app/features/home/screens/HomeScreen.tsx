@@ -1,3 +1,4 @@
+import { AmountText } from "@/components/ui/amount-text/AmountText";
 import {
   Pressable,
   ScrollView,
@@ -14,6 +15,7 @@ import i18n, { t } from "@/lib/i18n";
 import { Icon } from "@/components/icons/Icon";
 import { apiFetch } from "@/lib/api/client";
 import type {
+  BrowseTransactionsResponse,
   GoalsOverviewResponse,
   TransactionsOverviewResponse,
 } from "@repo/shared-types";
@@ -23,6 +25,7 @@ import { useAnalytics } from "@/features/analytics/hooks/useAnalytics";
 import { getGoalsOverview } from "@/features/goals/services/goals.service";
 import { QuickGoalsRow } from "@/features/goals/components/quick-goals-row/QuickGoalsRow";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { presetRange, rangeQuery } from "@/features/transactions/utils/dateRange";
 import { getUserProfile } from "@/features/profile/services/profile-service";
 import { getGreetingLabel } from "./utils/getGreetingLabel";
 import { AVATAR_IMAGES, type AvatarId } from "@/features/profile/components/AvatarPickerModal";
@@ -106,6 +109,7 @@ export default function HomeScreen() {
   const isDesktop = width >= DESKTOP_BREAKPOINT;
   const [transactionsOverview, setTransactionsOverview] =
     useState<TransactionsOverviewResponse | null>(null);
+  const [currentMonthExpense, setCurrentMonthExpense] = useState<string | null>(null);
   const [goalsOverview, setGoalsOverview] =
     useState<GoalsOverviewResponse | null>(null);
   const [fullName, setFullName] = useState("");
@@ -176,16 +180,34 @@ export default function HomeScreen() {
   const selectedAvatarImage = AVATAR_IMAGES[avatarId];
 
   const totalBalance = transactionsOverview?.summary.totalBalance ?? 0;
-  const totalExpense = transactionsOverview?.summary.totalExpense ?? 0;
 
   const loadTransactionsOverview = useCallback(async () => {
     try {
       setIsTransactionsLoading(true);
-      const response = await apiFetch<TransactionsOverviewResponse>(
-        "/transactions/overview",
-      );
+      setCurrentMonthExpense(null);
+      const today = new Date();
+      const bounds = rangeQuery({
+        ...presetRange("thisMonth", today),
+        endDate: today,
+      });
+      const params = new URLSearchParams({ pageSize: "1" });
+      if (bounds.startDate) params.set("startDate", bounds.startDate);
+      if (bounds.endDate) params.set("endDate", bounds.endDate);
+      const [overview, monthlyExpenses] = await Promise.allSettled([
+        apiFetch<TransactionsOverviewResponse>("/transactions/overview"),
+        apiFetch<BrowseTransactionsResponse>(`/transactions/browse?${params}`),
+      ]);
 
-      setTransactionsOverview(response);
+      if (overview.status === "fulfilled") {
+        setTransactionsOverview(overview.value);
+      } else {
+        console.warn("[HomeScreen] load transactions overview error:", overview.reason);
+      }
+      if (monthlyExpenses.status === "fulfilled") {
+        setCurrentMonthExpense(monthlyExpenses.value.summary.totalExpense);
+      } else {
+        console.warn("[HomeScreen] load current month expenses error:", monthlyExpenses.reason);
+      }
     } catch (error) {
       console.warn("[HomeScreen] load transactions overview error:", error);
     } finally {
@@ -288,9 +310,12 @@ export default function HomeScreen() {
               {isTransactionsLoading && !transactionsOverview ? (
                 <SkeletonText width={96} height={19} style={styles.skeletonTextGap} />
               ) : (
-                <Text style={styles.overviewPositive}>
-                  {formatCurrency(totalBalance)}
-                </Text>
+                <AmountText
+                  style={styles.overviewPositive}
+                  formatValue={(compact) =>
+                    formatCurrency(totalBalance, undefined, { compact })
+                  }
+                />
               )}
             </View>
           </Pressable>
@@ -301,13 +326,18 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.overviewTextWrap}>
-              <Text style={styles.overviewLabel}>{t("home.overview.totalExpense")}</Text>
-              {isTransactionsLoading && !transactionsOverview ? (
+              <Text style={styles.overviewLabel}>{t("home.overview.currentMonthExpense")}</Text>
+              {isTransactionsLoading && currentMonthExpense === null ? (
                 <SkeletonText width={96} height={19} style={styles.skeletonTextGap} />
               ) : (
-                <Text style={styles.overviewAmount}>
-                  -{formatCurrency(totalExpense)}
-                </Text>
+                <AmountText
+                  style={styles.overviewAmount}
+                  formatValue={(compact) =>
+                    currentMonthExpense === null
+                      ? "—"
+                      : "-" + formatCurrency(currentMonthExpense, undefined, { compact })
+                  }
+                />
               )}
             </View>
           </Pressable>

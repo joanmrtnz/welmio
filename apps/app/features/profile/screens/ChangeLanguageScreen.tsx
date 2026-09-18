@@ -128,23 +128,7 @@ export default function ChangeLanguageScreen() {
               </View>
             </View>
 
-            <View
-              style={[styles.noticeCard, isDesktop && styles.noticeCardDesktop]}
-            >
-              <View style={styles.noticeIcon}>
-                <FontAwesome name="globe" size={28} color={TEAL} />
-              </View>
 
-              <View style={styles.noticeTextWrap}>
-                <Text style={styles.noticeTitle}>
-                  {t("profile.language.notice.title")}
-                </Text>
-
-                <Text style={styles.noticeText}>
-                  {t("profile.language.notice.description")}
-                </Text>
-              </View>
-            </View>
           </View>
 
           <View style={[styles.formCard, isDesktop && styles.formCardDesktop]}>
@@ -322,55 +306,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     lineHeight: 19,
     textAlign: "center",
-  },
-
-  noticeCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    backgroundColor: CARD,
-    borderRadius: 18,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 18,
-    shadowColor: "#000",
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 1,
-  },
-
-  noticeCardDesktop: {
-    marginBottom: 0,
-    paddingHorizontal: 18,
-    paddingVertical: 18,
-  },
-
-  noticeIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 16,
-    backgroundColor: VERY_SOFT_TEAL,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  noticeTextWrap: {
-    flex: 1,
-  },
-
-  noticeTitle: {
-    fontSize: 14,
-    color: DARK_TEAL,
-    fontFamily: fonts.bold,
-    marginBottom: 3,
-  },
-
-  noticeText: {
-    fontSize: 12,
-    color: MUTED,
-    fontFamily: fonts.regular,
-    lineHeight: 17,
   },
 
   formCard: {

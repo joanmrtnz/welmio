@@ -1,22 +1,27 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   Pressable,
+  ScrollView,
+  StyleSheet,
   Text,
+  TextInput,
   useWindowDimensions,
   View,
 } from "react-native";
-
+import type { CalendarFilterModalProps, DateRange } from "@repo/shared-types";
+import { i18n, t } from "@/lib/i18n";
 import { Icon } from "@/components/icons/Icon";
-import i18n, { t } from "@/lib/i18n";
-
+import { styles } from "./calendarFilterModal.styles";
 import {
-  calendarFilterModalColors,
-  styles,
-} from "./calendarFilterModal.styles";
-import { CalendarFilterModalProps, DateRange } from "@repo/shared-types";
+  dateInputValue,
+  monthRange,
+  parseDateInput,
+  presetRange,
+  type DatePreset,
+} from "../../utils/dateRange";
 
-const WEEK_DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const PRESETS: DatePreset[] = ["thisMonth", "lastMonth", "thisYear", "allTime"];
 
 export function CalendarFilterModal({
   visible,
@@ -24,215 +29,195 @@ export function CalendarFilterModal({
   onClose,
   onApply,
 }: CalendarFilterModalProps) {
-  const [currentMonth, setCurrentMonth] = useState(() => new Date());
-  const [draftRange, setDraftRange] = useState<DateRange>(selectedRange);
   const { width } = useWindowDimensions();
-  const isDesktop = width >= 768;
+  const desktop = width >= 768;
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [year, setYear] = useState("");
+  const activePreset = PRESETS.find((preset) => {
+    const range = presetRange(preset);
+    return (
+      from === dateInputValue(range.startDate) &&
+      to === dateInputValue(range.endDate)
+    );
+  });
 
-  const { BLACK } = calendarFilterModalColors;
+  function setDraft(range: DateRange) {
+    setFrom(dateInputValue(range.startDate));
+    setTo(dateInputValue(range.endDate));
+  }
 
-  const monthDays = useMemo(() => {
-    return getCalendarMonthDays(currentMonth);
-  }, [currentMonth]);
-
-  const monthTitle = useMemo(() => {
-    return currentMonth.toLocaleDateString(i18n.locale, {
-      month: "long",
-      year: "numeric",
-    });
-  }, [currentMonth]);
-
-  function handleClose() {
-    setDraftRange(selectedRange);
+  function applyRange(range: DateRange) {
+    onApply(range);
     onClose();
   }
 
-  function handlePreviousMonth() {
-    setCurrentMonth((prev) => {
-      const next = new Date(prev);
-      next.setMonth(prev.getMonth() - 1);
-      return next;
-    });
-  }
+  useEffect(() => {
+    if (visible) {
+      setDraft(selectedRange);
+      setYear(String((selectedRange.startDate ?? new Date()).getFullYear()));
+    }
+  }, [visible, selectedRange]);
 
-  function handleNextMonth() {
-    setCurrentMonth((prev) => {
-      const next = new Date(prev);
-      next.setMonth(prev.getMonth() + 1);
-      return next;
-    });
-  }
-
-  function handleSelectDay(date: Date) {
-    setDraftRange((prev) => {
-      if (!prev.startDate || prev.endDate) {
-        return {
-          startDate: date,
-          endDate: null,
-        };
-      }
-
-      if (isSameDay(prev.startDate, date)) {
-        return {
-          startDate: null,
-          endDate: null,
-        };
-      }
-
-      if (date < prev.startDate) {
-        return {
-          startDate: date,
-          endDate: prev.startDate,
-        };
-      }
-
-      return {
-        startDate: prev.startDate,
-        endDate: date,
-      };
-    });
-  }
-
-  function handleClear() {
-    setDraftRange({
-      startDate: null,
-      endDate: null,
-    });
-  }
-
-  function handleApply() {
-    onApply(draftRange);
-    onClose();
-  }
+  const startDate = parseDateInput(from);
+  const endDate = parseDateInput(to);
+  const allTime = !from && !to;
+  const valid =
+    allTime || Boolean(startDate && endDate && startDate <= endDate);
+  const validYear = /^\d{4}$/.test(year) && Number(year) >= 1000;
 
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={handleClose}
+      onRequestClose={onClose}
     >
       <Pressable
-        style={[styles.backdrop, isDesktop && styles.backdropDesktop]}
-        onPress={handleClose}
+        style={[styles.backdrop, desktop && styles.backdropDesktop]}
+        onPress={onClose}
       >
         <Pressable
-          style={[styles.modalCard, isDesktop && styles.modalCardDesktop]}
+          style={[styles.modalCard, desktop && styles.modalCardDesktop]}
         >
           <View style={styles.header}>
-            <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
+            <Text style={styles.title}>
               {t("transactions.calendarFilter.title")}
             </Text>
-
-            <Pressable onPress={handleClose} style={styles.closeButton}>
-              <Icon name="close" size={15} color={BLACK} />
-            </Pressable>
-          </View>
-
-          <View style={styles.monthHeader}>
             <Pressable
-              onPress={handlePreviousMonth}
-              style={styles.monthArrowButton}
+              accessibilityRole="button"
+              accessibilityLabel={t("common.cancel")}
+              onPress={onClose}
+              style={styles.closeButton}
             >
-              <Icon
-                name="arrowLeft"
-                size={20}
-                strokeWidth={1.5}
-                color={BLACK}
-              />
-            </Pressable>
-
-            <Text
-              style={[styles.monthTitle, isDesktop && styles.monthTitleDesktop]}
-            >
-              {monthTitle}
-            </Text>
-
-            <Pressable
-              onPress={handleNextMonth}
-              style={styles.monthArrowButton}
-            >
-              <Icon
-                name="arrowRight"
-                size={20}
-                strokeWidth={1.5}
-                color={BLACK}
-              />
+              <Icon name="close" size={15} color="#052e2b" />
             </Pressable>
           </View>
-
-          <View style={styles.weekDaysRow}>
-            {WEEK_DAY_KEYS.map((day) => (
-              <Text key={day} style={styles.weekDayText}>
-                {t(`common.weekDays.${day}`)}
-              </Text>
-            ))}
-          </View>
-
-          <View style={[styles.daysGrid, isDesktop && styles.daysGridDesktop]}>
-            {monthDays.map((day, index) => {
-              if (!day) {
-                return (
-                  <View
-                    key={`empty-${index}`}
-                    style={[
-                      styles.dayCell,
-                      isDesktop && styles.dayCellDesktop,
-                    ]}
-                  />
-                );
-              }
-
-              const isStart =
-                draftRange.startDate && isSameDay(day, draftRange.startDate);
-
-              const isEnd =
-                draftRange.endDate && isSameDay(day, draftRange.endDate);
-
-              const isBetween =
-                draftRange.startDate &&
-                draftRange.endDate &&
-                day > draftRange.startDate &&
-                day < draftRange.endDate;
-
-              const isSelected = isStart || isEnd;
-
-              return (
+          <ScrollView keyboardShouldPersistTaps="handled">
+            <View style={local.wrap}>
+              {PRESETS.map((preset) => (
                 <Pressable
-                  key={day.toISOString()}
-                  style={[
-                    styles.dayCell,
-                    isDesktop && styles.dayCellDesktop,
-                    isBetween && styles.dayCellBetween,
-                    isSelected && styles.dayCellSelected,
-                    isSelected && isDesktop && styles.dayCellSelectedDesktop,
-                    isStart && draftRange.endDate && styles.dayCellStart,
-                    isEnd && styles.dayCellEnd,
-                  ]}
-                  onPress={() => handleSelectDay(day)}
+                  key={preset}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: activePreset === preset }}
+                  style={[local.chip, activePreset === preset && local.active]}
+                  onPress={() => {
+                    applyRange(presetRange(preset));
+                  }}
                 >
-                  <Text
-                    style={[
-                      styles.dayText,
-                      isBetween && styles.dayTextBetween,
-                      isSelected && styles.dayTextSelected,
-                    ]}
-                  >
-                    {day.getDate()}
+                  <Text style={local.text}>
+                    {t(`transactions.browse.${preset}`)}
                   </Text>
                 </Pressable>
-              );
-            })}
-          </View>
-
-          <View style={[styles.actions, isDesktop && styles.actionsDesktop]}>
-            <Pressable style={styles.clearButton} onPress={handleClear}>
-              <Text style={styles.clearButtonText}>
-                {t("transactions.calendarFilter.clear")}
+              ))}
+            </View>
+            <Text style={local.label}>
+              {t("transactions.browse.chooseMonth")}
+            </Text>
+            <Text style={local.text}>{t("transactions.browse.year")}</Text>
+            <TextInput
+              accessibilityLabel={t("transactions.browse.year")}
+              value={year}
+              onChangeText={setYear}
+              keyboardType="number-pad"
+              maxLength={4}
+              placeholder={String(new Date().getFullYear())}
+              style={local.input}
+            />
+            <View style={local.wrap}>
+              {Array.from({ length: 12 }, (_, month) => {
+                const range = validYear
+                  ? monthRange(Number(year), month)
+                  : null;
+                const selected = Boolean(
+                  range &&
+                  from === dateInputValue(range.startDate) &&
+                  to === dateInputValue(range.endDate),
+                );
+                return (
+                  <Pressable
+                    key={month}
+                    disabled={!validYear}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: !validYear, selected }}
+                    style={[
+                      local.month,
+                      selected && local.active,
+                      !validYear && local.disabled,
+                    ]}
+                    onPress={() => {
+                      if (range) {
+                        applyRange(range);
+                      }
+                    }}
+                  >
+                    <Text style={local.text}>
+                      {new Date(2024, month, 1).toLocaleDateString(
+                        i18n.locale,
+                        { month: "short" },
+                      )}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Text style={local.label}>
+              {t("transactions.browse.customRange")}
+            </Text>
+            <Text style={local.hint}>{t("transactions.browse.dateHint")}</Text>
+            <View style={local.row}>
+              <View style={local.field}>
+                <Text style={local.text}>{t("transactions.browse.from")}</Text>
+                <TextInput
+                  accessibilityLabel={t("transactions.browse.from")}
+                  style={local.input}
+                  value={from}
+                  placeholder={t("transactions.browse.datePlaceholder")}
+                  maxLength={10}
+                  autoCorrect={false}
+                  onChangeText={(value) => {
+                    setFrom(value);
+                  }}
+                />
+              </View>
+              <View style={local.field}>
+                <Text style={local.text}>{t("transactions.browse.to")}</Text>
+                <TextInput
+                  accessibilityLabel={t("transactions.browse.to")}
+                  style={local.input}
+                  value={to}
+                  placeholder={t("transactions.browse.datePlaceholder")}
+                  maxLength={10}
+                  autoCorrect={false}
+                  onChangeText={(value) => {
+                    setTo(value);
+                  }}
+                />
+              </View>
+            </View>
+            {!valid && (
+              <Text accessibilityRole="alert" style={local.error}>
+                {t("transactions.browse.invalidRange")}
               </Text>
+            )}
+          </ScrollView>
+          <View style={styles.actions}>
+            <Pressable
+              accessibilityRole="button"
+              style={styles.clearButton}
+              onPress={onClose}
+            >
+              <Text style={styles.clearButtonText}>{t("common.cancel")}</Text>
             </Pressable>
-
-            <Pressable style={styles.applyButton} onPress={handleApply}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !valid }}
+              disabled={!valid}
+              style={[styles.applyButton, !valid && local.disabled]}
+              onPress={() => {
+                applyRange({ startDate, endDate });
+              }}
+            >
               <Text style={styles.applyButtonText}>
                 {t("transactions.calendarFilter.applyFilter")}
               </Text>
@@ -244,43 +229,38 @@ export function CalendarFilterModal({
   );
 }
 
-function getCalendarMonthDays(date: Date) {
-  const year = date.getFullYear();
-  const month = date.getMonth();
-
-  const firstDayOfMonth = new Date(year, month, 1);
-  const lastDayOfMonth = new Date(year, month + 1, 0);
-
-  const firstWeekDay = getMondayBasedWeekDay(firstDayOfMonth);
-  const totalDays = lastDayOfMonth.getDate();
-
-  const days: Array<Date | null> = [];
-
-  for (let i = 0; i < firstWeekDay; i += 1) {
-    days.push(null);
-  }
-
-  for (let day = 1; day <= totalDays; day += 1) {
-    days.push(new Date(year, month, day));
-  }
-
-  return days;
-}
-
-function getMondayBasedWeekDay(date: Date) {
-  const day = date.getDay();
-
-  if (day === 0) {
-    return 6;
-  }
-
-  return day - 1;
-}
-
-function isSameDay(firstDate: Date, secondDate: Date) {
-  return (
-    firstDate.getFullYear() === secondDate.getFullYear() &&
-    firstDate.getMonth() === secondDate.getMonth() &&
-    firstDate.getDate() === secondDate.getDate()
-  );
-}
+const local = StyleSheet.create({
+  wrap: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 16 },
+  row: { flexDirection: "row", gap: 12 },
+  field: { flex: 1 },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    backgroundColor: "#eefbf6",
+    borderRadius: 12,
+  },
+  month: {
+    width: "30%",
+    minHeight: 44,
+    padding: 10,
+    alignItems: "center",
+    backgroundColor: "#eefbf6",
+    borderRadius: 10,
+  },
+  active: { backgroundColor: "#93e2c9" },
+  disabled: { opacity: 0.45 },
+  label: { fontSize: 15, fontWeight: "600", color: "#052e2b", marginBottom: 8 },
+  text: { color: "#052e2b", fontSize: 14 },
+  hint: { color: "#5e7b78", fontSize: 12, marginBottom: 12 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#a4cbbd",
+    backgroundColor: "white",
+    borderRadius: 10,
+    minHeight: 44,
+    padding: 12,
+    color: "#052e2b",
+    marginVertical: 8,
+  },
+  error: { color: "#a32727", marginBottom: 12 },
+});

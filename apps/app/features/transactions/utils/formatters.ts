@@ -6,8 +6,9 @@ export function formatSignedAmount(
   amount: string,
   type: "income" | "expense",
   currency = "USD",
+  compact = true,
 ) {
-  const formatted = formatCurrency(amount, currency);
+  const formatted = formatCurrency(amount, currency, { compact });
 
   return type === "expense" ? `-${formatted}` : formatted;
 }
