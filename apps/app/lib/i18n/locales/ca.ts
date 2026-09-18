@@ -652,6 +652,40 @@ const ca = {
   },
 
   transactions: {
+    browse: {
+      datePlaceholder: "AAAA-MM-DD",
+      pageStatus: "Pàgina %{page} de %{totalPages}",
+      search: "Cerca transaccions",
+      searchPlaceholder: "Cerca descripcions o notes",
+      clearSearch: "Esborra la cerca",
+      searchAllYears: "Cerca a tots els anys",
+      totalsHint:
+        "Els totals mostren tot el període seleccionat; els filtres s’apliquen a la llista.",
+      noMatches: "Cap transacció coincideix amb aquests filtres.",
+      emptyPeriod:
+        "No hi ha transaccions en aquest període. Tria un altre interval per explorar l’historial.",
+      clearFilters: "Esborra els filtres de la llista",
+
+      resultCount: "%{from}–%{to} de %{total} transaccions",
+      previous: "Anterior",
+      next: "Següent",
+      loadError: "No s’han pogut carregar les transaccions.",
+
+      periodBalance: "Balanç del període",
+      thisMonth: "Aquest mes",
+      lastMonth: "Mes passat",
+      thisYear: "Aquest any",
+      allTime: "Tot l’historial",
+      chooseMonth: "Ves a un mes",
+      year: "Any",
+      customRange: "Interval personalitzat",
+      dateHint:
+        "Introdueix dates com AAAA-MM-DD. S’inclouen totes dues dates.",
+      from: "Des de",
+      to: "Fins a",
+      invalidRange:
+        "Introdueix dates vàlides, amb Des de anterior o igual a Fins a.",
+    },
     title: "Transaccions",
     income: "Ingressos",
     expense: "Despeses",

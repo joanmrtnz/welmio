@@ -652,6 +652,38 @@ const en = {
   },
 
   transactions: {
+    browse: {
+      datePlaceholder: "YYYY-MM-DD",
+      pageStatus: "Page %{page} of %{totalPages}",
+      search: "Search transactions",
+      searchPlaceholder: "Search descriptions or notes",
+      clearSearch: "Clear search",
+      searchAllYears: "Search all years",
+      totalsHint:
+        "Totals show the full selected period; filters apply to the list.",
+      noMatches: "No transactions match these filters.",
+      emptyPeriod:
+        "No transactions in this period. Choose another date range to browse your history.",
+      clearFilters: "Clear list filters",
+
+      resultCount: "%{from}–%{to} of %{total} transactions",
+      previous: "Previous",
+      next: "Next",
+      loadError: "Could not load transactions.",
+
+      periodBalance: "Period balance",
+      thisMonth: "This month",
+      lastMonth: "Last month",
+      thisYear: "This year",
+      allTime: "All time",
+      chooseMonth: "Jump to a month",
+      year: "Year",
+      customRange: "Custom range",
+      dateHint: "Enter dates as YYYY-MM-DD. Both dates are included.",
+      from: "From",
+      to: "To",
+      invalidRange: "Enter valid dates with From on or before To.",
+    },
     title: "Transactions",
     income: "Income",
     expense: "Expense",
