@@ -506,6 +506,7 @@ const en = {
     },
 
     statusLabels: {
+      cancelled: "Cancelled",
       active: "Active",
       completed: "Completed",
       paused: "Paused",

@@ -318,10 +318,17 @@ export default function GoalsScreen() {
             </View>
 
             <View style={styles.bigProgressRow}>
-              <View style={styles.progressCircle}>
-                <Text style={styles.progressCircleValue}>
-                  {mainGoal.progress}%
-                </Text>
+              <View style={styles.mainGoalProgress}>
+                <View style={styles.progressCircle}>
+                  <Text style={styles.progressCircleValue}>
+                    {mainGoal.progress}%
+                  </Text>
+                </View>
+                <View style={styles.statusBadge}>
+                  <Text style={styles.filterText}>
+                    {formatGoalStatusLabel(mainGoal.status)}
+                  </Text>
+                </View>
               </View>
 
               <View style={styles.mainGoalInfo}>
@@ -413,10 +420,6 @@ export default function GoalsScreen() {
           <Text style={styles.sectionTitle}>{t("goals.list.title")}</Text>
 
           <View style={styles.sectionActions}>
-            <Pressable style={styles.filterButton}>
-              <Text style={styles.filterText}>{t("goals.filters.active")}</Text>
-            </Pressable>
-
             {isDesktop && (
               <Pressable
                 style={styles.addGoalButton}
@@ -461,8 +464,15 @@ export default function GoalsScreen() {
                   </View>
                 </View>
 
-                <View style={styles.percentBadge}>
-                  <Text style={styles.percentText}>{goal.progress}%</Text>
+                <View style={styles.goalBadges}>
+                  <View style={styles.statusBadge}>
+                    <Text style={styles.filterText}>
+                      {formatGoalStatusLabel(goal.status)}
+                    </Text>
+                  </View>
+                  <View style={styles.percentBadge}>
+                    <Text style={styles.percentText}>{goal.progress}%</Text>
+                  </View>
                 </View>
               </View>
 
@@ -782,6 +792,12 @@ const styles = StyleSheet.create({
     marginBottom: 17,
   },
 
+  mainGoalProgress: {
+    alignItems: "center",
+    gap: 8,
+    marginRight: 18,
+  },
+
   progressCircle: {
     width: 82,
     height: 82,
@@ -790,7 +806,6 @@ const styles = StyleSheet.create({
     borderColor: "rgba(16, 185, 146, 0.25)",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 18,
     backgroundColor: WHITE,
   },
 
@@ -906,7 +921,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 
-  filterButton: {
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     backgroundColor: DIVIDER_GREEN,
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -967,6 +985,7 @@ const styles = StyleSheet.create({
 
   goalLeft: {
     flex: 1,
+    minWidth: 0,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -999,6 +1018,15 @@ const styles = StyleSheet.create({
     opacity: 0.66,
     marginTop: 5,
     lineHeight: 15,
+  },
+
+  goalBadges: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 8,
+    maxWidth: "50%",
   },
 
   percentBadge: {

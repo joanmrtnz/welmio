@@ -506,6 +506,7 @@ const ca = {
     },
 
     statusLabels: {
+      cancelled: "Cancel·lat",
       active: "Actiu",
       completed: "Completat",
       paused: "Pausat",
